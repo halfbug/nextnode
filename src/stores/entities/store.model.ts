@@ -2,21 +2,18 @@ import { Column, Entity, ObjectIdColumn, PrimaryColumn } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
 
 @Entity()
-export default class Product extends DefaultColumnsService {
-  @ObjectIdColumn()
-  _id: string;
-
+export default class Store extends DefaultColumnsService {
   @PrimaryColumn()
-  shopifyId: string;
+  shopifySessionId: string;
 
   @Column()
-  storeId: string;
+  brandName: string;
 
   @Column()
-  image: string;
+  shop: string;
 
   @Column()
-  name: string;
+  accessToken: string;
 
   @Column()
   price: number;

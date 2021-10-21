@@ -1,18 +1,18 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 @ObjectType()
-export class Product {
+export class Store {
   @Field(() => ID)
-  shopifyId: string;
+  shopifySessionId: string;
 
   @Field()
-  storeId: string;
+  brandName: string;
 
   @Field()
-  image: string;
+  shop: string;
 
   @Field()
-  name: string;
+  accessToken: string;
 
   @Field()
   price: number;

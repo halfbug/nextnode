@@ -2,27 +2,15 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { StoreService } from './store/store.service';
 import { ShopifyStoreController } from './shopify-store.controller';
-import { ConfigService } from '@nestjs/config';
-import Shopify, { ApiVersion, AuthQuery } from '@shopify/shopify-api';
+import { ProductService } from './product/product.service';
+import { ShopifyService } from './shopify/shopify.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Global()
 @Module({
-  imports: [ConfigModule],
-  providers: [StoreService],
+  imports: [ConfigModule, HttpModule],
+  providers: [StoreService, ProductService, ShopifyService],
   controllers: [ShopifyStoreController],
+  exports: [StoreService, ProductService, ShopifyService],
 })
-export class ShopifyStoreModule {
-  protected shopify;
-  constructor(private configService: ConfigService) {
-    this.shopify = Shopify.Context.initialize({
-      API_KEY: configService.get('SHOPIFY_API_KEY'),
-      API_SECRET_KEY: configService.get('SHOPIFY_API_SECRET'),
-      SCOPES: configService.get('SCOPES').split(','),
-      HOST_NAME: configService.get('HOST').replace(/https:\/\//, ''),
-      API_VERSION: ApiVersion.October20,
-      IS_EMBEDDED_APP: false,
-      // This should be replaced with your preferred storage strategy
-      SESSION_STORAGE: new Shopify.Session.MemorySessionStorage(),
-    });
-  }
-}
+export class ShopifyStoreModule {}
