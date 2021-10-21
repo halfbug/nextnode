@@ -5,7 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import Product from './products/entities/product.model';
 import { ProductsModule } from './products/products.module';
 import { ShopifyStoreModule } from './shopify-store/shopify-store.module';
-import { StoreService } from './shopify-store/store/store.service';
+// import { StoresModule } from './stores/stores.module';
+import { UtilsModule } from './utils/utils.module';
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { StoreService } from './shopify-store/store/store.service';
     }),
     ProductsModule,
     ShopifyStoreModule,
+    // StoresModule,
+    UtilsModule,
   ],
-  // providers: [StoreService],
 })
 export class AppModule {}
