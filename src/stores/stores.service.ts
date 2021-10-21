@@ -1,11 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateStoreInput } from './dto/create-store.input';
 import { UpdateStoreInput } from './dto/update-store.input';
+import Store from './entities/store.model';
 
 @Injectable()
 export class StoresService {
+  constructor(
+    @InjectRepository(Store) private storeRepository: Repository<Store>,
+  ) {}
   create(createStoreInput: CreateStoreInput) {
-    return 'This action adds a new store';
+    const store = this.storeRepository.create(createStoreInput);
+    return this.storeRepository.save(store);
   }
 
   findAll() {

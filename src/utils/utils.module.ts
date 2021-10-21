@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-// import { DefaultColumnsService } from './default-columns/default-columns.service';
+import { DefaultColumnsService } from './default-columns/default-columns.service';
 
 @Module({
-  providers: [],
+  providers: [DefaultColumnsService],
+  exports: [DefaultColumnsService],
 })
 export class UtilsModule {}
