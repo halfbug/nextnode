@@ -6,7 +6,7 @@ export default class Store extends DefaultColumnsService {
   @PrimaryColumn()
   shopifySessionId: string;
 
-  @Column()
+  @Column({ nullable: true })
   brandName: string;
 
   @Column()
@@ -15,6 +15,6 @@ export default class Store extends DefaultColumnsService {
   @Column()
   accessToken: string;
 
-  @Column()
+  @Column({ nullable: true })
   price: number;
 }

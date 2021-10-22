@@ -5,8 +5,8 @@ export class Store {
   @Field(() => ID)
   shopifySessionId: string;
 
-  @Field()
-  brandName: string;
+  @Field({ nullable: true })
+  brandName?: string;
 
   @Field()
   shop: string;
@@ -14,6 +14,6 @@ export class Store {
   @Field()
   accessToken: string;
 
-  @Field()
-  price: number;
+  @Field({ nullable: true })
+  price?: number;
 }

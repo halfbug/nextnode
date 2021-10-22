@@ -8,9 +8,18 @@ import { ShopifyStoreModule } from './shopify-store/shopify-store.module';
 import Store from './stores/entities/store.model';
 import { StoresModule } from './stores/stores.module';
 import { UtilsModule } from './utils/utils.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot({
+      // set this to `true` to use wildcards
+      wildcard: true,
+      // the delimiter used to segment namespaces
+      delimiter: '.',
+      // the maximum amount of listeners that can be assigned to an event
+      maxListeners: 20,
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),

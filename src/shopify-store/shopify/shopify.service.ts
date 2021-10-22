@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
-import Shopify, {
-  ApiVersion,
-  AuthQuery,
-  SessionInterface,
-} from '@shopify/shopify-api';
+import Shopify, { ApiVersion, AuthQuery } from '@shopify/shopify-api';
 import { HttpService } from '@nestjs/axios';
-import { Session } from '@shopify/shopify-api/dist/auth/session';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { TokenReceivedEvent } from '../events/token-received.event';
 
 @Injectable()
 export class ShopifyService {
@@ -15,6 +12,7 @@ export class ShopifyService {
   constructor(
     private configService: ConfigService,
     private httpService: HttpService,
+    private eventEmitter: EventEmitter2,
   ) {
     Shopify.Context.initialize({
       API_KEY: configService.get('SHOPIFY_API_KEY'),
@@ -60,7 +58,12 @@ export class ShopifyService {
   }
 
   async offlineSession(shop: string) {
-    return await Shopify.Utils.loadOfflineSession(shop);
+    const session = await Shopify.Utils.loadOfflineSession(shop);
+    const tokenReceivedEvent = new TokenReceivedEvent();
+    tokenReceivedEvent.token = session.accessToken;
+    tokenReceivedEvent.session = session;
+    this.eventEmitter.emit('token.received', tokenReceivedEvent);
+    return session;
   }
 
   offlineSessionID(shop: string) {

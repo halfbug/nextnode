@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { ShopifyService } from './shopify/shopify.service';
 import { StoreService } from './store/store.service';
 
-@Controller('shopify-store')
+@Controller()
 export class ShopifyStoreController {
   constructor(
     private storeService: StoreService,
@@ -49,5 +49,9 @@ export class ShopifyStoreController {
     }
     // return products;
     return console.log('not done yet');
+  }
+  @Get('test')
+  async test() {
+    return 'running server on port 5000';
   }
 }
