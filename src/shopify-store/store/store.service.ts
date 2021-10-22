@@ -47,6 +47,11 @@ export class StoreService {
 
   async callback(req, res) {
     await this.shopifyapi.validateAuth(req, res);
-    return res.redirect('/shopify-store/load-products'); // wherever you want your user to end up after OAuth completes
+    await this.shopifyapi.offlineSession(this.configService.get('SHOP'));
+    return res.redirect(this.configService.get('FRONT')); // wherever you want your user to end up after OAuth completes
+  }
+
+  async loadSession() {
+    await this.shopifyapi.offlineSession(this.configService.get('SHOP'));
   }
 }
