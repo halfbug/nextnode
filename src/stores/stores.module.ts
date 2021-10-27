@@ -9,5 +9,6 @@ import { ShopifyAPIListener } from './listeners/shopify.listener';
 @Module({
   imports: [TypeOrmModule.forFeature([Store]), DefaultColumnsService],
   providers: [StoresResolver, StoresService, ShopifyAPIListener],
+  exports: [StoresService],
 })
 export class StoresModule {}

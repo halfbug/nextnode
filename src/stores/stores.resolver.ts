@@ -19,8 +19,8 @@ export class StoresResolver {
   }
 
   @Query(() => Store, { name: 'store' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.storesService.findOne(id);
+  findOne(@Args('shop', { type: () => Int }) shop: string) {
+    return this.storesService.findOne(shop);
   }
 
   @Mutation(() => Store)
