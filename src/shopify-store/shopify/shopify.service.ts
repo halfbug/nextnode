@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
-import Shopify, { ApiVersion, AuthQuery } from '@shopify/shopify-api';
+import Shopify, {
+  ApiVersion,
+  AuthQuery,
+  RegisterReturn,
+} from '@shopify/shopify-api';
 import { HttpService } from '@nestjs/axios';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { TokenReceivedEvent } from '../events/token-received.event';
@@ -30,20 +34,12 @@ export class ShopifyService {
     return await Shopify.Utils.loadCurrentSession(req, res, false);
   }
 
-  async client(shop: string) {
-    const session = await this.offlineSession(shop);
-    // GraphQLClient takes in the shop url and the accessToken for that shop.
-    return new Shopify.Clients.Graphql(session.shop, session.accessToken);
+  async client(shop: string, accessToken: string) {
+    return new Shopify.Clients.Graphql(shop, accessToken);
   }
 
-  async beginAuth(req: Request, res: Response) {
-    return await Shopify.Auth.beginAuth(
-      req,
-      res,
-      this.configService.get('SHOP'),
-      '/callback',
-      false,
-    );
+  async beginAuth(req: Request, res: Response, shop: string) {
+    return await Shopify.Auth.beginAuth(req, res, shop, '/callback', false);
   }
   async validateAuth(req: Request, res: Response) {
     try {
@@ -68,5 +64,29 @@ export class ShopifyService {
 
   offlineSessionID(shop: string) {
     return Shopify.Auth.getOfflineSessionId(shop);
+  }
+
+  async registerHook(shop, accessToken, path, topic) {
+    try {
+      const response = await Shopify.Webhooks.Registry.register({
+        shop,
+        accessToken,
+        path,
+        topic,
+        webhookHandler: async (topic, shop, body) => {
+          console.log('inside');
+        },
+      });
+      console.log(JSON.stringify(response));
+      return response;
+    } catch (error) {
+      console.log('error : ', error);
+    }
+
+    // if (!response.success) {
+    //   console.log(
+    //     `Failed to register APP_UNINSTALLED webhook: ${response.result}`,
+    //   );
+    // }
   }
 }

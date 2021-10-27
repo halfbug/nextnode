@@ -4,9 +4,15 @@ import { ProductsResolver } from './products.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import Product from './entities/product.model';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
+import { ProductsReceivedListener } from './listeners/products-received.listener';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product]), DefaultColumnsService],
-  providers: [ProductsResolver, ProductsService],
+  imports: [
+    TypeOrmModule.forFeature([Product]),
+    DefaultColumnsService,
+    HttpModule,
+  ],
+  providers: [ProductsResolver, ProductsService, ProductsReceivedListener],
 })
 export class ProductsModule {}

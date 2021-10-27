@@ -1,37 +1,39 @@
 import { Controller, Get, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ShopifyService } from './shopify/shopify.service';
+import { StoresService } from 'src/stores/stores.service';
 import { StoreService } from './store/store.service';
 
 @Controller()
 export class ShopifyStoreController {
   constructor(
     private storeService: StoreService,
-    private shopifyapi: ShopifyService,
+
+    private storesService: StoresService,
   ) {}
 
   // @Get()
-  // async refreshSession(@Req() req: Request, @Res() res: Response) {
-  //   // const session = await this.shopifyapi.session(req, res);
-  //   const session = await this.shopifyapi.oflineSession(
-  //     'native-roots-dev.myshopify.com',
-  //   );
-  //   // return session;
-  //   // return await this.shopifyapi.session(req, res);
-  //   console.log('inside');
-  //   res.send({ session });
+  // first(@Req() req: Request, @Res() res: Response) {
+  //   console.log(req.query);
+  //   res.send(req.query);
   // }
+
   // @Get('login')
   @Get()
-  login(@Req() req: Request, @Res() res: Response) {
+  async login(@Req() req: Request, @Res() res: Response) {
     console.log('inside login get request');
-    return this.storeService.login(req, res);
+    const { query } = req;
+    const shop = query.shop as string;
+    const store = await this.storesService.findOne(shop);
+    if (store) res.redirect(this.storeService.goToAppfront(store.shop));
+    else return this.storeService.login(req, res, shop);
   }
 
   @Get('callback')
   callback(@Req() req: Request, @Res() res: Response) {
     console.log('inside call back auth end');
-    return this.storeService.callback(req, res);
+    console.log(req.query);
+    console.log(req.body);
+    return this.storeService.callback(req, res, req.query.shop);
   }
 
   @Get('load-products')

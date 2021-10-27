@@ -19,8 +19,8 @@ export class StoresService {
     return `This action returns all stores`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} store`;
+  findOne(shop: string) {
+    return this.storeRepository.findOne({ shop });
   }
 
   update(id: number, updateStoreInput: UpdateStoreInput) {
@@ -29,5 +29,9 @@ export class StoresService {
 
   remove(id: number) {
     return `This action removes a #${id} store`;
+  }
+
+  isExist(shop: string) {
+    return this.storeRepository.findOne({ shop });
   }
 }

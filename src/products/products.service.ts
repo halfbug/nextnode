@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, getMongoManager } from 'typeorm';
 import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
 import Product from './entities/product.model';
@@ -29,5 +29,11 @@ export class ProductsService {
 
   remove(id: number) {
     return `This action removes a #${id} product`;
+  }
+
+  async insertMany(products: []) {
+    const manager = getMongoManager();
+
+    return await manager.insertMany(Product, products);
   }
 }
