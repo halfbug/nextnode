@@ -15,6 +15,6 @@ export default class Store extends DefaultColumnsService {
   @Column()
   accessToken: string;
 
-  @Column({ nullable: true })
-  price: number;
+  @Column({ default: 0 })
+  installationStep: number;
 }

@@ -13,6 +13,7 @@ export class ShopifyAPIListener {
     store.accessToken = event.token;
     store.shop = event.session.shop;
     store.shopifySessionId = event.session.id;
+    store.installationStep = 0;
     this.storeService.create(store).then((res) => {
       console.log(res);
       console.log('done');

@@ -24,7 +24,7 @@ export class ShopifyStoreController {
     const { query } = req;
     const shop = query.shop as string;
     const store = await this.storesService.findOne(shop);
-    if (store) res.redirect(this.storeService.goToAppfront(store.shop));
+    if (store) res.redirect(this.storeService.goToAppfront(store));
     else return this.storeService.login(req, res, shop);
   }
 

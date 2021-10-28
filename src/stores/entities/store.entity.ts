@@ -14,6 +14,6 @@ export class Store {
   @Field()
   accessToken: string;
 
-  @Field({ nullable: true })
-  price?: number;
+  @Field({ defaultValue: 0 })
+  installationStep: number;
 }

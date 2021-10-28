@@ -49,14 +49,19 @@ export class StoreService {
     await this.shopifyapi.validateAuth(req, res);
     await this.shopifyapi.offlineSession(shop);
     res.header('shop', shop);
-    return res.redirect(`${this.configService.get('FRONT')}?shop=${shop}`); // wherever you want your user to end up after OAuth completes
+    return res.redirect(
+      `${this.configService.get('FRONT')}?shop=${shop}&ins=0`,
+    ); // wherever you want your user to end up after OAuth completes
   }
 
   async loadSession() {
     await this.shopifyapi.offlineSession(this.configService.get('SHOP'));
   }
 
-  goToAppfront(shop) {
-    return `${this.configService.get('FRONT')}?shop=${shop}`;
+  goToAppfront(store) {
+    const { _id: storeid, installationStep } = store;
+    return `${this.configService.get(
+      'FRONT',
+    )}?sci=${storeid}&ins=${installationStep}`;
   }
 }
