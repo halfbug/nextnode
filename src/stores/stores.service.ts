@@ -16,7 +16,7 @@ export class StoresService {
   }
 
   findAll() {
-    return `This action returns all stores`;
+    return this.storeRepository.find();
   }
 
   findOne(shop: string) {
