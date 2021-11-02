@@ -3,7 +3,7 @@ import { DefaultColumnsService } from 'src/utils/default-columns/default-columns
 
 @Entity()
 export default class Store extends DefaultColumnsService {
-  @PrimaryColumn()
+  @Column()
   shopifySessionId: string;
 
   @Column({ nullable: true })

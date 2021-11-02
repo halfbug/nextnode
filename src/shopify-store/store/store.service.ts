@@ -49,8 +49,9 @@ export class StoreService {
     await this.shopifyapi.validateAuth(req, res);
     await this.shopifyapi.offlineSession(shop);
     res.header('shop', shop);
+    const shopName = shop.split('.')[0];
     return res.redirect(
-      `${this.configService.get('FRONT')}?shop=${shop}&ins=0`,
+      `${this.configService.get('FRONT')}/shop=${shopName}/0`,
     ); // wherever you want your user to end up after OAuth completes
   }
 
@@ -59,9 +60,8 @@ export class StoreService {
   }
 
   goToAppfront(store) {
-    const { _id: storeid, installationStep } = store;
-    return `${this.configService.get(
-      'FRONT',
-    )}?sci=${storeid}&ins=${installationStep}`;
+    const { shop, installationStep } = store;
+    const shopName = shop.split('.')[0];
+    return `${this.configService.get('FRONT')}/${shopName}/${installationStep}`;
   }
 }

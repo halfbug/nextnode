@@ -4,6 +4,7 @@ import {
   DeleteDateColumn,
   Entity,
   ObjectIdColumn,
+  PrimaryColumn,
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
@@ -12,6 +13,9 @@ import {
 export class DefaultColumnsService {
   @ObjectIdColumn()
   _id: string;
+
+  @PrimaryColumn()
+  id: string;
 
   @Column({ default: 'active' })
   status: string;
@@ -25,6 +29,6 @@ export class DefaultColumnsService {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @VersionColumn()
+  @VersionColumn({ default: 0.1 })
   version: number;
 }

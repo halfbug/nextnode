@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getMongoManager, Like, Repository } from 'typeorm';
 import { CreateStoreInput } from './dto/create-store.input';
 import { UpdateStoreInput } from './dto/update-store.input';
 import Store from './entities/store.model';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class StoresService {
   constructor(
     @InjectRepository(Store) private storeRepository: Repository<Store>,
   ) {}
-  create(createStoreInput: CreateStoreInput) {
-    const store = this.storeRepository.create(createStoreInput);
+  create(createStoreInput: CreateStoreInput): Promise<Store> {
+    const id = uuid();
+    const store = this.storeRepository.create({ id, ...createStoreInput });
     return this.storeRepository.save(store);
   }
 
@@ -23,6 +25,21 @@ export class StoresService {
     return this.storeRepository.findOne({ shop });
   }
 
+  async findOneByName(shop: string) {
+    return await this.storeRepository.findOne({
+      where: {
+        shop: { $regex: `^${shop}*` },
+      },
+    });
+  }
+
+  async findOneById(id: string) {
+    return await this.storeRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+  }
   update(id: number, updateStoreInput: UpdateStoreInput) {
     return `This action updates a #${id} store`;
   }
