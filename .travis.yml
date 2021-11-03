@@ -1,4 +1,7 @@
 language: node_js
+sudo: required
+on:
+    branch: main
 install:
   - yarn install
 script:
