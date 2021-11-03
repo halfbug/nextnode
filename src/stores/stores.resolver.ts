@@ -18,9 +18,14 @@ export class StoresResolver {
     return this.storesService.findAll();
   }
 
+  @Query(() => Store, { name: 'storeName' })
+  findOne(@Args('shop') shop: string) {
+    return this.storesService.findOneByName(shop);
+  }
+
   @Query(() => Store, { name: 'store' })
-  findOne(@Args('shop', { type: () => Int }) shop: string) {
-    return this.storesService.findOne(shop);
+  findOneById(@Args('id') id: string) {
+    return this.storesService.findOneById(id);
   }
 
   @Mutation(() => Store)

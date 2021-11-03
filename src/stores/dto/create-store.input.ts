@@ -2,7 +2,7 @@ import { InputType, ID, Field } from '@nestjs/graphql';
 
 @InputType()
 export class CreateStoreInput {
-  @Field(() => ID)
+  @Field()
   shopifySessionId: string;
 
   @Field({ nullable: true })
