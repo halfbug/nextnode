@@ -2,6 +2,9 @@ import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 @ObjectType()
 export class Store {
+  @Field({ description: 'mongo entity id' })
+  _id: string;
+
   @Field(() => ID)
   id: string;
 
@@ -19,4 +22,7 @@ export class Store {
 
   @Field({ defaultValue: 0 })
   installationStep: number;
+
+  @Field({ defaultValue: 0 })
+  createdAt: string;
 }
