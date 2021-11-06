@@ -4,7 +4,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { TokenReceivedEvent } from '../events/token-received.event';
 import { ShopifyService } from '../shopify/shopify.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ProductsReceivedEvent } from '../events/products-received.event';
+import { InventoryReceivedEvent } from '../events/inventory-received.event';
 
 @Injectable()
 export class TokenReceivedListener {
@@ -23,7 +23,7 @@ export class TokenReceivedListener {
           bulkOperationRunQuery(
             query:"""
             {
-              products(first: 1000, reverse: true)  {
+              products(first: 10000, reverse: true)  {
                     edges {
                       node {
                         id
@@ -38,13 +38,32 @@ export class TokenReceivedListener {
                         }
                         descriptionHtml
                         productType
+                        totalVariants
+                        totalInventory
+                        status
+                        publishedAt
+                        onlineStoreUrl
+                        createdAtShopify : createdAt
+                        collections(first: 1000, reverse: true){
+                          edges{
+                            node{
+                              id
+                              title
+                              description
+                              productsCount
+                              sortOrder
+                              storefrontId
+                            }
+                          }
+                        }
                         variants(first: 1000, reverse: true)  {
                           edges {
                             node {
                               id
                               title
                               displayName
-                              
+                              storefrontId
+                              shopifyCreatedAt :createdAt
                               image{
                                 src
                                 
@@ -102,11 +121,15 @@ export class TokenReceivedListener {
           poll.body['data']['currentBulkOperation']['status'] === 'COMPLETED'
         ) {
           clearInterval(pollit);
-          const productsReceivedEvent = new ProductsReceivedEvent();
-          productsReceivedEvent.bulkOperationResponse =
-            poll.body['data']['currentBulkOperation'];
 
-          this.eventEmitter.emit('products.received', productsReceivedEvent);
+          // fire inventory received event
+
+          const inventoryReceivedEvent = new InventoryReceivedEvent();
+          inventoryReceivedEvent.bulkOperationResponse =
+            poll.body['data']['currentBulkOperation'];
+          inventoryReceivedEvent.shop = shop;
+
+          this.eventEmitter.emit('inventory.received', inventoryReceivedEvent);
         }
       }, 3000);
     }

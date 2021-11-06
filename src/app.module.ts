@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import Product from './products/entities/product.model';
-import { ProductsModule } from './products/products.module';
 import { ShopifyStoreModule } from './shopify-store/shopify-store.module';
 import Store from './stores/entities/store.model';
 import { StoresModule } from './stores/stores.module';
 import { UtilsModule } from './utils/utils.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { InventoryModule } from './inventory/inventory.module';
+import Inventory from './inventory/entities/inventory.modal';
 
 @Module({
   imports: [
@@ -36,17 +36,17 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
           url: configservice.get('DB_URL'),
           synchronize: true,
           useUnifiedTopology: true,
-          entities: [Product, Store],
+          entities: [Store, Inventory],
         };
       },
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: true,
     }),
-    ProductsModule,
     ShopifyStoreModule,
     StoresModule,
     UtilsModule,
+    InventoryModule,
   ],
 })
 export class AppModule {}

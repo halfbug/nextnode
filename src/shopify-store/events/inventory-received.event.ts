@@ -1,4 +1,4 @@
-export class ProductsReceivedEvent {
+export class InventoryReceivedEvent {
   bulkOperationResponse: any;
   shop: string;
 }

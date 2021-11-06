@@ -1,4 +1,4 @@
-import { Column, Entity, ObjectIdColumn, PrimaryColumn } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
 
 @Entity()

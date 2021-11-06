@@ -17,7 +17,7 @@ export class DefaultColumnsService {
   @PrimaryColumn()
   id: string;
 
-  @Column({ default: 'active' })
+  @Column('string', { default: 'active' })
   status: string;
 
   @CreateDateColumn()
