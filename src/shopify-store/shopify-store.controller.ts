@@ -25,7 +25,8 @@ export class ShopifyStoreController {
     const shop = query.shop as string;
     const store = await this.storesService.findOne(shop);
     if (store) res.redirect(this.storeService.goToAppfront(store));
-    else return this.storeService.login(req, res, shop);
+    else if (shop) return this.storeService.login(req, res, shop);
+    else console.log('referer : ', req.headers.referer);
   }
 
   @Get('callback')
@@ -56,4 +57,7 @@ export class ShopifyStoreController {
   async test() {
     return 'running server on port 5000';
   }
+}
+function elseif(shop: string) {
+  throw new Error('Function not implemented.');
 }
