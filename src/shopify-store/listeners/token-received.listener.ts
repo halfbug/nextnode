@@ -30,14 +30,10 @@ export class TokenReceivedListener {
                         title
                         status
                         description
-                        onlineStorePreviewUrl
-                        onlineStoreUrl
                         storefrontId
                         featuredImage{
                           src
                         }
-                        descriptionHtml
-                        productType
                         totalVariants
                         totalInventory
                         status
@@ -132,6 +128,6 @@ export class TokenReceivedListener {
           this.eventEmitter.emit('inventory.received', inventoryReceivedEvent);
         }
       }, 3000);
-    }
+    } else console.log(JSON.stringify(qres.body['data']));
   }
 }
