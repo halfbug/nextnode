@@ -8,7 +8,9 @@ import { StoresModule } from './stores/stores.module';
 import { UtilsModule } from './utils/utils.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { InventoryModule } from './inventory/inventory.module';
+import { CampaignsModule } from './campaigns/campaigns.module';
 import Inventory from './inventory/entities/inventory.modal';
+import Campaign from './campaigns/entities/campaign.model';
 
 @Module({
   imports: [
@@ -36,7 +38,7 @@ import Inventory from './inventory/entities/inventory.modal';
           url: configservice.get('DB_URL'),
           synchronize: true,
           useUnifiedTopology: true,
-          entities: [Store, Inventory],
+          entities: [Store, Inventory, Campaign],
         };
       },
     }),
@@ -47,6 +49,7 @@ import Inventory from './inventory/entities/inventory.modal';
     StoresModule,
     UtilsModule,
     InventoryModule,
+    CampaignsModule,
   ],
 })
 export class AppModule {}
