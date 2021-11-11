@@ -3,7 +3,10 @@ import { InputType, ID, Field } from '@nestjs/graphql';
 @InputType()
 export class CreateStoreInput {
   @Field()
-  shopifySessionId: string;
+  id: string;
+
+  @Field()
+  shopifySessionId?: string;
 
   @Field({ nullable: true })
   brandName?: string;
@@ -12,8 +15,14 @@ export class CreateStoreInput {
   shop: string;
 
   @Field()
-  accessToken: string;
+  accessToken?: string;
 
   @Field({ defaultValue: 0 })
-  installationStep: number;
+  installationStep?: number;
+
+  @Field({ nullable: true })
+  logoImage?: string;
+
+  @Field({ nullable: true })
+  industry?: string;
 }

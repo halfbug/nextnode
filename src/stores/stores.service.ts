@@ -14,6 +14,7 @@ export class StoresService {
   create(createStoreInput: CreateStoreInput): Promise<Store> {
     const id = uuid();
     const store = this.storeRepository.create({ id, ...createStoreInput });
+    // const store = this.storeRepository.create(createStoreInput);
     return this.storeRepository.save(store);
   }
 
@@ -40,8 +41,10 @@ export class StoresService {
       },
     });
   }
-  update(id: number, updateStoreInput: UpdateStoreInput) {
-    return `This action updates a #${id} store`;
+
+  async update(id: string, updateStoreInput: UpdateStoreInput) {
+    await this.storeRepository.update({ id }, updateStoreInput);
+    return await this.findOneById(id);
   }
 
   remove(id: number) {
