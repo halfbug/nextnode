@@ -9,7 +9,13 @@ export class CampaignsResolver {
   constructor(private readonly campaignsService: CampaignsService) {}
 
   @Mutation(() => Campaign)
-  createCampaign(@Args('createCampaignInput') createCampaignInput: CreateCampaignInput) {
+  createCampaign(
+    @Args('createCampaignInput') createCampaignInput: CreateCampaignInput,
+  ) {
+    console.log(
+      '🚀 ~ file: campaigns.resolver.ts ~ line 15 ~ CampaignsResolver ~ createCampaignInput',
+      createCampaignInput,
+    );
     return this.campaignsService.create(createCampaignInput);
   }
 
@@ -24,8 +30,13 @@ export class CampaignsResolver {
   }
 
   @Mutation(() => Campaign)
-  updateCampaign(@Args('updateCampaignInput') updateCampaignInput: UpdateCampaignInput) {
-    return this.campaignsService.update(updateCampaignInput.id, updateCampaignInput);
+  updateCampaign(
+    @Args('updateCampaignInput') updateCampaignInput: UpdateCampaignInput,
+  ) {
+    return this.campaignsService.update(
+      updateCampaignInput.id,
+      updateCampaignInput,
+    );
   }
 
   @Mutation(() => Campaign)

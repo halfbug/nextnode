@@ -1,8 +1,19 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  Info,
+  Field,
+} from '@nestjs/graphql';
 import { InventoryService } from './inventory.service';
 import { Inventory } from './entities/inventory.entity';
 import { CreateInventoryInput } from './dto/create-inventory.input';
 import { UpdateInventoryInput } from './dto/update-inventory.input';
+import { Collection } from './entities/collection.entity';
+import { Product } from './entities/product.entity';
+import { ProductQueryInput } from './dto/product-query.input';
 
 @Resolver(() => Inventory)
 export class InventoryResolver {
@@ -15,9 +26,33 @@ export class InventoryResolver {
   //   return this.inventoryService.create(createInventoryInput);
   // }
 
-  @Query(() => [Inventory], { name: 'inventory' })
-  findAll() {
-    return this.inventoryService.findAll();
+  // @Query(() => [Inventory], { name: 'inventory' })
+  // find() {
+  //   return this.inventoryService.findAll();
+  // }
+
+  @Query(() => [Collection], { name: 'collections' })
+  findStoreCollections(@Args('shop') shop: string, @Info() info: any) {
+    const selectedFileds = info.fieldNodes[0].selectionSet.selections.map(
+      (item) => item.name.value,
+    );
+    console.log(
+      '🚀 ~ file: inventory.resolver.ts ~ line 38 ~ InventoryResolver ~ findStoreCollections ~ selectedFileds',
+      selectedFileds,
+    );
+    const withproducts = selectedFileds.includes('products');
+    const collections = this.inventoryService.findStoreCollections(
+      shop,
+      withproducts,
+    );
+    return collections;
+  }
+
+  @Query(() => [Product], { name: 'products' })
+  findStoreProducts(
+    @Args('productQueryInput') productQueryInput: ProductQueryInput,
+  ) {
+    return this.inventoryService.findStoreProducts(productQueryInput);
   }
 
   @Query(() => Inventory, { name: 'inventory' })

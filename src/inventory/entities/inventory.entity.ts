@@ -8,8 +8,8 @@ class FeatureImageType {
 
 @ObjectType()
 export class Inventory {
-  @Field({ description: 'mongo entity id' })
-  _id: string;
+  // @Field({ description: 'mongo entity id' })
+  // _id: string;
 
   @Field({ description: 'shopify entity id' })
   id: string;
@@ -73,6 +73,12 @@ export class Inventory {
 
   @Field()
   image?: string;
+
+  @Field()
+  sortOrder?: string;
+
+  @Field()
+  productsCount?: number;
 
   @Field()
   displayName?: string;

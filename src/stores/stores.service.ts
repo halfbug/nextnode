@@ -43,6 +43,15 @@ export class StoresService {
   }
 
   async update(id: string, updateStoreInput: UpdateStoreInput) {
+    console.log(
+      '🚀 ~ file: stores.service.ts ~ line 46 ~ StoresService ~ update ~ updateStoreInput',
+      updateStoreInput,
+    );
+    console.log(
+      '🚀 ~ file: stores.service.ts ~ line 46 ~ StoresService ~ update ~ id',
+      id,
+    );
+
     await this.storeRepository.update({ id }, updateStoreInput);
     return await this.findOneById(id);
   }
