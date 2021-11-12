@@ -21,7 +21,7 @@ export class Campaign {
   @Field({ nullable: true })
   productSelectionCriteria: string;
 
-  @Field({ nullable: true })
+  @Field({ nullable: true, defaultValue: false })
   joinExisting: boolean;
 
   @Field({ nullable: true })

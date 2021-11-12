@@ -21,10 +21,9 @@ export class InventoryReceivedListener {
 
   private reshapeInventory(inventoryArray, shop) {
     return inventoryArray.map((inventory) => {
-      // console.log(
-      //   '🚀 ~ file: inventory-received.listener.ts ~ line 37 ~ InventoryReceivedListener ~ returninventoryArray.map ~ inventory',
-      //   inventory,
-      // );
+      //
+      // if (typeof inventory.featuredImage === 'object')
+      inventory.featuredImage = inventory?.featuredImage?.src;
 
       //rename inventory __parentId
       if (inventory.__parentId) {
