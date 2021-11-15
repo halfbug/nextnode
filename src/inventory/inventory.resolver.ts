@@ -14,6 +14,7 @@ import { UpdateInventoryInput } from './dto/update-inventory.input';
 import { Collection } from './entities/collection.entity';
 import { Product } from './entities/product.entity';
 import { ProductQueryInput } from './dto/product-query.input';
+import { TotalProducts } from './entities/totalProducts.entity';
 
 @Resolver(() => Inventory)
 export class InventoryResolver {
@@ -30,6 +31,10 @@ export class InventoryResolver {
   // find() {
   //   return this.inventoryService.findAll();
   // }
+  @Query(() => TotalProducts, { name: 'TotalProducts' })
+  findStoreTotalProducts(@Args('shop') shop: string) {
+    return this.inventoryService.findTotalProducts(shop);
+  }
 
   @Query(() => [Collection], { name: 'collections' })
   findStoreCollections(@Args('shop') shop: string, @Info() info: any) {
