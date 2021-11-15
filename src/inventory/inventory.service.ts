@@ -9,10 +9,14 @@ import Inventory from './entities/inventory.modal';
 
 @Injectable()
 export class InventoryService {
+  private inventoryManager: any;
   constructor(
     @InjectRepository(Inventory)
-    private inventoryRepository: Repository<Inventory>,
-  ) {}
+    private inventoryRepository: Repository<Inventory>, // private inventoryManager: EntityManager,
+  ) {
+    this.inventoryManager = getMongoManager();
+    // this.inventoryManager = getMongoManager();
+  }
 
   // create(createInventoryInput: CreateInventoryInput) {
   //   const inventory = this.inventoryRepository.create(createInventoryInput);
@@ -20,8 +24,34 @@ export class InventoryService {
   //   return this.inventoryRepository.save(inventory);
   // }
 
-  findAll() {
-    return `This action returns all inventory`;
+  async findTotalProducts(shop: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              shop,
+            },
+            {
+              recordType: 'Product',
+            },
+            {
+              status: 'ACTIVE',
+            },
+          ],
+        },
+      },
+      {
+        $count: 'count',
+      },
+    ];
+    const tp = await this.inventoryManager.aggregate(Inventory, agg).toArray();
+    console.log(
+      '🚀 ~ file: inventory.service.ts ~ line 55 ~ InventoryService ~ findTotalProducts ~ tp',
+      tp,
+    );
+    return tp[0];
   }
 
   findOne(id: number) {

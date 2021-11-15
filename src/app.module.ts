@@ -38,6 +38,7 @@ import Campaign from './campaigns/entities/campaign.model';
           url: configservice.get('DB_URL'),
           synchronize: true,
           useUnifiedTopology: true,
+          // entities: [__dirname + './**/*.modal.ts'],
           entities: [Store, Inventory, Campaign],
         };
       },
