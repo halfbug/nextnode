@@ -34,6 +34,17 @@ export class TokenReceivedListener {
                         featuredImage{
                           src
                         }
+                        priceRangeV2{
+                          maxVariantPrice{
+                            amount
+                            currencyCode
+                            
+                          }
+                          minVariantPrice{
+                            amount
+                            currencyCode
+                          }
+                        }
                         totalVariants
                         totalInventory
                         status
