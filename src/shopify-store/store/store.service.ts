@@ -50,9 +50,7 @@ export class StoreService {
     await this.shopifyapi.offlineSession(shop);
     res.header('shop', shop);
     const shopName = shop.split('.')[0];
-    return res.redirect(
-      `${this.configService.get('FRONT')}/shop=${shopName}/0`,
-    ); // wherever you want your user to end up after OAuth completes
+    return res.redirect(`${this.configService.get('FRONT')}/${shopName}/0`); // wherever you want your user to end up after OAuth completes
   }
 
   async loadSession() {
