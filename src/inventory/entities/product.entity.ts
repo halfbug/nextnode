@@ -42,6 +42,12 @@ export class Product {
   // totalInventory?: number;
 
   @Field({ nullable: true })
+  price?: string;
+
+  @Field({ nullable: true })
+  currencyCode?: string;
+
+  @Field({ nullable: true })
   publishedAt?: string;
 
   @Field({ nullable: true })
