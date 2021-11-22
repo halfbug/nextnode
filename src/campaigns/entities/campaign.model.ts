@@ -1,6 +1,5 @@
 import { Column, Entity } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
-import Product from './product.model';
 
 @Entity()
 export default class Campaign extends DefaultColumnsService {
@@ -14,7 +13,7 @@ export default class Campaign extends DefaultColumnsService {
   name: string;
 
   @Column({ nullable: true })
-  joinExistingGroupshop: boolean;
+  joinExisting: boolean;
 
   @Column()
   collectionId: string;
