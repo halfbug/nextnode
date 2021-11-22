@@ -14,5 +14,6 @@ import { InventoryReceivedListener } from './listeners/inventory-received.listen
     HttpModule,
   ],
   providers: [InventoryResolver, InventoryService, InventoryReceivedListener],
+  exports: [InventoryService],
 })
 export class InventoryModule {}
