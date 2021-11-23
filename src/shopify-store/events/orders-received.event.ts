@@ -1,6 +1,5 @@
 import { EventBase } from 'src/utils/event.base';
 
-export class InventoryReceivedEvent extends EventBase {
+export class OrdersReceivedEvent extends EventBase {
   bulkOperationResponse: any;
-  // shop: string;
 }

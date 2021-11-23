@@ -135,6 +135,7 @@ export class TokenReceivedListener {
           inventoryReceivedEvent.bulkOperationResponse =
             poll.body['data']['currentBulkOperation'];
           inventoryReceivedEvent.shop = shop;
+          inventoryReceivedEvent.accessToken = accessToken;
 
           this.eventEmitter.emit('inventory.received', inventoryReceivedEvent);
         }

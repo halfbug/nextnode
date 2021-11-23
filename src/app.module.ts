@@ -11,6 +11,7 @@ import { InventoryModule } from './inventory/inventory.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import Inventory from './inventory/entities/inventory.modal';
 import Campaign from './campaigns/entities/campaign.model';
+import Orders from './inventory/entities/orders.modal';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import Campaign from './campaigns/entities/campaign.model';
           synchronize: true,
           useUnifiedTopology: true,
           // entities: [__dirname + './**/*.modal.ts'],
-          entities: [Store, Inventory, Campaign],
+          entities: [Store, Inventory, Campaign, Orders],
         };
       },
     }),

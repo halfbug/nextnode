@@ -16,7 +16,7 @@ export default class Campaign extends DefaultColumnsService {
   joinExisting: boolean;
 
   @Column()
-  collectionId: string;
+  criteria: string;
 
   // @Column(() => Product)
   // products?: Product[];

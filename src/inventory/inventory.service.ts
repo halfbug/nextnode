@@ -187,4 +187,42 @@ export class InventoryService {
 
     return await manager.insertMany(Inventory, inventory);
   }
+
+  async setPurchaseCount(inventory: any) {
+    const manager = getMongoManager();
+
+    return await manager.bulkWrite(Inventory, inventory);
+  }
+
+  async getBestSellerProducts(shop: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              purchaseCount: {
+                $gt: 0,
+              },
+            },
+            {
+              shop,
+            },
+            {
+              status: 'ACTIVE',
+            },
+          ],
+        },
+      },
+      {
+        $sort: {
+          purchaseCount: -1,
+        },
+      },
+      {
+        $limit: 80,
+      },
+    ];
+    return await manager.aggregate(Inventory, agg).toArray();
+  }
 }
