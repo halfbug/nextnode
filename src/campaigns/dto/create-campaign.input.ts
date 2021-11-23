@@ -14,7 +14,7 @@ export class CreateCampaignInput {
   createdAt: string;
 
   @Field({ nullable: true })
-  productSelectionCriteria: string;
+  criteria: string;
 
   @Field({ nullable: true })
   storeId: string;

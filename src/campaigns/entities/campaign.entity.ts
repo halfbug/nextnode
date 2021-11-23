@@ -19,7 +19,7 @@ export class Campaign {
   name: string;
 
   @Field({ nullable: true })
-  productSelectionCriteria: string;
+  criteria: string;
 
   @Field({ nullable: true, defaultValue: false })
   joinExisting: boolean;

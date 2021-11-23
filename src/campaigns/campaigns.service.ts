@@ -23,13 +23,13 @@ export class CampaignsService {
       '🚀 ~ file: campaigns.service.ts ~ line 19 ~ CampaignsService ~ create ~ createCampaignInput',
       createCampaignInput,
     );
-    const { storeId, productSelectionCriteria } = createCampaignInput;
+    const { storeId, criteria } = createCampaignInput;
     const { shop } = await this.sotresService.findOneById(storeId);
     console.log(
       '🚀 ~ file: campaigns.service.ts ~ line 26 ~ CampaignsService ~ create ~ shop',
       shop,
     );
-    switch (productSelectionCriteria) {
+    switch (criteria) {
       case 'newest':
         const npQuery = new ProductQueryInput();
         npQuery.limit = 80;
@@ -43,6 +43,10 @@ export class CampaignsService {
         break;
 
       case 'bestseller':
+        const bsproducts = await this.inventoryService.getBestSellerProducts(
+          shop,
+        );
+        products = bsproducts.map((prod) => prod.id);
         break;
 
       default:

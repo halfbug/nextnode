@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { ProductsReceivedEvent } from '../../shopify-store/events/products-received.event';
 import { HttpService } from '@nestjs/axios';
 import readJsonLines from 'read-json-lines-sync';
 import { InventoryService } from '../inventory.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { InventorySavedEvent } from '../events/inventory-saved.event';
+import { InventoryReceivedEvent } from 'src/shopify-store/events/inventory-received.event';
 
 @Injectable()
 export class InventoryReceivedListener {
   constructor(
     private httpService: HttpService,
     private inventoryService: InventoryService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   private handleFile(err, data) {
@@ -44,7 +47,7 @@ export class InventoryReceivedListener {
   }
 
   @OnEvent('inventory.received')
-  async storeInventoryReceived(event: ProductsReceivedEvent) {
+  async storeInventoryReceived(event: InventoryReceivedEvent) {
     console.log('inventory Received ----->>>> ', event.shop);
     console.log(event);
     // const productBulkFile = createReadStream(event.bulkOperationResponse.url);
@@ -59,11 +62,11 @@ export class InventoryReceivedListener {
         // const savedInventory =
         await this.inventoryService.insertMany(inventoryObj);
         console.log('saved inventory for ', event.shop);
-      });
 
-    // readFile(
-    //   this.httpService.get(event.bulkOperationResponse.url),
-    //   this.handleFile,
-    // );
+        const inventorySavedEvent = new InventorySavedEvent();
+        inventorySavedEvent.shop = event.shop;
+        inventorySavedEvent.accessToken = event.accessToken;
+        this.eventEmitter.emit('inventory.saved', inventorySavedEvent);
+      });
   }
 }
