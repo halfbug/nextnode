@@ -1,40 +1,31 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
 
+export class LineProduct {
+  @Field({ nullable: true })
+  id: string;
+}
+
 @InputType()
-export class CreateInventoryInput {
+export class CreateOrderInput {
   @Field({ description: 'shopify entity admin_graphql_api_id' })
   id: string;
 
-  @Field()
-  title: string;
-
   @Field({ nullable: true })
-  totalVariants?: number;
-
+  name: string;
   @Field({ nullable: true })
-  price?: string;
-
+  shopifyCreatedAt?: string;
   @Field({ nullable: true })
-  currencyCode?: string;
-
+  confirmed?: boolean;
   @Field({ nullable: true })
-  publishedAt?: string;
-
-  @Field({ nullable: true })
-  createdAtShopify?: string;
-
-  @Field({ nullable: true })
-  featuredImage?: string;
-
+  cancelledAt?: string;
   @Field({ nullable: true })
   shop?: string;
-
   @Field({ nullable: true })
-  recordType?: string;
-
-  @Field({ nullable: true })
-  status?: string;
-
+  totalPrice?: string;
   @Field({ nullable: true })
   parentId?: string;
+  @Field(() => LineProduct)
+  product?: LineProduct;
+  @Field({ nullable: true })
+  price?: string;
 }

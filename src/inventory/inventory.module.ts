@@ -25,6 +25,6 @@ import { OrderSavedListener } from './listeners/orders-saved.listener';
     OrdersService,
     OrderSavedListener,
   ],
-  exports: [InventoryService],
+  exports: [InventoryService, OrdersService],
 })
 export class InventoryModule {}

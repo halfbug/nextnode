@@ -124,4 +124,67 @@ export class InvenotrySavedListener {
       console.log(JSON.stringify(err));
     }
   }
+
+  @OnEvent('inventory.saved')
+  async registerWebhooks(event: InventorySavedEvent) {
+    try {
+      const { shop, accessToken } = event;
+      this.shopifyapi
+        .registerHook(
+          shop,
+          accessToken,
+          '/webhooks/product-create',
+          'PRODUCTS_CREATE',
+        )
+        .then(() => {
+          console.log('webhook PRODUCTS_CREATE-> registered for shop', shop);
+        });
+
+      this.shopifyapi
+        .registerHook(
+          shop,
+          accessToken,
+          '/webhooks/uninstalled',
+          'APP_UNINSTALLED',
+        )
+        .then(() => {
+          console.log('webhook APP_UNINSTALLED-> registered for shop', shop);
+        });
+
+      this.shopifyapi
+        .registerHook(
+          shop,
+          accessToken,
+          '/webhooks/product-update',
+          'PRODUCTS_UPDATE',
+        )
+        .then(() => {
+          console.log('webhook PRODUCTS_UPDATE-> registered for shop', shop);
+        });
+
+      this.shopifyapi
+        .registerHook(
+          shop,
+          accessToken,
+          '/webhooks/order-create',
+          'ORDERS_CREATE',
+        )
+        .then(() => {
+          console.log('webhook ORDERS_CREATE-> registered for shop', shop);
+        });
+      this.shopifyapi
+        .registerHook(
+          shop,
+          accessToken,
+          '/webhooks/product-delete',
+          'PRODUCTS_DELETE',
+        )
+        .then(() => {
+          console.log('webhook PRODUCTS_DELETE-> registered for shop', shop);
+        });
+      console.log('webhook registered');
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
+  }
 }

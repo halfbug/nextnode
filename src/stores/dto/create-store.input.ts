@@ -5,6 +5,9 @@ export class CreateStoreInput {
   @Field()
   id: string;
 
+  @Field({ defaultValue: 'Active' })
+  status?: string;
+
   @Field()
   shopifySessionId?: string;
 

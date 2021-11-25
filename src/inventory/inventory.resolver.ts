@@ -1,16 +1,6 @@
-import {
-  Resolver,
-  Query,
-  Mutation,
-  Args,
-  Int,
-  Info,
-  Field,
-} from '@nestjs/graphql';
+import { Resolver, Query, Args, Info } from '@nestjs/graphql';
 import { InventoryService } from './inventory.service';
 import { Inventory } from './entities/inventory.entity';
-import { CreateInventoryInput } from './dto/create-inventory.input';
-import { UpdateInventoryInput } from './dto/update-inventory.input';
 import { Collection } from './entities/collection.entity';
 import { Product } from './entities/product.entity';
 import { ProductQueryInput } from './dto/product-query.input';
@@ -20,17 +10,6 @@ import { TotalProducts } from './entities/totalProducts.entity';
 export class InventoryResolver {
   constructor(private readonly inventoryService: InventoryService) {}
 
-  // @Mutation(() => Inventory)
-  // createInventory(
-  //   @Args('createInventoryInput') createInventoryInput: CreateInventoryInput,
-  // ) {
-  //   return this.inventoryService.create(createInventoryInput);
-  // }
-
-  // @Query(() => [Inventory], { name: 'inventory' })
-  // find() {
-  //   return this.inventoryService.findAll();
-  // }
   @Query(() => TotalProducts, { name: 'TotalProducts' })
   findStoreTotalProducts(@Args('shop') shop: string) {
     return this.inventoryService.findTotalProducts(shop);
@@ -61,8 +40,8 @@ export class InventoryResolver {
   }
 
   @Query(() => Inventory, { name: 'inventory' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.inventoryService.findOne(id);
+  findOne(@Args('shop') shop: string, @Args('recordType') recordType: string) {
+    return this.inventoryService.findOne(shop, recordType);
   }
 
   // @Mutation(() => Inventory)

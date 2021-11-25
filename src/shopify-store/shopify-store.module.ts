@@ -11,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import Store from 'src/stores/entities/store.model';
 import { StoresModule } from 'src/stores/stores.module';
 import { InvenotrySavedListener } from './listeners/inventory-saved.listener';
+import { InventoryModule } from 'src/inventory/inventory.module';
 
 @Global()
 @Module({
@@ -19,12 +20,14 @@ import { InvenotrySavedListener } from './listeners/inventory-saved.listener';
     HttpModule,
     TypeOrmModule.forFeature([Store]),
     StoresModule,
+    InventoryModule,
   ],
   providers: [
     StoreService,
     ShopifyService,
     TokenReceivedListener,
     InvenotrySavedListener,
+    StoresModule,
   ],
   controllers: [ShopifyStoreController, WebhooksController],
   exports: [StoreService, ShopifyService],

@@ -68,10 +68,12 @@ export class ShopifyService {
 
   async registerHook(shop, accessToken, path, topic) {
     try {
+      // const host = this.configService.get('HOST') + path;
+
       const response = await Shopify.Webhooks.Registry.register({
         shop,
         accessToken,
-        path,
+        path: path + '?shop=' + shop,
         topic,
         webhookHandler: async (topic, shop, body) => {
           console.log('inside');

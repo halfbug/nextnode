@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { retry } from 'rxjs';
 import { getMongoManager, Repository } from 'typeorm';
 import { CreateInventoryInput } from './dto/create-inventory.input';
 import { ProductQueryInput } from './dto/product-query.input';
@@ -18,11 +17,26 @@ export class InventoryService {
     // this.inventoryManager = getMongoManager();
   }
 
-  // create(createInventoryInput: CreateInventoryInput) {
-  //   const inventory = this.inventoryRepository.create(createInventoryInput);
+  create(createInventoryInput: CreateInventoryInput): Promise<Inventory> {
+    const inventory = this.inventoryRepository.create(createInventoryInput);
+    console.log(
+      '🚀 ~ file: inventory.service.ts ~ line 21 ~ InventoryService ~ create ~ inventory',
+      inventory,
+    );
 
-  //   return this.inventoryRepository.save(inventory);
-  // }
+    return this.inventoryRepository.save(inventory);
+  }
+
+  async update(updateInvenotryInput: UpdateInventoryInput) {
+    const { id } = updateInvenotryInput;
+    return await this.inventoryRepository.update({ id }, updateInvenotryInput);
+  }
+
+  async remove(id: string) {
+    return await this.inventoryManager.deleteMany(Inventory, {
+      $or: [{ id: { $regex: id } }, { parentId: { $regex: id } }],
+    });
+  }
 
   async findTotalProducts(shop: string) {
     const manager = getMongoManager();
@@ -54,8 +68,13 @@ export class InventoryService {
     return tp[0];
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} inventory`;
+  async findOne(shop: string, recordType: string) {
+    return await this.inventoryRepository.findOne({
+      where: {
+        shop,
+        recordType,
+      },
+    });
   }
 
   async findStoreCollections(shop: string, withproducts: boolean) {
@@ -176,10 +195,6 @@ export class InventoryService {
       },
     ];
     return await manager.aggregate(Inventory, agg).toArray();
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} inventory`;
   }
 
   async insertMany(inventory: []) {
