@@ -13,6 +13,8 @@ import { StoresModule } from 'src/stores/stores.module';
 import { InvenotrySavedListener } from './listeners/inventory-saved.listener';
 import { InventoryModule } from 'src/inventory/inventory.module';
 
+// import { AwsService } from './aws.service';
+import { UploadImageModule } from './ImageUpload/uploadimage.module';
 @Global()
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { InventoryModule } from 'src/inventory/inventory.module';
     TypeOrmModule.forFeature([Store]),
     StoresModule,
     InventoryModule,
+    // AwsService,
+    UploadImageModule,
   ],
   providers: [
     StoreService,
