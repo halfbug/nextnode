@@ -1,12 +1,23 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Req,
+  Res,
+  // Post,
+  // UseInterceptors,
+  // UploadedFile,
+} from '@nestjs/common';
+// import { FileInterceptor } from '@nestjs/platform-express';
 import { Request, Response } from 'express';
 import { StoresService } from 'src/stores/stores.service';
 import { StoreService } from './store/store.service';
+// import { AwsService } from './aws.service';
 
 @Controller()
 export class ShopifyStoreController {
   constructor(
     private storeService: StoreService,
+    // private awsService: AwsService,
 
     private storesService: StoresService,
   ) {}
@@ -57,7 +68,4 @@ export class ShopifyStoreController {
   async test() {
     return 'running server on port 5000';
   }
-}
-function elseif(shop: string) {
-  throw new Error('Function not implemented.');
 }

@@ -12,6 +12,8 @@ import Store from 'src/stores/entities/store.model';
 import { StoresModule } from 'src/stores/stores.module';
 import { InvenotrySavedListener } from './listeners/inventory-saved.listener';
 
+// import { AwsService } from './aws.service';
+import { UploadImageModule } from './ImageUpload/uploadimage.module';
 @Global()
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { InvenotrySavedListener } from './listeners/inventory-saved.listener';
     HttpModule,
     TypeOrmModule.forFeature([Store]),
     StoresModule,
+    // AwsService,
+    UploadImageModule,
   ],
   providers: [
     StoreService,
