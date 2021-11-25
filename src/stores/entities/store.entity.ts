@@ -2,7 +2,7 @@ import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 @ObjectType('Store')
 export class Store {
- // @Field({ description: 'mongo entity id' })
+  // @Field({ description: 'mongo entity id' })
   // _id: string;
 
   @Field(() => ID)

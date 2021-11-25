@@ -48,6 +48,9 @@ export default class Inventory extends DefaultColumnsService {
   @Column('string', { default: null, nullable: true })
   recordType: string;
 
+  @Column({ nullable: true })
+  currencyCode?: string;
+
   @Column()
   __parentId?: string;
 
@@ -57,6 +60,12 @@ export default class Inventory extends DefaultColumnsService {
   @Column()
   displayName?: string;
 
-  @Column(() => IFeatureImage)
-  featuredImage?: IFeatureImage;
+  @Column()
+  featuredImage?: string;
+
+  @Column()
+  shop?: string;
+
+  @Column()
+  parentId?: string;
 }

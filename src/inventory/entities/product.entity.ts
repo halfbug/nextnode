@@ -48,6 +48,12 @@ export class Product {
   currencyCode?: string;
 
   @Field({ nullable: true })
+  shop?: string;
+
+  @Field({ nullable: true })
+  recordType?: string;
+
+  @Field({ nullable: true })
   publishedAt?: string;
 
   @Field({ nullable: true })
