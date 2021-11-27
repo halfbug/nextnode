@@ -20,48 +20,48 @@ export class WebhooksController {
     private orderService: OrdersService,
   ) {}
 
-  @Get('register')
-  async register() {
-    const { shop, accessToken } = await this.storesService.findOne(
-      'native-roots-dev.myshopify.com',
-    );
-    console.log(
-      '🚀 ~ file: webhooks.controller.ts ~ line 11 ~ WebhooksController ~ register ~ shop',
-      shop,
-    );
-    console.log('yes register');
-    const rhook = await this.shopifyService.registerHook(
-      shop,
-      accessToken,
-      '/webhooks/products',
-      'PRODUCTS_CREATE',
-    );
-    console.log(rhook);
-    const client = await this.shopifyService.client(shop, accessToken);
-    const qwbh = await client.query({
-      data: `{
-        webhookSubscription(id: "gid://shopify/WebhookSubscription/1094922371238") {
-          id
-          topic
-          endpoint {
-            __typename
-            ... on WebhookHttpEndpoint {
-              callbackUrl
-            }
-            ... on WebhookEventBridgeEndpoint {
-              arn
-            }
-          }
-        }
-      }`,
-    });
-    console.log(
-      '🚀 ~ file: webhooks.controller.ts ~ line 47 ~ WebhooksController ~ register ~ qwbh',
-      JSON.stringify(qwbh),
-    );
+  // @Get('register')
+  // async register() {
+  //   const { shop, accessToken } = await this.storesService.findOne(
+  //     'native-roots-dev.myshopify.com',
+  //   );
+  //   console.log(
+  //     '🚀 ~ file: webhooks.controller.ts ~ line 11 ~ WebhooksController ~ register ~ shop',
+  //     shop,
+  //   );
+  //   console.log('yes register');
+  //   const rhook = await this.shopifyService.registerHook(
+  //     shop,
+  //     accessToken,
+  //     '/webhooks/products',
+  //     'PRODUCTS_CREATE',
+  //   );
+  //   console.log(rhook);
+  //   const client = await this.shopifyService.client(shop, accessToken);
+  //   const qwbh = await client.query({
+  //     data: `{
+  //       webhookSubscription(id: "gid://shopify/WebhookSubscription/1094922371238") {
+  //         id
+  //         topic
+  //         endpoint {
+  //           __typename
+  //           ... on WebhookHttpEndpoint {
+  //             callbackUrl
+  //           }
+  //           ... on WebhookEventBridgeEndpoint {
+  //             arn
+  //           }
+  //         }
+  //       }
+  //     }`,
+  //   });
+  //   console.log(
+  //     '🚀 ~ file: webhooks.controller.ts ~ line 47 ~ WebhooksController ~ register ~ qwbh',
+  //     JSON.stringify(qwbh),
+  //   );
 
-    return 'yes done';
-  }
+  //   return 'yes done';
+  // }
 
   @Post('product-create?')
   async createProducts(@Req() req, @Res() res) {
@@ -114,6 +114,7 @@ export class WebhooksController {
     const updateStore = new UpdateStoreInput();
     updateStore.status = 'Unistalled';
     await this.storesService.update(storeInfo.id, updateStore);
+    res.send('store updated..');
   }
 
   @Post('product-update?')
@@ -134,6 +135,7 @@ export class WebhooksController {
     nprod.price = rproduct?.variants[0]?.price;
     nprod.featuredImage = rproduct?.image?.src;
     await this.inventryService.update(nprod);
+    res.send('product updated..');
   }
 
   @Post('order-create?')
@@ -162,6 +164,7 @@ export class WebhooksController {
       newItem.shopifyCreatedAt = whOrder.created_at;
       this.orderService.create(newItem);
     });
+    res.send('order created..');
   }
 
   @Post('product-delete?')
