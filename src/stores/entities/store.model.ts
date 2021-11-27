@@ -1,5 +1,6 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToOne } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
+import { Settings } from './settings.model';
 
 @Entity()
 export default class Store extends DefaultColumnsService {
@@ -23,4 +24,7 @@ export default class Store extends DefaultColumnsService {
 
   @Column({ nullable: true })
   industry: string;
+
+  @Column((type) => Settings)
+  settings?: Settings;
 }

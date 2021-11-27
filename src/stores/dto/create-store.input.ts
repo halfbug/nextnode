@@ -1,4 +1,22 @@
 import { InputType, ID, Field } from '@nestjs/graphql';
+// import { Settings } from '../entities/settings.entity';
+@InputType()
+export class SettingsInput {
+  @Field({ nullable: true })
+  brandColor?: string;
+
+  @Field({ nullable: true })
+  customColor?: string;
+
+  @Field({ nullable: true })
+  customBg?: string;
+
+  @Field({ nullable: true })
+  imageUrl?: string;
+
+  @Field({ nullable: true })
+  youtubeUrl?: string;
+}
 
 @InputType()
 export class CreateStoreInput {
@@ -28,4 +46,7 @@ export class CreateStoreInput {
 
   @Field({ nullable: true })
   industry?: string;
+
+  @Field((type) => SettingsInput)
+  settings: SettingsInput;
 }

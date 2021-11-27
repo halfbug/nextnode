@@ -15,6 +15,7 @@ export class StoresService {
     const id = uuid();
     const store = this.storeRepository.create({ id, ...createStoreInput });
     // const store = this.storeRepository.create(createStoreInput);
+    //
     return this.storeRepository.save(store);
   }
 

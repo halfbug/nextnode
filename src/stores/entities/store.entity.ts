@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { Settings } from './settings.entity';
 
 @ObjectType('Store')
 export class Store {
@@ -31,4 +32,7 @@ export class Store {
 
   @Field({ nullable: true })
   industry: string;
+
+  @Field((type) => Settings, { nullable: true })
+  settings: Settings;
 }
