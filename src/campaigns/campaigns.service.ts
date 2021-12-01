@@ -66,15 +66,24 @@ export class CampaignsService {
   }
 
   findAll() {
-    return `This action returns all campaigns`;
+    return this.campaignRepository.find();
   }
 
   findOne(id: string) {
-    return `This action returns a #${id} campaign`;
+    return this.campaignRepository.findOne({ id });
   }
 
-  update(id: string, updateCampaignInput: UpdateCampaignInput) {
-    return `This action updates a #${id} campaign`;
+  async findOneById(id: string) {
+    return await this.campaignRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+  }
+
+  async update(id: string, updateCampaignInput: UpdateCampaignInput) {
+    await this.campaignRepository.update({ id }, updateCampaignInput);
+    return await this.findOneById(id);
   }
 
   remove(id: string) {

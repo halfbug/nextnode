@@ -25,7 +25,7 @@ export class CampaignsResolver {
   }
 
   @Query(() => Campaign, { name: 'campaign' })
-  findOne(@Args('id', { type: () => Int }) id: string) {
+  findOne(@Args('id', { type: () => String }) id: string) {
     return this.campaignsService.findOne(id);
   }
 

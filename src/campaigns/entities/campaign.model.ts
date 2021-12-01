@@ -23,4 +23,7 @@ export default class Campaign extends DefaultColumnsService {
 
   @Column('string', { nullable: true })
   products?: string[];
+
+  @Column('string', { nullable: true })
+  rewards?: string;
 }
