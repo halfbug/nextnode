@@ -9,9 +9,11 @@ import { UtilsModule } from './utils/utils.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { InventoryModule } from './inventory/inventory.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
+import { AppsettingsModule } from './appsettings/appsettings.module';
 import Inventory from './inventory/entities/inventory.modal';
 import Campaign from './campaigns/entities/campaign.model';
 import Orders from './inventory/entities/orders.modal';
+import { Appsetting } from './appsettings/entities/appsetting.model';
 
 @Module({
   imports: [
@@ -40,7 +42,7 @@ import Orders from './inventory/entities/orders.modal';
           synchronize: true,
           useUnifiedTopology: true,
           // entities: [__dirname + './**/*.modal.ts'],
-          entities: [Store, Inventory, Campaign, Orders],
+          entities: [Store, Inventory, Campaign, Orders, Appsetting],
         };
       },
     }),
@@ -52,6 +54,7 @@ import Orders from './inventory/entities/orders.modal';
     UtilsModule,
     InventoryModule,
     CampaignsModule,
+    AppsettingsModule,
   ],
 })
 export class AppModule {}
