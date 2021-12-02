@@ -39,7 +39,7 @@ export class CreateStoreInput {
   accessToken?: string;
 
   @Field({ defaultValue: 0 })
-  installationStep?: number;
+  installationStep?: number | null;
 
   @Field({ nullable: true })
   logoImage?: string;
