@@ -9,7 +9,7 @@ export class Reward {
   discount?: string;
 
   @Field({ nullable: true })
-  customerDiscount?: string;
+  customerCount?: string;
 }
 
 @ObjectType()

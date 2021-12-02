@@ -2,18 +2,18 @@ import { InputType, ID, Field } from '@nestjs/graphql';
 // import { Settings } from '../entities/settings.entity';
 @InputType()
 export class RewardInput {
-  @Field(() => ID)
+  @Field(() => ID, { nullable: true })
   id: string;
 
   @Field({ nullable: true })
   discount?: string;
 
   @Field({ nullable: true })
-  customerDiscount?: string;
+  customerCount?: string;
 }
 @InputType()
 export class SalesTargetType {
-  @Field(() => ID)
+  @Field(() => ID, { nullable: true })
   id: string;
 
   @Field({ nullable: true })
@@ -28,15 +28,15 @@ export class SalesTargetType {
   @Field({ nullable: true })
   status: string;
 
-  @Field((type) => RewardInput)
+  @Field((type) => [RewardInput])
   rewards: RewardInput[];
 }
 
 @InputType()
 export class CreateAppsettingInput {
-  @Field()
+  @Field(() => ID, { nullable: true })
   id: string;
 
-  @Field((type) => SalesTargetType)
+  @Field((type) => [SalesTargetType])
   salestargets: SalesTargetType[];
 }

@@ -1,7 +1,5 @@
-import { ObjectType } from '@nestjs/graphql';
-import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
-import { Column, Entity } from 'typeorm';
-@Entity()
+import { Column } from 'typeorm';
+
 export class Reward {
   @Column()
   id: string;
@@ -10,9 +8,15 @@ export class Reward {
   discount?: string;
 
   @Column({ nullable: true })
-  customerDiscount?: string;
+  customerCount?: string;
+
+  constructor(id: string, discount: string, customerCount: string) {
+    this.id = id;
+    this.discount = discount;
+    this.customerCount = customerCount;
+  }
 }
-@Entity()
+
 export class SalesTarget {
   @Column()
   id: string;
