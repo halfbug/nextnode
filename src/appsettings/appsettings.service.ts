@@ -13,10 +13,10 @@ export class AppsettingsService {
   ) {}
 
   create(createAppsettingInput: CreateAppsettingInput) {
-    console.log(
-      '🚀 ~ file: appsettings.service.ts ~ line 15 ~ AppsettingsService ~ create ~ createAppsettingInput',
-      JSON.stringify(createAppsettingInput),
-    );
+    // console.log(
+    //   '🚀 ~ file: appsettings.service.ts ~ line 15 ~ AppsettingsService ~ create ~ createAppsettingInput',
+    //   JSON.stringify(createAppsettingInput),
+    // );
     if (createAppsettingInput.salestargets) {
       const { salestargets } = createAppsettingInput;
       const apsettings: Appsetting = new Appsetting();
@@ -36,10 +36,10 @@ export class AppsettingsService {
         }),
       ];
 
-      console.log(
-        '🚀 ~ file: appsettings.service.ts ~ line 23 ~ AppsettingsService ~ create ~ apsettings',
-        apsettings,
-      );
+      // console.log(
+      //   '🚀 ~ file: appsettings.service.ts ~ line 23 ~ AppsettingsService ~ create ~ apsettings',
+      //   apsettings,
+      // );
       return this.appRepository.save(apsettings);
       // createAppsettingInput.salestargets = { ...nsalestarget };
     } else {
@@ -56,14 +56,21 @@ export class AppsettingsService {
   }
 
   async findSalesTargetAll() {
-    const qurer = await this.appRepository.findOne({
+    const qurer = await this.appRepository.find({
       where: { salestargets: { $ne: null } },
     });
     console.log(
       '🚀 ~ file: appsettings.service.ts ~ line 62 ~ AppsettingsService ~ findSalesTargetAll ~ qurer',
       qurer,
     );
-    return qurer.salestargets;
+    const starget = qurer.map((rec) => {
+      return rec.salestargets[0];
+    });
+    // console.log(
+    //   '🚀 ~ file: appsettings.service.ts ~ line 69 ~ AppsettingsService ~ starget ~ starget',
+    //   starget,
+    // );
+    return starget;
   }
   // findOne(id: string) {
   //   return `This action returns a #${id} appsetting`;
