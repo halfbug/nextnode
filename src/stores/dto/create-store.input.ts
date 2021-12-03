@@ -38,7 +38,7 @@ export class CreateStoreInput {
   @Field()
   accessToken?: string;
 
-  @Field({ defaultValue: 0 })
+  @Field({ defaultValue: 0, nullable: true })
   installationStep?: number | null;
 
   @Field({ nullable: true })

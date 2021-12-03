@@ -16,8 +16,8 @@ export default class Store extends DefaultColumnsService {
   @Column()
   accessToken: string;
 
-  @Column({ default: 0 })
-  installationStep: number;
+  @Column({ default: 0, nullable: true })
+  installationStep: number | null;
 
   @Column({ nullable: true })
   logoImage: string;
