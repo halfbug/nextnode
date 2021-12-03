@@ -56,9 +56,15 @@ export class AppsettingsService {
   }
 
   async findSalesTargetAll() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
     const qurer = await this.appRepository.find({
       where: { salestargets: { $ne: null } },
+      order: {
+        'salestargets.rogsMin': -1,
+      },
     });
+
     console.log(
       '🚀 ~ file: appsettings.service.ts ~ line 62 ~ AppsettingsService ~ findSalesTargetAll ~ qurer',
       qurer,
