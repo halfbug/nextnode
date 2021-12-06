@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { Campaign } from 'src/campaigns/entities/campaign.entity';
 import { Settings } from './settings.entity';
 
 @ObjectType('Store')
@@ -35,4 +36,7 @@ export class Store {
 
   @Field((type) => Settings, { nullable: true })
   settings: Settings;
+
+  @Field(() => [Campaign], { nullable: true })
+  campaigns: Campaign[];
 }

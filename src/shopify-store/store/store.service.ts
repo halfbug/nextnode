@@ -60,6 +60,11 @@ export class StoreService {
   goToAppfront(store) {
     const { shop, installationStep } = store;
     const shopName = shop.split('.')[0];
-    return `${this.configService.get('FRONT')}/${shopName}/${installationStep}`;
+    if (installationStep === null)
+      return `${this.configService.get('FRONT')}/${shopName}/overview`;
+    else
+      return `${this.configService.get(
+        'FRONT',
+      )}/${shopName}/${installationStep}`;
   }
 }

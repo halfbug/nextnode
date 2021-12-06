@@ -27,6 +27,51 @@ export class StoresService {
     return this.storeRepository.findOne({ shop });
   }
 
+  async findOneWithCampaings(shop: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          shop: {
+            $regex: `^${shop}*`,
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'campaign',
+          let: {
+            store_id: '$id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ['$storeId', '$$store_id'],
+                },
+              },
+            },
+            {
+              $sort: {
+                'campaign.createdAt': -1,
+              },
+            },
+            {
+              $limit: 10,
+            },
+          ],
+          as: 'campaigns',
+        },
+      },
+    ];
+    const res = await manager.aggregate(Store, agg).toArray();
+    console.log(
+      '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
+      res,
+    );
+    return res;
+  }
+
   async findOneByName(shop: string) {
     return await this.storeRepository.findOne({
       where: {

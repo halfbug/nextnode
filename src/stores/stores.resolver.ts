@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, Info } from '@nestjs/graphql';
 import { StoresService } from './stores.service';
 import { Store } from './entities/store.entity';
 import { CreateStoreInput } from './dto/create-store.input';
@@ -19,8 +19,18 @@ export class StoresResolver {
   }
 
   @Query(() => Store, { name: 'storeName' })
-  findOne(@Args('shop') shop: string) {
-    return this.storesService.findOneByName(shop);
+  async findOne(@Args('shop') shop: string, @Info() info: any) {
+    const selectedFileds = info.fieldNodes[0].selectionSet.selections.map(
+      (item) => item.name.value,
+    );
+    const withCampaigns = selectedFileds.includes('campaigns');
+    const res = await this.storesService.findOneWithCampaings(shop);
+    console.log(
+      '🚀 ~ file: stores.resolver.ts ~ line 28 ~ StoresResolver ~ findOne ~ res',
+      res,
+    );
+    if (withCampaigns) return res[0];
+    else return this.storesService.findOneByName(shop);
   }
 
   @Query(() => Store, { name: 'store' })
