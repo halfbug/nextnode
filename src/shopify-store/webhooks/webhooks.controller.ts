@@ -20,48 +20,48 @@ export class WebhooksController {
     private orderService: OrdersService,
   ) {}
 
-  // @Get('register')
-  // async register() {
-  //   const { shop, accessToken } = await this.storesService.findOne(
-  //     'native-roots-dev.myshopify.com',
-  //   );
-  //   console.log(
-  //     '🚀 ~ file: webhooks.controller.ts ~ line 11 ~ WebhooksController ~ register ~ shop',
-  //     shop,
-  //   );
-  //   console.log('yes register');
-  //   const rhook = await this.shopifyService.registerHook(
-  //     shop,
-  //     accessToken,
-  //     '/webhooks/products',
-  //     'PRODUCTS_CREATE',
-  //   );
-  //   console.log(rhook);
-  //   const client = await this.shopifyService.client(shop, accessToken);
-  //   const qwbh = await client.query({
-  //     data: `{
-  //       webhookSubscription(id: "gid://shopify/WebhookSubscription/1094922371238") {
-  //         id
-  //         topic
-  //         endpoint {
-  //           __typename
-  //           ... on WebhookHttpEndpoint {
-  //             callbackUrl
-  //           }
-  //           ... on WebhookEventBridgeEndpoint {
-  //             arn
-  //           }
-  //         }
-  //       }
-  //     }`,
-  //   });
-  //   console.log(
-  //     '🚀 ~ file: webhooks.controller.ts ~ line 47 ~ WebhooksController ~ register ~ qwbh',
-  //     JSON.stringify(qwbh),
-  //   );
+  @Get('register')
+  async register() {
+    const { shop, accessToken } = await this.storesService.findOne(
+      'native-roots-dev.myshopify.com',
+    );
+    console.log(
+      '🚀 ~ file: webhooks.controller.ts ~ line 11 ~ WebhooksController ~ register ~ shop',
+      shop,
+    );
+    console.log('yes register');
+    const rhook = await this.shopifyService.registerHook(
+      shop,
+      accessToken,
+      '/webhooks/product-update',
+      'PRODUCTS_UPDATE',
+    );
+    console.log(rhook);
+    const client = await this.shopifyService.client(shop, accessToken);
+    const qwbh = await client.query({
+      data: `{
+        webhookSubscription(id: "gid://shopify/WebhookSubscription/1094922371238") {
+          id
+          topic
+          endpoint {
+            __typename
+            ... on WebhookHttpEndpoint {
+              callbackUrl
+            }
+            ... on WebhookEventBridgeEndpoint {
+              arn
+            }
+          }
+        }
+      }`,
+    });
+    console.log(
+      '🚀 ~ file: webhooks.controller.ts ~ line 47 ~ WebhooksController ~ register ~ qwbh',
+      JSON.stringify(qwbh),
+    );
 
-  //   return 'yes done';
-  // }
+    return 'yes done';
+  }
 
   @Post('product-create?')
   async createProducts(@Req() req, @Res() res) {
@@ -134,7 +134,23 @@ export class WebhooksController {
     nprod.status = rproduct?.status?.toUpperCase();
     nprod.price = rproduct?.variants[0]?.price;
     nprod.featuredImage = rproduct?.image?.src;
+    let qDifference: number;
+    rproduct.variants.map(async (variant) => {
+      const preVariant = await this.inventryService.findId(
+        variant.admin_graphql_api_id,
+      );
+      qDifference = variant.inventory_quantity - preVariant.inventory_quantity;
+
+      preVariant.inventory_quantity = variant.inventory_quantity;
+      await this.inventryService.update(preVariant);
+      await this.inventryService.updateInventory(
+        rproduct.admin_graphql_api_id,
+        qDifference,
+      );
+    });
+
     await this.inventryService.update(nprod);
+
     res.send('product updated..');
   }
 

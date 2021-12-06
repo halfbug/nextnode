@@ -37,4 +37,10 @@ export class CreateInventoryInput {
 
   @Field({ nullable: true })
   parentId?: string;
+
+  @Field({ nullable: true })
+  inventory_quantity?: number;
+
+  @Field({ nullable: true })
+  totalInventory?: number;
 }

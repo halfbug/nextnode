@@ -68,4 +68,7 @@ export default class Inventory extends DefaultColumnsService {
 
   @Column()
   parentId?: string;
+
+  @Column({ nullable: true })
+  inventory_quantity?: number;
 }
