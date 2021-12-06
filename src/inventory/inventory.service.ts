@@ -32,6 +32,20 @@ export class InventoryService {
     return await this.inventoryRepository.update({ id }, updateInvenotryInput);
   }
 
+  async updateInventory(id: string, dif: number) {
+    const manager = getMongoManager();
+
+    try {
+      return await manager.findOneAndUpdate(
+        Inventory,
+        { id },
+        { $inc: { totalInventory: dif } },
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   async remove(id: string) {
     return await this.inventoryManager.deleteMany(Inventory, {
       $or: [{ id: { $regex: id } }, { parentId: { $regex: id } }],
@@ -77,6 +91,13 @@ export class InventoryService {
     });
   }
 
+  async findId(id: string): Promise<Inventory> {
+    return await this.inventoryRepository.findOne({
+      where: {
+        id,
+      },
+    });
+  }
   async findStoreCollections(shop: string, withproducts: boolean) {
     const manager = getMongoManager();
 
