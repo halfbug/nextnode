@@ -24,7 +24,12 @@ export class OrdersReceivedListener {
       }
       // add shop to order
       order.shop = shop;
-
+      order.price =
+        order.totalPriceSet?.shopMoney.amount ||
+        order.originalUnitPriceSet?.shopMoney.amount;
+      order.totalDiscounts =
+        order.totalDiscountSet?.shopMoney.amount ||
+        order.currentTotalDiscountsSet?.shopMoney.amount;
       // add record type
       // order.recordType = order.id.split('/')[3];
 

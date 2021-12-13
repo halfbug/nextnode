@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getMongoManager, Repository } from 'typeorm';
-import { CreateOrderInput } from './dto/create-order.input';
+import { CreateOrderInput, DiscountInfo } from './dto/create-order.input';
 import Orders from './entities/orders.modal';
 
 @Injectable()
@@ -59,8 +59,10 @@ export class OrdersService {
     return await manager.aggregate(Orders, agg).toArray();
   }
 
-  create(createOrderInput: CreateOrderInput): Promise<Orders> {
+  async create(createOrderInput: CreateOrderInput) {
     const order = this.ordersRepository.create(createOrderInput);
-    return this.ordersRepository.save(order);
+    order.discountInfo = [new DiscountInfo()];
+    order.discountInfo = createOrderInput.discountInfo;
+    return await this.ordersRepository.save(order);
   }
 }

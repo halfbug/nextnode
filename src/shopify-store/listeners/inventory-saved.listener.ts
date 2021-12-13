@@ -15,6 +15,7 @@ export class InvenotrySavedListener {
   ) {}
   @OnEvent('inventory.saved')
   async bulkOrdersQuery(event: InventorySavedEvent) {
+    console.log('inventory----saved ---> fetching Orders Data');
     try {
       const { shop, accessToken } = event;
       const client = await this.shopifyapi.client(shop, accessToken);
@@ -32,6 +33,13 @@ export class InvenotrySavedListener {
                               shopifyCreateAt:createdAt
                               confirmed
                               cancelledAt
+                              currencyCode
+                              customer{
+                                firstName
+                                lastName
+                                email
+                              }
+                              discountCode
                               totalPriceSet{
                                 shopMoney{
                                   amount
@@ -42,6 +50,18 @@ export class InvenotrySavedListener {
                                 edges{
                                   node{
                                     id
+                                    originalUnitPriceSet{
+                                      shopMoney{
+                                        amount
+                                        currencyCode
+                                      }
+                                    }
+                                    totalDiscountSet{
+                                      shopMoney{
+                                        amount
+                                        currencyCode
+                                      }}
+                                    quantity
                                     product{
                                       id
                                       priceRangeV2{

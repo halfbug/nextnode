@@ -5,6 +5,34 @@ export class LineProduct {
   id: string;
 }
 
+export class Customer {
+  @Field({ nullable: true })
+  firstName: string;
+  @Field({ nullable: true })
+  LastName: string;
+  @Field({ nullable: true })
+  email: string;
+  @Field({ nullable: true })
+  ip?: string;
+  @Field({ nullable: true })
+  phone: string;
+}
+
+@InputType()
+export class DiscountInfo {
+  @Field({ nullable: true })
+  code: string;
+  @Field({ nullable: true })
+  amount: string;
+  @Field({ nullable: true })
+  type: string;
+  constructor(dc?: DiscountInfo | null) {
+    this.code = dc?.code;
+    this.amount = dc?.amount;
+    this.type = dc?.type;
+  }
+}
+
 @InputType()
 export class CreateOrderInput {
   @Field({ description: 'shopify entity admin_graphql_api_id' })
@@ -28,4 +56,16 @@ export class CreateOrderInput {
   product?: LineProduct;
   @Field({ nullable: true })
   price?: string;
+  @Field({ nullable: true })
+  quantity?: number;
+  @Field({ nullable: true })
+  currencyCode?: string;
+  @Field({ nullable: true })
+  discountCode?: string;
+  @Field({ nullable: true })
+  totalDiscounts?: string;
+  @Field(() => Customer)
+  customer?: Customer;
+  @Field(() => DiscountInfo)
+  discountInfo?: DiscountInfo[];
 }

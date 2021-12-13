@@ -6,6 +6,28 @@ export class LineProduct {
   id: string;
 }
 
+export class Customer {
+  @Column({ nullable: true })
+  firstName: string;
+  @Column({ nullable: true })
+  LastName: string;
+  @Column({ nullable: true })
+  email: string;
+  @Column({ nullable: true })
+  ip?: string;
+  @Column({ nullable: true })
+  phone: string;
+}
+
+export class DiscountInfo {
+  @Column({ nullable: true })
+  code: string;
+  @Column({ nullable: true })
+  amount: string;
+  @Column({ nullable: true })
+  type: string;
+}
+
 @Entity()
 export default class Orders extends DefaultColumnsService {
   @Column({ nullable: true })
@@ -26,4 +48,16 @@ export default class Orders extends DefaultColumnsService {
   product?: LineProduct;
   @Column({ nullable: true })
   price?: string;
+  @Column({ nullable: true })
+  quantity?: number;
+  @Column({ nullable: true })
+  currencyCode?: string;
+  @Column({ nullable: true })
+  discountCode?: string | null;
+  @Column({ nullable: true })
+  totalDiscounts?: string;
+  @Column(() => Customer)
+  customer?: Customer;
+  @Column(() => DiscountInfo)
+  discountInfo?: DiscountInfo[];
 }

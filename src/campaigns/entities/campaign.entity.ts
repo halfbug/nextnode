@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { SalesTarget } from 'src/appsettings/entities/sales-target.entity';
 import { Inventory } from 'src/inventory/entities/inventory.entity';
 
 @ObjectType('Campaign')
@@ -6,11 +7,11 @@ export class Campaign {
   @Field(() => ID)
   id: string;
 
-  @Field({ nullable: true })
+  @Field({ defaultValue: 'Active', nullable: true })
   status: string;
 
-  @Field({ defaultValue: 0 })
-  createdAt: string;
+  // @Field({ defaultValue: 0 })
+  // createdAt: string;
 
   @Field({ nullable: true })
   storeId: string;
@@ -24,8 +25,8 @@ export class Campaign {
   @Field({ nullable: true, defaultValue: false })
   joinExisting: boolean;
 
-  @Field({ nullable: true })
-  salesTargetId: string;
+  @Field(() => SalesTarget, { nullable: true })
+  salesTarget: SalesTarget;
 
   @Field({ nullable: true })
   collectionId: string;

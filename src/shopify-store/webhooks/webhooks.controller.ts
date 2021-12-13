@@ -2,6 +2,8 @@ import { Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { CreateInventoryInput } from 'src/inventory/dto/create-inventory.input';
 import {
   CreateOrderInput,
+  Customer,
+  DiscountInfo,
   LineProduct,
 } from 'src/inventory/dto/create-order.input';
 import { UpdateInventoryInput } from 'src/inventory/dto/update-inventory.input';
@@ -9,7 +11,11 @@ import { InventoryService } from 'src/inventory/inventory.service';
 import { OrdersService } from 'src/inventory/orders.service';
 import { UpdateStoreInput } from 'src/stores/dto/update-store.input';
 import { StoresService } from 'src/stores/stores.service';
+import { ConfigService } from '@nestjs/config';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { OrderPlacedEvent } from '../events/order-placed.envent';
 import { ShopifyService } from '../shopify/shopify.service';
+import Orders from 'src/inventory/entities/orders.modal';
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -18,6 +24,8 @@ export class WebhooksController {
     private shopifyService: ShopifyService,
     private inventryService: InventoryService,
     private orderService: OrdersService,
+    private eventEmitter: EventEmitter2,
+    private configSevice: ConfigService,
   ) {}
 
   @Get('register')
@@ -33,14 +41,14 @@ export class WebhooksController {
     const rhook = await this.shopifyService.registerHook(
       shop,
       accessToken,
-      '/webhooks/product-update',
-      'PRODUCTS_UPDATE',
+      '/webhooks/order-create',
+      'ORDERS_CREATE',
     );
     console.log(rhook);
     const client = await this.shopifyService.client(shop, accessToken);
     const qwbh = await client.query({
       data: `{
-        webhookSubscription(id: "gid://shopify/WebhookSubscription/1094922371238") {
+        webhookSubscription(id: "gid://shopify/WebhookSubscription/1097503637670") {
           id
           topic
           endpoint {
@@ -164,22 +172,55 @@ export class WebhooksController {
     );
     const newOrder = new CreateOrderInput();
     newOrder.id = whOrder.admin_graphql_api_id;
-    newOrder.name = '#' + JSON.stringify(whOrder.number);
+    newOrder.name = '#' + JSON.stringify(whOrder.order_number);
     newOrder.shop = shop;
     newOrder.confirmed = whOrder.confirmed;
     newOrder.shopifyCreatedAt = whOrder.created_at;
-    await this.orderService.create(newOrder);
+    newOrder.price = whOrder.current_subtotal_price;
+    newOrder.currencyCode = whOrder.currency;
+    newOrder.totalDiscounts = whOrder.total_discounts;
+    // newOrder.discountCode = whOrder.discount_codes[0].code || null;
+    const dc = whOrder.discount_codes.filter((itm) =>
+      itm.code.startsWith(this.configSevice.get('DC_PREFIX')),
+    );
+    newOrder.discountCode =
+      dc[0].code || whOrder.discount_codes[0].code || null;
+    // newOrder.discountInfo = [new DiscountInfo()];
+    // newOrder.discountInfo = whOrder.discount_codes?.map(
+    //   (dc: DiscountInfo) => new DiscountInfo(dc),
+    // );
+    newOrder.discountInfo = whOrder.discount_codes;
+    newOrder.customer = new Customer();
+    newOrder.customer.firstName = whOrder.customer.first_name;
+    newOrder.customer.firstName = whOrder.customer.last_name;
+    newOrder.customer.email = whOrder.customer.email;
+    newOrder.customer.ip = whOrder.browser_ip;
+    newOrder.customer.phone =
+      whOrder.customer.phone || whOrder.shipping_address.phone;
+    const newOrderSaved = await this.orderService.create(newOrder);
 
-    whOrder?.line_items?.map((item) => {
-      const newItem = new CreateOrderInput();
-      newItem.id = item.admin_graphql_api_id;
-      newItem.parentId = whOrder.admin_graphql_api_id;
-      newItem.shop = shop;
-      newItem.product = new LineProduct();
-      newItem.product.id = `gid://shopify/Product/${item.product_id}`;
-      newItem.shopifyCreatedAt = whOrder.created_at;
-      this.orderService.create(newItem);
-    });
+    const lineItems = await Promise.all(
+      whOrder?.line_items?.map(async (item: any) => {
+        const newItem = new CreateOrderInput();
+        newItem.id = item.admin_graphql_api_id;
+        newItem.parentId = whOrder.admin_graphql_api_id;
+        newItem.shop = shop;
+        newItem.product = new LineProduct();
+        newItem.product.id = `gid://shopify/Product/${item.product_id}`;
+        newItem.price = item.price;
+        newItem.quantity = item.quantity;
+        newItem.totalDiscounts = item.total_discount;
+        newItem.shopifyCreatedAt = whOrder.created_at;
+        return await this.orderService.create(newItem);
+        // return newItem;
+      }),
+    );
+
+    const newOrderPlaced = new OrderPlacedEvent();
+    newOrderPlaced.order = newOrderSaved;
+    newOrderPlaced.store = await this.storesService.findOneWithCampaings(shop);
+    newOrderPlaced.lineItems = lineItems;
+    this.eventEmitter.emit('order.placed', newOrderPlaced);
     res.send('order created..');
   }
 

@@ -1,13 +1,14 @@
 import { Column, Entity } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
+import { SalesTarget } from 'src/appsettings/entities/sales-target.model';
 
 @Entity()
 export default class Campaign extends DefaultColumnsService {
-  @Column()
+  @Column({ nullable: true })
   storeId: string;
 
-  @Column({ nullable: true })
-  salesTargetId: string;
+  @Column(() => SalesTarget)
+  salesTarget?: SalesTarget;
 
   @Column({ nullable: true })
   name: string;
@@ -15,7 +16,7 @@ export default class Campaign extends DefaultColumnsService {
   @Column({ nullable: true })
   joinExisting: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   criteria: string;
 
   // @Column(() => Product)
