@@ -56,7 +56,7 @@ export class Refund {
   @Field({ nullable: true })
   createdAt: Date;
   @Field({ nullable: true })
-  discount: string;
+  discount: number;
   @Field(() => Int, { nullable: true })
   amount: number;
 }
@@ -75,7 +75,7 @@ export class Member {
   orderId: string;
 
   @Field({ nullable: true })
-  availedDiscount: string;
+  availedDiscount: number;
 
   @Field(() => RoleTypeEnum, { nullable: true })
   role: RoleTypeEnum;

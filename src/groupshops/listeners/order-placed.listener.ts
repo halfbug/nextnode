@@ -3,16 +3,20 @@ import { ConfigService } from '@nestjs/config';
 import { OnEvent } from '@nestjs/event-emitter';
 // import moment from 'moment';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { Reward } from 'src/appsettings/entities/sales-target.model';
 import { OrderPlacedEvent } from 'src/shopify-store/events/order-placed.envent';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import {
   CreateGroupshopInput,
   DealProductsInput,
+  DiscountCodeInput,
   MemberInput,
   MilestoneInput,
+  RefundInput,
 } from '../dto/create-groupshops.input';
 import { UpdateGroupshopInput } from '../dto/update-groupshops.input';
 import { ProductTypeEnum, RoleTypeEnum } from '../entities/groupshop.entity';
+import { RefundStatusEnum } from '../entities/groupshop.modal';
 import { GroupshopsService } from '../groupshops.service';
 
 @Injectable()
@@ -35,18 +39,24 @@ export class OrderPlacedListener {
     return new Date(newDate.setDate(newDate.getDate() + number));
   }
   async setDiscountCode(
-    title: string,
-    percentage: number,
-    products: string[],
-    starts: Date,
-    ends: Date,
     shop: string,
+    action: string,
     accessToken: string,
+    title?: string,
+    percentage?: number,
+    products?: string[],
+    starts?: Date,
+    ends?: Date,
+    id?: string,
   ) {
+    // if (percentage) {
     const client = await this.shopifyapi.client(shop, accessToken);
-    const priceRule = await client.query({
-      data: {
-        query: `mutation priceRuleCreate($priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {
+    let priceRule: any;
+
+    if (action === 'Create')
+      priceRule = await client.query({
+        data: {
+          query: `mutation priceRuleCreate($priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {
           priceRuleCreate(priceRule: $priceRule, priceRuleDiscountCode: $priceRuleDiscountCode) {
             priceRule {
               id
@@ -63,35 +73,68 @@ export class OrderPlacedListener {
             }
           }
         }`,
-        variables: {
-          priceRule: {
-            title: title,
-            target: 'LINE_ITEM',
-            value: {
-              percentageValue: -percentage,
+          variables: {
+            id: id || null,
+            priceRule: {
+              title: title,
+              target: 'LINE_ITEM',
+              value: {
+                percentageValue: -percentage,
+              },
+              itemEntitlements: {
+                productIds: products,
+              },
+              customerSelection: {
+                forAllCustomers: true,
+              },
+              allocationMethod: 'EACH',
+              validityPeriod: {
+                start: starts,
+                end: ends,
+              },
             },
-            itemEntitlements: {
-              productIds: products,
-            },
-            customerSelection: {
-              forAllCustomers: true,
-            },
-            allocationMethod: 'EACH',
-            validityPeriod: {
-              start: starts,
-              end: ends,
+            priceRuleDiscountCode: { code: title },
+          },
+        },
+      });
+    else
+      priceRule = await client.query({
+        data: {
+          query: `mutation priceRuleUpdate($id: ID!,$priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {
+          priceRuleUpdate(id: $id, priceRule: $priceRule, priceRuleDiscountCode: $priceRuleDiscountCode) {
+          priceRule {
+            id
+            title
+            target
+            startsAt
+            endsAt
+          }
+          priceRuleDiscountCode {
+            code
+          }
+          priceRuleUserErrors {
+            message
+          }
+        }
+      }`,
+          variables: {
+            id,
+            priceRule: {
+              value: {
+                percentageValue: -percentage,
+              },
             },
           },
-          priceRuleDiscountCode: { code: title },
         },
-      },
-    });
+      });
+    // const
+
     console.log(
       '🚀 ~ file: order-placed.listener.ts ~ line 65 ~ OrderPlacedListener ~ priceRule',
       JSON.stringify(priceRule),
     );
     const {
-      priceRuleCreate: {
+      [`priceRule${action}`]: {
         priceRule: { id: priceRuleId },
       },
     } = priceRule.body['data'];
@@ -100,6 +143,49 @@ export class OrderPlacedListener {
       percentage: percentage.toString(),
       priceRuleId: priceRuleId,
     };
+    // }
+  }
+
+  getNextMemberDiscount(totalMembers: number, rewards: Reward[]) {
+    console.log(
+      '🚀 ~ file: order-placed.listener.ts ~ line 134 ~ OrderPlacedListener ~ getNextMemberDiscount ~ totalMembers',
+      totalMembers,
+    );
+    console.log(
+      '🚀 ~ file: order-placed.listener.ts ~ line 134 ~ OrderPlacedListener ~ getNextMemberDiscount ~ rewards',
+      rewards,
+    );
+    console.log(
+      rewards.filter((rew) => parseInt(rew.customerCount) === totalMembers + 1),
+    );
+    if (totalMembers === 5) return rewards[0].discount;
+    return (
+      rewards.filter(
+        (rew) => parseInt(rew.customerCount) === totalMembers + 1,
+      )[0]?.discount || null
+    );
+  }
+
+  calculatePreviousMembersRefund(
+    members: MemberInput[],
+    discountCode: DiscountCodeInput,
+  ) {
+    console.log(
+      '🚀 ~ file: order-placed.listener.ts ~ line 167 ~ OrderPlacedListener ~ getPreviousMembersRefund ~ members',
+      members,
+    );
+
+    const totalMembers = members.length;
+    const membersRefund = members.map((member) => {
+      if (member.availedDiscount < parseInt(discountCode.percentage)) {
+        const refund = new RefundInput();
+        refund.discount =
+          parseInt(discountCode.percentage) - member.availedDiscount;
+        refund.status = RefundStatusEnum.panding;
+        refund.createdAt = new Date();
+        // refund.amount = discountCode.percentage -
+      }
+    });
   }
 
   @OnEvent('order.placed')
@@ -154,27 +240,62 @@ export class OrderPlacedListener {
     if (discountCode) {
       // const updateGroupshop = await this.gsService.findOne(discountCode);
       let ugroupshop = new UpdateGroupshopInput();
-      ugroupshop = await this.gsService.findOne(discountCode);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      ugroupshop = await this.gsService.findOneWithLineItems(discountCode);
+      const {
+        discountCode: { title, priceRuleId },
+        createdAt,
+        expiredAt,
+      } = ugroupshop;
+
       gsMember.role = RoleTypeEnum.referral;
-      // gsMember.availedDiscount = 
+      gsMember.availedDiscount = parseFloat(ugroupshop.discountCode.percentage);
       ugroupshop.members = [...ugroupshop.members, gsMember];
-      console.log(
-        '🚀 ~ file: order-placed.listener.ts ~ line 155 ~ OrderPlacedListener ~ createGroupShop ~ updateGroupshop',
-        ugroupshop,
+      const newDiscount = this.getNextMemberDiscount(
+        ugroupshop.members.length,
+        rewards,
       );
-      console.log('------------ discount meet ---------');
+      console.log(
+        '🚀 ~ file: order-placed.listener.ts ~ line 235 ~ OrderPlacedListener ~ createGroupShop ~ newDiscount',
+        newDiscount,
+      );
+
+      if (newDiscount) {
+        ugroupshop.discountCode = await this.setDiscountCode(
+          shop,
+          'Update',
+          accessToken,
+          title,
+          parseInt(newDiscount),
+          totalCampaignProducts,
+          createdAt,
+          expiredAt,
+          priceRuleId,
+        );
+        const gsMilestone = new MilestoneInput();
+        gsMilestone.activatedAt = new Date();
+        gsMilestone.discount = `${newDiscount}%`;
+        ugroupshop.milestones = [...ugroupshop.milestones, gsMilestone];
+      }
+
+      ugroupshop.dealProducts = dealProducts;
+      ugroupshop.totalProducts = totalCampaignProducts.length;
+
+      await this.gsService.update(ugroupshop);
     } else {
       const newGroupshop = new CreateGroupshopInput();
       newGroupshop.storeId = id;
       newGroupshop.campaignId = campaignId;
       newGroupshop.discountCode = await this.setDiscountCode(
+        shop,
+        'Create',
+        accessToken,
         title,
         parseInt(rewards[0].discount),
         totalCampaignProducts,
         new Date(),
         expires,
-        shop,
-        accessToken,
       );
       newGroupshop.dealProducts = [new DealProductsInput()];
       newGroupshop.dealProducts = dealProducts;
@@ -183,7 +304,7 @@ export class OrderPlacedListener {
       newGroupshop.createdAt = new Date();
       newGroupshop.expiredAt = expires;
       // newGroupshop.
-      // gsMember.availedDiscount = rewards[0].discount;
+      gsMember.availedDiscount = 0;
       gsMember.role = RoleTypeEnum.owner;
       newGroupshop.members = [gsMember];
       const gsMilestone = new MilestoneInput();

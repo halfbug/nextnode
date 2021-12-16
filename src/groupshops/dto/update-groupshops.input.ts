@@ -5,4 +5,6 @@ import { InputType, Field, Int, PartialType } from '@nestjs/graphql';
 export class UpdateGroupshopInput extends PartialType(CreateGroupshopInput) {
   @Field(() => String)
   id: string;
+  @Field(() => String)
+  _id: string;
 }

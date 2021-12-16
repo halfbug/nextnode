@@ -1,10 +1,12 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
 
+@InputType()
 export class LineProduct {
   @Field({ nullable: true })
   id: string;
 }
 
+@InputType()
 export class Customer {
   @Field({ nullable: true })
   firstName: string;

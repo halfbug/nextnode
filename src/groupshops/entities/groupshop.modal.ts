@@ -1,5 +1,6 @@
 import { Column, Entity } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
+import { CreateOrderInput as LineItem } from 'src/inventory/dto/create-order.input';
 
 export enum ProductTypeEnum {
   deal,
@@ -49,7 +50,7 @@ export class Refund {
   @Column({ nullable: true })
   createdAt: Date;
   @Column({ nullable: true })
-  discount: string;
+  discount: number;
   @Column({ nullable: true })
   amount: number;
 }
@@ -66,13 +67,16 @@ export class Member {
   orderId: string;
 
   @Column({ nullable: true })
-  availedDiscount: string;
+  availedDiscount: number;
 
   @Column('enum', { nullable: true })
   role: RoleTypeEnum;
 
   @Column(() => Refund)
   refund?: Refund[];
+
+  @Column(() => LineItem)
+  lineItems?: LineItem[];
 }
 
 @Entity()

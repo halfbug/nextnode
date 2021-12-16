@@ -184,7 +184,7 @@ export class WebhooksController {
       itm.code.startsWith(this.configSevice.get('DC_PREFIX')),
     );
     newOrder.discountCode =
-      dc[0].code || whOrder.discount_codes[0].code || null;
+      dc[0]?.code || whOrder.discount_codes[0]?.code || null;
     // newOrder.discountInfo = [new DiscountInfo()];
     // newOrder.discountInfo = whOrder.discount_codes?.map(
     //   (dc: DiscountInfo) => new DiscountInfo(dc),

@@ -1,4 +1,5 @@
 import { InputType, Int, Field, ID } from '@nestjs/graphql';
+import { CreateOrderInput as LineItem } from 'src/inventory/dto/create-order.input';
 import {
   ProductTypeEnum,
   RefundStatusEnum,
@@ -37,13 +38,16 @@ export class MemberInput {
   orderId: string;
 
   @Field({ nullable: true })
-  availedDiscount: string;
+  availedDiscount: number;
 
   @Field(() => RoleTypeEnum, { nullable: true })
   role: RoleTypeEnum;
 
   @Field(() => [RefundInput], { nullable: 'itemsAndList' })
   refund?: RefundInput[];
+
+  @Field(() => [LineItem], { nullable: 'itemsAndList' })
+  lineItems?: LineItem[];
 }
 
 @InputType()
@@ -61,7 +65,7 @@ export class RefundInput {
   @Field({ nullable: true })
   createdAt: Date;
   @Field({ nullable: true })
-  discount: string;
+  discount: number;
   @Field(() => Int, { nullable: true })
   amount: number;
 }

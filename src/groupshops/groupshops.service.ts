@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getMongoManager, Repository } from 'typeorm';
 import {
   CreateGroupshopInput,
   DealProductsInput,
@@ -45,7 +45,69 @@ export class GroupshopsService {
     });
   }
 
-  update(id: string, updateGroupshopInput: UpdateGroupshopInput) {
+  async findOneWithLineItems(discountCode: string) {
+    const agg = [
+      {
+        $match: {
+          'discountCode.title': discountCode,
+        },
+      },
+      {
+        $sort: {
+          'milestones.activatedAt': -1,
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'parentId',
+          as: 'orderDetails',
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    LineItems: {
+                      $filter: {
+                        input: '$orderDetails',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.orderId', '$$j.parentId'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          orderDetails: 0,
+        },
+      },
+    ];
+
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    console.log('🚀 ~ find one groupshop with line items', gs);
+    return gs[0];
+  }
+
+  update(updateGroupshopInput: UpdateGroupshopInput) {
+    const { _id: id, dealProducts } = updateGroupshopInput;
+    updateGroupshopInput.dealProducts = [new DealProductsInput()];
+    updateGroupshopInput.dealProducts = dealProducts;
+
     return this.groupshopRepository.update(id, updateGroupshopInput);
   }
 
