@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { forwardRef, Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { StoreService } from './store/store.service';
 import { ShopifyStoreController } from './shopify-store.controller';
@@ -15,6 +15,9 @@ import { InventoryModule } from 'src/inventory/inventory.module';
 
 // import { AwsService } from './aws.service';
 import { UploadImageModule } from './ImageUpload/uploadimage.module';
+import { CampaignsModule } from 'src/campaigns/campaigns.module';
+import { GroupshopsModule } from 'src/groupshops/groupshops.module';
+// import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 @Global()
 @Module({
   imports: [
@@ -23,7 +26,8 @@ import { UploadImageModule } from './ImageUpload/uploadimage.module';
     TypeOrmModule.forFeature([Store]),
     StoresModule,
     InventoryModule,
-    // AwsService,
+    CampaignsModule,
+    forwardRef(() => GroupshopsModule),
     UploadImageModule,
   ],
   providers: [

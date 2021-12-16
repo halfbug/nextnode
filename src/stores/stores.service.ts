@@ -114,8 +114,12 @@ export class StoresService {
     return await this.findOneById(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} store`;
+  remove(id: string) {
+    return this.storeRepository.delete({ id });
+  }
+
+  async removeShop(shop: string) {
+    return await this.storeRepository.delete({ shop });
   }
 
   isExist(shop: string) {

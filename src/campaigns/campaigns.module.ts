@@ -16,5 +16,6 @@ import { StoresModule } from 'src/stores/stores.module';
     StoresModule,
   ],
   providers: [CampaignsResolver, CampaignsService],
+  exports: [CampaignsService],
 })
 export class CampaignsModule {}

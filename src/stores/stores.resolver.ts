@@ -44,7 +44,7 @@ export class StoresResolver {
   }
 
   @Mutation(() => Store)
-  removeStore(@Args('id', { type: () => Int }) id: number) {
+  removeStore(@Args('id', { type: () => String }) id: string) {
     return this.storesService.remove(id);
   }
 }

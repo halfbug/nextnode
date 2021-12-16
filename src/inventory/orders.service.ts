@@ -65,4 +65,8 @@ export class OrdersService {
     order.discountInfo = createOrderInput.discountInfo;
     return await this.ordersRepository.save(order);
   }
+
+  async removeShop(shop: string) {
+    return await this.ordersRepository.delete({ shop });
+  }
 }
