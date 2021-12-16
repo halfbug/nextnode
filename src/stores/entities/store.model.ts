@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
 import { Settings } from './settings.model';
 import Campaign from 'src/campaigns/entities/campaign.model';

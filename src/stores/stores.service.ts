@@ -59,6 +59,17 @@ export class StoresService {
             {
               $limit: 10,
             },
+            {
+              $lookup: {
+                from: 'appsetting',
+                localField: 'rewards',
+                foreignField: 'salestargets.id',
+                as: 'salesTarget',
+              },
+            },
+            { $unwind: '$salesTarget' },
+            { $addFields: { salesTarget: '$salesTarget.salestargets' } },
+            { $unwind: '$salesTarget' },
           ],
           as: 'campaigns',
         },
@@ -69,7 +80,8 @@ export class StoresService {
       '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
       res,
     );
-    return res;
+    // const salesTarget = res[0].salesTarget[0].salesTargets[0];
+    return { ...res[0] };
   }
 
   async findOneByName(shop: string) {

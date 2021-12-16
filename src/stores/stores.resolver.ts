@@ -29,7 +29,7 @@ export class StoresResolver {
       '🚀 ~ file: stores.resolver.ts ~ line 28 ~ StoresResolver ~ findOne ~ res',
       res,
     );
-    if (withCampaigns) return res[0];
+    if (withCampaigns) return res;
     else return this.storesService.findOneByName(shop);
   }
 

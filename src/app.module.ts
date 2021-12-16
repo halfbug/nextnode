@@ -14,6 +14,8 @@ import Inventory from './inventory/entities/inventory.modal';
 import Campaign from './campaigns/entities/campaign.model';
 import Orders from './inventory/entities/orders.modal';
 import { Appsetting } from './appsettings/entities/appsetting.model';
+import { GroupshopsModule } from './groupshops/groupshops.module';
+import { Groupshops } from './groupshops/entities/groupshop.modal';
 
 @Module({
   imports: [
@@ -42,7 +44,14 @@ import { Appsetting } from './appsettings/entities/appsetting.model';
           synchronize: true,
           useUnifiedTopology: true,
           // entities: [__dirname + './**/*.modal.ts'],
-          entities: [Store, Inventory, Campaign, Orders, Appsetting],
+          entities: [
+            Store,
+            Inventory,
+            Campaign,
+            Orders,
+            Appsetting,
+            Groupshops,
+          ],
         };
       },
     }),
@@ -55,6 +64,7 @@ import { Appsetting } from './appsettings/entities/appsetting.model';
     InventoryModule,
     CampaignsModule,
     AppsettingsModule,
+    GroupshopsModule,
   ],
 })
 export class AppModule {}
