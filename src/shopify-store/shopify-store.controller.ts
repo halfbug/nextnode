@@ -1,24 +1,11 @@
-import {
-  Controller,
-  forwardRef,
-  Get,
-  Inject,
-  Req,
-  Res,
-  // Post,
-  // UseInterceptors,
-  // UploadedFile,
-} from '@nestjs/common';
-// import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, forwardRef, Get, Inject, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
 import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { InventoryService } from 'src/inventory/inventory.service';
-// import { InventoryService } from 'src/inventory/inventory.service';
 import { OrdersService } from 'src/inventory/orders.service';
 import { StoresService } from 'src/stores/stores.service';
 import { StoreService } from './store/store.service';
-// import { AwsService } from './aws.service';
 
 @Controller()
 export class ShopifyStoreController {
