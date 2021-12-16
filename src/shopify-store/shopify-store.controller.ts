@@ -1,6 +1,8 @@
 import {
   Controller,
+  forwardRef,
   Get,
+  Inject,
   Req,
   Res,
   // Post,
@@ -9,6 +11,11 @@ import {
 } from '@nestjs/common';
 // import { FileInterceptor } from '@nestjs/platform-express';
 import { Request, Response } from 'express';
+import { CampaignsService } from 'src/campaigns/campaigns.service';
+import { GroupshopsService } from 'src/groupshops/groupshops.service';
+import { InventoryService } from 'src/inventory/inventory.service';
+// import { InventoryService } from 'src/inventory/inventory.service';
+import { OrdersService } from 'src/inventory/orders.service';
 import { StoresService } from 'src/stores/stores.service';
 import { StoreService } from './store/store.service';
 // import { AwsService } from './aws.service';
@@ -18,7 +25,11 @@ export class ShopifyStoreController {
   constructor(
     private storeService: StoreService,
     // private awsService: AwsService,
-
+    // @Inject(forwardRef(() => InventoryService))
+    private inventorySrv: InventoryService,
+    private campaignSrv: CampaignsService,
+    private ordersSrv: OrdersService,
+    private groupshopSrv: GroupshopsService,
     private storesService: StoresService,
   ) {}
 
@@ -67,5 +78,21 @@ export class ShopifyStoreController {
   @Get('test')
   async test() {
     return 'running server on port 5000';
+  }
+
+  @Get('refresh')
+  async dbfresh() {
+    try {
+      const shop = 'native-roots-dev.myshopify.com';
+      const store = await this.storesService.findOne(shop);
+      await this.inventorySrv.removeShop(shop);
+      await this.ordersSrv.removeShop(shop);
+      await this.campaignSrv.removeShop(store.id);
+      await this.groupshopSrv.removeShop(store.id);
+      await this.storesService.removeShop(shop);
+      return 'done';
+    } catch (error) {
+      return error.message;
+    }
   }
 }

@@ -52,6 +52,10 @@ export class InventoryService {
     });
   }
 
+  async removeShop(shop: string) {
+    return await this.inventoryRepository.delete({ shop });
+  }
+
   async findTotalProducts(shop: string) {
     const manager = getMongoManager();
     const agg = [

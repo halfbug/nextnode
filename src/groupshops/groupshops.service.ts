@@ -114,4 +114,8 @@ export class GroupshopsService {
   remove(id: number) {
     return `This action removes a #${id} Groupshop`;
   }
+
+  async removeShop(storeId: string) {
+    return await this.groupshopRepository.delete({ storeId });
+  }
 }
