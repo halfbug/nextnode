@@ -68,6 +68,18 @@ export class RefundInput {
   discount: number;
   @Field(() => Int, { nullable: true })
   amount: number;
+
+  constructor(
+    status?: RefundStatusEnum,
+    createdAt?: Date,
+    discount?: number,
+    amount?: number,
+  ) {
+    this.status = status;
+    this.createdAt = createdAt || new Date();
+    this.discount = discount;
+    this.amount = amount;
+  }
 }
 
 @InputType()
