@@ -74,7 +74,7 @@ export class GroupshopsService {
                 $mergeObjects: [
                   '$$this',
                   {
-                    LineItems: {
+                    lineItems: {
                       $filter: {
                         input: '$orderDetails',
                         as: 'j',

@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { OnEvent } from '@nestjs/event-emitter';
 // import moment from 'moment';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { CreateMemberInput } from 'aws-sdk/clients/managedblockchain';
 import { Reward } from 'src/appsettings/entities/sales-target.model';
 import { OrderPlacedEvent } from 'src/shopify-store/events/order-placed.envent';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
@@ -129,10 +130,6 @@ export class OrderPlacedListener {
       });
     // const
 
-    console.log(
-      '🚀 ~ file: order-placed.listener.ts ~ line 65 ~ OrderPlacedListener ~ priceRule',
-      JSON.stringify(priceRule),
-    );
     const {
       [`priceRule${action}`]: {
         priceRule: { id: priceRuleId },
@@ -147,17 +144,6 @@ export class OrderPlacedListener {
   }
 
   getNextMemberDiscount(totalMembers: number, rewards: Reward[]) {
-    console.log(
-      '🚀 ~ file: order-placed.listener.ts ~ line 134 ~ OrderPlacedListener ~ getNextMemberDiscount ~ totalMembers',
-      totalMembers,
-    );
-    console.log(
-      '🚀 ~ file: order-placed.listener.ts ~ line 134 ~ OrderPlacedListener ~ getNextMemberDiscount ~ rewards',
-      rewards,
-    );
-    console.log(
-      rewards.filter((rew) => parseInt(rew.customerCount) === totalMembers + 1),
-    );
     if (totalMembers === 5) return rewards[0].discount;
     return (
       rewards.filter(
@@ -166,25 +152,46 @@ export class OrderPlacedListener {
     );
   }
 
-  calculatePreviousMembersRefund(
+  totalPricePercent(lineItems, discountPercentage) {
+    const totalPrice = lineItems?.reduce(
+      (priceSum: number, { price, quantity }) =>
+        priceSum + quantity * parseFloat(price),
+      0,
+    );
+    return discountPercentage * totalPrice;
+  }
+
+  calculateRefund(member: any, milestone: number) {
+    const netDiscount = milestone * 100 - member.availedDiscount;
+
+    const refundAmount = this.totalPricePercent(member.lineItems, milestone);
+    const refund = new RefundInput(
+      RefundStatusEnum.panding,
+      new Date(),
+      netDiscount,
+      refundAmount,
+    );
+
+    member.refund = [...(member.refund ?? []), refund];
+    member.availedDiscount += netDiscount;
+    return member;
+  }
+  setPreviousMembersRefund(
     members: MemberInput[],
     discountCode: DiscountCodeInput,
   ) {
-    console.log(
-      '🚀 ~ file: order-placed.listener.ts ~ line 167 ~ OrderPlacedListener ~ getPreviousMembersRefund ~ members',
-      members,
-    );
-
     const totalMembers = members.length;
-    const membersRefund = members.map((member) => {
-      if (member.availedDiscount < parseInt(discountCode.percentage)) {
-        const refund = new RefundInput();
-        refund.discount =
-          parseInt(discountCode.percentage) - member.availedDiscount;
-        refund.status = RefundStatusEnum.panding;
-        refund.createdAt = new Date();
-        // refund.amount = discountCode.percentage -
+    const currentMilestone = parseFloat(discountCode.percentage) / 100;
+    return members.map((member) => {
+      if (totalMembers === 5 && member.role === RoleTypeEnum.owner) {
+        member = this.calculateRefund(member, 50 / 100);
+      } else if (totalMembers === 10 && member.role === RoleTypeEnum.owner) {
+        member = this.calculateRefund(member, 90 / 100);
+      } else if (member.availedDiscount / 100 < currentMilestone) {
+        member = this.calculateRefund(member, currentMilestone);
       }
+
+      return member;
     });
   }
 
@@ -193,11 +200,6 @@ export class OrderPlacedListener {
     console.log(
       '🚀 ~ file: order-placed.listener.ts ~ line 18 ~ OrderPlacedListener ~ createGroupShop ~ event',
       event,
-    );
-
-    console.log(
-      '🚀 ~ Lineitmes ~ OrderPlacedListener ~ createGroupShop ~ event',
-      event.lineItems,
     );
 
     const {
@@ -240,8 +242,7 @@ export class OrderPlacedListener {
     if (discountCode) {
       // const updateGroupshop = await this.gsService.findOne(discountCode);
       let ugroupshop = new UpdateGroupshopInput();
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
+
       ugroupshop = await this.gsService.findOneWithLineItems(discountCode);
       const {
         discountCode: { title, priceRuleId },
@@ -252,13 +253,17 @@ export class OrderPlacedListener {
       gsMember.role = RoleTypeEnum.referral;
       gsMember.availedDiscount = parseFloat(ugroupshop.discountCode.percentage);
       ugroupshop.members = [...ugroupshop.members, gsMember];
+
+      ugroupshop.dealProducts = dealProducts;
+      ugroupshop.totalProducts = totalCampaignProducts.length;
+      ugroupshop.members = this.setPreviousMembersRefund(
+        ugroupshop.members,
+        ugroupshop.discountCode,
+      );
+
       const newDiscount = this.getNextMemberDiscount(
         ugroupshop.members.length,
         rewards,
-      );
-      console.log(
-        '🚀 ~ file: order-placed.listener.ts ~ line 235 ~ OrderPlacedListener ~ createGroupShop ~ newDiscount',
-        newDiscount,
       );
 
       if (newDiscount) {
@@ -275,12 +280,9 @@ export class OrderPlacedListener {
         );
         const gsMilestone = new MilestoneInput();
         gsMilestone.activatedAt = new Date();
-        gsMilestone.discount = `${newDiscount}%`;
+        gsMilestone.discount = `${newDiscount}`;
         ugroupshop.milestones = [...ugroupshop.milestones, gsMilestone];
       }
-
-      ugroupshop.dealProducts = dealProducts;
-      ugroupshop.totalProducts = totalCampaignProducts.length;
 
       await this.gsService.update(ugroupshop);
     } else {
@@ -313,16 +315,5 @@ export class OrderPlacedListener {
       newGroupshop.milestones = [gsMilestone];
       this.gsService.create(newGroupshop);
     }
-    // const client = await this.shopifyapi.client(shop, accessToken);
-    // const qres = await client.query({
-
-    // });
-    //       const inventoryReceivedEvent = new InventoryReceivedEvent();
-    //   inventoryReceivedEvent.bulkOperationResponse =
-    //     poll.body['data']['currentBulkOperation'];
-    //   inventoryReceivedEvent.shop = shop;
-    //   inventoryReceivedEvent.accessToken = accessToken;
-
-    //   this.eventEmitter.emit('inventory.received', inventoryReceivedEvent);
   }
 }
