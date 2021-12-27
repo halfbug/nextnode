@@ -53,6 +53,9 @@ export class CampaignsService {
         products = createCampaignInput.products;
         break;
     }
+    /// update all capaign
+    // const manager = getMongoManager();
+    this.campaignRepository.update({ isActive: true }, { isActive: false });
 
     const id = uuid();
 

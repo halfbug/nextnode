@@ -27,4 +27,7 @@ export default class Campaign extends DefaultColumnsService {
 
   @Column('string', { nullable: true })
   rewards?: string;
+
+  @Column()
+  isActive?: boolean;
 }

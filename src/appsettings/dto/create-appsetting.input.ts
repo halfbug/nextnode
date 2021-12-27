@@ -30,6 +30,9 @@ export class SalesTargetType {
 
   @Field((type) => [RewardInput])
   rewards: RewardInput[];
+
+  @Field({ defaultValue: true })
+  isActive?: boolean;
 }
 
 @InputType()
