@@ -71,6 +71,10 @@ export class InvenotrySavedListener {
                                         }
                                       }
                                     }
+                                    variant{
+                                      id,
+                                      price
+                                      }
                                   }
                                 }
                               }

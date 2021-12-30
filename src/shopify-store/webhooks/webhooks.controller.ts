@@ -41,6 +41,8 @@ export class WebhooksController {
     const rhook = await this.shopifyService.registerHook(
       shop,
       accessToken,
+      // '/webhooks/product-update',
+      // 'PRODUCTS_UPDATE',
       '/webhooks/order-create',
       'ORDERS_CREATE',
     );
@@ -48,7 +50,7 @@ export class WebhooksController {
     const client = await this.shopifyService.client(shop, accessToken);
     const qwbh = await client.query({
       data: `{
-        webhookSubscription(id: "gid://shopify/WebhookSubscription/1097503637670") {
+        webhookSubscription(id: "gid://shopify/WebhookSubscription/1100885262502") {
           id
           topic
           endpoint {

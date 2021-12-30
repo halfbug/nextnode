@@ -71,6 +71,7 @@ export class TokenReceivedListener {
                               displayName
                               storefrontId
                               inventoryQuantity
+                              price
                               shopifyCreatedAt :createdAt
                               image{
                                 src

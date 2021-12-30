@@ -39,10 +39,108 @@ export class GroupshopsService {
     return `This action returns all Groupshops`;
   }
 
-  findOne(discountCode: string) {
-    return this.groupshopRepository.findOne({
-      where: { 'discountCode.title': discountCode },
-    });
+  async findOne(discountCode: string) {
+    const agg = [
+      {
+        $match: {
+          'discountCode.title': discountCode,
+        },
+      },
+      {
+        $sort: {
+          'milestones.activatedAt': -1,
+        },
+      },
+      {
+        $lookup: {
+          from: 'store',
+          localField: 'storeId',
+          foreignField: 'id',
+          as: 'store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$store',
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'parentId',
+          as: 'orderDetails',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'orderDetails.product.id',
+          foreignField: 'id',
+          as: 'PopularProducts',
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    lineItems: {
+                      $filter: {
+                        input: '$orderDetails',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.orderId', '$$j.parentId'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $unwind: {
+          path: '$orderDetails',
+        },
+      },
+      {
+        $lookup: {
+          from: 'campaign',
+          localField: 'campaignId',
+          foreignField: 'id',
+          as: 'campaign',
+        },
+      },
+      {
+        $unwind: {
+          path: '$campaign',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'campaign.products',
+          foreignField: 'id',
+          as: 'campaignProducts',
+        },
+      },
+      {
+        $project: {
+          orderDetails: 0,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    console.log('🚀 ~ find one groupshop products', gs);
+    return gs[0];
   }
 
   async findOneWithLineItems(discountCode: string) {
