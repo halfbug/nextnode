@@ -60,10 +60,15 @@ export class OrdersService {
   }
 
   async create(createOrderInput: CreateOrderInput) {
-    const order = this.ordersRepository.create(createOrderInput);
-    order.discountInfo = [new DiscountInfo()];
-    order.discountInfo = createOrderInput.discountInfo;
-    return await this.ordersRepository.save(order);
+    try {
+      const order = this.ordersRepository.create(createOrderInput);
+      order.discountInfo = [new DiscountInfo()];
+      order.discountInfo = createOrderInput.discountInfo;
+
+      return await this.ordersRepository.save(order);
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
   }
 
   async removeShop(shop: string) {

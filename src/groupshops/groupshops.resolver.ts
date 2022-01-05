@@ -25,10 +25,10 @@ export class GroupshopsResolver {
   //   return this.GroupshopsService.findAll();
   // }
 
-  // @Query(() => Groupshop, { name: 'Groupshop' })
-  // findOne(@Args('id', { type: () => Int }) id: number) {
-  //   return this.GroupshopsService.findOne(id);
-  // }
+  @Query(() => Groupshop, { name: 'groupshop' })
+  findOne(@Args('code') code: string) {
+    return this.GroupshopsService.findOne(code);
+  }
 
   // @Mutation(() => Groupshop)
   // updateGroupshop(

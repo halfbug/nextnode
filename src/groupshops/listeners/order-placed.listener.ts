@@ -30,7 +30,7 @@ export class OrderPlacedListener {
   ) {}
 
   static formatTitle(name: string) {
-    return `GS${Math.floor(1000 + Math.random() * 9000)}${name.substring(
+    return `GS${Math.floor(1000 + Math.random() * 9000)}${name?.substring(
       1,
       name.length,
     )}`;
@@ -302,7 +302,7 @@ export class OrderPlacedListener {
       newGroupshop.dealProducts = [new DealProductsInput()];
       newGroupshop.dealProducts = dealProducts;
       newGroupshop.totalProducts = totalCampaignProducts.length;
-      newGroupshop.url = `/${shop.split('.')[0]}/${title}`;
+      newGroupshop.url = `/${shop.split('.')[0]}/deal/${title}`;
       newGroupshop.createdAt = new Date();
       newGroupshop.expiredAt = expires;
       // newGroupshop.

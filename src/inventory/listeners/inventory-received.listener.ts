@@ -27,7 +27,8 @@ export class InventoryReceivedListener {
       //
       // if (typeof inventory.featuredImage === 'object')
       inventory.featuredImage = inventory?.featuredImage?.src;
-      inventory.price = inventory?.priceRangeV2?.maxVariantPrice?.amount;
+      inventory.price =
+        inventory?.priceRangeV2?.maxVariantPrice?.amount || inventory.price;
       inventory.currencyCode =
         inventory?.priceRangeV2?.maxVariantPrice?.currencyCode;
 

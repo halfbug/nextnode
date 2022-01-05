@@ -1,12 +1,14 @@
-import { InputType, Int, Field } from '@nestjs/graphql';
+import { InputType, Int, Field, ObjectType } from '@nestjs/graphql';
 
-@InputType()
+@InputType('LineProductInput')
+@ObjectType('LineProduct')
 export class LineProduct {
   @Field({ nullable: true })
   id: string;
 }
 
-@InputType()
+@InputType('CustomerInput')
+@ObjectType('Customer')
 export class Customer {
   @Field({ nullable: true })
   firstName: string;
@@ -20,7 +22,8 @@ export class Customer {
   phone: string;
 }
 
-@InputType()
+@InputType('DiscountInfoInput')
+@ObjectType('DiscountInfo')
 export class DiscountInfo {
   @Field({ nullable: true })
   code: string;
@@ -34,7 +37,7 @@ export class DiscountInfo {
     this.type = dc?.type;
   }
 }
-
+@ObjectType('Order')
 @InputType()
 export class CreateOrderInput {
   @Field({ description: 'shopify entity admin_graphql_api_id' })

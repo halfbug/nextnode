@@ -39,10 +39,221 @@ export class GroupshopsService {
     return `This action returns all Groupshops`;
   }
 
-  findOne(discountCode: string) {
-    return this.groupshopRepository.findOne({
-      where: { 'discountCode.title': discountCode },
-    });
+  async findOne(discountCode: string) {
+    const agg = [
+      {
+        $match: {
+          'discountCode.title': discountCode,
+        },
+      },
+      {
+        $sort: {
+          'milestones.activatedAt': -1,
+        },
+      },
+      {
+        $lookup: {
+          from: 'store',
+          localField: 'storeId',
+          foreignField: 'id',
+          as: 'store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$store',
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'parentId',
+          as: 'lineItemsDetails',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'lineItemsDetails.product.id',
+          foreignField: 'id',
+          as: 'popularProducts',
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    lineItems: {
+                      $filter: {
+                        input: '$lineItemsDetails',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.orderId', '$$j.parentId'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'id',
+          as: 'orderDetails',
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    orderDetail: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$orderDetails',
+                            as: 'j',
+                            cond: {
+                              $eq: ['$$this.orderId', '$$j.id'],
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          popularProducts: {
+            $map: {
+              input: '$popularProducts',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    lineItems: {
+                      $filter: {
+                        input: '$lineItemsDetails',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.id', '$$j.product.id'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              as: 'me',
+              in: {
+                $mergeObjects: [
+                  '$$me',
+                  {
+                    products: {
+                      $arrayElemAt: [
+                        {
+                          $map: {
+                            input: '$$me.lineItems',
+                            in: {
+                              $filter: {
+                                input: '$popularProducts',
+                                as: 'j',
+                                cond: {
+                                  $eq: ['$$this.product.id', '$$j.id'],
+                                },
+                              },
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'campaign',
+          localField: 'campaignId',
+          foreignField: 'id',
+          as: 'campaign',
+        },
+      },
+      {
+        $unwind: {
+          path: '$campaign',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'campaign.products',
+          foreignField: 'id',
+          as: 'campaignProducts',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'dealProducts.productId',
+          foreignField: 'id',
+          as: 'dealsProducts',
+        },
+      },
+      {
+        $addFields: {
+          allProducts: {
+            $concatArrays: ['$campaignProducts', '$dealsProducts'],
+          },
+        },
+      },
+      {
+        $project: {
+          lineItemsDetails: 0,
+          orderDetails: 0,
+          dealsProducts: 0,
+          campaignProducts: 0,
+          'members.lineItems': 0,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    console.log('🚀 ~ find one groupshop products', gs);
+    return gs[0];
   }
 
   async findOneWithLineItems(discountCode: string) {

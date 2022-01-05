@@ -1,12 +1,14 @@
-import { ObjectType, Field } from '@nestjs/graphql';
-
+import { ObjectType, Field, InputType } from '@nestjs/graphql';
+import { CreateOrderInput as Orders } from '../dto/create-order.input';
+// import Orders from './orders.entity';
+// CreateOrderInput
 @ObjectType()
 class FeatureImageType {
   @Field()
   src: string;
 }
-
-@ObjectType()
+@InputType('ProductInput')
+@ObjectType('Product')
 export class Product {
   // @Field({ description: 'mongo entity id' })
   // _id: string;
@@ -61,4 +63,7 @@ export class Product {
 
   @Field({ nullable: true })
   featuredImage?: string;
+
+  @Field(() => [Orders], { nullable: 'itemsAndList' })
+  lineItems?: Orders[];
 }
