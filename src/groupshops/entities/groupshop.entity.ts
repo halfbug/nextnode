@@ -1,4 +1,8 @@
 import { ObjectType, Field, registerEnumType, ID, Int } from '@nestjs/graphql';
+import { Campaign } from 'src/campaigns/entities/campaign.entity';
+import { CreateOrderInput as Order } from 'src/inventory/dto/create-order.input';
+import { Product } from 'src/inventory/entities/product.entity';
+import { Store } from 'src/stores/entities/store.entity';
 
 export enum ProductTypeEnum {
   deal,
@@ -82,6 +86,11 @@ export class Member {
 
   @Field(() => [Refund], { nullable: 'itemsAndList' })
   refund?: Refund[];
+  @Field(() => [Product], { nullable: 'itemsAndList' })
+  products?: Product[];
+
+  @Field(() => Order, { nullable: true })
+  orderDetail?: Order;
 }
 
 @ObjectType()
@@ -118,4 +127,17 @@ export class GroupShop {
 
   @Field(() => [Milestone])
   milestones: Milestone[];
+
+  @Field(() => Store, { nullable: true })
+  store?: Store;
+
+  @Field(() => [Product], { nullable: 'itemsAndList' })
+  popularProducts?: Product[];
+
+  @Field(() => Campaign, { nullable: true })
+  campaign?: Campaign;
+
+  @Field(() => [Product], { nullable: 'itemsAndList' })
+  allProducts?: Product[];
+
 }

@@ -1,5 +1,6 @@
 import { InputType, Int, Field, ID } from '@nestjs/graphql';
 import { CreateOrderInput as LineItem } from 'src/inventory/dto/create-order.input';
+import { Product } from 'src/inventory/entities/product.entity';
 import {
   ProductTypeEnum,
   RefundStatusEnum,
@@ -48,6 +49,9 @@ export class MemberInput {
 
   @Field(() => [LineItem], { nullable: 'itemsAndList' })
   lineItems?: LineItem[];
+
+  @Field(() => [Product], { nullable: 'itemsAndList' })
+  products?: Product[];
 }
 
 @InputType()

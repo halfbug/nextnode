@@ -166,64 +166,70 @@ export class WebhooksController {
 
   @Post('order-create?')
   async orderCreate(@Req() req, @Res() res) {
-    const { shop } = req.query;
-    const whOrder = req.body;
-    console.log(
-      'WebhooksController ~ orderCreate ~ webhookData',
-      JSON.stringify(whOrder),
-    );
-    const newOrder = new CreateOrderInput();
-    newOrder.id = whOrder.admin_graphql_api_id;
-    newOrder.name = '#' + JSON.stringify(whOrder.order_number);
-    newOrder.shop = shop;
-    newOrder.confirmed = whOrder.confirmed;
-    newOrder.shopifyCreatedAt = whOrder.created_at;
-    newOrder.price = whOrder.current_subtotal_price;
-    newOrder.currencyCode = whOrder.currency;
-    newOrder.totalDiscounts = whOrder.total_discounts;
-    // newOrder.discountCode = whOrder.discount_codes[0].code || null;
-    const dc = whOrder.discount_codes.filter((itm) =>
-      itm.code.startsWith(this.configSevice.get('DC_PREFIX')),
-    );
-    newOrder.discountCode =
-      dc[0]?.code || whOrder.discount_codes[0]?.code || null;
-    // newOrder.discountInfo = [new DiscountInfo()];
-    // newOrder.discountInfo = whOrder.discount_codes?.map(
-    //   (dc: DiscountInfo) => new DiscountInfo(dc),
-    // );
-    newOrder.discountInfo = whOrder.discount_codes;
-    newOrder.customer = new Customer();
-    newOrder.customer.firstName = whOrder.customer.first_name;
-    newOrder.customer.firstName = whOrder.customer.last_name;
-    newOrder.customer.email = whOrder.customer.email;
-    newOrder.customer.ip = whOrder.browser_ip;
-    newOrder.customer.phone =
-      whOrder.customer.phone || whOrder.shipping_address.phone;
-    const newOrderSaved = await this.orderService.create(newOrder);
+    try {
+      const { shop } = req.query;
+      const whOrder = req.body;
+      console.log(
+        'WebhooksController ~ orderCreate ~ webhookData',
+        JSON.stringify(whOrder),
+      );
+      const newOrder = new CreateOrderInput();
+      newOrder.id = whOrder.admin_graphql_api_id;
+      newOrder.name = '#' + JSON.stringify(whOrder.order_number);
+      newOrder.shop = shop;
+      newOrder.confirmed = whOrder.confirmed;
+      newOrder.shopifyCreatedAt = whOrder.created_at;
+      newOrder.price = whOrder.current_subtotal_price;
+      newOrder.currencyCode = whOrder.currency;
+      newOrder.totalDiscounts = whOrder.total_discounts;
+      // newOrder.discountCode = whOrder.discount_codes[0].code || null;
+      const dc = whOrder.discount_codes.filter((itm) =>
+        itm.code.startsWith(this.configSevice.get('DC_PREFIX')),
+      );
+      newOrder.discountCode =
+        dc[0]?.code || whOrder.discount_codes[0]?.code || null;
+      // newOrder.discountInfo = [new DiscountInfo()];
+      // newOrder.discountInfo = whOrder.discount_codes?.map(
+      //   (dc: DiscountInfo) => new DiscountInfo(dc),
+      // );
+      newOrder.discountInfo = whOrder.discount_codes;
+      newOrder.customer = new Customer();
+      newOrder.customer.firstName = whOrder.customer.first_name;
+      newOrder.customer.firstName = whOrder.customer.last_name;
+      newOrder.customer.email = whOrder.customer.email;
+      newOrder.customer.ip = whOrder.browser_ip;
+      newOrder.customer.phone =
+        whOrder.customer.phone || whOrder.shipping_address.phone;
+      const newOrderSaved = await this.orderService.create(newOrder);
 
-    const lineItems = await Promise.all(
-      whOrder?.line_items?.map(async (item: any) => {
-        const newItem = new CreateOrderInput();
-        newItem.id = item.admin_graphql_api_id;
-        newItem.parentId = whOrder.admin_graphql_api_id;
-        newItem.shop = shop;
-        newItem.product = new LineProduct();
-        newItem.product.id = `gid://shopify/Product/${item.product_id}`;
-        newItem.price = item.price;
-        newItem.quantity = item.quantity;
-        newItem.totalDiscounts = item.total_discount;
-        newItem.shopifyCreatedAt = whOrder.created_at;
-        return await this.orderService.create(newItem);
-        // return newItem;
-      }),
-    );
+      const lineItems = await Promise.all(
+        whOrder?.line_items?.map(async (item: any) => {
+          const newItem = new CreateOrderInput();
+          newItem.id = item.admin_graphql_api_id;
+          newItem.parentId = whOrder.admin_graphql_api_id;
+          newItem.shop = shop;
+          newItem.product = new LineProduct();
+          newItem.product.id = `gid://shopify/Product/${item.product_id}`;
+          newItem.price = item.price;
+          newItem.quantity = item.quantity;
+          newItem.totalDiscounts = item.total_discount;
+          newItem.shopifyCreatedAt = whOrder.created_at;
+          return await this.orderService.create(newItem);
+          // return newItem;
+        }),
+      );
 
-    const newOrderPlaced = new OrderPlacedEvent();
-    newOrderPlaced.order = newOrderSaved;
-    newOrderPlaced.store = await this.storesService.findOneWithCampaings(shop);
-    newOrderPlaced.lineItems = lineItems;
-    this.eventEmitter.emit('order.placed', newOrderPlaced);
-    res.send('order created..');
+      const newOrderPlaced = new OrderPlacedEvent();
+      newOrderPlaced.order = newOrderSaved;
+      newOrderPlaced.store = await this.storesService.findOneWithCampaings(
+        shop,
+      );
+      newOrderPlaced.lineItems = lineItems;
+      this.eventEmitter.emit('order.placed', newOrderPlaced);
+      res.send('order created..');
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
   }
 
   @Post('product-delete?')

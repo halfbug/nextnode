@@ -69,15 +69,15 @@ export class GroupshopsService {
           from: 'orders',
           localField: 'members.orderId',
           foreignField: 'parentId',
-          as: 'orderDetails',
+          as: 'lineItemsDetails',
         },
       },
       {
         $lookup: {
           from: 'inventory',
-          localField: 'orderDetails.product.id',
+          localField: 'lineItemsDetails.product.id',
           foreignField: 'id',
-          as: 'PopularProducts',
+          as: 'popularProducts',
         },
       },
       {
@@ -91,7 +91,7 @@ export class GroupshopsService {
                   {
                     lineItems: {
                       $filter: {
-                        input: '$orderDetails',
+                        input: '$lineItemsDetails',
                         as: 'j',
                         cond: {
                           $eq: ['$$this.orderId', '$$j.parentId'],
@@ -106,8 +106,102 @@ export class GroupshopsService {
         },
       },
       {
-        $unwind: {
-          path: '$orderDetails',
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'id',
+          as: 'orderDetails',
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    orderDetail: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$orderDetails',
+                            as: 'j',
+                            cond: {
+                              $eq: ['$$this.orderId', '$$j.id'],
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          popularProducts: {
+            $map: {
+              input: '$popularProducts',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    lineItems: {
+                      $filter: {
+                        input: '$lineItemsDetails',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.id', '$$j.product.id'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              as: 'me',
+              in: {
+                $mergeObjects: [
+                  '$$me',
+                  {
+                    products: {
+                      $arrayElemAt: [
+                        {
+                          $map: {
+                            input: '$$me.lineItems',
+                            in: {
+                              $filter: {
+                                input: '$popularProducts',
+                                as: 'j',
+                                cond: {
+                                  $eq: ['$$this.product.id', '$$j.id'],
+                                },
+                              },
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
         },
       },
       {
@@ -132,8 +226,27 @@ export class GroupshopsService {
         },
       },
       {
+        $lookup: {
+          from: 'inventory',
+          localField: 'dealProducts.productId',
+          foreignField: 'id',
+          as: 'dealsProducts',
+        },
+      },
+      {
+        $addFields: {
+          allProducts: {
+            $concatArrays: ['$campaignProducts', '$dealsProducts'],
+          },
+        },
+      },
+      {
         $project: {
+          lineItemsDetails: 0,
           orderDetails: 0,
+          dealsProducts: 0,
+          campaignProducts: 0,
+          'members.lineItems': 0,
         },
       },
     ];

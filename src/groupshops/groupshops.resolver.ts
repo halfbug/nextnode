@@ -25,7 +25,7 @@ export class GroupshopsResolver {
   //   return this.GroupshopsService.findAll();
   // }
 
-  @Query(() => Groupshop, { name: 'Groupshop' })
+  @Query(() => Groupshop, { name: 'groupshop' })
   findOne(@Args('code') code: string) {
     return this.GroupshopsService.findOne(code);
   }
