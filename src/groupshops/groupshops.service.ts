@@ -162,6 +162,17 @@ export class GroupshopsService {
                       },
                     },
                   },
+                  {
+                    orders: {
+                      $filter: {
+                        input: '$lineItemsDetails',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.id', '$$j.product.id'],
+                        },
+                      },
+                    },
+                  },
                 ],
               },
             },

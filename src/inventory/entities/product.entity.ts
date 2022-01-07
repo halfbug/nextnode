@@ -66,4 +66,7 @@ export class Product {
 
   @Field(() => [Orders], { nullable: 'itemsAndList' })
   lineItems?: Orders[];
+
+  @Field(() => [Orders], { nullable: 'itemsAndList' })
+  orders?: Orders[];
 }
