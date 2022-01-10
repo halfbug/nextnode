@@ -17,18 +17,9 @@ export class CampaignsService {
     private readonly inventoryService: InventoryService,
     private readonly sotresService: StoresService,
   ) {}
-  async create(createCampaignInput: CreateCampaignInput) {
-    let products: string[] = [];
-    console.log(
-      '🚀 ~ file: campaigns.service.ts ~ line 19 ~ CampaignsService ~ create ~ createCampaignInput',
-      createCampaignInput,
-    );
-    const { storeId, criteria } = createCampaignInput;
-    const { shop } = await this.sotresService.findOneById(storeId);
-    console.log(
-      '🚀 ~ file: campaigns.service.ts ~ line 26 ~ CampaignsService ~ create ~ shop',
-      shop,
-    );
+
+  async setProducts(shop, criteria, prevProducts) {
+    let newProducts: string[] = [];
     switch (criteria) {
       case 'newest':
         const npQuery = new ProductQueryInput();
@@ -39,26 +30,45 @@ export class CampaignsService {
           npQuery,
         );
 
-        products = nproducts.map((prod) => prod.id);
+        newProducts = nproducts.map((prod) => prod.id);
         break;
 
       case 'bestseller':
         const bsproducts = await this.inventoryService.getBestSellerProducts(
           shop,
         );
-        products = bsproducts.map((prod) => prod.id);
+        newProducts = bsproducts.map((prod) => prod.id);
         break;
 
       default:
-        products = createCampaignInput.products;
+        newProducts = prevProducts;
         break;
     }
+    return newProducts;
+  }
+
+  async create(createCampaignInput: CreateCampaignInput) {
+    console.log(
+      '🚀 ~ file: campaigns.service.ts ~ line 19 ~ CampaignsService ~ create ~ createCampaignInput',
+      createCampaignInput,
+    );
+    const { storeId, criteria } = createCampaignInput;
+    const { shop } = await this.sotresService.findOneById(storeId);
+    console.log(
+      '🚀 ~ file: campaigns.service.ts ~ line 26 ~ CampaignsService ~ create ~ shop',
+      shop,
+    );
+    const prevProducts = createCampaignInput.products;
+    const products: string[] = await this.setProducts(
+      shop,
+      criteria,
+      prevProducts,
+    );
+
     /// update all capaign
-    // const manager = getMongoManager();
     this.campaignRepository.update({ isActive: true }, { isActive: false });
 
     const id = uuid();
-
     const campaign = this.campaignRepository.create({
       id,
       ...createCampaignInput,
@@ -85,7 +95,17 @@ export class CampaignsService {
   }
 
   async update(id: string, updateCampaignInput: UpdateCampaignInput) {
+    const { criteria, products, storeId } = updateCampaignInput;
+    const { shop } = await this.sotresService.findOneById(storeId);
+    const updatedProducts: string[] = await this.setProducts(
+      shop,
+      criteria,
+      products,
+    );
+    updateCampaignInput.products = updatedProducts;
+
     await this.campaignRepository.update({ id }, updateCampaignInput);
+
     return await this.findOneById(id);
   }
 
