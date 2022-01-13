@@ -96,13 +96,24 @@ export class CampaignsService {
 
   async update(id: string, updateCampaignInput: UpdateCampaignInput) {
     const { criteria, products, storeId } = updateCampaignInput;
+
     const { shop } = await this.sotresService.findOneById(storeId);
-    const updatedProducts: string[] = await this.setProducts(
-      shop,
-      criteria,
-      products,
-    );
-    updateCampaignInput.products = updatedProducts;
+
+    const prevCampaign = await this.findOneById(id);
+    const prevProducts = prevCampaign.products;
+
+    if (products?.length && criteria) {
+      const updatedProducts: string[] = await this.setProducts(
+        shop,
+        criteria,
+        products,
+      );
+      updateCampaignInput.products = updatedProducts;
+    } else if (products === undefined) {
+      updateCampaignInput.products = prevProducts;
+    } else {
+      updateCampaignInput.products = prevProducts;
+    }
 
     await this.campaignRepository.update({ id }, updateCampaignInput);
 
