@@ -102,17 +102,19 @@ export class CampaignsService {
     const prevCampaign = await this.findOneById(id);
     const prevProducts = prevCampaign.products;
 
-    if (products?.length && criteria) {
+    if (products && criteria === 'custom') {
+      updateCampaignInput.products = products;
+    }
+    // else if (products === undefined || products === null) {
+    //   updateCampaignInput.products = prevProducts;
+    // }
+    else {
       const updatedProducts: string[] = await this.setProducts(
         shop,
         criteria,
-        products,
+        prevProducts,
       );
       updateCampaignInput.products = updatedProducts;
-    } else if (products === undefined) {
-      updateCampaignInput.products = prevProducts;
-    } else {
-      updateCampaignInput.products = prevProducts;
     }
 
     await this.campaignRepository.update({ id }, updateCampaignInput);
