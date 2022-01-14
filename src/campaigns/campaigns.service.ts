@@ -96,10 +96,18 @@ export class CampaignsService {
 
   async update(id: string, updateCampaignInput: UpdateCampaignInput) {
     const { criteria, products, storeId } = updateCampaignInput;
+    console.log(
+      '🚀 ~ file: campaigns.service.ts ~ line 99 ~ CampaignsService ~ update ~ updateCampaignInput',
+      updateCampaignInput,
+    );
 
     const { shop } = await this.sotresService.findOneById(storeId);
 
     const prevCampaign = await this.findOneById(id);
+    console.log(
+      '🚀 ~ file: campaigns.service.ts ~ line 107 ~ CampaignsService ~ update ~ prevCampaign',
+      prevCampaign,
+    );
     const prevProducts = prevCampaign.products;
 
     if (products && criteria === 'custom') {

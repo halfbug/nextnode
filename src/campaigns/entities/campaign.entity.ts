@@ -1,6 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { SalesTarget } from 'src/appsettings/entities/sales-target.entity';
-import { Inventory } from 'src/inventory/entities/inventory.entity';
 
 @ObjectType('Campaign')
 export class Campaign {
