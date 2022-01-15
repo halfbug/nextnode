@@ -1,6 +1,7 @@
 import { Column, Entity } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
 import { SalesTarget } from 'src/appsettings/entities/sales-target.model';
+import { Settings } from 'src/stores/entities/settings.model';
 
 @Entity()
 export default class Campaign extends DefaultColumnsService {
@@ -30,4 +31,7 @@ export default class Campaign extends DefaultColumnsService {
 
   @Column()
   isActive?: boolean;
+
+  @Column({ nullable: true })
+  settings?: Settings;
 }

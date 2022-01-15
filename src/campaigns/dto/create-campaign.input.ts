@@ -1,6 +1,7 @@
 import { InputType, ID, Field } from '@nestjs/graphql';
 import { SalesTargetType } from 'src/appsettings/dto/create-appsetting.input';
 import { Inventory } from 'src/inventory/entities/inventory.entity';
+import { SettingsInput } from 'src/stores/dto/create-store.input';
 import { ProductInputType } from './product.input';
 
 @InputType()
@@ -40,4 +41,7 @@ export class CreateCampaignInput {
 
   @Field((type) => SalesTargetType, { nullable: true })
   salesTarget?: SalesTargetType;
+
+  @Field((type) => SettingsInput, { nullable: true })
+  settings?: SettingsInput;
 }
