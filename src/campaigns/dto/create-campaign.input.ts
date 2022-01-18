@@ -5,6 +5,24 @@ import { SettingsInput } from 'src/stores/dto/create-store.input';
 import { ProductInputType } from './product.input';
 
 @InputType()
+export class SocialLinksInput {
+  @Field({ nullable: true })
+  instagram?: string;
+
+  @Field({ nullable: true })
+  pinterest?: string;
+
+  @Field({ nullable: true })
+  tiktok?: string;
+
+  @Field({ nullable: true })
+  twitter?: string;
+
+  @Field({ nullable: true })
+  facebook?: string;
+}
+
+@InputType()
 export class CreateCampaignInput {
   // @Field(() => ID)
   // id: string;
@@ -44,4 +62,7 @@ export class CreateCampaignInput {
 
   @Field((type) => SettingsInput, { nullable: true })
   settings?: SettingsInput;
+
+  @Field((type) => SocialLinksInput, { nullable: true })
+  socialLinks?: SocialLinksInput;
 }
