@@ -1,8 +1,26 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  GqlExecutionContext,
+} from '@nestjs/graphql';
 import { GroupshopsService } from './groupshops.service';
 import { GroupShop as Groupshop } from './entities/groupshop.entity';
 import { CreateGroupshopInput } from './dto/create-groupshops.input';
 import { UpdateGroupshopInput } from './dto/update-groupshops.input';
+import {
+  createParamDecorator,
+  ExecutionContext,
+  Ip,
+  Req,
+} from '@nestjs/common';
+
+export const ReqDecorator = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) =>
+    GqlExecutionContext.create(ctx).getContext().req,
+);
 
 @Resolver(() => Groupshop)
 export class GroupshopsResolver {
@@ -30,15 +48,12 @@ export class GroupshopsResolver {
     return this.GroupshopsService.findOne(code);
   }
 
-  // @Mutation(() => Groupshop)
-  // updateGroupshop(
-  //   @Args('updateGroupshopInput') updateGroupshopInput: UpdateGroupshopInput,
-  // ) {
-  //   return this.GroupshopsService.update(
-  //     updateGroupshopInput.id,
-  //     updateGroupshopInput,
-  //   );
-  // }
+  @Mutation(() => Groupshop, { name: 'addDealProduct' })
+  addDealProduct(
+    @Args('updateGroupshopInput') updateGroupshopInput: UpdateGroupshopInput,
+  ) {
+    return this.GroupshopsService.update(updateGroupshopInput);
+  }
 
   // @Mutation(() => Groupshop)
   // removeGroupshop(@Args('id', { type: () => Int }) id: number) {

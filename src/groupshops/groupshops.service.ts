@@ -10,6 +10,7 @@ import {
 import { UpdateGroupshopInput } from './dto/update-groupshops.input';
 import { Groupshops } from './entities/groupshop.modal';
 import { v4 as uuid } from 'uuid';
+import { AddDealProductInput } from './dto/add-deal-product.input';
 
 @Injectable()
 export class GroupshopsService {
@@ -325,13 +326,33 @@ export class GroupshopsService {
     return gs[0];
   }
 
-  update(updateGroupshopInput: UpdateGroupshopInput) {
-    const { _id: id, dealProducts } = updateGroupshopInput;
+  async update(updateGroupshopInput: UpdateGroupshopInput) {
+    const { id, dealProducts } = updateGroupshopInput;
+    console.log(
+      '🚀 ~ file: groupshops.service.ts ~ line 331 ~ GroupshopsService ~ update ~ updateGroupshopInput',
+      updateGroupshopInput,
+    );
+
     updateGroupshopInput.dealProducts = [new DealProductsInput()];
     updateGroupshopInput.dealProducts = dealProducts;
+    delete updateGroupshopInput.id;
+    // delete updateGroupshopInput['_id'];
+    await this.groupshopRepository.update({ id }, updateGroupshopInput);
 
-    return this.groupshopRepository.update(id, updateGroupshopInput);
+    return await this.groupshopRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
   }
+
+  // updateDealProducts(addDealProductInput: AddDealProductInput) {
+  //   const { id, dealProducts } = addDealProductInput;
+  //   // const  dealProducts = [new DealProductsInput()];
+  //   // updateGroupshopInput.dealProducts = dealProducts;
+
+  //   return this.groupshopRepository.update(id, dealProducts);
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} Groupshop`;

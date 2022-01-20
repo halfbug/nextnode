@@ -21,6 +21,9 @@ export class DealProductsInput {
 
   @Field({ nullable: true })
   customerIP: string;
+
+  @Field({ nullable: true })
+  gsid?: string;
 }
 
 @InputType()
