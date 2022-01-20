@@ -30,9 +30,16 @@ export class TokenReceivedListener {
                         title
                         status
                         description
-                        storefrontId
                         featuredImage{
                           src
+                        }
+                        images(first:10, reverse: true){
+                          edges{
+                            node{
+                              src
+                              id
+                            }
+                          }
                         }
                         priceRangeV2{
                           maxVariantPrice{
@@ -59,7 +66,6 @@ export class TokenReceivedListener {
                               description
                               productsCount
                               sortOrder
-                              storefrontId
                             }
                           }
                         }
@@ -69,7 +75,6 @@ export class TokenReceivedListener {
                               id
                               title
                               displayName
-                              storefrontId
                               inventoryQuantity
                               price
                               shopifyCreatedAt :createdAt
