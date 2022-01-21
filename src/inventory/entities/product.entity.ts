@@ -1,12 +1,54 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { CreateOrderInput as Orders } from '../dto/create-order.input';
-// import Orders from './orders.entity';
-// CreateOrderInput
-@ObjectType()
-class FeatureImageType {
+
+// @ObjectType()
+// class FeatureImageType {
+//   @Field()
+//   src: string;
+// }
+
+@InputType('ProductOptionInput')
+@ObjectType('ProductOption')
+export class ProductOption {
+  @Field()
+  id: string;
+
+  @Field()
+  name: string;
+
+  @Field()
+  position: number;
+
+  @Field(() => [String], { nullable: 'itemsAndList' })
+  values?: string[];
+}
+
+@InputType('ProductImageInput')
+@ObjectType('ProductImage')
+export class ProductImage {
+  @Field()
+  id: string;
+
   @Field()
   src: string;
 }
+
+@InputType('ProductVariantInput')
+@ObjectType('ProductVariant')
+export class ProductVariant {
+  @Field()
+  id: string;
+
+  @Field()
+  title: string;
+
+  @Field()
+  inventoryQuantity: number;
+
+  @Field()
+  price: string;
+}
+
 @InputType('ProductInput')
 @ObjectType('Product')
 export class Product {
@@ -19,29 +61,20 @@ export class Product {
   @Field()
   title: string;
 
-  // @Field({ nullable: true })
-  // description: string;
+  @Field({ nullable: true })
+  description: string;
 
-  // @Field({ nullable: true })
-  // onlineStorePreviewUrl?: string;
+  @Field(() => [ProductImage], { nullable: 'itemsAndList' })
+  images?: ProductImage[];
 
-  // @Field({ nullable: true })
-  // onlineStoreUrl?: string;
+  @Field(() => [ProductVariant], { nullable: 'itemsAndList' })
+  variants?: ProductVariant[];
 
-  // @Field({ nullable: true })
-  // storefrontId: string;
-
-  // @Field({ nullable: true })
-  // descriptionHtml?: string;
-
-  // @Field()
-  // productType?: string;
+  @Field(() => [ProductOption], { nullable: 'itemsAndList' })
+  options?: ProductOption[];
 
   @Field({ nullable: true })
   totalVariants?: number;
-
-  // @Field({ nullable: true })
-  // totalInventory?: number;
 
   @Field({ nullable: true })
   price?: string;

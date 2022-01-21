@@ -39,6 +39,12 @@ export class InventoryResolver {
     return this.inventoryService.findStoreProducts(productQueryInput);
   }
 
+  @Query(() => Product, { name: 'productById' })
+  findProductById(@Args('id') id: string) {
+    console.log({ id });
+    return this.inventoryService.findProductById(id);
+  }
+
   @Query(() => Inventory, { name: 'inventory' })
   findOne(@Args('shop') shop: string, @Args('recordType') recordType: string) {
     return this.inventoryService.findOne(shop, recordType);

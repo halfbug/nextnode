@@ -30,6 +30,13 @@ export class TokenReceivedListener {
                         title
                         status
                         description
+                        options{
+                          id
+                          name
+                          name
+                          position
+                          values
+                        }
                         featuredImage{
                           src
                         }
@@ -77,6 +84,10 @@ export class TokenReceivedListener {
                               displayName
                               inventoryQuantity
                               price
+                              selectedOptions{
+                                name
+                                value
+                              }
                               shopifyCreatedAt :createdAt
                               image{
                                 src

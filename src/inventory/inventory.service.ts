@@ -265,4 +265,72 @@ export class InventoryService {
     ];
     return await manager.aggregate(Inventory, agg).toArray();
   }
+
+  async findProductById(id: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          id,
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          let: {
+            pid: '$id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ['$$pid', '$parentId'],
+                    },
+                    {
+                      $eq: ['$recordType', 'ProductVariant'],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'variants',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          let: {
+            pid: '$id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ['$$pid', '$parentId'],
+                    },
+                    {
+                      $eq: ['$recordType', 'ProductImage'],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'images',
+        },
+      },
+    ];
+    const res = await manager.aggregate(Inventory, agg).toArray();
+    console.log(
+      '🚀 ~ file: inventory.service.ts ~ line 329 ~ InventoryService ~ findProductById ~ res',
+      res,
+    );
+    return res[0];
+    // return await manager.aggregate(Inventory, agg).toArray();
+  }
 }

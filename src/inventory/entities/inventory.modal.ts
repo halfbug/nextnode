@@ -1,10 +1,26 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
+// import { InputType } from '@nestjsgraphql';
 
 @Entity()
 class IFeatureImage {
   @Column()
   src: string;
+}
+
+@Entity('ProductOption')
+export class ProductOption {
+  @Column()
+  id: string;
+
+  @Column()
+  name: string;
+
+  @Column()
+  postion: number;
+
+  @Column()
+  values: string[];
 }
 
 @Entity()
@@ -17,6 +33,9 @@ export default class Inventory extends DefaultColumnsService {
 
   @Column()
   onlineStorePreviewUrl?: string;
+
+  @Column(() => ProductOption)
+  options: ProductOption[];
 
   @Column()
   onlineStoreUrl?: string;
