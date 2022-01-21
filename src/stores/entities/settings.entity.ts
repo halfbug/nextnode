@@ -19,4 +19,7 @@ export class Settings {
 
   @Field({ nullable: true })
   youtubeUrl?: string;
+
+  @Field({ nullable: true })
+  media?: string;
 }

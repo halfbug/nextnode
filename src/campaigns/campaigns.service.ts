@@ -8,6 +8,10 @@ import { v4 as uuid } from 'uuid';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { StoresService } from 'src/stores/stores.service';
 import { ProductQueryInput } from 'src/inventory/dto/product-query.input';
+import { Settings } from 'src/stores/entities/settings.model';
+import SocialLinks from './entities/social-link.model';
+import { SalesTarget } from 'src/appsettings/entities/sales-target.model';
+import { SettingsInput } from 'src/stores/dto/create-store.input';
 
 @Injectable()
 export class CampaignsService {
@@ -95,11 +99,12 @@ export class CampaignsService {
   }
 
   async update(id: string, updateCampaignInput: UpdateCampaignInput) {
-    const { criteria, products, storeId } = updateCampaignInput;
     console.log(
       '🚀 ~ file: campaigns.service.ts ~ line 99 ~ CampaignsService ~ update ~ updateCampaignInput',
       updateCampaignInput,
     );
+    const { criteria, products, storeId, settings, socialLinks, salesTarget } =
+      updateCampaignInput;
 
     const { shop } = await this.sotresService.findOneById(storeId);
 
@@ -112,11 +117,7 @@ export class CampaignsService {
 
     if (products && criteria === 'custom') {
       updateCampaignInput.products = products;
-    }
-    // else if (products === undefined || products === null) {
-    //   updateCampaignInput.products = prevProducts;
-    // }
-    else {
+    } else {
       const updatedProducts: string[] = await this.setProducts(
         shop,
         criteria,

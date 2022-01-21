@@ -14,4 +14,22 @@ export class Settings {
 
   @Column({ nullable: true })
   youtubeUrl: string;
+
+  @Column({ nullable: true })
+  media: string;
+  constructor(
+    brandColor: string,
+    customColor: string,
+    customBg: string,
+    imageUrl: string,
+    youtubeUrl: string,
+    media: string,
+  ) {
+    this.brandColor = brandColor;
+    this.customColor = customColor;
+    this.customBg = customBg;
+    this.imageUrl = imageUrl;
+    this.youtubeUrl = youtubeUrl;
+    this.media = media;
+  }
 }
