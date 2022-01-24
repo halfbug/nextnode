@@ -41,7 +41,7 @@ export class Campaign {
   @Field({ nullable: true })
   rewards?: string;
 
-  @Field({ defaultValue: true })
+  @Field()
   isActive?: boolean;
 
   @Field({ nullable: true })

@@ -100,19 +100,22 @@ export class CampaignsService {
 
   async update(id: string, updateCampaignInput: UpdateCampaignInput) {
     console.log(
-      '🚀 ~ file: campaigns.service.ts ~ line 99 ~ CampaignsService ~ update ~ updateCampaignInput',
+      '🚀 ~ file:CampaignsService updateCampaignInput',
       updateCampaignInput,
     );
-    const { criteria, products, storeId, settings, socialLinks, salesTarget } =
-      updateCampaignInput;
+    const {
+      criteria,
+      products,
+      storeId,
+      settings,
+      socialLinks,
+      salesTarget,
+      isActive,
+    } = updateCampaignInput;
 
     const { shop } = await this.sotresService.findOneById(storeId);
 
     const prevCampaign = await this.findOneById(id);
-    console.log(
-      '🚀 ~ file: campaigns.service.ts ~ line 107 ~ CampaignsService ~ update ~ prevCampaign',
-      prevCampaign,
-    );
     const prevProducts = prevCampaign.products;
 
     if (products && criteria === 'custom') {
@@ -124,6 +127,12 @@ export class CampaignsService {
         prevProducts,
       );
       updateCampaignInput.products = updatedProducts;
+    }
+    if (isActive === true) {
+      await this.campaignRepository.update(
+        { isActive: true },
+        { isActive: false },
+      );
     }
 
     await this.campaignRepository.update({ id }, updateCampaignInput);

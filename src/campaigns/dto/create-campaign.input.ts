@@ -65,4 +65,7 @@ export class CreateCampaignInput {
 
   @Field((type) => SocialLinksInput, { nullable: true })
   socialLinks?: SocialLinksInput;
+
+  @Field()
+  isActive?: boolean;
 }
