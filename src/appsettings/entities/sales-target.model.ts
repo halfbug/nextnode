@@ -33,16 +33,16 @@ export class SalesTarget {
   @Column({ nullable: true })
   status: string;
 
-  @Column((type) => Reward)
+  @Column(() => Reward)
   rewards: Reward[];
 
   constructor(
-    id: string,
-    name: string,
-    rogsMin: string,
-    rogsMax: string,
-    status: string,
-    rewards: Reward[],
+    id?: string,
+    name?: string,
+    rogsMin?: string,
+    rogsMax?: string,
+    status?: string,
+    rewards?: any,
   ) {
     this.id = id;
     this.name = name;

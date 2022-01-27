@@ -24,7 +24,7 @@ export class SocialLinksInput {
 
 @InputType()
 export class CreateCampaignInput {
-  // @Field(() => ID)
+  // @Field()
   // id: string;
 
   @Field({ nullable: true })
@@ -47,9 +47,6 @@ export class CreateCampaignInput {
 
   @Field({ nullable: true })
   collectionId: string;
-
-  // @Field(() => ProductInputType, { nullable: true })
-  // products?: ProductInputType[];
 
   @Field(() => [String], { nullable: true })
   products?: string[];

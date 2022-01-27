@@ -28,7 +28,7 @@ export class SalesTargetType {
   @Field({ nullable: true })
   status: string;
 
-  @Field((type) => [RewardInput])
+  @Field(() => [RewardInput])
   rewards: RewardInput[];
 
   @Field({ defaultValue: true })

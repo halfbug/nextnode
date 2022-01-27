@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,10 +9,9 @@ import { v4 as uuid } from 'uuid';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { StoresService } from 'src/stores/stores.service';
 import { ProductQueryInput } from 'src/inventory/dto/product-query.input';
-import { Settings } from 'src/stores/entities/settings.model';
-import SocialLinks from './entities/social-link.model';
-import { SalesTarget } from 'src/appsettings/entities/sales-target.model';
-import { SettingsInput } from 'src/stores/dto/create-store.input';
+import {
+  Reward,
+} from 'src/appsettings/entities/sales-target.model';
 
 @Injectable()
 export class CampaignsService {
@@ -52,16 +52,13 @@ export class CampaignsService {
   }
 
   async create(createCampaignInput: CreateCampaignInput) {
-    console.log(
-      '🚀 ~ file: campaigns.service.ts ~ line 19 ~ CampaignsService ~ create ~ createCampaignInput',
-      createCampaignInput,
-    );
+    // console.log(
+    //   '🚀 ~ file: campaigns.service.ts ~ line 19 ~ CampaignsService ~ create ~ createCampaignInput',
+    //   createCampaignInput,
+    // );
     const { storeId, criteria } = createCampaignInput;
     const { shop } = await this.sotresService.findOneById(storeId);
-    console.log(
-      '🚀 ~ file: campaigns.service.ts ~ line 26 ~ CampaignsService ~ create ~ shop',
-      shop,
-    );
+   
     const prevProducts = createCampaignInput.products;
     const products: string[] = await this.setProducts(
       shop,
@@ -69,17 +66,40 @@ export class CampaignsService {
       prevProducts,
     );
 
-    /// update all capaign
+    /// update all campaign
     this.campaignRepository.update({ isActive: true }, { isActive: false });
+    const {
+      salesTarget: { rewards },
+    } = createCampaignInput;
+    
+    delete createCampaignInput.salesTarget.rewards;
+    createCampaignInput.products = products;
+    // const campaign = this.campaignRepository.create(createCampaignInput);
 
     const id = uuid();
-    const campaign = this.campaignRepository.create({
+    const campaign = await this.campaignRepository.create({
       id,
       ...createCampaignInput,
       products,
     });
+    
+    const savedCampaign = await this.campaignRepository.save(campaign);
+    console.log("🚀 ~ savedCampaign", savedCampaign)
 
-    return this.campaignRepository.save(campaign);
+    const { id: campaign_id } = savedCampaign;
+    // console.log("🚀 ~ file: campaigns.service.ts ~ line 87 ~ CampaignsService ~ create ~ campaign_id", campaign_id)
+    // const {id} = savedCampaign;
+    const nrewards = rewards.map((rew) => {
+        
+            const { id:rid, discount, customerCount } = rew;
+           
+            return new Reward(rid, discount, customerCount);
+          });
+
+          await this.campaignRepository.update({id: campaign_id}, { ...savedCampaign, salesTarget: { ...savedCampaign.salesTarget, rewards:nrewards}})
+              // console.log(await this.campaignRepository.findOne(campaign_id))
+          return await this.findOneById(campaign_id);
+   
   }
 
   findAll() {
