@@ -119,5 +119,5 @@ export class GroupShop {
   @Field(() => [Milestone])
   milestones: Milestone[];
 
-//   @Field(()=>[] )
+  //   @Field(()=>[] )
 }

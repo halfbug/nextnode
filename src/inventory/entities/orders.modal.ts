@@ -8,6 +8,8 @@ export class LineProduct {
 
 export class Customer {
   @Column({ nullable: true })
+  customer_id: string;
+  @Column({ nullable: true })
   firstName: string;
   @Column({ nullable: true })
   LastName: string;
@@ -60,4 +62,6 @@ export default class Orders extends DefaultColumnsService {
   customer?: Customer;
   @Column(() => DiscountInfo)
   discountInfo?: DiscountInfo[];
+  @Column({ nullable: true })
+  gateway?: string;
 }

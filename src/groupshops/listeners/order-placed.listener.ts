@@ -5,6 +5,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CreateMemberInput } from 'aws-sdk/clients/managedblockchain';
 import { Reward } from 'src/appsettings/entities/sales-target.model';
+import Orders from 'src/inventory/entities/orders.modal';
 import { OrderPlacedEvent } from 'src/shopify-store/events/order-placed.envent';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import {
@@ -28,6 +29,10 @@ export class OrderPlacedListener {
     private eventEmitter: EventEmitter2,
     private gsService: GroupshopsService,
   ) {}
+
+  accessToken: string;
+  shop: string;
+  order: Orders;
 
   static formatTitle(name: string) {
     return `GS${Math.floor(1000 + Math.random() * 9000)}${name?.substring(
@@ -161,10 +166,49 @@ export class OrderPlacedListener {
     return discountPercentage * totalPrice;
   }
 
+  async shopifyRefund(amount: string, orderId: string) {
+    const client = await this.shopifyapi.client(this.shop, this.accessToken);
+    const refund = await client.query({
+      data: {
+        query: `mutation refundCreate($input: RefundInput!) {
+          refundCreate(input: $input) {
+            order {
+              id
+              name
+            }
+            refund {
+              id
+              
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }`,
+        variables: {
+          input: {
+            orderId: orderId,
+            note: 'GROUPSHOP cash back for referral V2',
+            notify: true,
+            transactions: {
+              amount,
+              gateway: 'exchange-credit',
+              kind: 'REFUND',
+              orderId: orderId,
+            },
+          },
+        },
+      },
+    });
+    console.log(JSON.stringify(refund));
+  }
+
   calculateRefund(member: any, milestone: number) {
     const netDiscount = milestone * 100 - member.availedDiscount;
 
     const refundAmount = this.totalPricePercent(member.lineItems, milestone);
+    this.shopifyRefund(refundAmount.toString(), member.orderId);
     const refund = new RefundInput(
       RefundStatusEnum.panding,
       new Date(),
@@ -219,7 +263,10 @@ export class OrderPlacedListener {
       lineItems,
     } = event;
 
-    //check if product is a member of active campain.
+    this.accessToken = accessToken;
+    this.shop = shop;
+    this.order = event.order;
+
     const dealProducts = lineItems
       .filter((item) => !campaignProducts.includes(item.product.id))
       .map((nitem) => ({

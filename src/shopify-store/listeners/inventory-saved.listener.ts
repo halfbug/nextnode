@@ -34,10 +34,13 @@ export class InvenotrySavedListener {
                               confirmed
                               cancelledAt
                               currencyCode
+                              
                               customer{
+                                
                                 firstName
                                 lastName
                                 email
+                                  
                               }
                               discountCode
                               totalPriceSet{
