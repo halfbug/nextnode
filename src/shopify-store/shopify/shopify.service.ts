@@ -91,4 +91,154 @@ export class ShopifyService {
     //   );
     // }
   }
+
+  async setDiscountCode(
+    shop: string,
+    action: string,
+    accessToken: string,
+    title?: string,
+    percentage?: number,
+    products?: string[],
+    starts?: Date,
+    ends?: Date,
+    id?: string,
+  ) {
+    // if (percentage) {
+    const client = await this.client(shop, accessToken);
+    let priceRule: any;
+
+    if (action === 'Create')
+      priceRule = await client.query({
+        data: {
+          query: `mutation priceRuleCreate($priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {
+          priceRuleCreate(priceRule: $priceRule, priceRuleDiscountCode: $priceRuleDiscountCode) {
+            priceRule {
+              id
+              title
+              target
+              startsAt
+              endsAt
+            }
+            priceRuleDiscountCode {
+              code
+            }
+            priceRuleUserErrors {
+              message
+            }
+          }
+        }`,
+          variables: {
+            id: id || null,
+            priceRule: {
+              title: title,
+              target: 'LINE_ITEM',
+              value: {
+                percentageValue: -percentage,
+              },
+              itemEntitlements: {
+                productIds: products,
+              },
+              customerSelection: {
+                forAllCustomers: true,
+              },
+              allocationMethod: 'EACH',
+              validityPeriod: {
+                start: starts,
+                end: ends,
+              },
+            },
+            priceRuleDiscountCode: { code: title },
+          },
+        },
+      });
+    else {
+      let variables: any = { id };
+      if (percentage)
+        variables = {
+          id,
+          priceRule: {
+            value: {
+              percentageValue: -percentage,
+            },
+          },
+        };
+      if (products)
+        variables = {
+          id,
+          priceRule: {
+            itemEntitlements: {
+              productIds: products,
+            },
+          },
+        };
+      priceRule = await client.query({
+        data: {
+          query: `mutation priceRuleUpdate($id: ID!,$priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {
+          priceRuleUpdate(id: $id, priceRule: $priceRule, priceRuleDiscountCode: $priceRuleDiscountCode) {
+          priceRule {
+            id
+            title
+            target
+            startsAt
+            endsAt
+          }
+          priceRuleDiscountCode {
+            code
+          }
+          priceRuleUserErrors {
+            message
+          }
+        }
+      }`,
+          variables,
+        },
+      });
+    }
+    console.log(
+      '🚀 ~ file: shopify.service.ts ~ line 196 ~ ShopifyService ~ priceRule',
+      JSON.stringify(priceRule),
+    );
+    const {
+      [`priceRule${action}`]: {
+        priceRule: { id: priceRuleId },
+      },
+    } = priceRule.body['data'];
+    return {
+      title,
+      percentage: percentage?.toString(),
+      priceRuleId: priceRuleId,
+    };
+  }
+
+  // updateDiscountCode(shop: shop, accessToken: string, variables: any) {
+  //   priceRule = await client.query({
+  //     data: {
+  //       query: `mutation priceRuleUpdate($id: ID!,$priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {
+  //       priceRuleUpdate(id: $id, priceRule: $priceRule, priceRuleDiscountCode: $priceRuleDiscountCode) {
+  //       priceRule {
+  //         id
+  //         title
+  //         target
+  //         startsAt
+  //         endsAt
+  //       }
+  //       priceRuleDiscountCode {
+  //         code
+  //       }
+  //       priceRuleUserErrors {
+  //         message
+  //       }
+  //     }
+  //   }`,
+  //       variables: {
+  //         id,
+  //         priceRule: {
+  //           value: {
+  //             percentageValue: -percentage,
+  //           },
+  //         },
+  //       },
+  //     },
+  //   });
+  // }
 }

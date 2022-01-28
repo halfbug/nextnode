@@ -11,12 +11,14 @@ import { UpdateGroupshopInput } from './dto/update-groupshops.input';
 import { Groupshops } from './entities/groupshop.modal';
 import { v4 as uuid } from 'uuid';
 import { AddDealProductInput } from './dto/add-deal-product.input';
+import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 
 @Injectable()
 export class GroupshopsService {
   constructor(
     @InjectRepository(Groupshops)
     private groupshopRepository: Repository<Groupshops>,
+    private shopifyapi: ShopifyService,
   ) {}
   async create(createGroupshopInput: CreateGroupshopInput) {
     console.log(
@@ -37,7 +39,7 @@ export class GroupshopsService {
   }
 
   findAll() {
-    return `This action returns all Groupshops`;
+    return this.groupshopRepository.find();
   }
 
   async findOne(discountCode: string) {
@@ -326,6 +328,64 @@ export class GroupshopsService {
     return gs[0];
   }
 
+  async findWithStore(id: string) {
+    const agg = [
+      {
+        $lookup: {
+          from: 'store',
+          localField: 'storeId',
+          foreignField: 'id',
+          as: 'store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$store',
+        },
+      },
+      {
+        $match: {
+          id,
+        },
+      },
+      {
+        $lookup: {
+          from: 'campaign',
+          localField: 'campaignId',
+          foreignField: 'id',
+          as: 'campaign',
+        },
+      },
+      {
+        $unwind: {
+          path: '$campaign',
+        },
+      },
+      {
+        $addFields: {
+          cproducts: '$campaign.products',
+        },
+      },
+      {
+        $addFields: {
+          dproducts: '$dealProducts.productId',
+        },
+      },
+      {
+        $addFields: {
+          gsproducts: {
+            $concatArrays: ['$cproducts', '$dproducts'],
+          },
+        },
+      },
+    ];
+
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    console.log('🚀 ~ find one groupshop with line items', gs);
+    return gs[0];
+  }
+
   async update(updateGroupshopInput: UpdateGroupshopInput) {
     const { id, dealProducts } = updateGroupshopInput;
     console.log(
@@ -338,12 +398,33 @@ export class GroupshopsService {
     delete updateGroupshopInput.id;
     // delete updateGroupshopInput['_id'];
     await this.groupshopRepository.update({ id }, updateGroupshopInput);
-
-    return await this.groupshopRepository.findOne({
-      where: {
-        id: id,
-      },
-    });
+    const gs = await this.findWithStore(id);
+    console.log(
+      '🚀 ~ file: groupshops.service.ts ~ line 402 ~ GroupshopsService ~ update ~ gs',
+      gs,
+    );
+    const {
+      discountCode: { priceRuleId },
+      store: { shop, accessToken },
+      gsproducts,
+    } = gs;
+    await this.shopifyapi.setDiscountCode(
+      shop,
+      'Update',
+      accessToken,
+      null,
+      null,
+      gsproducts,
+      null,
+      null,
+      priceRuleId,
+    );
+    return gs;
+    // return await this.groupshopRepository.findOne({
+    //   where: {
+    //     id: id,
+    //   },
+    // });
   }
 
   // updateDealProducts(addDealProductInput: AddDealProductInput) {

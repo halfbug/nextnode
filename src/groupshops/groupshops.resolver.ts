@@ -38,10 +38,10 @@ export class GroupshopsResolver {
     return this.GroupshopsService.create(createGroupshopInput);
   }
 
-  // @Query(() => [Groupshop], { name: 'Groupshops' })
-  // findAll() {
-  //   return this.GroupshopsService.findAll();
-  // }
+  @Query(() => [Groupshop], { name: 'groupshops' })
+  findAll() {
+    return this.GroupshopsService.findAll();
+  }
 
   @Query(() => Groupshop, { name: 'groupshop' })
   findOne(@Args('code') code: string) {

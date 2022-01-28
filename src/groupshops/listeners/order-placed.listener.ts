@@ -44,109 +44,6 @@ export class OrderPlacedListener {
     const newDate = new Date(date);
     return new Date(newDate.setDate(newDate.getDate() + number));
   }
-  async setDiscountCode(
-    shop: string,
-    action: string,
-    accessToken: string,
-    title?: string,
-    percentage?: number,
-    products?: string[],
-    starts?: Date,
-    ends?: Date,
-    id?: string,
-  ) {
-    // if (percentage) {
-    const client = await this.shopifyapi.client(shop, accessToken);
-    let priceRule: any;
-
-    if (action === 'Create')
-      priceRule = await client.query({
-        data: {
-          query: `mutation priceRuleCreate($priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {
-          priceRuleCreate(priceRule: $priceRule, priceRuleDiscountCode: $priceRuleDiscountCode) {
-            priceRule {
-              id
-              title
-              target
-              startsAt
-              endsAt
-            }
-            priceRuleDiscountCode {
-              code
-            }
-            priceRuleUserErrors {
-              message
-            }
-          }
-        }`,
-          variables: {
-            id: id || null,
-            priceRule: {
-              title: title,
-              target: 'LINE_ITEM',
-              value: {
-                percentageValue: -percentage,
-              },
-              itemEntitlements: {
-                productIds: products,
-              },
-              customerSelection: {
-                forAllCustomers: true,
-              },
-              allocationMethod: 'EACH',
-              validityPeriod: {
-                start: starts,
-                end: ends,
-              },
-            },
-            priceRuleDiscountCode: { code: title },
-          },
-        },
-      });
-    else
-      priceRule = await client.query({
-        data: {
-          query: `mutation priceRuleUpdate($id: ID!,$priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {
-          priceRuleUpdate(id: $id, priceRule: $priceRule, priceRuleDiscountCode: $priceRuleDiscountCode) {
-          priceRule {
-            id
-            title
-            target
-            startsAt
-            endsAt
-          }
-          priceRuleDiscountCode {
-            code
-          }
-          priceRuleUserErrors {
-            message
-          }
-        }
-      }`,
-          variables: {
-            id,
-            priceRule: {
-              value: {
-                percentageValue: -percentage,
-              },
-            },
-          },
-        },
-      });
-    // const
-
-    const {
-      [`priceRule${action}`]: {
-        priceRule: { id: priceRuleId },
-      },
-    } = priceRule.body['data'];
-    return {
-      title,
-      percentage: percentage.toString(),
-      priceRuleId: priceRuleId,
-    };
-    // }
-  }
 
   getNextMemberDiscount(totalMembers: number, rewards: Reward[]) {
     if (totalMembers === 5) return rewards[0].discount;
@@ -314,7 +211,7 @@ export class OrderPlacedListener {
       );
 
       if (newDiscount) {
-        ugroupshop.discountCode = await this.setDiscountCode(
+        ugroupshop.discountCode = await this.shopifyapi.setDiscountCode(
           shop,
           'Update',
           accessToken,
@@ -336,7 +233,7 @@ export class OrderPlacedListener {
       const newGroupshop = new CreateGroupshopInput();
       newGroupshop.storeId = id;
       newGroupshop.campaignId = campaignId;
-      newGroupshop.discountCode = await this.setDiscountCode(
+      newGroupshop.discountCode = await this.shopifyapi.setDiscountCode(
         shop,
         'Create',
         accessToken,
