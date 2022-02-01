@@ -68,11 +68,7 @@ export class CampaignsService {
 
     /// update all campaign
     this.campaignRepository.update({ isActive: true }, { isActive: false });
-    const {
-      salesTarget: { rewards },
-    } = createCampaignInput;
     
-    delete createCampaignInput.salesTarget.rewards;
     createCampaignInput.products = products;
     // const campaign = this.campaignRepository.create(createCampaignInput);
 
@@ -87,8 +83,16 @@ export class CampaignsService {
     console.log("🚀 ~ savedCampaign", savedCampaign)
 
     const { id: campaign_id } = savedCampaign;
-    // console.log("🚀 ~ file: campaigns.service.ts ~ line 87 ~ CampaignsService ~ create ~ campaign_id", campaign_id)
-    // const {id} = savedCampaign;
+
+    if(createCampaignInput.rewards)
+    {
+    const {
+      salesTarget: { rewards },
+    } = createCampaignInput;
+    
+    delete createCampaignInput.salesTarget.rewards;
+   
+     
     const nrewards = rewards.map((rew) => {
         
             const { id:rid, discount, customerCount } = rew;
@@ -98,7 +102,8 @@ export class CampaignsService {
 
           await this.campaignRepository.update({id: campaign_id}, { ...savedCampaign, salesTarget: { ...savedCampaign.salesTarget, rewards:nrewards}})
               // console.log(await this.campaignRepository.findOne(campaign_id))
-          return await this.findOneById(campaign_id);
+        }
+              return await this.findOneById(campaign_id);
    
   }
 
