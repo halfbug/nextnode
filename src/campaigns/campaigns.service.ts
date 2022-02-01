@@ -56,7 +56,7 @@ export class CampaignsService {
     //   '🚀 ~ file: campaigns.service.ts ~ line 19 ~ CampaignsService ~ create ~ createCampaignInput',
     //   createCampaignInput,
     // );
-    const { storeId, criteria } = createCampaignInput;
+    const { storeId, criteria, isActive } = createCampaignInput;
     const { shop } = await this.sotresService.findOneById(storeId);
    
     const prevProducts = createCampaignInput.products;
