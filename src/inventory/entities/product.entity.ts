@@ -33,6 +33,16 @@ export class ProductImage {
   src: string;
 }
 
+@InputType('SelectedOptionInput')
+@ObjectType('SelectedOption')
+export class SelectedOption {
+  @Field()
+  name: string;
+
+  @Field()
+  value: string;
+}
+
 @InputType('ProductVariantInput')
 @ObjectType('ProductVariant')
 export class ProductVariant {
@@ -47,6 +57,9 @@ export class ProductVariant {
 
   @Field()
   price: string;
+
+  @Field(() => [SelectedOption], { nullable: 'itemsAndList' })
+  selectedOptions?: SelectedOption[];
 }
 
 @InputType('ProductInput')
