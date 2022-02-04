@@ -82,4 +82,10 @@ export class ShopifyStoreController {
       return error.message;
     }
   }
+
+  @Get('gs')
+  async gropshopTestUrl() {
+    const gs = await this.groupshopSrv.findAll();
+    return gs.map((g) => `https://appfront.groupshop.co${g.url} `);
+  }
 }
