@@ -31,4 +31,7 @@ export default class Store extends DefaultColumnsService {
 
   @Column(() => Campaign)
   campaigns?: Campaign[];
+
+  @Column(() => Campaign)
+  activeCampaign?: Campaign;
 }

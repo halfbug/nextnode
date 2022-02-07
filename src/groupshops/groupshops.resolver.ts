@@ -16,6 +16,7 @@ import {
   Ip,
   Req,
 } from '@nestjs/common';
+import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
@@ -24,7 +25,10 @@ export const ReqDecorator = createParamDecorator(
 
 @Resolver(() => Groupshop)
 export class GroupshopsResolver {
-  constructor(private readonly GroupshopsService: GroupshopsService) {}
+  constructor(
+    private readonly GroupshopsService: GroupshopsService,
+    private crypt: EncryptDecryptService,
+  ) {}
 
   @Mutation(() => Groupshop)
   createGroupshop(
@@ -44,8 +48,8 @@ export class GroupshopsResolver {
   }
 
   @Query(() => Groupshop, { name: 'groupshop' })
-  findOne(@Args('code') code: string) {
-    return this.GroupshopsService.findOne(code);
+  async findOne(@Args('code') code: string) {
+    return this.GroupshopsService.findOne(await this.crypt.dicrypt(code));
   }
 
   @Mutation(() => Groupshop, { name: 'addDealProduct' })

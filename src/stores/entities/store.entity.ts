@@ -39,4 +39,7 @@ export class Store {
 
   @Field(() => [Campaign], { nullable: 'itemsAndList' })
   campaigns?: Campaign[];
+
+  @Field(() => Campaign, { nullable: true })
+  activeCampaign?: Campaign;
 }

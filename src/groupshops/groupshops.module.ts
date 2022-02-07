@@ -8,12 +8,14 @@ import { Groupshops } from './entities/groupshop.modal';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
 
 import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
+import { UtilsModule } from 'src/utils/utils.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Groupshops]),
     DefaultColumnsService,
     forwardRef(() => ShopifyStoreModule),
+    UtilsModule,
   ],
   providers: [GroupshopsResolver, GroupshopsService, OrderPlacedListener],
   exports: [GroupshopsService],

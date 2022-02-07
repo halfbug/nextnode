@@ -8,6 +8,7 @@ import { Reward } from 'src/appsettings/entities/sales-target.model';
 import Orders from 'src/inventory/entities/orders.modal';
 import { OrderPlacedEvent } from 'src/shopify-store/events/order-placed.envent';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
+import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import {
   CreateGroupshopInput,
   DealProductsInput,
@@ -28,6 +29,7 @@ export class OrderPlacedListener {
     private configSevice: ConfigService,
     private eventEmitter: EventEmitter2,
     private gsService: GroupshopsService,
+    private crypt: EncryptDecryptService,
   ) {}
 
   accessToken: string;
@@ -148,13 +150,11 @@ export class OrderPlacedListener {
       store: {
         shop,
         accessToken,
-        campaigns: [
-          {
-            id: campaignId,
-            salesTarget: { rewards },
-            products: campaignProducts,
-          },
-        ],
+        activeCampaign: {
+          id: campaignId,
+          salesTarget: { rewards },
+          products: campaignProducts,
+        },
         id,
       },
       lineItems,
@@ -246,7 +246,9 @@ export class OrderPlacedListener {
       newGroupshop.dealProducts = [new DealProductsInput()];
       newGroupshop.dealProducts = dealProducts;
       newGroupshop.totalProducts = totalCampaignProducts.length;
-      newGroupshop.url = `/${shop.split('.')[0]}/deal/${title}`;
+      newGroupshop.url = `/${
+        shop.split('.')[0]
+      }/deal/${await this.crypt.encrypt(title)}`;
       newGroupshop.createdAt = new Date();
       newGroupshop.expiredAt = expires;
       // newGroupshop.

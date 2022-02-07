@@ -221,7 +221,7 @@ export class WebhooksController {
 
       const newOrderPlaced = new OrderPlacedEvent();
       newOrderPlaced.order = newOrderSaved;
-      newOrderPlaced.store = await this.storesService.findOneWithCampaings(
+      newOrderPlaced.store = await this.storesService.findOneWithActiveCampaing(
         shop,
       );
       newOrderPlaced.lineItems = lineItems;
