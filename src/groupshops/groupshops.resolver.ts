@@ -27,7 +27,7 @@ export const ReqDecorator = createParamDecorator(
 export class GroupshopsResolver {
   constructor(
     private readonly GroupshopsService: GroupshopsService,
-    private crypt: EncryptDecryptService,
+    private readonly crypt: EncryptDecryptService,
   ) {}
 
   @Mutation(() => Groupshop)
@@ -49,7 +49,7 @@ export class GroupshopsResolver {
 
   @Query(() => Groupshop, { name: 'groupshop' })
   async findOne(@Args('code') code: string) {
-    return this.GroupshopsService.findOne(await this.crypt.dicrypt(code));
+    return await this.GroupshopsService.findOne(await this.crypt.decrypt(code));
   }
 
   @Mutation(() => Groupshop, { name: 'addDealProduct' })

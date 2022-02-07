@@ -6,7 +6,7 @@ import { promisify } from 'util';
 export class EncryptDecryptService {
   iv = randomBytes(16);
   password = 'Password used to generate key';
-  async encrypt(text: string) {
+  async sencrypt(text: string) {
     const key = (await promisify(scrypt)(this.password, 'salt', 32)) as Buffer;
     const cipher = createCipheriv('aes-256-ctr', key, this.iv);
 
@@ -15,7 +15,7 @@ export class EncryptDecryptService {
     return encryptedText.toString('base64');
   }
 
-  async dicrypt(text: string) {
+  async sdicrypt(text: string) {
     const key = (await promisify(scrypt)(this.password, 'salt', 32)) as Buffer;
     const decipher = createDecipheriv('aes-256-ctr', key, this.iv);
     const decryptedText = Buffer.concat([
@@ -23,5 +23,13 @@ export class EncryptDecryptService {
       decipher.final(),
     ]);
     return decryptedText.toString();
+  }
+
+  encrypt(text: string) {
+    return Buffer.from(text).toString('base64');
+  }
+
+  decrypt(text: string) {
+    return Buffer.from(text, 'base64').toString('ascii');
   }
 }
