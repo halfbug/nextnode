@@ -1,4 +1,8 @@
 import { InputType, ID, Field } from '@nestjs/graphql';
+import {
+  BannerDesignTypeEnum,
+  BannerSummaryEnum,
+} from '../entities/settings.entity';
 // import { Settings } from '../entities/settings.entity';
 @InputType()
 export class SettingsInput {
@@ -19,6 +23,24 @@ export class SettingsInput {
 
   @Field({ nullable: true })
   media?: string;
+
+  @Field(() => BannerDesignTypeEnum, { nullable: true })
+  bannerDesign: BannerDesignTypeEnum;
+
+  @Field({ nullable: true })
+  bannerProductPage?: boolean;
+
+  @Field({ nullable: true })
+  bannerCartPage?: boolean;
+
+  @Field({ nullable: true })
+  bannerLocation?: string;
+
+  @Field({ nullable: true })
+  callToActionText?: string;
+
+  @Field(() => BannerSummaryEnum, { nullable: true })
+  bannerSummaryPage?: BannerSummaryEnum;
 }
 
 @InputType()
