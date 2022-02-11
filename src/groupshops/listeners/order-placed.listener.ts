@@ -48,11 +48,10 @@ export class OrderPlacedListener {
   }
 
   getNextMemberDiscount(totalMembers: number, rewards: Reward[]) {
-    if (totalMembers === 5) return rewards[0].discount;
+    if (totalMembers === 6) return rewards[0].discount;
     return (
-      rewards.filter(
-        (rew) => parseInt(rew.customerCount) === totalMembers + 1,
-      )[0]?.discount || null
+      rewards.filter((rew) => parseInt(rew.customerCount) === totalMembers)[0]
+        ?.discount || null
     );
   }
 
@@ -126,7 +125,7 @@ export class OrderPlacedListener {
     const totalMembers = members.length;
     const currentMilestone = parseFloat(discountCode.percentage) / 100;
     return members.map((member) => {
-      if (totalMembers === 5 && member.role === RoleTypeEnum.owner) {
+      if (totalMembers === 6 && member.role === RoleTypeEnum.owner) {
         member = this.calculateRefund(member, 50 / 100);
       } else if (totalMembers === 10 && member.role === RoleTypeEnum.owner) {
         member = this.calculateRefund(member, 90 / 100);
