@@ -100,7 +100,7 @@ export class CampaignsService {
             return new Reward(rid, discount, customerCount);
           });
 
-          await this.campaignRepository.update({id: campaign_id}, { ...savedCampaign, salesTarget: { ...savedCampaign.salesTarget, rewards:nrewards}})
+          await this.campaignRepository.update({id: campaign_id}, { ...savedCampaign, salesTarget: { ...savedCampaign.salesTarget, rewards:nrewards}, isActive: true});
               // console.log(await this.campaignRepository.findOne(campaign_id))
         }
               return await this.findOneById(campaign_id);
