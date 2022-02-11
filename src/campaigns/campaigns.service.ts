@@ -67,7 +67,7 @@ export class CampaignsService {
     );
 
     /// update all campaign
-    if (isActive) this.campaignRepository.update({ isActive: true }, { isActive: false });
+    if (isActive) await this.campaignRepository.update({ isActive: true }, { isActive: false });
     
     createCampaignInput.products = products;
     // const campaign = this.campaignRepository.create(createCampaignInput);
