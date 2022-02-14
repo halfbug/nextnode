@@ -195,7 +195,7 @@ export class WebhooksController {
       newOrder.discountInfo = whOrder.discount_codes;
       newOrder.customer = new Customer();
       newOrder.customer.firstName = whOrder.customer.first_name;
-      newOrder.customer.firstName = whOrder.customer.last_name;
+      newOrder.customer.lastName = whOrder.customer.last_name;
       newOrder.customer.email = whOrder.customer.email;
       newOrder.customer.ip = whOrder.browser_ip;
       newOrder.customer.phone =

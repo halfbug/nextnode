@@ -13,7 +13,7 @@ export class Customer {
   @Field({ nullable: true })
   firstName: string;
   @Field({ nullable: true })
-  LastName: string;
+  lastName: string;
   @Field({ nullable: true })
   email: string;
   @Field({ nullable: true })
