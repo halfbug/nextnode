@@ -193,11 +193,13 @@ export class GroupshopsService {
                   '$$me',
                   {
                     products: {
-                      $arrayElemAt: [
-                        {
-                          $map: {
-                            input: '$$me.lineItems',
-                            in: {
+                      // $arrayElemAt: [
+                      //   {
+                      $map: {
+                        input: '$$me.lineItems',
+                        in: {
+                          $arrayElemAt: [
+                            {
                               $filter: {
                                 input: '$popularProducts',
                                 as: 'j',
@@ -206,10 +208,13 @@ export class GroupshopsService {
                                 },
                               },
                             },
-                          },
+                            0,
+                          ],
                         },
-                        0,
-                      ],
+                      },
+                      //   },
+                      //   0,
+                      // ],
                     },
                   },
                 ],
@@ -395,14 +400,11 @@ export class GroupshopsService {
 
     updateGroupshopInput.dealProducts = [new DealProductsInput()];
     updateGroupshopInput.dealProducts = dealProducts;
+    console.log('🚀 ~ ~ update ~ dealProducts', dealProducts);
     delete updateGroupshopInput.id;
     // delete updateGroupshopInput['_id'];
     await this.groupshopRepository.update({ id }, updateGroupshopInput);
     const gs = await this.findWithStore(id);
-    console.log(
-      '🚀 ~ file: groupshops.service.ts ~ line 402 ~ GroupshopsService ~ update ~ gs',
-      gs,
-    );
     const {
       discountCode: { priceRuleId },
       store: { shop, accessToken },
@@ -418,6 +420,11 @@ export class GroupshopsService {
       null,
       null,
       priceRuleId,
+    );
+
+    await this.groupshopRepository.update(
+      { id },
+      { totalProducts: gsproducts.length },
     );
     return gs;
     // return await this.groupshopRepository.findOne({

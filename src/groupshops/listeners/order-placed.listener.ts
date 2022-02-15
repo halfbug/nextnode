@@ -61,10 +61,10 @@ export class OrderPlacedListener {
         priceSum + quantity * parseFloat(price),
       0,
     );
-    return discountPercentage * totalPrice;
+    return Math.floor((discountPercentage / 100) * totalPrice);
   }
 
-  async shopifyRefund(amount: string, orderId: string) {
+  async shopifyRefund(amount: string, orderId: string, discount: number) {
     const client = await this.shopifyapi.client(this.shop, this.accessToken);
     const refund = await client.query({
       data: {
@@ -87,7 +87,7 @@ export class OrderPlacedListener {
         variables: {
           input: {
             orderId: orderId,
-            note: 'GROUPSHOP cash back for referral V2',
+            note: `GROUPSHOP V2 ${discount}% cash back for referral`,
             notify: true,
             transactions: {
               amount,
@@ -105,8 +105,8 @@ export class OrderPlacedListener {
   calculateRefund(member: any, milestone: number) {
     const netDiscount = milestone * 100 - member.availedDiscount;
 
-    const refundAmount = this.totalPricePercent(member.lineItems, milestone);
-    this.shopifyRefund(refundAmount.toString(), member.orderId);
+    const refundAmount = this.totalPricePercent(member.lineItems, netDiscount);
+    this.shopifyRefund(refundAmount.toString(), member.orderId, netDiscount);
     const refund = new RefundInput(
       RefundStatusEnum.panding,
       new Date(),
