@@ -51,6 +51,9 @@ export class CreateCampaignInput {
   @Field(() => [String], { nullable: true })
   products?: string[];
 
+  @Field(() => [String], { nullable: true })
+  addableProducts?: string[];
+
   @Field({ nullable: true })
   rewards?: string;
 
