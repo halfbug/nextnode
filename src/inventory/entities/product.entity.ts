@@ -26,11 +26,11 @@ export class ProductOption {
 @InputType('ProductImageInput')
 @ObjectType('ProductImage')
 export class ProductImage {
-  @Field()
-  id: string;
+  @Field({ nullable: true })
+  id?: string;
 
-  @Field()
-  src: string;
+  @Field({ nullable: true })
+  src?: string;
 }
 
 @InputType('SelectedOptionInput')
@@ -54,6 +54,9 @@ export class ProductVariant {
 
   @Field()
   inventoryQuantity: number;
+
+  @Field(() => ProductImage, { nullable: true })
+  image?: ProductImage;
 
   @Field()
   price: string;
