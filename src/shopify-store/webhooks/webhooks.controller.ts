@@ -97,16 +97,18 @@ export class WebhooksController {
 
     //add variat
     const vprod = nprod;
-    vprod.id = rproduct.variants[0]?.admin_graphql_api_id;
-    vprod.title = rproduct.variants[0]?.title;
-    vprod.parentId = rproduct?.admin_graphql_api_id;
-    vprod.recordType = 'ProductVariant';
-    vprod.createdAtShopify = rproduct?.variants[0]?.created_at;
-    vprod.publishedAt = rproduct?.published_at;
-    vprod.price = rproduct?.variants[0]?.price;
+    rproduct.variants.map(async (variant) => {
+      vprod.id = variant.admin_graphql_api_id;
+      vprod.title = variant?.title;
+      vprod.parentId = rproduct?.admin_graphql_api_id;
+      vprod.recordType = 'ProductVariant';
+      vprod.createdAtShopify = variant?.created_at;
+      vprod.publishedAt = rproduct?.published_at;
+      vprod.price = variant?.variants[0]?.price;
+      vprod.inventoryQuantity = variant?.inventory_quantity;
 
-    await this.inventryService.create(vprod);
-
+      await this.inventryService.create(vprod);
+    });
     // console.log(JSON.stringify(req.body));
     // console.log(req.query);
     res.send('values updated');
@@ -149,9 +151,11 @@ export class WebhooksController {
       const preVariant = await this.inventryService.findId(
         variant.admin_graphql_api_id,
       );
-      qDifference = variant.inventory_quantity - preVariant.inventory_quantity;
+      qDifference = Math.abs(
+        variant.inventory_quantity - preVariant.inventoryQuantity,
+      );
 
-      preVariant.inventory_quantity = variant.inventory_quantity;
+      preVariant.inventoryQuantity = variant.inventory_quantity;
       await this.inventryService.update(preVariant);
       await this.inventryService.updateInventory(
         rproduct.admin_graphql_api_id,

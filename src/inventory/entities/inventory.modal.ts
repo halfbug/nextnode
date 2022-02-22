@@ -89,5 +89,5 @@ export default class Inventory extends DefaultColumnsService {
   parentId?: string;
 
   @Column({ nullable: true })
-  inventory_quantity?: number;
+  inventoryQuantity?: number;
 }
