@@ -59,6 +59,8 @@ export class CreateOrderInput {
   parentId?: string;
   @Field(() => LineProduct)
   product?: LineProduct;
+  @Field(() => LineProduct)
+  variant?: LineProduct;
   @Field({ nullable: true })
   price?: string;
   @Field({ nullable: true })

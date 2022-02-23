@@ -46,8 +46,13 @@ export default class Orders extends DefaultColumnsService {
   totalPrice?: string;
   @Column({ nullable: true })
   parentId?: string;
+
   @Column(() => LineProduct)
   product?: LineProduct;
+
+  @Column(() => LineProduct)
+  variant?: LineProduct;
+
   @Column({ nullable: true })
   price?: string;
   @Column({ nullable: true })

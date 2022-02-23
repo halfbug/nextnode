@@ -214,6 +214,8 @@ export class WebhooksController {
           newItem.shop = shop;
           newItem.product = new LineProduct();
           newItem.product.id = `gid://shopify/Product/${item.product_id}`;
+          newItem.variant = new LineProduct();
+          newItem.variant.id = `gid://shopify/ProductVariant/${item.variant_id}`;
           newItem.price = item.price;
           newItem.quantity = item.quantity;
           newItem.totalDiscounts = item.total_discount;
