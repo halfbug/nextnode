@@ -255,7 +255,7 @@ export class GroupshopsService {
       {
         $addFields: {
           allProducts: {
-            $concatArrays: ['$campaignProducts', '$dealsProducts'],
+            $concatArrays: ['$dealsProducts', '$campaignProducts'],
           },
         },
       },
