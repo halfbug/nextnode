@@ -5,6 +5,8 @@ import {
   UploadedFile,
   Controller,
   Res,
+  Get,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiResponse } from '@nestjs/swagger';
@@ -12,7 +14,7 @@ import { ApiResponse } from '@nestjs/swagger';
 import { ImageFileDTO, ImageResponseDTO } from './UploadImageDTO';
 import { UploadImageService } from './uploadimage.service';
 
-@Controller('upload')
+@Controller('image')
 export class UploadImageController {
   constructor(private readonly uploadImageService: UploadImageService) {}
 
@@ -30,6 +32,26 @@ export class UploadImageController {
       return response
         .status(500)
         .json(`Failed to upload image to S3: ${error.message}`);
+    }
+  }
+
+  @Get('')
+  @ApiResponse({ status: HttpStatus.CREATED, type: ImageResponseDTO })
+  async getImageUrl(@Req() req, @Res() response) {
+    console.log(req.query);
+    // response.send(req.query);
+    const { key } = req.query;
+
+    try {
+      const data = await this.uploadImageService.getSignedUrl(key);
+      return response.status(200).json({
+        message: `s3 url sent`,
+        data,
+      });
+    } catch (error) {
+      return response
+        .status(500)
+        .json(`Failed to get image from S3: ${error.message}`);
     }
   }
 }

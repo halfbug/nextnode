@@ -38,4 +38,18 @@ export class UploadImageService {
       });
     });
   }
+  async getSignedUrl(key: string) {
+    const S3 = this.s3Provider.getS3();
+    const S3bucket = this.s3Provider.getBucketName();
+    const params = { Bucket: S3bucket, Key: key };
+    // console.log(S3Obj);
+    const SignedUrl = await S3.getSignedUrl('getObject', params);
+    console.log(
+      '🚀 ~ file: uploadimage.service.ts ~ line 47 ~ UploadImageService ~ getSignedUrl ~ SignedUrl',
+      SignedUrl,
+    );
+    return SignedUrl;
+
+    // return await this.uploadS3(file.buffer, S3bucket, originalname);
+  }
 }
