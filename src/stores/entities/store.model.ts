@@ -2,6 +2,7 @@ import { Column, Entity } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
 import { Settings } from './settings.model';
 import Campaign from 'src/campaigns/entities/campaign.model';
+import { BillingPlanEnum } from './store.entity';
 
 @Entity()
 export default class Store extends DefaultColumnsService {
@@ -34,4 +35,10 @@ export default class Store extends DefaultColumnsService {
 
   @Column(() => Campaign)
   activeCampaign?: Campaign;
+
+  @Column('enum', { default: BillingPlanEnum.EXPLORE })
+  plan?: BillingPlanEnum;
+
+  @Column({ nullable: true })
+  totalGroupShop?: number;
 }

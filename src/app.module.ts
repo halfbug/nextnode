@@ -10,12 +10,14 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { InventoryModule } from './inventory/inventory.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { AppsettingsModule } from './appsettings/appsettings.module';
+import { BillingModule } from './billing/billing.module';
 import Inventory from './inventory/entities/inventory.modal';
 import Campaign from './campaigns/entities/campaign.model';
 import Orders from './inventory/entities/orders.modal';
 import { Appsetting } from './appsettings/entities/appsetting.model';
 import { GroupshopsModule } from './groupshops/groupshops.module';
 import { Groupshops } from './groupshops/entities/groupshop.modal';
+import Billing from './billing/entities/billing.model';
 
 @Module({
   imports: [
@@ -51,6 +53,7 @@ import { Groupshops } from './groupshops/entities/groupshop.modal';
             Orders,
             Appsetting,
             Groupshops,
+            Billing,
           ],
         };
       },
@@ -65,6 +68,7 @@ import { Groupshops } from './groupshops/entities/groupshop.modal';
     CampaignsModule,
     AppsettingsModule,
     GroupshopsModule,
+    BillingModule,
   ],
 })
 export class AppModule {}

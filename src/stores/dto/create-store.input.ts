@@ -3,6 +3,7 @@ import {
   BannerDesignTypeEnum,
   BannerSummaryEnum,
 } from '../entities/settings.entity';
+import { BillingPlanEnum } from '../entities/store.entity';
 // import { Settings } from '../entities/settings.entity';
 @InputType()
 export class SettingsInput {
@@ -74,4 +75,10 @@ export class CreateStoreInput {
 
   @Field((type) => SettingsInput)
   settings: SettingsInput;
+
+  @Field(() => BillingPlanEnum, { defaultValue: BillingPlanEnum.EXPLORE })
+  plan?: BillingPlanEnum;
+
+  @Field({ nullable: true })
+  totalGroupShop?: number;
 }

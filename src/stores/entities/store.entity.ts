@@ -1,6 +1,16 @@
-import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
 import { Campaign } from 'src/campaigns/entities/campaign.entity';
 import { Settings } from './settings.entity';
+
+export enum BillingPlanEnum {
+  EXPLORE,
+  LAUNCH,
+  GROWTH,
+  UNICORN,
+}
+registerEnumType(BillingPlanEnum, {
+  name: 'BillingPlanEnum',
+});
 
 @ObjectType('Store')
 export class Store {
@@ -45,4 +55,12 @@ export class Store {
 
   @Field(() => Campaign, { nullable: true })
   activeCampaign?: Campaign;
+
+  @Field(() => BillingPlanEnum, {
+    defaultValue: BillingPlanEnum.EXPLORE,
+  })
+  plan?: BillingPlanEnum;
+
+  @Field({ defaultValue: 0, nullable: true })
+  totalGroupShop?: number;
 }
