@@ -47,6 +47,14 @@ export class GroupshopsResolver {
     return this.GroupshopsService.findAll();
   }
 
+  @Query(() => Groupshop, { name: 'getQrDealLink' })
+  findQrDealLink(
+    @Args('email') email: string,
+    @Args('ordernumber') ordernumber: string,
+  ) {
+    return this.GroupshopsService.findfindQrDealLinkAll(email, ordernumber);
+  }
+
   @Query(() => Groupshop, { name: 'groupshop' })
   async findOne(@Args('code') code: string) {
     return await this.GroupshopsService.findOne(await this.crypt.decrypt(code));

@@ -12,6 +12,7 @@ import { Groupshops } from './entities/groupshop.modal';
 import { v4 as uuid } from 'uuid';
 import { AddDealProductInput } from './dto/add-deal-product.input';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
+import Orders from 'src/inventory/entities/orders.modal';
 
 @Injectable()
 export class GroupshopsService {
@@ -40,6 +41,30 @@ export class GroupshopsService {
 
   findAll() {
     return this.groupshopRepository.find();
+  }
+
+  async findfindQrDealLinkAll(email: string, ordernumber: string) {
+    const agg = [
+      {
+        $match: {
+          name: '#' + ordernumber,
+          'customer.email': email,
+        },
+      },
+      {
+        $lookup: {
+          from: 'groupshops',
+          localField: 'id',
+          foreignField: 'members.orderId',
+          as: 'groupshops',
+        },
+      },
+    ];
+    console.log(agg);
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Orders, agg).toArray();
+    console.log('🚀 ~ find qr deal link', gs);
+    return gs[0].groupshops[0];
   }
 
   async findOne(discountCode: string) {

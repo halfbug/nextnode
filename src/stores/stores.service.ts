@@ -23,6 +23,10 @@ export class StoresService {
     return this.storeRepository.find();
   }
 
+  findActiveAll() {
+    return this.storeRepository.find({ where: { status: 'Active' } });
+  }
+
   findOne(shop: string) {
     return this.storeRepository.findOne({ shop });
   }

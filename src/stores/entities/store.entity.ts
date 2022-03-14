@@ -32,6 +32,9 @@ export class Store {
   logoImage: string;
 
   @Field({ nullable: true })
+  status: string;
+
+  @Field({ nullable: true })
   industry: string;
 
   @Field((type) => Settings, { nullable: true })

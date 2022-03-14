@@ -18,6 +18,11 @@ export class StoresResolver {
     return this.storesService.findAll();
   }
 
+  @Query(() => [Store], { name: 'activeStores' })
+  findActive() {
+    return this.storesService.findActiveAll();
+  }
+
   @Query(() => Store, { name: 'storeName' })
   async findOne(@Args('shop') shop: string, @Info() info: any) {
     const selectedFileds = info.fieldNodes[0].selectionSet.selections.map(
