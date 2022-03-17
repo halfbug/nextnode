@@ -25,10 +25,6 @@ export class BillingListener {
       '🚀 ~ file: billing.listener.ts ~ line 28 ~ BillingListener ~ createBilling ~ members',
       members,
     );
-    // let totalRefund = 0;
-    // const totalCashBack = members.map((item) => {
-    //   totalRefund = totalRefund + item.refund;
-    // })
     const payload: CreateBillingInput = {
       type: BillingTypeEnum.ON_GS_CREATION,
       totalCashBack: 0,
