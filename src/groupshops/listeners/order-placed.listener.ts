@@ -20,6 +20,7 @@ import {
 import { UpdateGroupshopInput } from '../dto/update-groupshops.input';
 import { ProductTypeEnum, RoleTypeEnum } from '../entities/groupshop.entity';
 import { RefundStatusEnum } from '../entities/groupshop.modal';
+import { GroupShopCreated } from '../events/groupshop-created.event';
 import { GroupshopsService } from '../groupshops.service';
 
 @Injectable()
@@ -258,7 +259,11 @@ export class OrderPlacedListener {
       gsMilestone.activatedAt = new Date();
       gsMilestone.discount = rewards[0].discount;
       newGroupshop.milestones = [gsMilestone];
-      this.gsService.create(newGroupshop);
+      const savedGs = await this.gsService.create(newGroupshop);
+      const groupShopCreated = new GroupShopCreated();
+      groupShopCreated.groupshop = savedGs;
+      groupShopCreated.store = event.store;
+      this.eventEmitter.emit('groupshop.created', groupShopCreated);
     }
   }
 }

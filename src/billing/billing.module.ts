@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import Billing from './entities/billing.model';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
 import { StoresModule } from 'src/stores/stores.module';
+import { BillingListener } from './listeners/billing.listener';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { StoresModule } from 'src/stores/stores.module';
     DefaultColumnsService,
     StoresModule,
   ],
-  providers: [BillingsResolver, BillingsService],
+  providers: [BillingsResolver, BillingsService, BillingListener],
   exports: [BillingsService],
 })
 export class BillingModule {}

@@ -4,18 +4,24 @@ import { BillingTypeEnum } from './billing.entity';
 
 @Entity()
 export default class Billing extends DefaultColumnsService {
-  // @Column()
-  // id: string;
+  @Column()
+  id: string;
 
   @Column('enum', { nullable: true })
   type: BillingTypeEnum;
 
   @Column()
-  amount: string;
+  amount: number;
 
   @Column()
-  totalCashBack: string;
+  totalCashBack: number;
+
+  @Column()
+  groupShopId: string;
 
   @Column()
   storeId: string;
+
+  @Column()
+  revenue?: number;
 }

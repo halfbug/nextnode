@@ -45,7 +45,7 @@ export class CampaignsService {
         break;
 
       default:
-        newProducts = prevProducts;
+        newProducts = [...new Set(prevProducts)] as string[];
         break;
     }
     return newProducts;
@@ -144,7 +144,7 @@ export class CampaignsService {
     const prevProducts = prevCampaign.products;
 
     if (products && criteria === 'custom') {
-      updateCampaignInput.products = products;
+      updateCampaignInput.products = [...new Set(products)];
     } else {
       const updatedProducts: string[] = await this.setProducts(
         shop,

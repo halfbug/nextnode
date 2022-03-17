@@ -79,6 +79,6 @@ export class CreateStoreInput {
   @Field(() => BillingPlanEnum, { defaultValue: BillingPlanEnum.EXPLORE })
   plan?: BillingPlanEnum;
 
-  @Field({ nullable: true })
+  @Field({ defaultValue: 0, nullable: true })
   totalGroupShop?: number;
 }

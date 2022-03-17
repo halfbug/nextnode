@@ -18,8 +18,11 @@ export class BillingsService {
 
   async create(createBillingInput: CreateBillingInput) {
     const billing = await this.billingRepository.create(createBillingInput);
-      const savedBilling = await this.billingRepository.save(billing);
+    const id = uuid();
+
+      const savedBilling = await this.billingRepository.save({id, ...billing});
       console.log("🚀 ~ savedBilling", savedBilling)
+      return savedBilling;
   
   }
 

@@ -39,6 +39,6 @@ export default class Store extends DefaultColumnsService {
   @Column('enum', { default: BillingPlanEnum.EXPLORE })
   plan?: BillingPlanEnum;
 
-  @Column({ nullable: true })
+  @Column({ default: 0, nullable: true })
   totalGroupShop?: number;
 }
