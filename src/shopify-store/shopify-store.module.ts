@@ -18,6 +18,7 @@ import { UploadImageModule } from './ImageUpload/uploadimage.module';
 import { CampaignsModule } from 'src/campaigns/campaigns.module';
 import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 // import { GroupshopsModule } from 'src/groupshops/groupshops.module';
+import { ThemeAppExtensionController } from './theme-app-extension/theme-app-extension.controller';
 @Global()
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import { GroupshopsModule } from 'src/groupshops/groupshops.module';
     InvenotrySavedListener,
     StoresModule,
   ],
-  controllers: [ShopifyStoreController, WebhooksController],
+  controllers: [ShopifyStoreController, WebhooksController, ThemeAppExtensionController],
   exports: [StoreService, ShopifyService],
 })
 export class ShopifyStoreModule {}

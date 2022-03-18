@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { HttpService } from '@nestjs/axios';
 import readJsonLines from 'read-json-lines-sync';
@@ -41,23 +41,30 @@ export class OrdersReceivedListener {
   async storeOrdersReceived(event: OrdersReceivedEvent) {
     console.log('orders Received ----->>>> ', event.shop);
     console.log(event);
-    // const productBulkFile = createReadStream(event.bulkOperationResponse.url);
-    this.httpService
-      .get(event.bulkOperationResponse.url)
-      .subscribe(async (res) => {
-        const ordersObj = this.reshapeOrders(
-          readJsonLines(res.data),
-          event.shop,
-        );
-        // console.log(ordersObj);
-        // const savedorder =
-        await this.orderService.insertMany(ordersObj);
-        console.log('saved orders for ', event.shop);
+    try {
+      if (event.bulkOperationResponse.url) {
+        this.httpService
+          .get(event.bulkOperationResponse.url)
+          .subscribe(async (res) => {
+            const ordersObj = this.reshapeOrders(
+              readJsonLines(res.data),
+              event.shop,
+            );
+            // console.log(ordersObj);
+            // const savedorder =
+            await this.orderService.insertMany(ordersObj);
+            console.log('saved orders for ', event.shop);
 
-        const ordersSavedEvent = new OrdersSavedEvent();
-        ordersSavedEvent.shop = event.shop;
-        ordersSavedEvent.accessToken = event.accessToken;
-        this.eventEmitter.emit('orders.saved', ordersSavedEvent);
-      });
+            const ordersSavedEvent = new OrdersSavedEvent();
+            ordersSavedEvent.shop = event.shop;
+            ordersSavedEvent.accessToken = event.accessToken;
+            this.eventEmitter.emit('orders.saved', ordersSavedEvent);
+          });
+      }
+    } catch (err) {
+      Logger.error(err);
+    } finally {
+      console.log('out');
+    }
   }
 }
