@@ -91,4 +91,10 @@ export class ShopifyStoreController {
     const gs = await this.groupshopSrv.findAll();
     return gs.map((g) => `https://appfront.groupshop.co${g.url} `);
   }
+  @Get('healthcheck')
+  async testme() {
+    return `server is running properly on
+    HOST: ${process.env.HOST}
+    FRONT: ${process.env.FRONT}`;
+  }
 }
