@@ -17,6 +17,7 @@ import { InventoryModule } from 'src/inventory/inventory.module';
 import { UploadImageModule } from './ImageUpload/uploadimage.module';
 import { CampaignsModule } from 'src/campaigns/campaigns.module';
 import { GroupshopsModule } from 'src/groupshops/groupshops.module';
+import { BillingModule } from 'src/billing/billing.module';
 // import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 import { ThemeAppExtensionController } from './theme-app-extension/theme-app-extension.controller';
 @Global()
@@ -30,6 +31,7 @@ import { ThemeAppExtensionController } from './theme-app-extension/theme-app-ext
     CampaignsModule,
     forwardRef(() => GroupshopsModule),
     UploadImageModule,
+    BillingModule,
   ],
   providers: [
     StoreService,

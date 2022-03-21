@@ -6,6 +6,7 @@ import { GroupShopCreated } from '../../groupshops/events/groupshop-created.even
 import { BillingsService } from '../billing.service';
 import { CreateBillingInput } from '../dto/create-billing.input';
 import { BillingTypeEnum } from '../entities/billing.entity';
+import { CashBackEvent } from '../events/cashback.event';
 
 @Injectable()
 export class BillingListener {
@@ -35,6 +36,26 @@ export class BillingListener {
     const newBilling = await this.billingService.create(payload);
     console.log(
       '🚀 ~ file: billing.listener.ts ~ line 35 ~ BillingListener ~ createBilling ~ newBilling',
+      newBilling,
+    );
+  }
+  @OnEvent('cashback.generated')
+  async createBillingForCashBack(event: CashBackEvent) {
+    console.log(JSON.stringify(event));
+    console.log('...............');
+    const { id, storeId } = event.groupshop;
+    const { cashbackAmount } = event;
+
+    const payload: CreateBillingInput = {
+      type: BillingTypeEnum.ON_CASHBACK,
+      totalCashBack: +cashbackAmount.toFixed(2),
+      amount: GS_CHARGE_CASHBACK,
+      groupShopId: id,
+      storeId,
+    };
+    const newBilling = await this.billingService.create(payload);
+    console.log(
+      '🚀 ~ file: billing.listener.ts ~ line 57 ~ BillingListener ~ createBillingForCashBack ~ newBilling',
       newBilling,
     );
   }

@@ -5,9 +5,11 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CreateMemberInput } from 'aws-sdk/clients/managedblockchain';
 import { Reward } from 'src/appsettings/entities/sales-target.model';
+import { CashBackEvent } from 'src/billing/events/cashback.event';
 import Orders from 'src/inventory/entities/orders.modal';
 import { OrderPlacedEvent } from 'src/shopify-store/events/order-placed.envent';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
+import { GS_CHARGE_CASHBACK } from 'src/utils/constant';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import {
   CreateGroupshopInput,
@@ -19,7 +21,7 @@ import {
 } from '../dto/create-groupshops.input';
 import { UpdateGroupshopInput } from '../dto/update-groupshops.input';
 import { ProductTypeEnum, RoleTypeEnum } from '../entities/groupshop.entity';
-import { RefundStatusEnum } from '../entities/groupshop.modal';
+import { Groupshops, RefundStatusEnum } from '../entities/groupshop.modal';
 import { GroupShopCreated } from '../events/groupshop-created.event';
 import { GroupshopsService } from '../groupshops.service';
 
@@ -36,6 +38,7 @@ export class OrderPlacedListener {
   accessToken: string;
   shop: string;
   order: Orders;
+  groupshop: Groupshops;
 
   static formatTitle(name: string) {
     return `GS${Math.floor(1000 + Math.random() * 9000)}${name?.substring(
@@ -62,11 +65,25 @@ export class OrderPlacedListener {
         priceSum + quantity * parseFloat(price),
       0,
     );
-    return Math.floor((discountPercentage / 100) * totalPrice);
+    const netPrice = (discountPercentage / 100) * totalPrice;
+    return netPrice < 1 ? netPrice : Math.floor(netPrice);
   }
 
   async shopifyRefund(amount: string, orderId: string, discount: number) {
+    console.log('.............refund....................');
+    console.log({ amount });
+    console.log({ orderId });
+    console.log({ discount });
+
     const client = await this.shopifyapi.client(this.shop, this.accessToken);
+    console.log(
+      '🚀 ~ file: order-placed.listener.ts ~ line 79 ~ OrderPlacedListener ~ shopifyRefund ~ this.accessToken',
+      this.accessToken,
+    );
+    console.log(
+      '🚀 ~ file: order-placed.listener.ts ~ line 79 ~ OrderPlacedListener ~ shopifyRefund ~ this.shop,',
+      this.shop,
+    );
     const refund = await client.query({
       data: {
         query: `mutation refundCreate($input: RefundInput!) {
@@ -101,13 +118,29 @@ export class OrderPlacedListener {
       },
     });
     console.log(JSON.stringify(refund));
+    console.log('.............refund....................');
   }
 
   calculateRefund(member: any, milestone: number) {
     const netDiscount = milestone * 100 - member.availedDiscount;
 
     const refundAmount = this.totalPricePercent(member.lineItems, netDiscount);
-    this.shopifyRefund(refundAmount.toString(), member.orderId, netDiscount);
+    // cashback - gsfees
+    const percentageGiven = (100 - GS_CHARGE_CASHBACK) / 100;
+    const actualCashBack = refundAmount * percentageGiven;
+    console.log(
+      '🚀 ~ file: order-placed.listener.ts ~ line 116 ~ OrderPlacedListener ~ calculateRefund ~ refundAmount',
+      refundAmount,
+    );
+    this.shopifyRefund(actualCashBack.toString(), member.orderId, netDiscount);
+    // after shopify refund we emit cashBack event n go to billing listner
+    const cashBackEvent = new CashBackEvent();
+    cashBackEvent.cashbackAmount = actualCashBack;
+    cashBackEvent.groupshop = this.groupshop;
+    // cashBackEvent.store = event.store;
+    console.log('.......cashback..........');
+    this.eventEmitter.emit('cashback.generated', cashBackEvent);
+
     const refund = new RefundInput(
       RefundStatusEnum.panding,
       new Date(),
@@ -193,6 +226,7 @@ export class OrderPlacedListener {
         createdAt,
         expiredAt,
       } = ugroupshop;
+      this.groupshop = ugroupshop as Groupshops;
 
       gsMember.role = RoleTypeEnum.referral;
       gsMember.availedDiscount = parseFloat(ugroupshop.discountCode.percentage);

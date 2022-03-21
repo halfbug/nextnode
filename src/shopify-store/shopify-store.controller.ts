@@ -1,5 +1,6 @@
 import { Controller, forwardRef, Get, Inject, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { BillingsService } from 'src/billing/billing.service';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
 import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { InventoryService } from 'src/inventory/inventory.service';
@@ -18,6 +19,7 @@ export class ShopifyStoreController {
     private ordersSrv: OrdersService,
     private groupshopSrv: GroupshopsService,
     private storesService: StoresService,
+    private billingService: BillingsService,
   ) {}
 
   // @Get()
@@ -77,6 +79,7 @@ export class ShopifyStoreController {
       await this.campaignSrv.removeShop(store.id);
       await this.groupshopSrv.removeShop(store.id);
       await this.storesService.removeShop(shop);
+      await this.billingService.removeByShop(store.id);
       return 'done';
     } catch (error) {
       return error.message;
