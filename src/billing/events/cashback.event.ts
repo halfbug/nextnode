@@ -5,4 +5,5 @@ export class CashBackEvent {
   groupshop: Groupshops;
   cashbackAmount: number;
   store: Store;
+  revenue: number;
 }

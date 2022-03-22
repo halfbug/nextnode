@@ -44,13 +44,14 @@ export class BillingListener {
     console.log(JSON.stringify(event));
     console.log('...............');
     const { id, storeId } = event.groupshop;
-    const { cashbackAmount } = event;
+    const { cashbackAmount, revenue } = event;
 
     const payload: CreateBillingInput = {
       type: BillingTypeEnum.ON_CASHBACK,
       totalCashBack: +cashbackAmount.toFixed(2),
       amount: GS_CHARGE_CASHBACK,
       groupShopId: id,
+      revenue,
       storeId,
     };
     const newBilling = await this.billingService.create(payload);
