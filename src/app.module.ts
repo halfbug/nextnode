@@ -18,6 +18,7 @@ import { Appsetting } from './appsettings/entities/appsetting.model';
 import { GroupshopsModule } from './groupshops/groupshops.module';
 import { Groupshops } from './groupshops/entities/groupshop.modal';
 import Billing from './billing/entities/billing.model';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import Billing from './billing/entities/billing.model';
     AppsettingsModule,
     GroupshopsModule,
     BillingModule,
+    EmailModule,
   ],
 })
 export class AppModule {}

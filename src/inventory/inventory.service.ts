@@ -266,6 +266,28 @@ export class InventoryService {
     return await manager.aggregate(Inventory, agg).toArray();
   }
 
+  async getCollectionNameByProductId(shop: string, productId: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              shop,
+            },
+            {
+              recordType: 'Collection',
+            },
+            {
+              parentId: productId,
+            },
+          ],
+        },
+      },
+    ];
+    return await manager.aggregate(Inventory, agg).toArray();
+  }
+
   async findProductById(id: string) {
     const manager = getMongoManager();
     const agg = [

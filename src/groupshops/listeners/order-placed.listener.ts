@@ -21,6 +21,7 @@ import {
 } from '../dto/create-groupshops.input';
 import { UpdateGroupshopInput } from '../dto/update-groupshops.input';
 import { ProductTypeEnum, RoleTypeEnum } from '../entities/groupshop.entity';
+import { GroupshopSavedEvent } from '../events/groupshop-saved.event';
 import { Groupshops, RefundStatusEnum } from '../entities/groupshop.modal';
 import { GroupShopCreated } from '../events/groupshop-created.event';
 import { GroupshopsService } from '../groupshops.service';
@@ -263,8 +264,15 @@ export class OrderPlacedListener {
         gsMilestone.discount = `${newDiscount}`;
         ugroupshop.milestones = [...ugroupshop.milestones, gsMilestone];
       }
-
       await this.gsService.update(ugroupshop);
+
+      const groupshopSavedEvent = new GroupshopSavedEvent();
+      console.log('Referrer Order');
+      groupshopSavedEvent.data = event;
+      groupshopSavedEvent.post = 'no';
+      groupshopSavedEvent.groupdeal = newDiscount;
+      groupshopSavedEvent.ugroupshop = ugroupshop;
+      this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
     } else {
       const newGroupshop = new CreateGroupshopInput();
       newGroupshop.storeId = id;
@@ -295,6 +303,15 @@ export class OrderPlacedListener {
       gsMilestone.activatedAt = new Date();
       gsMilestone.discount = rewards[0].discount;
       newGroupshop.milestones = [gsMilestone];
+      this.gsService.create(newGroupshop);
+
+      const groupshopSavedEvent = new GroupshopSavedEvent();
+      console.log('GroupshopSavedEvent Start');
+      groupshopSavedEvent.data = event;
+      groupshopSavedEvent.post = 'yes';
+      groupshopSavedEvent.groupdeal = newGroupshop;
+      this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
+
       const savedGs = await this.gsService.create(newGroupshop);
       const groupShopCreated = new GroupShopCreated();
       groupShopCreated.groupshop = savedGs;
