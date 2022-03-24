@@ -43,6 +43,22 @@ export class GroupshopsService {
     return this.groupshopRepository.find();
   }
 
+  async totalGs(storeId: string) {
+    const agg = [
+      {
+        $match: {
+          storeId: storeId,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const totalGS = await manager.aggregate(Groupshops, agg).toArray();
+    console.log(
+      '🚀 ~ file: groupshops.service.ts ~ line 56 ~ GroupshopsService ~ totalGs ~ totalGS',
+      totalGS,
+    );
+    return totalGS;
+  }
   async findfindQrDealLinkAll(email: string, ordernumber: string) {
     const agg = [
       {

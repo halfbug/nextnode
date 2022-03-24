@@ -30,6 +30,7 @@ export class BillingListener {
       type: BillingTypeEnum.ON_GS_CREATION,
       totalCashBack: 0,
       amount: 0,
+      revenue: 0,
       groupShopId: id,
       storeId,
     };

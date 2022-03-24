@@ -70,6 +70,15 @@ export class OrderPlacedListener {
     return netPrice < 1 ? netPrice : Math.floor(netPrice);
   }
 
+  totalRevenue(lineItems, discountPercentage) {
+    const totalPrice = lineItems?.reduce(
+      (priceSum: number, { price, quantity }) =>
+        priceSum + quantity * parseFloat(price),
+      0,
+    );
+    const netPrice = ((100 - discountPercentage) / 100) * totalPrice;
+    return netPrice < 1 ? netPrice : Math.floor(netPrice);
+  }
   async shopifyRefund(amount: string, orderId: string, discount: number) {
     console.log('.............shopifyrefund....................');
     console.log({ amount });
@@ -127,6 +136,9 @@ export class OrderPlacedListener {
     // 100 -
 
     const refundAmount = this.totalPricePercent(member.lineItems, netDiscount);
+    const revenuePrice = this.totalRevenue(member.lineItems, netDiscount);
+    //((100 - discountPercentage) / 100) * totalPrice;
+
     // cashback - gsfees
     const percentageGiven = (100 - GS_CHARGE_CASHBACK) / 100;
     const actualCashBack = refundAmount * percentageGiven;
@@ -139,9 +151,8 @@ export class OrderPlacedListener {
     const cashBackEvent = new CashBackEvent();
     cashBackEvent.cashbackAmount = actualCashBack;
     cashBackEvent.groupshop = this.groupshop;
-    cashBackEvent.revenue = refundAmount;
+    cashBackEvent.revenue = revenuePrice;
     // cashBackEvent.store = event.store;
-    console.log('.......cashback..........');
     this.eventEmitter.emit('cashback.generated', cashBackEvent);
 
     const refund = new RefundInput(

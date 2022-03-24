@@ -47,6 +47,11 @@ export class GroupshopsResolver {
     return this.GroupshopsService.findAll();
   }
 
+  @Query(() => [Groupshop], { name: 'totalGroupshops' })
+  totalGs(@Args('storeId') storeId: string) {
+    return this.GroupshopsService.totalGs(storeId);
+  }
+
   @Query(() => Groupshop, { name: 'getQrDealLink' })
   findQrDealLink(
     @Args('email') email: string,
