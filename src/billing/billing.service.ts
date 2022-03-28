@@ -58,18 +58,22 @@ export class BillingsService {
               '$month': '$createdAt'
             }
           }, 
-          'totalCashBack': {
-            '$sum': '$totalCashBack'
+          'cashBack': {
+            '$sum': '$cashBack'
           }, 
           'revenue': {
             '$sum': '$revenue'
           }, 
-          'amount': {
-            '$sum': '$amount'
+          'feeCharges': {
+            '$sum': '$feeCharges'
           }, 
           'count': {
             '$count': {}
           }
+        }
+      }, {
+        '$sort': {
+          '_id': -1
         }
       }
     ];
@@ -78,6 +82,35 @@ export class BillingsService {
     const gs = await manager.aggregate(Billing, agg).toArray();
     console.log("🚀 findMonthlyBilling ~ gs", gs)
     return gs;
+  }
+
+  async findTotalGSMonthly(storeId: string) {
+    const agg = [
+      {
+        '$match': {
+          'storeId': storeId
+        }
+      }, {
+        '$group': {
+          '_id': {
+            'year': {
+              '$year': '$createdAt'
+            }, 
+            'month': {
+              '$month': '$createdAt'
+            }
+          }, 
+          'count': {
+            '$count': {}
+          }
+        }
+      }
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    console.log("🚀 total GSs in month ~ gs", gs)
+    return gs;
+
   }
 
   async findTotalRevenue(storeId: string) {

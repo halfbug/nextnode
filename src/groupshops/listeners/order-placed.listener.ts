@@ -138,18 +138,25 @@ export class OrderPlacedListener {
     const refundAmount = this.totalPricePercent(member.lineItems, netDiscount);
     const revenuePrice = this.totalRevenue(member.lineItems, netDiscount);
     //((100 - discountPercentage) / 100) * totalPrice;
+    // refundAmount 10% = x
+    // shopify y = refundAmount - x (old amount)
+    //store x in new field cashBackcharge (old totalcachback)
+    // totalcashback = sum of X
 
     // cashback - gsfees
     const percentageGiven = (100 - GS_CHARGE_CASHBACK) / 100;
-    const actualCashBack = refundAmount * percentageGiven;
+    const cashBackUsageCharge = GS_CHARGE_CASHBACK / 100; //convert percentage in amount
+    const cashBackUsageChargeAmount = refundAmount * cashBackUsageCharge;
+    const shopifyAmount = refundAmount - cashBackUsageChargeAmount;
     console.log(
       '🚀 ~ file: order-placed.listener.ts ~ line 116  calculateRefund ~ refundAmount',
       refundAmount,
     );
-    this.shopifyRefund(actualCashBack.toString(), member.orderId, netDiscount);
+    this.shopifyRefund(shopifyAmount.toString(), member.orderId, netDiscount);
     // after shopify refund we emit cashBack event n go to billing listner
     const cashBackEvent = new CashBackEvent();
-    cashBackEvent.cashbackAmount = actualCashBack;
+    cashBackEvent.cashbackAmount = shopifyAmount;
+    cashBackEvent.cashbackCharge = cashBackUsageChargeAmount;
     cashBackEvent.groupshop = this.groupshop;
     cashBackEvent.revenue = revenuePrice;
     // cashBackEvent.store = event.store;

@@ -11,10 +11,10 @@ export default class Billing extends DefaultColumnsService {
   type: BillingTypeEnum;
 
   @Column()
-  amount: number;
+  feeCharges: number;
 
   @Column()
-  totalCashBack: number;
+  cashBack: number;
 
   @Column()
   groupShopId: string;

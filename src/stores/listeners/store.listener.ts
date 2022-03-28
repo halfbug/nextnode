@@ -46,7 +46,7 @@ export class StoreListener {
     ) {
       plan = BillingPlanEnum.GROWTH;
     } else {
-      plan = BillingPlanEnum.UNICORN;
+      plan = BillingPlanEnum.ENTERPRISE;
     }
     const payload = { id, plan, totalGroupShop: newCount };
     const updatedStore = await this.storeService.update(id, payload);

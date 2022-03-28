@@ -3,7 +3,11 @@ import { BillingsService } from './billing.service';
 import { Billing } from './entities/billing.entity';
 import { CreateBillingInput } from './dto/create-billing.input';
 import { UpdateBillingInput } from './dto/update-billing.input';
-import { MonthlyBillingInput, TotalRevenue } from './dto/monthly-billing.input';
+import {
+  MonthlyBillingInput,
+  Total,
+  TotalRevenue,
+} from './dto/monthly-billing.input';
 
 @Resolver(() => Billing)
 export class BillingsResolver {
@@ -38,6 +42,11 @@ export class BillingsResolver {
   @Query(() => TotalRevenue, { name: 'findTotalRevenue' })
   findTotalRevenue(@Args('storeId') storeId: string) {
     return this.billingService.findTotalRevenue(storeId);
+  }
+
+  @Query(() => [Total], { name: 'findTotalGSMonthly' })
+  findTotalGSMonthly(@Args('storeId') storeId: string) {
+    return this.billingService.findTotalGSMonthly(storeId);
   }
 
   @Mutation(() => Billing)

@@ -6,7 +6,7 @@ export enum BillingPlanEnum {
   EXPLORE,
   LAUNCH,
   GROWTH,
-  UNICORN,
+  ENTERPRISE,
 }
 registerEnumType(BillingPlanEnum, {
   name: 'BillingPlanEnum',

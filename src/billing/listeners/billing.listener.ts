@@ -28,8 +28,8 @@ export class BillingListener {
     );
     const payload: CreateBillingInput = {
       type: BillingTypeEnum.ON_GS_CREATION,
-      totalCashBack: 0,
-      amount: 0,
+      cashBack: 0,
+      feeCharges: 0,
       revenue: 0,
       groupShopId: id,
       storeId,
@@ -45,12 +45,12 @@ export class BillingListener {
     console.log(JSON.stringify(event));
     console.log('...............');
     const { id, storeId } = event.groupshop;
-    const { cashbackAmount, revenue } = event;
+    const { cashbackAmount, revenue, cashbackCharge } = event;
 
     const payload: CreateBillingInput = {
       type: BillingTypeEnum.ON_CASHBACK,
-      totalCashBack: +cashbackAmount.toFixed(2),
-      amount: GS_CHARGE_CASHBACK,
+      cashBack: +cashbackAmount.toFixed(2),
+      feeCharges: cashbackCharge,
       groupShopId: id,
       revenue,
       storeId,

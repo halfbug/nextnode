@@ -7,10 +7,10 @@ export class CreateBillingInput {
   type: BillingTypeEnum;
 
   @Field()
-  amount: number;
+  feeCharges: number;
 
   @Field()
-  totalCashBack: number;
+  cashBack: number;
 
   @Field()
   groupShopId: string;

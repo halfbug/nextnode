@@ -1,5 +1,5 @@
 export const TEST = 'test';
-export const GS_CHARGE_CASHBACK = 20;
+export const GS_CHARGE_CASHBACK = 10;
 export const GS_CHARGE_FEE_LAUNCH = 25;
 export const GS_CHARGE_FEE_GROWTH = 20;
 export const GS_CHARGE_FEE_UNICORN = 10;

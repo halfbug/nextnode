@@ -14,10 +14,10 @@ export class MonthlyBillingInput {
   _id?: MonthYearType;
 
   @Field()
-  amount?: number;
+  feeCharges?: number;
 
   @Field()
-  totalCashBack?: number;
+  cashBack?: number;
 
   @Field()
   revenue?: number;
@@ -32,4 +32,12 @@ export class TotalRevenue {
 
   @Field()
   revenue?: number;
+}
+@ObjectType()
+export class Total {
+  @Field()
+  _id?: MonthYearType;
+
+  @Field()
+  count?: number;
 }
