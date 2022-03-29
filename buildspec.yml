@@ -7,7 +7,7 @@ phases:
       - aws --version
       - echo $AWS_DEFAULT_REGION
       - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      - REPOSITORY_URI=984077295172.dkr.ecr.us-east-1.amazonaws.com/gs-ecs-node-api
+      - REPOSITORY_URI=984077295172.dkr.ecr.us-east-1.amazonaws.com/gs-ecs-node-api-stage
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
@@ -20,8 +20,8 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - docker push 984077295172.dkr.ecr.us-east-1.amazonaws.com/gs-ecs-node-api:latest
+      - docker push 984077295172.dkr.ecr.us-east-1.amazonaws.com/gs-ecs-node-api-stage:latest
       - docker push ${REPOSITORY_URI}:${IMAGE_TAG}
-      - printf '[{"name":"nginx_API_node","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"nginx_API_node_stage","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
     files: imagedefinitions.json
