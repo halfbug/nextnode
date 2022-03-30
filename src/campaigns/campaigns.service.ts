@@ -67,7 +67,7 @@ export class CampaignsService {
     );
 
     /// update all campaign
-    if (isActive) await this.campaignRepository.update({ isActive: true }, { isActive: false });
+    if (isActive === true) await this.campaignRepository.update({ isActive: true }, { isActive: false });
     
     createCampaignInput.products = products;
     // const campaign = this.campaignRepository.create(createCampaignInput);
@@ -100,7 +100,7 @@ export class CampaignsService {
             return new Reward(rid, discount, customerCount);
           });
 
-          await this.campaignRepository.update({id: campaign_id}, { ...savedCampaign, salesTarget: { ...savedCampaign.salesTarget, rewards:nrewards}, isActive: true});
+          await this.campaignRepository.update({id: campaign_id}, { ...savedCampaign, salesTarget: { ...savedCampaign.salesTarget, rewards:nrewards}});
               // console.log(await this.campaignRepository.findOne(campaign_id))
         }
               return await this.findOneById(campaign_id);
@@ -160,7 +160,7 @@ export class CampaignsService {
       );
     }
 
-    await this.campaignRepository.update({ id }, updateCampaignInput);
+    await this.campaignRepository.update({ id }, updateCampaignInput);    
 
     return await this.findOneById(id);
   }
