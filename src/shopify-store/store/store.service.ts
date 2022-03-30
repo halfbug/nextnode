@@ -42,10 +42,28 @@ export class StoreService {
 
   async login(req, res, shop) {
     const authRoute = await this.shopifyapi.beginAuth(req, res, shop);
+    console.log(
+      '🚀 ~ file: store.service.ts ~ line 45 ~ StoreService ~ login ~ authRoute',
+      JSON.stringify(authRoute),
+    );
     return res.redirect(authRoute);
   }
 
   async callback(req, res, shop) {
+
+    console.log(
+      '🚀 ~ file: store.service.ts ~ line 49 ~ StoreService ~ callback ~ shop',
+      JSON.stringify(shop),
+    );
+    console.log(
+      '🚀 ~ file: store.service.ts ~ line 49 ~ StoreService ~ callback ~ res',
+      JSON.stringify(res),
+    );
+    console.log(
+      '🚀 ~ file: store.service.ts ~ line 49 ~ StoreService ~ callback ~ req',
+      JSON.stringify(req),
+    );
+
     console.log('inside store servide call back');
     const validateRes = await this.shopifyapi.validateAuth(req, res);
     console.log(
