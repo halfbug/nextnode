@@ -46,8 +46,18 @@ export class StoreService {
   }
 
   async callback(req, res, shop) {
-    await this.shopifyapi.validateAuth(req, res);
-    await this.shopifyapi.offlineSession(shop);
+    console.log('inside store servide call back');
+    const validateRes = await this.shopifyapi.validateAuth(req, res);
+    console.log(
+      ' file: store.service.ts ~ line 51 ~ StoreService ~ callback ~ validateRes',
+      JSON.stringify(validateRes),
+    );
+    const offlineSessRes = await this.shopifyapi.offlineSession(shop);
+    console.log(
+      '🚀 ~ file: store.service.ts ~ line 56 ~ StoreService ~ callback ~ offlineSessRes',
+      JSON.stringify(offlineSessRes),
+    );
+
     res.header('shop', shop);
     const shopName = shop.split('.')[0];
     return res.redirect(`${this.configService.get('FRONT')}/${shopName}/0`); // wherever you want your user to end up after OAuth completes

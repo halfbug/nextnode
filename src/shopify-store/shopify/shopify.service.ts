@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import Shopify, {
@@ -49,7 +49,8 @@ export class ShopifyService {
         req.query as unknown as AuthQuery,
       ); // req.query must be cast to unkown and then AuthQuery in order to be accepted
     } catch (error) {
-      console.error(error); // in practice these should be handled more gracefully
+      console.error(JSON.stringify(error)); // in practice these should be handled more gracefully
+      Logger.error(error);
     }
   }
 
