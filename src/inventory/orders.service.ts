@@ -59,6 +59,36 @@ export class OrdersService {
     return await manager.aggregate(Orders, agg).toArray();
   }
 
+  async getDataByOrderId(orderId: string) {
+    const agg = [
+      {
+        $match: {
+          id: orderId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'id',
+          foreignField: 'parentId',
+          as: 'lineItems',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'lineItems.product.id',
+          foreignField: 'id',
+          as: 'products',
+        },
+      },
+    ];
+
+    const manager = getMongoManager();
+
+    return await manager.aggregate(Orders, agg).toArray();
+  }
+
   async create(createOrderInput: CreateOrderInput) {
     try {
       const order = this.ordersRepository.create(createOrderInput);

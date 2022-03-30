@@ -3,6 +3,7 @@ import { Controller, forwardRef, Get, Inject, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { InventoryService } from 'src/inventory/inventory.service';
+import { KalavioService } from '../kalavio.service';
 import { HttpService } from '@nestjs/axios';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { GroupshopSavedEvent } from 'src/groupshops/events/groupshop-saved.event';
@@ -17,19 +18,15 @@ export class GroupshopSavedListener {
     private eventEmitter: EventEmitter2,
     private httpService: HttpService,
     private inventoryService: InventoryService,
+    private kalavioService: KalavioService,
   ) {}
-
-  hello() {
-    return 5;
-  }
 
   @OnEvent('groupshop.saved')
   async handleTokenReceivedEvent(res: GroupshopSavedEvent) {
     const PUBLIC_KEY = this.configService.get('KLAVIYO_PUBLIC_KEY');
     const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
-    const url = `https://a.klaviyo.com/api/track`;
 
-    console.log('resData : ' + JSON.stringify(res));
+    //console.log('resData : ' + JSON.stringify(res));
     const discount_1 =
       res.data.store.activeCampaign.salesTarget.rewards[0].discount.replace(
         '%',
@@ -171,7 +168,6 @@ export class GroupshopSavedListener {
               id,
             );
           const collectionName = getCollectionName[0]?.title || '';
-          console.log(collectionName);
 
           const campaignResult = {
             product_title: title,
@@ -223,15 +219,7 @@ export class GroupshopSavedListener {
         properties: mdata,
       });
 
-      const options = {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      };
-      this.httpService.post(url, body, options).subscribe(async (res) => {
-        console.log(res);
-      });
+      this.kalavioService.sendKlaviyoEmail(body);
     } else {
       console.log('groupshop referrer listener received');
       const dealUrl = res.ugroupshop.url;
@@ -261,15 +249,7 @@ export class GroupshopSavedListener {
         properties: rdata,
       });
 
-      const options = {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      };
-      this.httpService.post(url, body, options).subscribe(async (res) => {
-        console.log(res);
-      });
+      this.kalavioService.sendKlaviyoEmail(body);
     }
   }
 }

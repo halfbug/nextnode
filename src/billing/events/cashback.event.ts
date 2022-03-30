@@ -7,4 +7,6 @@ export class CashBackEvent {
   cashbackCharge: number;
   store: Store;
   revenue: number;
+  orderId: any;
+  netDiscount: any;
 }

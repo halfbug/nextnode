@@ -25,6 +25,7 @@ import { GroupshopSavedEvent } from '../events/groupshop-saved.event';
 import { Groupshops, RefundStatusEnum } from '../entities/groupshop.modal';
 import { GroupShopCreated } from '../events/groupshop-created.event';
 import { GroupshopsService } from '../groupshops.service';
+import Store from 'src/stores/entities/store.model';
 
 @Injectable()
 export class OrderPlacedListener {
@@ -38,6 +39,7 @@ export class OrderPlacedListener {
 
   accessToken: string;
   shop: string;
+  store: Store;
   order: Orders;
   groupshop: Groupshops;
 
@@ -158,9 +160,13 @@ export class OrderPlacedListener {
     cashBackEvent.cashbackAmount = shopifyAmount;
     cashBackEvent.cashbackCharge = cashBackUsageChargeAmount;
     cashBackEvent.groupshop = this.groupshop;
-    cashBackEvent.revenue = revenuePrice;
-    // cashBackEvent.store = event.store;
+    cashBackEvent.revenue = refundAmount;
+    cashBackEvent.orderId = member.orderId;
+    cashBackEvent.netDiscount = netDiscount;
+    cashBackEvent.store = this.store;
+    console.log('.......cashback..........');
     this.eventEmitter.emit('cashback.generated', cashBackEvent);
+    this.eventEmitter.emit('cashbackEmail.generated', cashBackEvent);
 
     const refund = new RefundInput(
       RefundStatusEnum.panding,
@@ -217,6 +223,7 @@ export class OrderPlacedListener {
     this.accessToken = accessToken;
     this.shop = shop;
     this.order = event.order;
+    this.store = event.store;
 
     const dealProducts = lineItems
       .filter((item) => !campaignProducts.includes(item.product.id))
