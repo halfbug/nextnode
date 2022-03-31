@@ -50,20 +50,10 @@ export class StoreService {
   }
 
   async callback(req, res, shop) {
-
     console.log(
       '🚀 ~ file: store.service.ts ~ line 49 ~ StoreService ~ callback ~ shop',
       JSON.stringify(shop),
     );
-    console.log(
-      '🚀 ~ file: store.service.ts ~ line 49 ~ StoreService ~ callback ~ res',
-      JSON.stringify(res),
-    );
-    console.log(
-      '🚀 ~ file: store.service.ts ~ line 49 ~ StoreService ~ callback ~ req',
-      JSON.stringify(req),
-    );
-
     console.log('inside store servide call back');
     const validateRes = await this.shopifyapi.validateAuth(req, res);
     console.log(

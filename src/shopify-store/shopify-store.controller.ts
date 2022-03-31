@@ -43,8 +43,8 @@ export class ShopifyStoreController {
   @Get('callback')
   callback(@Req() req: Request, @Res() res: Response) {
     console.log('inside call back auth end');
-    console.log(req.query);
-    console.log(req.body);
+    console.log('req.quer :', req.query);
+    console.log('req.body :', req.body);
     return this.storeService.callback(req, res, req.query.shop);
   }
 
