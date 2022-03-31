@@ -139,4 +139,7 @@ export class GroupShop {
 
   @Field(() => [Product], { nullable: 'itemsAndList' })
   allProducts?: Product[];
+
+  @Field(() => [Product], { nullable: 'itemsAndList' })
+  bestSeller?: Product[];
 }

@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getMongoManager, Repository } from 'typeorm';
 import { CreateCampaignInput } from './dto/create-campaign.input';
 import { UpdateCampaignInput } from './dto/update-campaign.input';
 import Campaign from './entities/campaign.model';
@@ -172,4 +172,30 @@ export class CampaignsService {
   async removeShop(storeId: string) {
     return await this.campaignRepository.delete({ storeId });
   }
+  // this funtion will return best seller product of running active campaign
+  async getBestSellerProducts(shop: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        '$match': {
+          '$and': [
+            {
+              'isActive': true
+            }, {
+              'storeId': '86c67716-d137-4f95-a095-ac6cedc32e43'
+            }
+          ]
+        }
+      }, {
+        '$lookup': {
+          'from': 'inventory', 
+          'localField': 'products', 
+          'foreignField': 'id', 
+          'as': 'pobj'
+        }
+      }
+    ];
+    return await manager.aggregate(Campaign, agg).toArray();
+  }
+
 }

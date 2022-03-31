@@ -301,6 +301,26 @@ export class GroupshopsService {
         },
       },
       {
+        $addFields: {
+          popularProducts: {
+            $concatArrays: ['$popularProducts', '$dealsProducts'],
+          },
+        },
+      },
+      {
+        $addFields: {
+          bestSeller: {
+            $filter: {
+              input: '$allProducts',
+              as: 'j',
+              cond: {
+                $gte: ['$$j.purchaseCount', 1],
+              },
+            },
+          },
+        },
+      },
+      {
         $project: {
           lineItemsDetails: 0,
           orderDetails: 0,
@@ -309,10 +329,59 @@ export class GroupshopsService {
           'members.lineItems': 0,
         },
       },
+      {
+        $project: {
+          bestSeller: {
+            $slice: ['$bestSeller', 0, 4],
+          },
+          createdAt: 1,
+          campaignId: 1,
+          storeId: 1,
+          totalProducts: 1,
+          url: 1,
+          expiredAt: 1,
+          dealProducts: 1,
+          discountCode: 1,
+          members: 1,
+          milestones: 1,
+          id: 1,
+          updatedAt: 1,
+          store: 1,
+          popularProducts: 1,
+          campaign: 1,
+          allProducts: 1,
+        },
+      },
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
     console.log('🚀 ~ find one groupshop products', gs);
+    // a b put in b, check every item of a and put in b. map
+    const popular = gs[0].popularProducts;
+    const dPopular = [];
+    console.log(
+      '🚀 ~ file: groupshops.service.ts ~ line 319 ~ GroupshopsService ~ findOne ~ dPopular',
+      dPopular,
+    );
+    popular.map((item, ind) => {
+      if (ind === 0) {
+        dPopular.push(item);
+      } else {
+        if (dPopular.find((prd) => prd.id !== item.id)) {
+          console.log(
+            '🚀 ~ file: groupshops.service.ts ~ line 332 ~ GroupshopsService ~ popular.map ~ dPopular.find((prd) => prd.id !== item.id)',
+            dPopular.find((prd) => prd.id !== item.id),
+          );
+          dPopular.push(item);
+        }
+      }
+    });
+    gs[0].popularProducts = dPopular;
+
+    console.log(
+      '🚀 ~ file: groupshops.service.ts ~ line 347 ~ GroupshopsService ~ findOne ~ gs[0]',
+      gs[0].bestSeller,
+    );
     return gs[0];
   }
 
