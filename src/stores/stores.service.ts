@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getMongoManager, Like, Repository } from 'typeorm';
 import { CreateStoreInput } from './dto/create-store.input';
 import { UpdateStoreInput } from './dto/update-store.input';
 import Store from './entities/store.model';
 import { v4 as uuid } from 'uuid';
+import { Resource } from './entities/store.entity';
 
 @Injectable()
 export class StoresService {
@@ -14,8 +15,6 @@ export class StoresService {
   create(createStoreInput: CreateStoreInput): Promise<Store> {
     const id = uuid();
     const store = this.storeRepository.create({ id, ...createStoreInput });
-    // const store = this.storeRepository.create(createStoreInput);
-    //
     return this.storeRepository.save(store);
   }
 
@@ -84,8 +83,7 @@ export class StoresService {
       '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
       res,
     );
-    // const salesTarget = res[0].salesTarget[0].salesTargets[0];
-    return { ...res[0] };
+     return { ...res[0] };
   }
 
   async findOneByName(shop: string) {
@@ -105,19 +103,25 @@ export class StoresService {
   }
 
   async update(id: string, updateStoreInput: UpdateStoreInput) {
-    console.log(
-      '🚀 ~ file: stores.service.ts ~ line 46 ~ StoresService ~ update ~ updateStoreInput',
-      updateStoreInput,
-    );
-    console.log(
-      '🚀 ~ file: stores.service.ts ~ line 46 ~ StoresService ~ update ~ id',
-      id,
-    );
-
     await this.storeRepository.update({ id }, updateStoreInput);
     return await this.findOneById(id);
   }
 
+  async updateResource(shop: string, resource: Resource) {
+    try {
+      const manager = getMongoManager();
+      await manager.updateOne(
+        Store,
+        { shop },
+        { $push: { resources: resource } },
+      );
+
+      return true;
+    } catch (err) {
+      Logger.error(err);
+      return false;
+    }
+  }
   remove(id: string) {
     return this.storeRepository.delete({ id });
   }

@@ -1,5 +1,12 @@
-import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
+import {
+  ObjectType,
+  Field,
+  ID,
+  registerEnumType,
+  InputType,
+} from '@nestjs/graphql';
 import { Campaign } from 'src/campaigns/entities/campaign.entity';
+import { AnyScalar } from 'src/utils/any.scalarType';
 import { Settings } from './settings.entity';
 
 export enum BillingPlanEnum {
@@ -11,6 +18,17 @@ export enum BillingPlanEnum {
 registerEnumType(BillingPlanEnum, {
   name: 'BillingPlanEnum',
 });
+
+@InputType('ResourceInput')
+@ObjectType('Resource')
+export class Resource {
+  @Field()
+  id: string;
+  @Field({ nullable: true })
+  type?: string;
+  @Field({ nullable: true })
+  detail?: string;
+}
 
 @ObjectType('Store')
 export class Store {
@@ -63,4 +81,7 @@ export class Store {
 
   @Field({ defaultValue: 0, nullable: true })
   totalGroupShop?: number;
+
+  @Field(() => [Resource], { nullable: 'itemsAndList' })
+  resources?: Resource[];
 }

@@ -42,7 +42,75 @@ export class GroupshopsService {
   findAll() {
     return this.groupshopRepository.find();
   }
-
+  async getRunningGroupshop(campaignId, productId) {
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              campaignId,
+            },
+            {
+              expiredAt: {
+                $gte: new Date(),
+              },
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'campaign',
+          localField: 'campaignId',
+          foreignField: 'id',
+          as: 'campaign',
+        },
+      },
+      {
+        $unwind: {
+          path: '$campaign',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'campaign.products',
+          foreignField: 'id',
+          as: 'campaignProducts',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'dealProducts.productId',
+          foreignField: 'id',
+          as: 'dealsProducts',
+        },
+      },
+      {
+        $addFields: {
+          allProducts: {
+            $concatArrays: ['$campaignProducts', '$dealsProducts'],
+          },
+        },
+      },
+      {
+        $match: {
+          'allProducts.id': `gid://shopify/Product/${productId}`,
+        },
+      },
+      {
+        $sort: {
+          'discountCode.percent': 1,
+        },
+      },
+    ];
+    console.log(agg);
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    console.log({ gs });
+    return gs[0];
+  }
   async totalGs(storeId: string) {
     const agg = [
       {

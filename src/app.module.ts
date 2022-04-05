@@ -18,6 +18,8 @@ import { Appsetting } from './appsettings/entities/appsetting.model';
 import { GroupshopsModule } from './groupshops/groupshops.module';
 import { Groupshops } from './groupshops/entities/groupshop.modal';
 import Billing from './billing/entities/billing.model';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { EmailModule } from './email/email.module';
 
 @Module({
@@ -70,6 +72,10 @@ import { EmailModule } from './email/email.module';
     AppsettingsModule,
     GroupshopsModule,
     BillingModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/public/', //last slash was important
+    }),
     EmailModule,
   ],
 })

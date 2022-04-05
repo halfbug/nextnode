@@ -4,6 +4,15 @@ import { Settings } from './settings.model';
 import Campaign from 'src/campaigns/entities/campaign.model';
 import { BillingPlanEnum } from './store.entity';
 
+export class Resource {
+  @Column({ nullable: true })
+  id: string;
+  @Column({ nullable: true })
+  type?: string;
+  @Column({ nullable: true })
+  detail?: string;
+}
+
 @Entity()
 export default class Store extends DefaultColumnsService {
   @Column()
@@ -41,4 +50,7 @@ export default class Store extends DefaultColumnsService {
 
   @Column({ default: 0, nullable: true })
   totalGroupShop?: number;
+
+  @Column({ nullable: true })
+  resources?: Resource[];
 }

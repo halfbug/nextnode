@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
 import Shopify, {
@@ -12,6 +12,8 @@ import { TokenReceivedEvent } from '../events/token-received.event';
 
 @Injectable()
 export class ShopifyService {
+  public shop: string;
+  public accessToken: string;
   // private shopify;
   constructor(
     private configService: ConfigService,
@@ -36,6 +38,10 @@ export class ShopifyService {
 
   async client(shop: string, accessToken: string) {
     return new Shopify.Clients.Graphql(shop, accessToken);
+  }
+
+  async restClient(shop: string, accessToken: string) {
+    return new Shopify.Clients.Rest(shop, accessToken);
   }
 
   async beginAuth(req: Request, res: Response, shop: string) {
@@ -242,4 +248,51 @@ export class ShopifyService {
   //     },
   //   });
   // }
+
+  async scriptTagRegister(src: string) {
+    try {
+      const client = await this.client(this.shop, this.accessToken);
+      const scriptTag = await client.query({
+        data: {
+          query: `mutation scriptTagCreate($input: ScriptTagInput!) {
+              scriptTagCreate(input: $input) {
+                scriptTag {
+                  cache
+                  createdAt
+                  displayScope
+                  id
+                  src 
+                }
+                userErrors {
+                  field
+                  message
+                }
+              }
+            }`,
+          variables: {
+            input: {
+              cache: false,
+              displayScope: 'ONLINE_STORE',
+              src: `${this.configService.get('HOST')}/public/${src}`,
+            },
+          },
+        },
+      });
+      console.log('-------------Register scriptTag');
+      console.log(JSON.stringify(scriptTag));
+      if (scriptTag.body['data']['scriptTagCreate'])
+        return scriptTag.body['data']['scriptTagCreate']['scriptTag'];
+      else
+        throw new HttpException(
+          {
+            status: HttpStatus.FORBIDDEN,
+            error: JSON.stringify(scriptTag),
+          },
+          HttpStatus.FORBIDDEN,
+        );
+    } catch (err) {
+      console.log(err.message);
+      Logger.error(err);
+    }
+  }
 }

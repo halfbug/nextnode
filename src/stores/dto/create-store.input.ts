@@ -1,9 +1,10 @@
 import { InputType, ID, Field } from '@nestjs/graphql';
+import { AnyScalar } from 'src/utils/any.scalarType';
 import {
   BannerDesignTypeEnum,
   BannerSummaryEnum,
 } from '../entities/settings.entity';
-import { BillingPlanEnum } from '../entities/store.entity';
+import { BillingPlanEnum, Resource } from '../entities/store.entity';
 // import { Settings } from '../entities/settings.entity';
 @InputType()
 export class SettingsInput {
@@ -81,4 +82,7 @@ export class CreateStoreInput {
 
   @Field({ defaultValue: 0, nullable: true })
   totalGroupShop?: number;
+
+  @Field(() => [Resource], { nullable: 'itemsAndList' })
+  resources?: Resource[];
 }
