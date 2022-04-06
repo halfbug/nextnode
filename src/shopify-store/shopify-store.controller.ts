@@ -6,6 +6,7 @@ import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { OrdersService } from 'src/inventory/orders.service';
 import { StoresService } from 'src/stores/stores.service';
+import { ShopifyService } from './shopify/shopify.service';
 import { StoreService } from './store/store.service';
 
 @Controller()
@@ -20,6 +21,7 @@ export class ShopifyStoreController {
     private groupshopSrv: GroupshopsService,
     private storesService: StoresService,
     private billingService: BillingsService,
+    private shopifyService: ShopifyService,
   ) {}
 
   // @Get()
@@ -74,6 +76,13 @@ export class ShopifyStoreController {
     try {
       const shop = 'native-roots-dev.myshopify.com';
       const store = await this.storesService.findOne(shop);
+      this.shopifyService.accessToken = store.accessToken;
+      this.shopifyService.shop = shop;
+      store.resources.map((res) => {
+        if (res.type === 'scriptTag') {
+          this.shopifyService.scriptTagDelete(res.id);
+        }
+      });
       await this.inventorySrv.removeShop(shop);
       await this.ordersSrv.removeShop(shop);
       await this.campaignSrv.removeShop(store.id);

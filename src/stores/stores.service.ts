@@ -83,7 +83,7 @@ export class StoresService {
       '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
       res,
     );
-     return { ...res[0] };
+    return { ...res[0] };
   }
 
   async findOneByName(shop: string) {
@@ -108,6 +108,8 @@ export class StoresService {
   }
 
   async updateResource(shop: string, resource: Resource) {
+    // console.log('🚀 ~ ~ shop', shop);
+    // console.log('🚀 ~ ~ resource', resource);
     try {
       const manager = getMongoManager();
       await manager.updateOne(

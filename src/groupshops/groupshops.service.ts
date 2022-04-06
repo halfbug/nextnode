@@ -105,7 +105,6 @@ export class GroupshopsService {
         },
       },
     ];
-    console.log(agg);
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
     console.log({ gs });

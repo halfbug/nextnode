@@ -11,9 +11,12 @@ export class AddResourceListener {
     const { id, type, detail, shop } = event;
     console.log(
       '🚀 ~ file: add-resource.listener.ts ~ line 14 ~ addResourceListener ~ addResource ~ event',
-      event,
+      { id, type, detail, shop },
     );
 
-    this.storeService.updateResource(shop, { id, type, detail });
+    this.storeService
+      .updateResource(shop, { id, type, detail })
+      .then((res) => console.log(JSON.stringify(res)))
+      .catch((err) => console.log(JSON.stringify(err)));
   }
 }

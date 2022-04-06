@@ -295,4 +295,73 @@ export class ShopifyService {
       Logger.error(err);
     }
   }
+
+  async scriptTagList() {
+    try {
+      const client = await this.client(this.shop, this.accessToken);
+      const scriptTag = await client.query({
+        data: {
+          query: `{
+            scriptTags(first: 15, reverse: true) {
+              edges {
+                node {
+                  id
+                  src
+                  displayScope
+                  createdAt
+                }
+              }
+            }
+          }`,
+        },
+      });
+      console.log('-------------list scriptTag');
+      console.log(JSON.stringify(scriptTag));
+      return JSON.stringify(scriptTag);
+    } catch (err) {
+      console.log(err.message);
+      Logger.error(err);
+    }
+  }
+
+  async scriptTagDelete(sid: any) {
+    try {
+      console.log(sid);
+      const client = await this.client(this.shop, this.accessToken);
+      const scriptTagDel = await client.query({
+        data: {
+          query: `mutation scriptTagDelete($id: ID!) {
+            scriptTagDelete(id: $id) {
+              deletedScriptTagId
+              userErrors {
+                field
+                message
+              }
+            }
+          }`,
+          variables: {
+            // input: {
+            id: sid,
+            // },
+          },
+        },
+      });
+      console.log('🚀 ~  scriptTagDel', JSON.stringify(scriptTagDel));
+      console.log('-------------list scriptTag');
+
+      // if (scriptTag.body['data']['scriptTagCreate'])
+      //   return scriptTag.body['data']['scriptTagCreate']['scriptTag'];
+      // else
+      //   throw new HttpException(
+      //     {
+      //       status: HttpStatus.FORBIDDEN,
+      //       error: JSON.stringify(scriptTag),
+      //     },
+      //     HttpStatus.FORBIDDEN,
+      //   );
+    } catch (err) {
+      console.log(err.message);
+      Logger.error(err);
+    }
+  }
 }

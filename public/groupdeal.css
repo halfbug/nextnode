@@ -2,7 +2,7 @@
 /*@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');*/
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
-@font-face {
+/* @font-face {
 	font-family: "Mulish";
 	font-display: swap;
 	font-weight: 300;
@@ -150,7 +150,7 @@
 		url('../fonts/ProximaNova-Semibold.svg#ProximaNova-Semibold') format('svg');
 	font-weight: 600;
 	font-style: normal;
-}
+} */
 
 /*@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');*/
 .link-logo {

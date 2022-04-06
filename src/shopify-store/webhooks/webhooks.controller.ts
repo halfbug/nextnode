@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
 import { CreateInventoryInput } from 'src/inventory/dto/create-inventory.input';
 import {
   CreateOrderInput,
@@ -71,6 +71,29 @@ export class WebhooksController {
     );
 
     return 'yes done';
+  }
+
+  @Get('scriptTag')
+  async scriptTag() {
+    const { shop, accessToken } = await this.storesService.findOne(
+      'native-roots-dev.myshopify.com',
+    );
+    this.shopifyService.accessToken = accessToken;
+    this.shopifyService.shop = shop;
+    const st = await this.shopifyService.scriptTagList();
+    return st;
+  }
+
+  @Get('delscriptTag')
+  async scriptTagDelete(@Query('sid') sid: any) {
+    console.log(sid);
+    const { shop, accessToken } = await this.storesService.findOne(
+      'native-roots-dev.myshopify.com',
+    );
+    this.shopifyService.accessToken = accessToken;
+    this.shopifyService.shop = shop;
+    this.shopifyService.scriptTagDelete(sid);
+    return 'check console' + sid;
   }
 
   @Post('product-create?')
