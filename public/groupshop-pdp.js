@@ -88,8 +88,7 @@ function addModal() {
   //create banner element
   console.log(gsbootstrap);
   var gsModal = document.createElement('div');
-  gsModal.className =
-    'groupshop_modal groupshop_fade modal-gss shopdealcartmodel';
+  gsModal.className = 'groupshop_modal groupshop_fade gspdpmodel';
   gsModal.id = 'gsmodal';
   gsModal.setAttribute('aria-hidden', true);
   gsModal.setAttribute('tabindex', '-1');

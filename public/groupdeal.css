@@ -164,7 +164,7 @@
 	margin-right: 14px;
 	display: flex;
 }
-.shopdealcartmodel {
+.gspdpmodel {
 	z-index: 99999;
 }
 #grp-shop-section .link-logo {
@@ -355,7 +355,7 @@
 	padding-left: 10px;
 	margin-top: 5px;
 }
-.shopdealcartmodel .modal-dialog-gss {
+.gspdpmodel .modal-dialog-gss {
 	width: 460px;
 }
 /*Is_Flex*/
@@ -455,7 +455,7 @@
 }
 
 @media only screen and (min-height: 768px) {
-	.shopdealcartmodel#dealcartmodel .modal-body-gss {
+	.gspdpmodel#dealcartmodel .modal-body-gss {
 		padding: 5px 24px 25px 24px;
 	}
 }
@@ -481,10 +481,10 @@
 		/*        font-size: 15px;
         line-height: 18px;*/
 	}
-	.shopdealcartmodel .modal-header-gss {
+	.gspdpmodel .modal-header-gss {
 		padding: 10px 0px 0px !important;
 	}
-	.shopdealcartmodel#dealcartmodel .modal-body-gss {
+	.gspdpmodel#dealcartmodel .modal-body-gss {
 		padding: 0rem 24px;
 	}
 	.btntext-1,
@@ -532,7 +532,7 @@
 }
 
 @media only screen and (max-width: 480px) {
-	.shopdealcartmodel .modal-dialog-gss {
+	.gspdpmodel .modal-dialog-gss {
 		width: unset;
 	}
 	.rb-text-2 {
@@ -545,7 +545,7 @@
 	.how-shop-desc {
 		/*font-size: 16px;*/
 	}
-	.shopdealcartmodel#dealcartmodel .modal-body-gss {
+	.gspdpmodel#dealcartmodel .modal-body-gss {
 		padding: 0.5rem 20px;
 	}
 	#dealcartmodel {
@@ -608,7 +608,7 @@
 	.sec-3 {
 		margin: 15px 0 10px 0;
 	}
-	.shopdealcartmodel .modal-dialog-gss.modal-dialog-centered-gss {
+	.gspdpmodel .modal-dialog-gss.modal-dialog-centered-gss {
 		padding: 0px 0px;
 	}
 
@@ -745,7 +745,7 @@
 	.shop-with {
 		font-size: 14px;
 	}
-	.shopdealcartmodel .modal-header-gss {
+	.gspdpmodel .modal-header-gss {
 		padding: 10px 0px 0px !important;
 	}
 	.main-logo {
@@ -764,7 +764,7 @@
 	.num-box {
 		padding: 7px;
 	}
-	.shopdealcartmodel#dealcartmodel .modal-body-gss {
+	.gspdpmodel#dealcartmodel .modal-body-gss {
 		padding: 1rem 44px;
 	}
 	.shop-with:before {
@@ -782,7 +782,7 @@
 	}
 }
 @media only screen and (max-width: 395px) and (min-width: 360px) {
-	.shopdealcartmodel#dealcartmodel .modal-body-gss {
+	.gspdpmodel#dealcartmodel .modal-body-gss {
 		padding: 0rem 24px;
 	}
 	.how-complete-3 {
@@ -801,7 +801,7 @@
 	.how-complete-2 {
 		margin-top: 0px;
 	}
-	.shopdealcartmodel#dealcartmodel .modal-body-gss {
+	.gspdpmodel#dealcartmodel .modal-body-gss {
 		/*padding: 0rem 24px;*/
 	}
 	.how-complete-3 {
@@ -812,18 +812,18 @@
 	/*line-height: 3;*/
 }
 
-.shopdealcartmodel#dealcartmodel .modal-body-gss {
+.gspdpmodel#dealcartmodel .modal-body-gss {
 	border-bottom-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 }
-.shopdealcartmodel .modal-dialog-gss {
+.gspdpmodel .modal-dialog-gss {
 	/*top: 1%;*/
 }
-.shopdealcartmodel .modal-header-gss {
+.gspdpmodel .modal-header-gss {
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
 }
-.shopdealcartmodel .modal-content-gss {
+.gspdpmodel .modal-content-gss {
 	border-radius: 10px;
 	box-shadow: 0px 1px 7px rgb(0 0 0 / 12%);
 }
@@ -836,7 +836,7 @@
 	flex-direction: row-reverse !important;
 }
 
-#dealcartmodel.shopdealcartmodel .close {
+#dealcartmodel.gspdpmodel .close {
 	top: 10px;
 	right: 10px;
 	position: absolute;
@@ -860,7 +860,7 @@
 }
 
 @media only screen and (max-width: 380px) {
-	.shopdealcartmodel#dealcartmodel .modal-body-gss {
+	.gspdpmodel#dealcartmodel .modal-body-gss {
 		/*padding: 0.2rem 15px!important;*/
 	}
 	.greybg:before {
@@ -1014,7 +1014,7 @@
 	}
 }
 @media only screen and (max-width: 1930px) and (min-width: 1430px) {
-	.shopdealcartmodel#dealcartmodel .modal-body-gss {
+	.gspdpmodel#dealcartmodel .modal-body-gss {
 		padding: 1rem 0;
 	}
 	.dont_pay_full {
@@ -1024,7 +1024,7 @@
 	.to-start {
 		/*margin: 22px auto 15px;*/
 	}
-	.shopdealcartmodel .modal-content-gss {
+	.gspdpmodel .modal-content-gss {
 		/*padding-bottom: 30px;*/
 	}
 	.btn-grey.btntext-1 {
@@ -1099,7 +1099,7 @@
 		width: 26.33%;
 		margin-right: 40px;
 	}
-	.shopdealcartmodel .modal-header-gss {
+	.gspdpmodel .modal-header-gss {
 		padding: 20px 0px 0px !important;
 	}
 	.how-text {
@@ -1107,7 +1107,7 @@
 		line-height: 22px;
 	}
 }
-.shopdealcartmodel .modal-header-gss {
+.gspdpmodel .modal-header-gss {
 	/*padding: 20px 0px 0px;*/
 }
 .modal-header-gss {
@@ -1116,14 +1116,14 @@
 
 /*@media only screen and (max-width: 2840px) and (min-width: 1930px) {*/
 @media only screen and (min-width: 1930px) {
-	.shopdealcartmodel .modal-dialog-gss {
+	.gspdpmodel .modal-dialog-gss {
 		max-width: 910px !important;
 		margin: 1.75rem auto;
 	}
 }
 
 @media only screen and (min-width: 1930px) {
-	.shopdealcartmodel .modal-header-gss {
+	.gspdpmodel .modal-header-gss {
 		padding: 20px 0px 0px !important;
 	}
 	.width-33 {
@@ -1260,10 +1260,10 @@
 	.width-33:first-child {
 		margin-left: 40px;
 	}
-	.shopdealcartmodel {
+	.gspdpmodel {
 		padding-right: 0 !important;
 	}
-	/* .shopdealcartmodel .modal-dialog-gss {
+	/* .gspdpmodel .modal-dialog-gss {
 		max-width: 750px !important;
 	} */
 	.arrow:after {
@@ -1480,7 +1480,7 @@
 } */
 
 /*Is_Flex*/
-/* .modal-gss.shopdealcartmodel.show {
+/* .modal-gss.gspdpmodel.show {
 	display: flex !important;
 } */
 /*Is_Flex*/
@@ -1530,7 +1530,7 @@
 	opacity: .8;
 	background-size: 100px;
 } */
-.shopdealcartmodel .modal-content-gss {
+.gspdpmodel .modal-content-gss {
 	padding: 0px !important;
 	border: none !important;
 	display: flex;
@@ -1539,7 +1539,7 @@
 	padding: 40px 40px;
 	/*Is_Flex*/
 }
-.shopdealcartmodel .modal-header-gss {
+.gspdpmodel .modal-header-gss {
 	text-align: center;
 	background: #fff;
 	border: none !important;
@@ -1553,7 +1553,7 @@
 	/*is_flex*/
 }
 
-.shopdealcartmodel#dealcartmodel .modal-body-gss {
+.gspdpmodel#dealcartmodel .modal-body-gss {
 	/*padding: 5px ​24px 0px 24px;*/
 	padding: 1rem 0;
 	max-height: fit-content;
@@ -1561,14 +1561,14 @@
 }
 
 @media (min-width: 576px) {
-	.shopdealcartmodel .modal-dialog-gss {
+	.gspdpmodel .modal-dialog-gss {
 		/*max-width: 770px;
         margin: 1.75rem auto;*/
 	}
-	.shopdealcartmodel .modal-dialog-centered-gss {
+	.gspdpmodel .modal-dialog-centered-gss {
 		/*min-height: calc(100% - 3.5rem);*/
 	}
-	.shopdealcartmodel .modal-dialog-centered-gss::before {
+	.gspdpmodel .modal-dialog-centered-gss::before {
 		height: calc(100vh - 3.5rem);
 		height: -webkit-min-content;
 		height: -moz-min-content;
@@ -1576,7 +1576,7 @@
 	}
 }
 @media only screen and (max-width: 1930px) and (min-width: 1430px) {
-	.shopdealcartmodel .modal-content-gss {
+	.gspdpmodel .modal-content-gss {
 		padding-bottom: 30px;
 	}
 }
