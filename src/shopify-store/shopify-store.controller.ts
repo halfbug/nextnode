@@ -2,6 +2,7 @@ import { Controller, forwardRef, Get, Inject, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { BillingsService } from 'src/billing/billing.service';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
+import { ConfigService } from '@nestjs/config';
 import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { OrdersService } from 'src/inventory/orders.service';
@@ -22,6 +23,7 @@ export class ShopifyStoreController {
     private storesService: StoresService,
     private billingService: BillingsService,
     private shopifyService: ShopifyService,
+    private configService: ConfigService,
   ) {}
 
   // @Get()
@@ -99,7 +101,7 @@ export class ShopifyStoreController {
   @Get('gs')
   async gropshopTestUrl() {
     const gs = await this.groupshopSrv.findAll();
-    return gs.map((g) => `https://appfront.groupshop.co${g.url} `);
+    return gs.map((g) => `${this.configService.get('FRONT')}${g.url} `);
   }
   @Get('healthcheck')
   async testme() {

@@ -328,7 +328,7 @@ export class OrderPlacedListener {
       gsMilestone.activatedAt = new Date();
       gsMilestone.discount = rewards[0].discount;
       newGroupshop.milestones = [gsMilestone];
-      this.gsService.create(newGroupshop);
+      // this.gsService.create(newGroupshop);
 
       const groupshopSavedEvent = new GroupshopSavedEvent();
       console.log('GroupshopSavedEvent Start');
