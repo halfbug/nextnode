@@ -89,6 +89,149 @@ export class OrdersService {
     return await manager.aggregate(Orders, agg).toArray();
   }
 
+  async getOrderDetailsByOrderId(orderId: string) {
+    const agg = [
+      {
+        $match: {
+          id: orderId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'id',
+          foreignField: 'parentId',
+          as: 'lineItems',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'lineItems.product.id',
+          foreignField: 'id',
+          as: 'products',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'products.id',
+          foreignField: 'parentId',
+          as: 'variants',
+        },
+      },
+      {
+        $addFields: {
+          Products: {
+            $map: {
+              input: '$products',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    variants: {
+                      $filter: {
+                        input: '$variants',
+                        as: 'j',
+                        cond: {
+                          $and: [
+                            {
+                              $eq: ['$$this.id', '$$j.parentId'],
+                            },
+                            {
+                              $eq: ['$$j.recordType', 'ProductVariant'],
+                            },
+                          ],
+                        },
+                      },
+                    },
+                  },
+                  {
+                    image: {
+                      $filter: {
+                        input: '$variants',
+                        as: 'j',
+                        cond: {
+                          $and: [
+                            {
+                              $eq: ['$$this.id', '$$j.parentId'],
+                            },
+                            {
+                              $eq: ['$$j.recordType', 'ProductImage'],
+                            },
+                          ],
+                        },
+                      },
+                    },
+                  },
+                  {
+                    collections: {
+                      $filter: {
+                        input: '$variants',
+                        as: 'j',
+                        cond: {
+                          $and: [
+                            {
+                              $eq: ['$$this.id', '$$j.parentId'],
+                            },
+                            {
+                              $eq: ['$$j.recordType', 'Collection'],
+                            },
+                          ],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          products: 0,
+          variants: 0,
+        },
+      },
+      {
+        $addFields: {
+          LineItems: {
+            $map: {
+              input: '$lineItems',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    product: {
+                      $filter: {
+                        input: '$Products',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.product.id', '$$j.id'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          lineItems: 0,
+          Products: 0,
+        },
+      },
+    ];
+
+    const manager = getMongoManager();
+
+    return await manager.aggregate(Orders, agg).toArray();
+  }
+
   async create(createOrderInput: CreateOrderInput) {
     try {
       const order = this.ordersRepository.create(createOrderInput);

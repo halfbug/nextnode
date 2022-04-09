@@ -71,8 +71,10 @@ export class StoreService {
     return res.redirect(`${this.configService.get('FRONT')}/${shopName}/0`); // wherever you want your user to end up after OAuth completes
   }
 
-  async loadSession() {
-    await this.shopifyapi.offlineSession(this.configService.get('SHOP'));
+  async loadSession(shop: string) {
+    await this.shopifyapi.offlineSession(
+      shop || this.configService.get('SHOP'),
+    );
   }
 
   goToAppfront(store) {
