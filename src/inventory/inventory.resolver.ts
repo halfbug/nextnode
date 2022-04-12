@@ -50,6 +50,16 @@ export class InventoryResolver {
     return this.inventoryService.findOne(shop, recordType);
   }
 
+  @Query(() => [Product], { name: 'findAllProducts' })
+  async findAllProducts(@Args('shop') shop: string) {
+    const res = await this.inventoryService.findAllProducts(shop);
+    // console.log(
+    //   '🚀 ~ file: inventory.resolver.ts ~ line 57 ~ InventoryResolver ~ res',
+    //   res,
+    // );
+    return res;
+  }
+
   // @Mutation(() => Inventory)
   // updateInventory(
   //   @Args('updateInventoryInput') updateInventoryInput: UpdateInventoryInput,

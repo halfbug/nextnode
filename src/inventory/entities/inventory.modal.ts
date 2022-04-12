@@ -90,4 +90,7 @@ export default class Inventory extends DefaultColumnsService {
 
   @Column({ nullable: true })
   inventoryQuantity?: number;
+
+  @Column({ nullable: true })
+  outofstock?: boolean;
 }

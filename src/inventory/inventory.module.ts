@@ -10,6 +10,7 @@ import { OrdersService } from './orders.service';
 import { OrdersReceivedListener } from './listeners/orders-received.listener';
 import Orders from './entities/orders.modal';
 import { OrderSavedListener } from './listeners/orders-saved.listener';
+import { InventorySavedListener } from './listeners/inventory-saved.listener';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { OrderSavedListener } from './listeners/orders-saved.listener';
     OrdersReceivedListener,
     OrdersService,
     OrderSavedListener,
+    InventorySavedListener,
   ],
   exports: [InventoryService, OrdersService],
 })

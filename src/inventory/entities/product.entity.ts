@@ -1,5 +1,6 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { CreateOrderInput as Orders } from '../dto/create-order.input';
+import { Collection } from './collection.entity';
 
 // @ObjectType()
 // class FeatureImageType {
@@ -86,6 +87,12 @@ export class Product {
   @Field(() => [ProductVariant], { nullable: 'itemsAndList' })
   variants?: ProductVariant[];
 
+  @Field(() => [ProductVariant], { nullable: 'itemsAndList' })
+  imagesObj?: ProductVariant[];
+
+  @Field(() => [ProductVariant], { nullable: 'itemsAndList' })
+  collections?: ProductVariant[];
+
   @Field(() => [ProductOption], { nullable: 'itemsAndList' })
   options?: ProductOption[];
 
@@ -118,4 +125,7 @@ export class Product {
 
   @Field(() => [Orders], { nullable: 'itemsAndList' })
   orders?: Orders[];
+
+  @Field({ nullable: true })
+  outofstock?: boolean;
 }

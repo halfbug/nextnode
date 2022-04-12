@@ -348,11 +348,107 @@ export class InventoryService {
       },
     ];
     const res = await manager.aggregate(Inventory, agg).toArray();
-    console.log(
-      '🚀 ~ file: inventory.service.ts ~ line 329 ~ InventoryService ~ findProductById ~ res',
-      res,
-    );
+    // console.log(
+    //   '🚀 ~ file: inventory.service.ts ~ line 329 ~ InventoryService ~ findProductById ~ res',
+    //   res,
+    // );
     return res[0];
+    // return await manager.aggregate(Inventory, agg).toArray();
+  }
+
+  // it find all products, variants, collection, images
+  async findAllProducts(shop: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          shop,
+          recordType: 'Product',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          let: {
+            product_id: '$id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $and: [
+                  {
+                    $expr: {
+                      $eq: ['$parentId', '$$product_id'],
+                    },
+                  },
+                  {
+                    recordType: 'ProductVariant',
+                  },
+                ],
+              },
+            },
+          ],
+          as: 'variants',
+        },
+      },
+      // {
+      //   $lookup: {
+      //     from: 'inventory',
+      //     let: {
+      //       product_id: '$id',
+      //     },
+      //     pipeline: [
+      //       {
+      //         $match: {
+      //           $and: [
+      //             {
+      //               $expr: {
+      //                 $eq: ['$parentId', '$$product_id'],
+      //               },
+      //             },
+      //             {
+      //               recordType: 'ProductImage',
+      //             },
+      //           ],
+      //         },
+      //       },
+      //     ],
+      //     as: 'imagesObj',
+      //   },
+      // },
+      {
+        $lookup: {
+          from: 'inventory',
+          let: {
+            product_id: '$id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $and: [
+                  {
+                    $expr: {
+                      $eq: ['$parentId', '$$product_id'],
+                    },
+                  },
+                  {
+                    recordType: 'Collection',
+                  },
+                ],
+              },
+            },
+          ],
+          as: 'collections',
+        },
+      },
+    ];
+    // console.log(
+    //   '🚀 ~ file: inventory.service.ts ~ line 446 ~ InventoryService ~ findAllProducts ~ agg',
+    //   JSON.stringify(agg),
+    // );
+    const res = await manager.aggregate(Inventory, agg).toArray();
+    // console.log('🚀 ~ file: InventoryService ~ findAllProducts ~ res', res);
+    return res;
     // return await manager.aggregate(Inventory, agg).toArray();
   }
 }
