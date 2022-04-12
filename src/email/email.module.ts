@@ -7,8 +7,10 @@ import { GroupshopSavedListener } from './listeners/groupshop-saved.listener';
 import { KalavioService } from './kalavio.service';
 import { UploadImageService } from 'src/shopify-store/ImageUpload/uploadimage.service';
 
+import { UploadImageModule } from 'src/shopify-store/ImageUpload/uploadimage.module';
+
 @Module({
-  imports: [HttpModule, InventoryModule, UploadImageService],
+  imports: [HttpModule, InventoryModule, UploadImageModule],
   providers: [
     GroupshopSavedListener,
     GroupshopCashbackListener,
