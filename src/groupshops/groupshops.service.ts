@@ -399,7 +399,7 @@ export class GroupshopsService {
       {
         $project: {
           bestSeller: {
-            $slice: ['$bestSeller', 0, 4],
+            $slice: ['$bestSeller', 0, 15],
           },
           createdAt: 1,
           campaignId: 1,
