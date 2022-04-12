@@ -247,4 +247,28 @@ export class OrdersService {
   async removeShop(shop: string) {
     return await this.ordersRepository.delete({ shop });
   }
+
+  async findfindQrDealLinkAll(email: string, ordernumber: string) {
+    const agg = [
+      {
+        $match: {
+          name: '#' + ordernumber,
+          'customer.email': email,
+        },
+      },
+      {
+        $lookup: {
+          from: 'groupshops',
+          localField: 'id',
+          foreignField: 'members.orderId',
+          as: 'groupshops',
+        },
+      },
+    ];
+    console.log(agg);
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Orders, agg).toArray();
+    console.log('🚀 ~ find qr deal link', gs);
+    return gs[0].groupshops[0];
+  }
 }

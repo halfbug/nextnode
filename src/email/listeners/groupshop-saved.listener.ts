@@ -11,6 +11,7 @@ import { GroupshopSavedEvent } from 'src/groupshops/events/groupshop-saved.event
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import * as getSymbolFromCurrency from 'currency-symbol-map';
+import { UploadImageService } from 'src/shopify-store/ImageUpload/uploadimage.service';
 
 @Injectable()
 export class GroupshopSavedListener {
@@ -21,6 +22,7 @@ export class GroupshopSavedListener {
     private inventoryService: InventoryService,
     private ordersService: OrdersService,
     private kalavioService: KalavioService,
+    private uploadImageService: UploadImageService,
   ) {}
 
   @OnEvent('groupshop.saved')
@@ -160,6 +162,9 @@ export class GroupshopSavedListener {
       ' ' +
       hoursFormat;
 
+    const imgPath = res.data.store.logoImage.split('/');
+    const brandLogo = await this.uploadImageService.getSignedUrl(imgPath[4]);
+
     if (res.post == 'yes') {
       console.log('groupshop saved listener received');
       const campaigns_products = res.data.store.activeCampaign.products;
@@ -202,13 +207,13 @@ export class GroupshopSavedListener {
       );
 
       const mdata = {
-        logoImage: res.data.store.logoImage,
+        logoImage: brandLogo,
         brandName: res.data.store.brandName,
         shippingAddress:
           ' 2972 Westheimer Rd. Santa Ana, Illinois 85486 United States',
         customerName: custName,
         customerEmail: customerEmail,
-        dealUrl: `${this.configService.get('FRONT')}/${dealUrl}`,
+        dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
         created_at: orderDate,
         order_number: res.data.order.name,
         total_price: order_price,
@@ -239,13 +244,13 @@ export class GroupshopSavedListener {
       const dealUrl = res.ugroupshop.url;
 
       const rdata = {
-        logoImage: res.data.store.logoImage,
+        logoImage: brandLogo,
         brandName: res.data.store.brandName,
         shippingAddress:
           ' 2972 Westheimer Rd. Santa Ana, Illinois 85486 United States',
         customerName: custName,
         customerEmail: customerEmail,
-        dealUrl: `${this.configService.get('FRONT')}/${dealUrl}`,
+        dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
         created_at: orderDate,
         order_number: res.data.order.name,
         total_price: sumTotalPrice,

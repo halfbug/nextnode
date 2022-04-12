@@ -5,9 +5,10 @@ import { CatController } from './connect/connect.controller';
 import { GroupshopCashbackListener } from './listeners/groupshop-cashback.listener';
 import { GroupshopSavedListener } from './listeners/groupshop-saved.listener';
 import { KalavioService } from './kalavio.service';
+import { UploadImageService } from 'src/shopify-store/ImageUpload/uploadimage.service';
 
 @Module({
-  imports: [HttpModule, InventoryModule],
+  imports: [HttpModule, InventoryModule, UploadImageService],
   providers: [
     GroupshopSavedListener,
     GroupshopCashbackListener,

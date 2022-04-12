@@ -12,6 +12,7 @@ import { GroupshopCashbackEvent } from 'src/groupshops/events/groupshop-cashback
 // @ts-ignore
 import * as getSymbolFromCurrency from 'currency-symbol-map';
 import { RoleTypeEnum } from 'src/groupshops/entities/groupshop.modal';
+import { UploadImageService } from 'src/shopify-store/ImageUpload/uploadimage.service';
 
 @Injectable()
 export class GroupshopCashbackListener {
@@ -20,6 +21,7 @@ export class GroupshopCashbackListener {
     private httpService: HttpService,
     private ordersService: OrdersService,
     private kalavioService: KalavioService,
+    private uploadImageService: UploadImageService,
   ) {}
 
   @OnEvent('cashbackEmail.generated')
@@ -149,6 +151,10 @@ export class GroupshopCashbackListener {
     const totalPrice = +(orderData[0].price + calOrderSalePrice)
       .toString()
       .match(/^-?\d+(?:\.\d{0,2})?/)[0];
+
+    const imgPath = res.store.logoImage.split('/');
+    const brandLogo = await this.uploadImageService.getSignedUrl(imgPath[4]);
+
     const mdata = {
       earnedcashback: res.cashbackAmount
         .toString()
@@ -156,7 +162,7 @@ export class GroupshopCashbackListener {
       customerEmail: customerEmail,
       customer_role: customerRole,
       brandName: res.store.brandName,
-      logoImage: res.store.logoImage,
+      logoImage: brandLogo,
       order_number: orderData[0].name,
       customerName: custName,
       orderLineItems: orderline_items,
@@ -165,7 +171,7 @@ export class GroupshopCashbackListener {
       getUptoDiscount: getUptoDiscount,
       total_price: totalPrice,
       total_sale_price: orderData[0].price,
-      dealUrl: `${this.configService.get('FRONT')}/${dealUrl}`,
+      dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
     };
 
     const body = JSON.stringify({

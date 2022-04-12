@@ -6,6 +6,7 @@ import {
   Req,
   Res,
   Param,
+  Query,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
@@ -22,6 +23,7 @@ import { StoreService } from 'src/shopify-store/store/store.service';
 // @ts-ignore
 import * as getSymbolFromCurrency from 'currency-symbol-map';
 import { TokenReceivedEvent } from 'src/shopify-store/events/token-received.event';
+import { UploadImageService } from 'src/shopify-store/ImageUpload/uploadimage.service';
 
 @Controller('connect')
 export class CatController {
@@ -35,6 +37,7 @@ export class CatController {
     private storeService: StoreService,
     private ordersService: OrdersService,
     private kalavioService: KalavioService,
+    private uploadImageService: UploadImageService,
   ) {}
   @Get('/')
   async test() {
@@ -137,7 +140,7 @@ export class CatController {
         const discountCalculate = 50 - recDiscount;
         const calPrice = +(
           (discountCalculate / 100) *
-          groupshop.orders[1].price
+          groupshop.orders[0].price
         )
           .toString()
           .match(/^-?\d+(?:\.\d{0,2})?/)[0];
@@ -172,18 +175,22 @@ export class CatController {
           }),
         );
         const customerEmail = groupshop.orders[0].customer.email;
+        const imgPath = groupshop.stores[0].logoImage.split('/');
+        const brandLogo = await this.uploadImageService.getSignedUrl(
+          imgPath[4],
+        );
         const dealUrl = groupshop.url;
         const mdata = {
           customerEmail: customerEmail,
           customerName: custName,
           leftCashback: calPrice,
           brandName: groupshop.stores[0].brandName,
-          logoImage: groupshop.stores[0].logoImage,
+          logoImage: brandLogo,
           getUptoDiscount: discountCalculate,
-          total_price: groupshop.orders[1].price,
+          total_price: groupshop.orders[0].price,
           currencyCode: currencySymbol,
           order_number: groupshop.orders[0].name,
-          dealUrl: `${this.configService.get('FRONT')}/${dealUrl}`,
+          dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
           campaignsLineItems: campaigns_line_items,
           orderLineItems: order_line_items,
         };
@@ -202,21 +209,24 @@ export class CatController {
   }
 
   @Get('inventory-insert')
-  async inventoryInsert(@Param('pname') pname: string) {
-    console.log('inventory-insert  :: ' + pname);
-    // this.shopifyService.offlineSession('native-roots-dev.myshopify.com');
-    const client = await this.shopifyService.client(
-      'native-roots-dev.myshopify.com',
-      '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',
-    );
+  async inventoryInsert(
+    @Query('shop') shop: string,
+    @Query('token') token: string,
+  ) {
+    console.log('inventory-insert  :: ' + shop);
+    console.log('inventory-insert  :: ' + token);
+    const tokenReceivedEvent = new TokenReceivedEvent();
+    const session = {
+      shop: shop,
+      accessToken: token,
+    };
+    tokenReceivedEvent.token = session.accessToken;
+    tokenReceivedEvent.session = session;
+    this.eventEmitter.emit('token.received', tokenReceivedEvent);
+  }
 
-    // const tokenReceivedEvent = new TokenReceivedEvent();
-    // const session = {
-    //   shop: 'youngandrecklessdev.myshopify.com',
-    //   accessToken: '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',
-    // };
-    // tokenReceivedEvent.token = session.accessToken;
-    // tokenReceivedEvent.session = session;
-    //this.eventEmitter.emit('token.received', tokenReceivedEvent);
+  @Get('campaign-insert')
+  async campaignInsert() {
+    console.log('yes');
   }
 }
