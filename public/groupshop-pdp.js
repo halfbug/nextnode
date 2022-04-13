@@ -1,7 +1,7 @@
 console.log('v2 Script Triggered');
 
 // Define App Url
-window.APPv2URL = 'https://9f74-39-51-3-243.ngrok.io';
+window.APPv2URL = 'https://api-stage.groupshop.co';
 
 // App Status
 window.STATUS = true;
