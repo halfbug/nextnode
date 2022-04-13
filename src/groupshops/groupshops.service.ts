@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getMongoManager, Repository } from 'typeorm';
+import { getMongoManager, Like, Repository } from 'typeorm';
 import {
   CreateGroupshopInput,
   DealProductsInput,
@@ -38,7 +38,20 @@ export class GroupshopsService {
 
     return this.groupshopRepository.save(groupshop);
   }
+  async findByOrderId(orderId: string) {
+    console.log(
+      '🚀 ~ file: groupshops.service.ts ~ line 42 ~ GroupshopsService ~ findByOrderId ~ orderId',
+      orderId,
+    );
+    const res = await this.groupshopRepository.findOne({
+      where: {
+        'members.orderId': { $regex: `${orderId}` },
+        // `gid://shopify/Order/${orderId}`, //{ $regex: `${orderId}` },
+      },
+    });
 
+    return res;
+  }
   findAll() {
     return this.groupshopRepository.find();
   }
@@ -107,7 +120,7 @@ export class GroupshopsService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
-    console.log({ gs });
+    // console.log({ gs });
     return gs[0];
   }
   async totalGs(storeId: string) {
@@ -143,10 +156,10 @@ export class GroupshopsService {
         },
       },
     ];
-    console.log(agg);
+    // console.log(agg);
     const manager = getMongoManager();
     const gs = await manager.aggregate(Orders, agg).toArray();
-    console.log('🚀 ~ find qr deal link', gs);
+    // console.log('🚀 ~ find qr deal link', gs);
     return gs[0].groupshops[0];
   }
 
@@ -422,7 +435,7 @@ export class GroupshopsService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
-    console.log('🚀 ~ find one groupshop products', gs);
+    // console.log('🚀 ~ find one groupshop products', gs);
     // a b put in b, check every item of a and put in b. map
     const popular = gs[0].popularProducts;
     const dPopular = [];

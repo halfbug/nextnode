@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Controller, Get, Logger, Post, Req, Res } from '@nestjs/common';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
 import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { ConfigService } from '@nestjs/config';
@@ -14,20 +14,34 @@ export class ThemeAppExtensionController {
   ) {}
   @Get('store')
   async getStoreWithActiveCampaign(@Req() req, @Res() res) {
-    const { shop } = req.query;
-    const {
-      id,
-      activeCampaign: {
-        id: campaignId,
-        salesTarget: {
-          rewards: [, , { discount }],
+    try {
+      const { shop } = req.query;
+      const {
+        id,
+        activeCampaign: {
+          id: campaignId,
+          salesTarget: {
+            rewards: [, , { discount }],
+          },
         },
-      },
-      status,
-      logoImage,
-    } = await this.storesService.findOneWithActiveCampaing(shop);
-    console.log(await this.storesService.findOneWithActiveCampaing(shop));
-    res.send(JSON.stringify({ id, campaignId, status, discount, logoImage }));
+        status,
+        logoImage,
+        brandName,
+      } = await this.storesService.findOneWithActiveCampaing(shop);
+      // console.log(await this.storesService.findOneWithActiveCampaing(shop));
+      res.send(
+        JSON.stringify({
+          id,
+          campaignId,
+          status,
+          discount,
+          logoImage,
+          brandName,
+        }),
+      );
+    } catch (err) {
+      Logger.error(err);
+    }
   }
 
   @Post('gslink')
@@ -48,6 +62,47 @@ export class ThemeAppExtensionController {
       );
     } catch (err) {
       res.send(JSON.stringify({ id: null, url: null }));
+    }
+  }
+
+  @Post('member')
+  async getMemberDetails(@Req() req, @Res() res) {
+    try {
+      const { orderId } = req.body;
+      console.log({ orderId });
+
+      const { members, url } = await this.groupshopSrv.findByOrderId(orderId);
+      console.log(
+        '🚀 ~ file: theme-app-extension.controller.ts ~ line 65 ~ ThemeAppExtensionController ~ getMemberDetails ~ members',
+        members,
+      );
+      // console.log(await /this.groupshopSrv.findByOrderId(orderId));
+      const activeMember = members.find((member) =>
+        member.orderId.includes(orderId),
+      );
+      console.log(
+        '🚀 ~ file: theme-app-extension.controller.ts ~ line 69 ~ ThemeAppExtensionController ~ getMemberDetails ~ activeMember',
+        activeMember,
+      );
+      res.send(JSON.stringify({ activeMember, url }));
+    } catch (err) {
+      res.send(JSON.stringify({ activeMember: null, url: null }));
+    }
+  }
+
+  @Post('products')
+  async getCampainProducts(@Req() req, @Res() res) {
+    try {
+      const { campaignId } = req.body;
+      console.log({ campaignId });
+
+      const { products } = await this.campaignSrv.findOneWithProducts(
+        campaignId,
+      );
+
+      res.send(JSON.stringify(products));
+    } catch (err) {
+      res.send(JSON.stringify({ products: null }));
     }
   }
 }

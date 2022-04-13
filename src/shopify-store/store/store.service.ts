@@ -42,10 +42,10 @@ export class StoreService {
 
   async login(req, res, shop) {
     const authRoute = await this.shopifyapi.beginAuth(req, res, shop);
-    console.log(
-      '🚀 ~ file: store.service.ts ~ line 45 ~ StoreService ~ login ~ authRoute',
-      JSON.stringify(authRoute),
-    );
+    // console.log(
+    //   '🚀 ~ file: store.service.ts ~ line 45 ~ StoreService ~ login ~ authRoute',
+    //   JSON.stringify(authRoute),
+    // );
     return res.redirect(authRoute);
   }
 

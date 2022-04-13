@@ -1,7 +1,7 @@
 console.log('v2 Script Triggered');
 
 // Define App Url
-window.APPv2URL = 'https://api-stage.groupshop.co';
+window.APPv2URL = 'https://9f74-39-51-3-243.ngrok.io';
 
 // App Status
 window.STATUS = true;
@@ -70,7 +70,7 @@ async function fetchProduct() {
 function displayBanner(price) {
   //create banner element
   var banner = document.createElement('div');
-  banner.innerHTML = `<div class="grp-shop-logo"><img src="https://app.groupshop.co//images/GROUPSHOP-logo.svg" class="link-logo"></div> <div class="grp-shop-text">(v2)Shop with friends, <br> get <strong>$${price} cashback</strong></div>`;
+  banner.innerHTML = `<div class="grp-shop-logo"><img src="https://app.groupshop.co/images/GROUPSHOP-logo.svg" class="link-logo"></div> <div class="grp-shop-text">(v2)Shop with friends, <br> get <strong>$${price} cashback</strong></div>`;
   banner.className = 'yellow_banner';
   banner.id = 'grp-shop-section-2';
   banner.setAttribute('data-gs-toggle', 'groupshop_modal');

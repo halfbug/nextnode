@@ -1,0 +1,237 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&family=Montserrat:wght@500;700&display=swap');
+
+.groupshop_left-block {
+	width: 100%;
+	margin: 25px 0px;
+}
+
+.groupshop_left-block h3 {
+	font-family: 'Montserrat';
+	font-style: normal;
+	font-weight: 500;
+	font-size: 20px;
+	line-height: 22px;
+	text-align: center;
+	color: #000000;
+	padding: 15px 60px;
+}
+
+.groupshop_left-block h3 strong {
+	font-family: 'Montserrat';
+	font-weight: 700;
+}
+
+@keyframes blink {
+	0% {
+		background-color: rgba(238, 238, 238, 1);
+	}
+	50% {
+		background-color: rgba(238, 238, 238, 0.5);
+	}
+	100% {
+		background-color: rgba(238, 238, 238, 1);
+	}
+}
+@-webkit-keyframes blink {
+	0% {
+		background-color: rgba(238, 238, 238, 1);
+	}
+	50% {
+		background-color: rgba(238, 238, 238, 0.5);
+	}
+	100% {
+		background-color: rgba(238, 238, 238, 1);
+	}
+}
+.image-placeholder {
+	background-color: rgb(238, 238, 238);
+	display: flex;
+	height: 180px !important;
+	margin: 5px;
+	width: 260px;
+	-moz-transition: all 0.5s ease-in-out;
+	-webkit-transition: all 0.5s ease-in-out;
+	-o-transition: all 0.5s ease-in-out;
+	-ms-transition: all 0.5s ease-in-out;
+	transition: all 0.5s ease-in-out;
+	-moz-animation: blink normal 1.5s infinite ease-in-out;
+	/* Firefox */
+	-webkit-animation: blink normal 1.5s infinite ease-in-out;
+	/* Webkit */
+	-ms-animation: blink normal 1.5s infinite ease-in-out;
+	/* IE */
+	animation: blink normal 1.5s infinite ease-in-out;
+	/* Opera */
+}
+
+.image-placeholder > h4 {
+	align-self: center;
+	text-align: center;
+	width: 100%;
+}
+
+.gscard img {
+	height: unset;
+	object-fit: cover;
+}
+.gscard {
+	position: relative;
+}
+.gscard .discount {
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	font-family: 'DM Sans', sans-serif;
+	background: #444444;
+	box-shadow: 0px 0px 4px rgb(0 0 0 / 6%);
+	border-radius: 15px;
+	font-style: normal;
+	font-weight: 600;
+	font-size: 9px;
+	line-height: 10px;
+	text-align: center;
+	color: #ffffff;
+	display: inline-block;
+	padding: 6px 12px;
+}
+.gscard h4 {
+	padding: 0;
+	margin: 2px 0px;
+	margin-bottom: 5px;
+	font-family: 'DM Sans', sans-serif;
+	font-weight: 500;
+	font-size: 14px;
+	line-height: 1;
+	letter-spacing: 0;
+	color: #000000;
+	text-align: left;
+	text-transform: lowercase;
+}
+
+.gscard span {
+	font-family: 'DM Sans', sans-serif;
+	font-weight: 500;
+	color: #000000;
+}
+
+.bold {
+	font-weight: 700;
+}
+
+.get-start-thank-wrap {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: fit-content;
+	margin: 0 auto;
+	padding-top: 14px;
+}
+.get-start-wrap a {
+	font-family: 'DM Sans', sans-serif;
+	/*font-family: 'Montserrat-SemiBold';*/
+	position: relative;
+	font-style: normal;
+	font-weight: 600;
+	font-size: 16px;
+	line-height: 16px;
+	text-align: center;
+	color: #282828 !important;
+	padding: 9px 40px;
+	border-radius: 3px;
+	border: 3px solid transparent;
+	/* background: linear-gradient(90deg, #ccb2f9, #fee750) border-box; */
+	-webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+}
+.get-start-wrap a:before {
+	content: "";
+	position: absolute;
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	border-radius: 3px;
+	border: 1px solid transparent;
+	background: linear-gradient(90deg, #ccb2f9, #fee750) border-box;
+	-webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+	mask-composite: clear;
+	-webkit-mask-composite: destination-out;
+	z-index: -1;
+}
+
+.powerby {
+	border-top: 1px solid rgba(0, 0, 0, 0.05);
+	position: relative;
+	display: inline-block;
+	width: 100%;
+	text-align: center;
+	margin-top: 21px;
+	padding-top: 10px;
+	font-size: 12px;
+	/*font-family: 'Montserrat-Regular';*/
+	font-family: 'DM Sans', sans-serif;
+}
+.powerby img {
+	width: 110px;
+	display: inline-block;
+	position: relative;
+}
+/* unvisited link */
+a:link {
+	color: #000000;
+}
+
+/* visited link */
+a:visited {
+	color: #000000;
+}
+
+/* mouse over link */
+a:hover {
+	color: #000000;
+}
+
+/* selected link */
+a:active {
+	color: #000000;
+}
+.groupshop_right-block {
+	position: relative;
+	background: #ffffff;
+	padding: 20px;
+	border: 0px solid #e4e4e4;
+	border-radius: 10px;
+	box-shadow: 0px 1px 7px rgb(0 0 0 / 8%);
+	margin: 5px 0px;
+}
+.gs_brandbar {
+	background: linear-gradient(90deg, #ccb2f9 30%, #fee750 70%, #f4dec4 100%);
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 20px;
+	top: 17px;
+}
+.gs_branding {
+	background: url(https://beta.groupshop.co/images/grpshp-png.png);
+	background-size: 22%;
+	display: inline-block;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	background-repeat: repeat-x !important;
+	background-position: left center;
+	z-index: 99;
+}
+.gs_content {
+	margin: 50px auto 20px;
+	display: table;
+	font-style: normal;
+	font-weight: 500;
+	font-size: 18px;
+	line-height: 1.4;
+	text-align: center;
+	color: #000000;
+	padding: 0px 16px;
+	font-family: DM Sans, sans-serif;
+}

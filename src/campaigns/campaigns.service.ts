@@ -197,5 +197,24 @@ export class CampaignsService {
     ];
     return await manager.aggregate(Campaign, agg).toArray();
   }
-
-}
+  async findOneWithProducts(id: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+          '$match': {
+              'id': id
+          }
+      }, {
+          '$lookup': {
+              'from': 'inventory', 
+              'localField': 'products', 
+              'foreignField': 'id', 
+              'as': 'products'
+          }
+      }
+  ];
+  // console.log(agg);
+  const res =await manager.aggregate(Campaign, agg).toArray();
+  return res[0];
+  }
+}   

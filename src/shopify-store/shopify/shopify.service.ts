@@ -249,7 +249,7 @@ export class ShopifyService {
   //   });
   // }
 
-  async scriptTagRegister(src: string) {
+  async scriptTagRegister(src: string, scope?: string) {
     try {
       const client = await this.client(this.shop, this.accessToken);
       const scriptTag = await client.query({
@@ -271,8 +271,11 @@ export class ShopifyService {
             }`,
           variables: {
             input: {
-              cache: false,
-              displayScope: 'ONLINE_STORE',
+              cache:
+                this.configService.get('SHOPIFYCACHE') === 'true'
+                  ? true
+                  : false,
+              displayScope: scope ?? 'ONLINE_STORE',
               src: `${this.configService.get('HOST')}/public/${src}`,
             },
           },

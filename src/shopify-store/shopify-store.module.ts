@@ -20,7 +20,8 @@ import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 import { BillingModule } from 'src/billing/billing.module';
 // import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 import { ThemeAppExtensionController } from './theme-app-extension/theme-app-extension.controller';
-import { oldThemeFoundListener } from './listeners/old-theme-found.listener';
+import { OldThemeFoundListener } from './listeners/old-theme-found.listener';
+import { StoreSavedListener } from './listeners/store-saved.listener';
 @Global()
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { oldThemeFoundListener } from './listeners/old-theme-found.listener';
     ShopifyService,
     TokenReceivedListener,
     InvenotrySavedListener,
-    oldThemeFoundListener,
+    OldThemeFoundListener,
+    StoreSavedListener,
     StoresModule,
   ],
   controllers: [

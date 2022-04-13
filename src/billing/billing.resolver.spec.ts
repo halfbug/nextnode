@@ -12,10 +12,10 @@ export class BillingResolver {
   createBilling(
     @Args('createBillingInput') createBillingInput: CreateBillingInput,
   ) {
-    console.log(
-      '🚀 ~ file: billings.resolver.ts ~ line 15 ~ BillingResolver ~ createBillingInput',
-      createBillingInput,
-    );
+    // console.log(
+    //   '🚀 ~ file: billings.resolver.ts ~ line 15 ~ BillingResolver ~ createBillingInput',
+    //   createBillingInput,
+    // );
     return this.billingsService.create(createBillingInput);
   }
 

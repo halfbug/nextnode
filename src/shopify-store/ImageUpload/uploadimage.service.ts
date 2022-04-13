@@ -44,10 +44,10 @@ export class UploadImageService {
     const params = { Bucket: S3bucket, Key: key };
     // console.log(S3Obj);
     const SignedUrl = await S3.getSignedUrl('getObject', params);
-    console.log(
-      '🚀 ~ file: uploadimage.service.ts ~ line 47 ~ UploadImageService ~ getSignedUrl ~ SignedUrl',
-      SignedUrl,
-    );
+    // console.log(
+    //   '🚀 ~ file: uploadimage.service.ts ~ line 47 ~ UploadImageService ~ getSignedUrl ~ SignedUrl',
+    //   SignedUrl,
+    // );
     return SignedUrl;
 
     // return await this.uploadS3(file.buffer, S3bucket, originalname);

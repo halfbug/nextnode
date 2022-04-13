@@ -79,10 +79,10 @@ export class StoresService {
       },
     ];
     const res = await manager.aggregate(Store, agg).toArray();
-    console.log(
-      '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
-      res,
-    );
+    // console.log(
+    //   '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
+    //   res,
+    // );
     return { ...res[0] };
   }
 
@@ -186,10 +186,10 @@ export class StoresService {
       },
     ];
     const res = await manager.aggregate(Store, agg).toArray();
-    console.log(
-      '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
-      res,
-    );
+    // console.log(
+    //   '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
+    //   res,
+    // );
     // const salesTarget = res[0].salesTarget[0].salesTargets[0];
     return { ...res[0] };
   }

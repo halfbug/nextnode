@@ -115,15 +115,15 @@ export class GroupshopCashbackListener {
       netDiscountCal = discountThree - recDiscount;
     }
 
-    console.log(
-      'groupMember  :: ' +
-        groupMemberength +
-        ' --- ' +
-        netDiscountCal +
-        ' --- ' +
-        customerRole,
-    );
-    console.log('netDiscountCal  :: ' + discountThree + ' --- ' + recDiscount);
+    // console.log(
+    //   'groupMember  :: ' +
+    //     groupMemberength +
+    //     ' --- ' +
+    //     netDiscountCal +
+    //     ' --- ' +
+    //     customerRole,
+    // );
+    // console.log('netDiscountCal  :: ' + discountThree + ' --- ' + recDiscount);
 
     const availableCashbackCal = Math.floor(
       (netDiscountCal / 100) * orderData[0].price,
