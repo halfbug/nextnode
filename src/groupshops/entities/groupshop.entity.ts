@@ -1,4 +1,11 @@
-import { ObjectType, Field, registerEnumType, ID, Int } from '@nestjs/graphql';
+import {
+  ObjectType,
+  Field,
+  registerEnumType,
+  ID,
+  Int,
+  Float,
+} from '@nestjs/graphql';
 import { Campaign } from 'src/campaigns/entities/campaign.entity';
 import { CreateOrderInput as Order } from 'src/inventory/dto/create-order.input';
 import { Product } from 'src/inventory/entities/product.entity';
@@ -61,7 +68,7 @@ export class Refund {
   createdAt: Date;
   @Field({ nullable: true })
   discount: number;
-  @Field(() => Int, { nullable: true })
+  @Field(() => Float, { nullable: true })
   amount: number;
 }
 

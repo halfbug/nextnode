@@ -1,4 +1,4 @@
-import { InputType, Int, Field, ID } from '@nestjs/graphql';
+import { InputType, Int, Field, ID, Float } from '@nestjs/graphql';
 import { CreateOrderInput as LineItem } from 'src/inventory/dto/create-order.input';
 import { Product } from 'src/inventory/entities/product.entity';
 import {
@@ -73,7 +73,7 @@ export class RefundInput {
   createdAt: Date;
   @Field({ nullable: true })
   discount: number;
-  @Field(() => Int, { nullable: true })
+  @Field(() => Float, { nullable: true })
   amount: number;
 
   constructor(
