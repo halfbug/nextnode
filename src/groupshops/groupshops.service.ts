@@ -22,10 +22,6 @@ export class GroupshopsService {
     private shopifyapi: ShopifyService,
   ) {}
   async create(createGroupshopInput: CreateGroupshopInput) {
-    console.log(
-      '🚀 ~ file: groupshops.service.ts ~ line 8 ~ GroupshopsService ~ create ~ createGroupshopInput',
-      createGroupshopInput,
-    );
     const groupshop = this.groupshopRepository.create(createGroupshopInput);
     groupshop.dealProducts = [new DealProductsInput()];
     groupshop.id = uuid();
@@ -39,10 +35,6 @@ export class GroupshopsService {
     return this.groupshopRepository.save(groupshop);
   }
   async findByOrderId(orderId: string) {
-    console.log(
-      '🚀 ~ file: groupshops.service.ts ~ line 42 ~ GroupshopsService ~ findByOrderId ~ orderId',
-      orderId,
-    );
     const res = await this.groupshopRepository.findOne({
       where: {
         'members.orderId': { $regex: `${orderId}` },
@@ -133,10 +125,7 @@ export class GroupshopsService {
     ];
     const manager = getMongoManager();
     const totalGS = await manager.aggregate(Groupshops, agg).toArray();
-    console.log(
-      '🚀 ~ file: groupshops.service.ts ~ line 56 ~ GroupshopsService ~ totalGs ~ totalGS',
-      totalGS,
-    );
+
     return totalGS;
   }
   async findfindQrDealLinkAll(email: string, ordernumber: string) {
@@ -435,33 +424,21 @@ export class GroupshopsService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
-    // console.log('🚀 ~ find one groupshop products', gs);
-    // a b put in b, check every item of a and put in b. map
+
     const popular = gs[0].popularProducts;
     const dPopular = [];
-    console.log(
-      '🚀 ~ file: groupshops.service.ts ~ line 319 ~ GroupshopsService ~ findOne ~ dPopular',
-      dPopular,
-    );
+
     popular.map((item, ind) => {
       if (ind === 0) {
         dPopular.push(item);
       } else {
         if (dPopular.find((prd) => prd.id !== item.id)) {
-          console.log(
-            '🚀 ~ file: groupshops.service.ts ~ line 332 ~ GroupshopsService ~ popular.map ~ dPopular.find((prd) => prd.id !== item.id)',
-            dPopular.find((prd) => prd.id !== item.id),
-          );
           dPopular.push(item);
         }
       }
     });
     gs[0].popularProducts = dPopular;
 
-    console.log(
-      '🚀 ~ file: groupshops.service.ts ~ line 347 ~ GroupshopsService ~ findOne ~ gs[0]',
-      gs[0].bestSeller,
-    );
     return gs[0];
   }
 
@@ -519,7 +496,6 @@ export class GroupshopsService {
 
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
-    console.log('🚀 ~ find one groupshop with line items', gs);
     return gs[0];
   }
 
@@ -577,20 +553,16 @@ export class GroupshopsService {
 
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
-    console.log('🚀 ~ find one groupshop with line items', gs);
+    // console.log('🚀 ~ find one groupshop with line items', gs);
     return gs[0];
   }
 
   async update(updateGroupshopInput: UpdateGroupshopInput) {
     const { id, dealProducts } = updateGroupshopInput;
-    console.log(
-      '🚀 ~ file: groupshops.service.ts ~ line 331 ~ GroupshopsService ~ update ~ updateGroupshopInput',
-      updateGroupshopInput,
-    );
 
     updateGroupshopInput.dealProducts = [new DealProductsInput()];
     updateGroupshopInput.dealProducts = dealProducts;
-    console.log('🚀 ~ ~ update ~ dealProducts', dealProducts);
+    // console.log('🚀 ~ ~ update ~ dealProducts', dealProducts);
     delete updateGroupshopInput.id;
     // delete updateGroupshopInput['_id'];
     await this.groupshopRepository.update({ id }, updateGroupshopInput);
@@ -617,11 +589,6 @@ export class GroupshopsService {
       { totalProducts: gsproducts.length },
     );
     return gs;
-    // return await this.groupshopRepository.findOne({
-    //   where: {
-    //     id: id,
-    //   },
-    // });
   }
 
   // updateDealProducts(addDealProductInput: AddDealProductInput) {
