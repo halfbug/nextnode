@@ -20,8 +20,8 @@ export class CampaignsResolver {
   }
 
   @Query(() => [Campaign], { name: 'campaigns' })
-  findAll() {
-    return this.campaignsService.findAll();
+  findAll(@Args('storeId') storeId: string) {
+    return this.campaignsService.findAll(storeId);
   }
 
   @Query(() => Campaign, { name: 'campaign' })

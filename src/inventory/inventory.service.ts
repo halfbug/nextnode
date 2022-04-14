@@ -189,10 +189,6 @@ export class InventoryService {
   async findStoreProducts(productQueryInput: ProductQueryInput) {
     const { shop, sort, limit } = productQueryInput;
     const manager = getMongoManager();
-    console.log(
-      '🚀 ~ file: inventory.service.ts ~ line 55 ~ InventoryService ~ findStoreProducts ~ shop',
-      shop,
-    );
 
     const agg = [
       {
