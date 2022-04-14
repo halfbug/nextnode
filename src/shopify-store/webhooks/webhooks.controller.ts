@@ -160,6 +160,10 @@ export class WebhooksController {
       'WebhooksController ~ productUpdate ~ rproduct',
       JSON.stringify(rproduct),
     );
+    console.log(
+      'WebhooksController ~ productUpdate ~ rproduct variants',
+      JSON.stringify(rproduct.variants),
+    );
     const nprod = new UpdateInventoryInput();
     nprod.id = rproduct.id;
     nprod.id = rproduct?.admin_graphql_api_id;
@@ -167,9 +171,14 @@ export class WebhooksController {
     nprod.publishedAt = rproduct?.published_at;
     nprod.title = rproduct?.title;
     nprod.status = rproduct?.status?.toUpperCase();
-    nprod.price = rproduct?.variants[0]?.price;
+    nprod.price = rproduct?.variants[0]?.price; //
     nprod.featuredImage = rproduct?.image?.src;
     let qDifference: number;
+    const isAvailable = rproduct.variants.some(
+      (item) => item.inventory_quantity > 0,
+    );
+    nprod.outofstock = !isAvailable;
+
     rproduct.variants.map(async (variant) => {
       const preVariant = await this.inventryService.findId(
         variant.admin_graphql_api_id,
@@ -185,7 +194,6 @@ export class WebhooksController {
         qDifference,
       );
     });
-
     await this.inventryService.update(nprod);
 
     res.send('product updated..');

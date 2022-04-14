@@ -43,4 +43,7 @@ export class CreateInventoryInput {
 
   @Field({ nullable: true })
   totalInventory?: number;
+
+  @Field({ nullable: true })
+  outofstock?: boolean;
 }

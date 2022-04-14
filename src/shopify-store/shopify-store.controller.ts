@@ -80,8 +80,8 @@ export class ShopifyStoreController {
       const store = await this.storesService.findOne(shop);
       this.shopifyService.accessToken = store.accessToken;
       this.shopifyService.shop = shop;
-      if (store.resources.length > 0)
-        store.resources.map((res) => {
+      if (store?.resources?.length > 0)
+        store?.resources?.map((res) => {
           if (res.type === 'scriptTag') {
             this.shopifyService.scriptTagDelete(res.id);
           }
