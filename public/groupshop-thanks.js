@@ -525,7 +525,7 @@ async function init() {
       }
       document.querySelectorAll('#gscashback').forEach((elem) => {
         console.log(elem);
-        elem.innerHTML = `$${cashback}`;
+        elem.innerHTML = `$${cashback.toFixed(2)}`;
       });
       window.GSURL = window.FURL + url;
       document.querySelector(
