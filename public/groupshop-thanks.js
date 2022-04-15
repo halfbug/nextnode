@@ -514,25 +514,29 @@ async function init() {
       },
     });
 
-    gsPost('member', { orderId }).then(({ activeMember: mem, url }) => {
-      let cashback = 0;
-      if (mem.role === 0) {
-        cashback = Shopify.checkout.subtotal_price * 0.5;
-      } else {
-        cashback =
-          Shopify.checkout.subtotal_price *
-          (parseFloat(store.discount) / 100 - mem.availedDiscount / 100);
-      }
-      document.querySelectorAll('#gscashback').forEach((elem) => {
-        console.log(elem);
-        elem.innerHTML = `$${cashback.toFixed(2)}`;
-      });
-      window.GSURL = window.FURL + url;
-      document.querySelector(
-        '.get-start-thank-wrap',
-      ).innerHTML = `<div class="get-start-wrap"><a target="_blank" href="${window.GSURL}">Get Started</a></div>`;
-      document.getElementById('gs_link').setAttribute('href', window.GSURL);
+    const {
+      activeMember: mem,
+      url,
+      percentage,
+    } = await gsPost('member', { orderId });
+
+    let cashback = 0;
+    if (mem.role === 0) {
+      cashback = Shopify.checkout.subtotal_price * 0.5;
+    } else {
+      cashback =
+        Shopify.checkout.subtotal_price *
+        (parseFloat(store.discount) / 100 - mem.availedDiscount / 100);
+    }
+    document.querySelectorAll('#gscashback').forEach((elem) => {
+      console.log(elem);
+      elem.innerHTML = `$${cashback.toFixed(2)}`;
     });
+    window.GSURL = window.FURL + url;
+    document.querySelector(
+      '.get-start-thank-wrap',
+    ).innerHTML = `<div class="get-start-wrap"><a target="_blank" href="${window.GSURL}">Get Started</a></div>`;
+    document.getElementById('gs_link').setAttribute('href', window.GSURL);
 
     const products = await gsPost('products', {
       campaignId: store.campaignId,
@@ -558,11 +562,12 @@ async function init() {
       slide.className = 'gscard';
       slide.innerHTML = `<img src="${
         prod.featuredImage
-      }"alt="img"><span class="discount">${
-        store.discount
-      } OFF</span><h4>${prod.title.slice(0, 15)}..</h4><span class="bold">$${(
+      }"alt="img"><span class="discount">${percentage} OFF</span><h4>${prod.title.slice(
+        0,
+        15,
+      )}..</h4><span class="bold">$${(
         prod.price -
-        (parseFloat(store.discount) / 100) * prod.price
+        (parseFloat(percentage) / 100) * prod.price
       ).toFixed(2)}</span> <del>$${prod.price}</del>`;
       glider.addItem(slide);
       glider.refresh(true);

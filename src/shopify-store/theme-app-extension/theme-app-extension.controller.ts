@@ -71,7 +71,11 @@ export class ThemeAppExtensionController {
       const { orderId } = req.body;
       console.log({ orderId });
 
-      const { members, url } = await this.groupshopSrv.findByOrderId(orderId);
+      const {
+        members,
+        url,
+        discountCode: { percentage },
+      } = await this.groupshopSrv.findByOrderId(orderId);
       console.log(
         '🚀 ~ file: theme-app-extension.controller.ts ~ line 65 ~ ThemeAppExtensionController ~ getMemberDetails ~ members',
         members,
@@ -84,7 +88,7 @@ export class ThemeAppExtensionController {
         '🚀 ~ file: theme-app-extension.controller.ts ~ line 69 ~ ThemeAppExtensionController ~ getMemberDetails ~ activeMember',
         activeMember,
       );
-      res.send(JSON.stringify({ activeMember, url }));
+      res.send(JSON.stringify({ activeMember, url, percentage }));
     } catch (err) {
       res.send(JSON.stringify({ activeMember: null, url: null }));
     }
