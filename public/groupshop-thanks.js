@@ -562,7 +562,7 @@ async function init() {
       slide.className = 'gscard';
       slide.innerHTML = `<img src="${
         prod.featuredImage
-      }"alt="img"><span class="discount">${percentage} OFF</span><h4>${prod.title.slice(
+      }"alt="img"><span class="discount">${percentage}% OFF</span><h4>${prod.title.slice(
         0,
         15,
       )}..</h4><span class="bold">$${(
