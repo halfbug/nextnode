@@ -155,19 +155,19 @@ export class InventoryService {
               as: 'products',
             },
           },
-          {
-            $project: {
-              'products.id': 1,
-              'products.title': 1,
-              'products.totalVariants': 1,
-              'products.createdAtShopify': 1,
-              'products.publishedAt': 1,
-              'products.featuredImage': 1,
-              id: 1,
-              title: 1,
-              productsCount: 1,
-            },
-          },
+          // {
+          //   $project: {
+          //     'products.id': 1,
+          //     'products.title': 1,
+          //     'products.totalVariants': 1,
+          //     'products.createdAtShopify': 1,
+          //     'products.publishedAt': 1,
+          //     'products.featuredImage': 1,
+          //     id: 1,
+          //     title: 1,
+          //     productsCount: 1,
+          //   },
+          // },
         ]
       : [
           { $match: { $and: [{ shop }, { recordType: 'Collection' }] } },
