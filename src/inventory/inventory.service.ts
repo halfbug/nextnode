@@ -115,7 +115,7 @@ export class InventoryService {
             $match: {
               $and: [
                 {
-                  shop: 'native-roots-dev.myshopify.com',
+                  shop,
                 },
                 {
                   recordType: 'Collection',
