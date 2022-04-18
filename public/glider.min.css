@@ -51,8 +51,8 @@
 	min-width: 150px;
 }
 .glider-slide img {
-	max-width: 100%;
-	max-height: 70%;
+	width: 90% !important;
+	height: 60% !important;
 }
 .glider::-webkit-scrollbar {
 	opacity: 0;
