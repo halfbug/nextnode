@@ -186,6 +186,7 @@ export class WebhooksController {
       qDifference = Math.abs(
         variant.inventory_quantity - preVariant.inventoryQuantity,
       );
+      preVariant.price = variant.price;
 
       preVariant.inventoryQuantity = variant.inventory_quantity;
       await this.inventryService.update(preVariant);

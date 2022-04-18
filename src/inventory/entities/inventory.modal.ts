@@ -93,4 +93,7 @@ export default class Inventory extends DefaultColumnsService {
 
   @Column({ nullable: true })
   outofstock?: boolean;
+
+  @Column({ nullable: true })
+  price: string;
 }
