@@ -250,6 +250,7 @@ export class GroupshopSavedListener {
       const rdata = {
         logoImage: brandLogo,
         brandName: res.data.store.brandName,
+        shopUrl: res.data.store.shop,
         shippingAddress:
           ' 2972 Westheimer Rd. Santa Ana, Illinois 85486 United States',
         customerName: custName,

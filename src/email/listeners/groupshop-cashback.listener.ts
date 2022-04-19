@@ -162,6 +162,7 @@ export class GroupshopCashbackListener {
       customerEmail: customerEmail,
       customer_role: customerRole,
       brandName: res.store.brandName,
+      shopUrl: res.store.shop,
       logoImage: brandLogo,
       order_number: orderData[0].name,
       customerName: custName,
