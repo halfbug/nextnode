@@ -20,7 +20,7 @@ export class KalavioService {
       },
     };
     this.httpService.post(urlKlaviyo, body, options).subscribe(async (res) => {
-      console.log(res);
+      //console.log(res);
     });
   }
 

@@ -60,7 +60,7 @@ export class GroupshopSavedListener {
     const orderData = await this.ordersService.getOrderDetailsByOrderId(
       res.data.order.id,
     );
-    console.log('orderData : ' + JSON.stringify(orderData));
+    //console.log('orderData : ' + JSON.stringify(orderData));
     let order_line_items = [];
     let recDiscount = 0;
 
@@ -180,7 +180,7 @@ export class GroupshopSavedListener {
             await this.inventoryService.findProductById(id);
           const { title, price, featuredImage } = campaignSingleProduct;
           const variantPrice = (currentDiscount / 100) * price;
-
+          const prdId = id.replace('gid://shopify/Product/', '');
           // const getCollectionName =
           //   await this.inventoryService.getCollectionNameByProductId(
           //     shopName,
@@ -196,6 +196,9 @@ export class GroupshopSavedListener {
             product_category: '',
             product_image: featuredImage !== '' ? featuredImage : 'dummy-image',
             product_price: price,
+            product_url: `${this.configService.get(
+              'FRONT',
+            )}${dealUrl}/product&${prdId}`,
             sale_price: salePrice,
             discount_price: discountPrice,
           };
@@ -208,6 +211,7 @@ export class GroupshopSavedListener {
 
       const mdata = {
         logoImage: brandLogo,
+        shopUrl: res.data.store.shop,
         brandName: res.data.store.brandName,
         shippingAddress:
           ' 2972 Westheimer Rd. Santa Ana, Illinois 85486 United States',

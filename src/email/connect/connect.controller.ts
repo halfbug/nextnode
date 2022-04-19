@@ -152,7 +152,7 @@ export class CatController {
             const { title, price, totalDiscounts, featuredImage } =
               campaignSingleProduct;
             const variantPrice = (recDiscount / 100) * price;
-
+            const prdId = id.replace('gid://shopify/Product/', '');
             // const getCollectionName =
             //   await this.inventoryService.getCollectionNameByProductId(
             //     shopName,
@@ -162,6 +162,9 @@ export class CatController {
 
             const campaignResult = {
               product_title: title,
+              product_url: `${this.configService.get(
+                'FRONT',
+              )}${dealUrl}/product&${prdId}`,
               product_category: '',
               product_image:
                 featuredImage !== '' ? featuredImage : 'dummy-image',
@@ -184,6 +187,7 @@ export class CatController {
           customerEmail: customerEmail,
           customerName: custName,
           leftCashback: calPrice,
+          shopUrl: groupshop.stores[0].shop,
           brandName: groupshop.stores[0].brandName,
           logoImage: brandLogo,
           getUptoDiscount: discountCalculate,
