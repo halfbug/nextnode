@@ -568,7 +568,10 @@ async function init() {
       )}..</h4><span class="bold">$${(
         prod.price -
         (parseFloat(percentage) / 100) * prod.price
-      ).toFixed(2)}</span> <del>$${prod.price}</del>`;
+      )
+        .toFixed(2)
+        .toString()
+        .replace('.00', '')}</span> <del>$${prod.price}</del>`;
       glider.addItem(slide);
       glider.refresh(true);
       return prod;
