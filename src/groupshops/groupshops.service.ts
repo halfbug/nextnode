@@ -395,7 +395,7 @@ export class GroupshopsService {
           orderDetails: 0,
           dealsProducts: 0,
           campaignProducts: 0,
-          'members.lineItems': 0,
+          // 'members.lineItems': 0,
         },
       },
       {

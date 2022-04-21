@@ -98,6 +98,9 @@ export class Member {
 
   @Field(() => Order, { nullable: true })
   orderDetail?: Order;
+
+  @Field(() => [Order], { nullable: 'itemsAndList' })
+  lineItems?: Order[];
 }
 
 @ObjectType()
