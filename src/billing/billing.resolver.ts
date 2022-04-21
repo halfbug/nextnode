@@ -5,6 +5,7 @@ import { CreateBillingInput } from './dto/create-billing.input';
 import { UpdateBillingInput } from './dto/update-billing.input';
 import {
   MonthlyBillingInput,
+  SingleDayBillingInput,
   Total,
   TotalRevenue,
 } from './dto/monthly-billing.input';
@@ -47,6 +48,15 @@ export class BillingsResolver {
   @Query(() => [Total], { name: 'findTotalGSMonthly' })
   findTotalGSMonthly(@Args('storeId') storeId: string) {
     return this.billingService.findTotalGSMonthly(storeId);
+  }
+
+  @Query(() => SingleDayBillingInput, { name: 'getBillingByDate' })
+  getBillingByDate(
+    @Args('storeId') storeId: string,
+    @Args('startDate', { type: () => Date }) startDate: Date,
+    @Args('endDate', { type: () => Date }) endDate: Date,
+  ) {
+    return this.billingService.getBillingByDate(storeId, startDate, endDate);
   }
 
   @Mutation(() => Billing)
