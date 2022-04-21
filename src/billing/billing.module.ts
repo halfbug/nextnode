@@ -6,6 +6,7 @@ import Billing from './entities/billing.model';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
 import { StoresModule } from 'src/stores/stores.module';
 import { BillingListener } from './listeners/billing.listener';
+import { BillingUsageCargeCron } from './billing.cron';
 
 @Module({
   imports: [
@@ -13,7 +14,12 @@ import { BillingListener } from './listeners/billing.listener';
     DefaultColumnsService,
     StoresModule,
   ],
-  providers: [BillingsResolver, BillingsService, BillingListener],
+  providers: [
+    BillingsResolver,
+    BillingsService,
+    BillingListener,
+    BillingUsageCargeCron,
+  ],
   exports: [BillingsService],
 })
 export class BillingModule {}

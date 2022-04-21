@@ -20,6 +20,7 @@ import { Groupshops } from './groupshops/entities/groupshop.modal';
 import Billing from './billing/entities/billing.model';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ScheduleModule } from '@nestjs/schedule';
 import { EmailModule } from './email/email.module';
 
 @Module({
@@ -64,6 +65,7 @@ import { EmailModule } from './email/email.module';
     GraphQLModule.forRoot({
       autoSchemaFile: true,
     }),
+    ScheduleModule.forRoot(),
     ShopifyStoreModule,
     StoresModule,
     UtilsModule,

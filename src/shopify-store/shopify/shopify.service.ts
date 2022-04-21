@@ -367,4 +367,61 @@ export class ShopifyService {
       Logger.error(err);
     }
   }
+
+  async AppSubscriptionCreate() {
+    try {
+      const client = await this.client(this.shop, this.accessToken);
+      const AppSubscriptionCreate = await client.query({
+        data: {
+          query: `mutation AppSubscriptionCreate($name: String!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL! ){
+            appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems) {
+              userErrors {
+                field
+                message
+              }
+              appSubscription {
+                id
+                lineItems {
+                  id
+                  plan {
+                    pricingDetails
+                    __typename
+                  }
+                }
+              }
+              confirmationUrl
+            }
+          }`,
+          variables: {
+            name: 'Groupshop Super Duper Usage Plan',
+            returnUrl: `${this.configService.get('FRONT')}/${
+              this.shop.split('.')[0]
+            }/overview`,
+            lineItems: [
+              {
+                plan: {
+                  appUsagePricingDetails: {
+                    terms: 'Groupshop Usage Charge Detail',
+                    cappedAmount: {
+                      amount: 20.0,
+                      currencyCode: 'USD',
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      });
+      console.log(
+        '🚀 ~  AppSubscriptionCreate',
+        JSON.stringify(AppSubscriptionCreate),
+      );
+      if (AppSubscriptionCreate.body['data']['appSubscriptionCreate'])
+        return AppSubscriptionCreate.body['data']['appSubscriptionCreate'];
+    } catch (err) {
+      console.log(err.message);
+      Logger.error(err, 'AppSubscriptionCreate');
+    }
+  }
 }

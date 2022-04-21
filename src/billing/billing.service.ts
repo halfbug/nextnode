@@ -152,4 +152,124 @@ export class BillingsService {
   async removeByShop(storeId: string) {
     return await this.billingRepository.delete({ storeId });
   }
+
+  async getBillingByDate(storeId: string, startDate: any, endDate: any) {
+  console.log("🚀 endDate", endDate)
+  console.log("🚀 startDate", startDate)
+  console.log("🚀 ~ storeId", storeId)
+//     const d = new Date('4/19/2022');
+// new Date(d.setDate(d.getDate() - 1));
+
+    const agg = [
+      {
+        '$match': {
+          storeId
+        }
+      }, {
+        '$match': {
+          'createdAt': {
+            '$gte': startDate , 
+            '$lte': endDate 
+          }
+        }
+      }, {
+        '$lookup': {
+          'from': 'store', 
+          'localField': 'storeId', 
+          'foreignField': 'id', 
+          'as': 'store'
+        }
+      }, {
+        '$unwind': {
+          'path': '$store'
+        }
+      }, {
+        '$project': {
+          'id': 1, 
+          'type': 1, 
+          'feeCharges': 1, 
+          'cashBack': 1, 
+          'groupShopId': 1, 
+          'storeId': 1, 
+          'revenue': 1, 
+          'createdAt': 1, 
+          'updatedAt': 1, 
+          'store': 1, 
+          'createdTodayGS': {
+            '$cond': {
+              'if': {
+                '$eq': [
+                  '$type', 1
+                ]
+              }, 
+              'then': '$groupShopId', 
+              'else': null
+            }
+          }
+        }
+      }, {
+        '$group': {
+          '_id': {
+            'year': {
+              '$year': '$createdAt'
+            }, 
+            'month': {
+              '$month': '$createdAt'
+            }, 
+            'date': {
+              '$dayOfMonth': '$createdAt'
+            }
+          }, 
+          'totalCashback': {
+            '$sum': '$cashBack'
+          }, 
+          'revenue': {
+            '$sum': '$revenue'
+          }, 
+          'amountFeeCharge': {
+            '$sum': '$feeCharges'
+          }, 
+          'plan': {
+            '$first': '$store.plan'
+          }, 
+          'uniqueGroupshop': {
+            '$addToSet': '$createdTodayGS'
+          }, 
+          'storeTotalGS': {
+            '$first': '$store.totalGroupShop'
+          }
+        }
+      }, {
+        '$addFields': {
+          'todaysGS': {
+            '$filter': {
+              'input': '$uniqueGroupshop', 
+              'as': 'd', 
+              'cond': {
+                '$ne': [
+                  '$$d', null
+                ]
+              }
+            }
+          }
+        }
+      }, {
+        '$project': {
+          'totalCashback': 1, 
+          'revenue': 1, 
+          'amountFeeCharge': 1, 
+          'plan': 1, 
+          'todaysTotalGS': {
+            '$size': '$todaysGS'
+          }, 
+          'storeTotalGS': 1
+        }
+      }
+    ];
+    // console.log("🚀 findMonthlyBilling ~ agg", agg)
+    const manager = getMongoManager();
+    const TotalRev = await manager.aggregate(Billing, agg).toArray();
+    console.log("🚀 get billing by date", TotalRev)
+    return TotalRev[0];
+  }
 }

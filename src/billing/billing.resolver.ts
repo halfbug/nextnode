@@ -63,4 +63,9 @@ export class BillingsResolver {
   removeBillings(@Args('id', { type: () => Int }) id: string) {
     return this.billingService.remove(id);
   }
+
+  @Mutation(() => [Billing], { name: 'BillingSubscription' })
+  getBillingSubs() {
+    return this.billingService.findAll();
+  }
 }
