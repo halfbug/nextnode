@@ -107,6 +107,11 @@ export class StoresService {
     return await this.findOneById(id);
   }
 
+  async updateField(criteria: any, updateLiteral: any) {
+    const manager = getMongoManager();
+    manager.updateOne(Store, criteria, { $set: updateLiteral });
+  }
+
   async updateResource(shop: string, resource: Resource) {
     // console.log('🚀 ~ ~ shop', shop);
     // console.log('🚀 ~ ~ resource', resource);

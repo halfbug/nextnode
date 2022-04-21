@@ -30,6 +30,17 @@ export class Resource {
   detail?: string;
 }
 
+// @InputType('SubscriptionInput')
+// @ObjectType('Subscription')
+// export class Subscription {
+//   @Field()
+//   id: string;
+//   @Field({ nullable: true })
+//   lineItems: any[];
+//   @Field({ nullable: true })
+//   detail?: string;
+// }
+
 @ObjectType('Store')
 export class Store {
   // @Field({ description: 'mongo entity id' })
@@ -84,4 +95,7 @@ export class Store {
 
   @Field(() => [Resource], { nullable: 'itemsAndList' })
   resources?: Resource[];
+
+  @Field(() => String, { nullable: true })
+  shopifySubscription?: Resource[];
 }

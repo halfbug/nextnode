@@ -397,6 +397,7 @@ export class ShopifyService {
             returnUrl: `${this.configService.get('FRONT')}/${
               this.shop.split('.')[0]
             }/overview`,
+            test: true,
             lineItems: [
               {
                 plan: {

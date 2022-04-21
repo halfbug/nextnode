@@ -9,10 +9,17 @@ import {
   Total,
   TotalRevenue,
 } from './dto/monthly-billing.input';
+import { AppSubscription } from './entities/app-subscription.input';
+import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
+import { StoresService } from 'src/stores/stores.service';
 
 @Resolver(() => Billing)
 export class BillingsResolver {
-  constructor(private readonly billingService: BillingsService) {}
+  constructor(
+    private readonly billingService: BillingsService,
+    private shopifyapi: ShopifyService,
+    private readonly storeService: StoresService,
+  ) {}
 
   @Mutation(() => Billing)
   createBillings(
@@ -74,8 +81,15 @@ export class BillingsResolver {
     return this.billingService.remove(id);
   }
 
-  @Mutation(() => [Billing], { name: 'BillingSubscription' })
-  getBillingSubs() {
-    return this.billingService.findAll();
+  @Mutation(() => AppSubscription, { name: 'billingSubscription' })
+  async getBillingSubs(
+    @Args('shop') shop: string,
+    @Args('accessToken') accessToken: string,
+  ) {
+    this.shopifyapi.shop = shop;
+    this.shopifyapi.accessToken = accessToken;
+    const subscription = await this.shopifyapi.AppSubscriptionCreate();
+    this.storeService.updateField({ shop }, { subscription });
+    return { redirectUrl: subscription['confirmationUrl']};
   }
 }

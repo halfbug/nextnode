@@ -53,4 +53,7 @@ export default class Store extends DefaultColumnsService {
 
   @Column({ nullable: true })
   resources?: Resource[];
+
+  @Column({ nullable: true })
+  subscription?: any[];
 }
