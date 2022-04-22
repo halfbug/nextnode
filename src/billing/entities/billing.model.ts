@@ -24,4 +24,7 @@ export default class Billing extends DefaultColumnsService {
 
   @Column()
   revenue?: number;
+
+  @Column({ default: false })
+  isPaid?: boolean;
 }

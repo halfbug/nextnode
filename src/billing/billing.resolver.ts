@@ -90,6 +90,7 @@ export class BillingsResolver {
     this.shopifyapi.accessToken = accessToken;
     const subscription = await this.shopifyapi.AppSubscriptionCreate();
     this.storeService.updateField({ shop }, { subscription });
-    return { redirectUrl: subscription['confirmationUrl'] };
+    return { redirectUrl: subscription['confirmationUrl']};
+
   }
 }

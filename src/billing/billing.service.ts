@@ -235,6 +235,9 @@ export class BillingsService {
           'uniqueGroupshop': {
             '$addToSet': '$createdTodayGS'
           }, 
+          'badgeIds':{
+            '$addToSet': '$id'
+          },
           'storeTotalGS': {
             '$first': '$store.totalGroupShop'
           }
@@ -262,7 +265,8 @@ export class BillingsService {
           'todaysTotalGS': {
             '$size': '$todaysGS'
           }, 
-          'storeTotalGS': 1
+          'storeTotalGS': 1,
+          'badgeIds':1,
         }
       }
     ];
@@ -271,5 +275,11 @@ export class BillingsService {
     const TotalRev = await manager.aggregate(Billing, agg).toArray();
     console.log("🚀 get billing by date", TotalRev)
     return TotalRev[0];
+  }
+
+  async bulkUpdate(billiingRecords: any) {
+    const manager = getMongoManager();
+
+    return await manager.bulkWrite(Billing, billiingRecords);
   }
 }

@@ -160,7 +160,7 @@ export class InventoryService {
           //     'products.id': 1,
           //     'products.title': 1,
           //     'products.totalVariants': 1,
-          //     'products.createdAtShopify': 1,
+          //     'productsf.createdAtShopify': 1,
           //     'products.publishedAt': 1,
           //     'products.featuredImage': 1,
           //     id: 1,

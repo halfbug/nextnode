@@ -373,8 +373,8 @@ export class ShopifyService {
       const client = await this.client(this.shop, this.accessToken);
       const AppSubscriptionCreate = await client.query({
         data: {
-          query: `mutation AppSubscriptionCreate($name: String!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL! ){
-            appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems) {
+          query: `mutation AppSubscriptionCreate($name: String!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL!, $test: Boolean, $trialDays:Int){
+            appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems, test:$test, trialDays:$trialDays) {
               userErrors {
                 field
                 message
@@ -398,13 +398,14 @@ export class ShopifyService {
               this.shop.split('.')[0]
             }/overview`,
             test: true,
+            trialDays: 30,
             lineItems: [
               {
                 plan: {
                   appUsagePricingDetails: {
                     terms: 'Groupshop Usage Charge Detail',
                     cappedAmount: {
-                      amount: 20.0,
+                      amount: 2000.0,
                       currencyCode: 'USD',
                     },
                   },
@@ -414,15 +415,51 @@ export class ShopifyService {
           },
         },
       });
-      console.log(
-        '🚀 ~  AppSubscriptionCreate',
-        JSON.stringify(AppSubscriptionCreate),
-      );
+      Logger.debug(AppSubscriptionCreate, 'Response-AppSubscriptionCreate');
       if (AppSubscriptionCreate.body['data']['appSubscriptionCreate'])
         return AppSubscriptionCreate.body['data']['appSubscriptionCreate'];
     } catch (err) {
-      console.log(err.message);
+      // console.log(err.message);
       Logger.error(err, 'AppSubscriptionCreate');
+    }
+  }
+
+  async appUsageRecordCreate(
+    subscriptionLineItemId: string,
+    amount: number,
+    description: string,
+  ) {
+    try {
+      const client = await this.client(this.shop, this.accessToken);
+      const AppUsageRecordCreate = await client.query({
+        data: {
+          query: `mutation appUsageRecordCreate($description: String!, $price: MoneyInput!, $subscriptionLineItemId: ID!) {
+            appUsageRecordCreate(description: $description, price: $price, subscriptionLineItemId: $subscriptionLineItemId) {
+              userErrors {
+                field
+                message
+              }
+              appUsageRecord {
+                id
+              }
+            }
+          }`,
+          variables: {
+            subscriptionLineItemId,
+            price: {
+              amount,
+              currencyCode: 'USD',
+            },
+            description,
+          },
+        },
+      });
+      Logger.debug(AppUsageRecordCreate, 'Response-AppUsageRecordCreate');
+      if (AppUsageRecordCreate.body['data']['appUsageRecordCreate'])
+        return AppUsageRecordCreate.body['data']['appUsageRecordCreate'];
+    } catch (err) {
+      // console.log(err.message);
+      Logger.error(err, 'AppUsageRecordCreate');
     }
   }
 }

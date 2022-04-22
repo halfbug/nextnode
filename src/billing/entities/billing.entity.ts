@@ -30,4 +30,7 @@ export class Billing {
 
   @Field()
   revenue?: number;
+
+  @Field({ defaultValue: false })
+  isPaid?: boolean;
 }
