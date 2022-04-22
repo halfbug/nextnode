@@ -8,6 +8,9 @@ export class MonthYearType {
 
   @Field()
   month?: number;
+
+  @Field({ nullable: true })
+  date?: number;
 }
 @ObjectType()
 export class MonthlyBillingInput {
