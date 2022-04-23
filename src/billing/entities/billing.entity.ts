@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
+import { BillingPlanEnum } from 'src/stores/entities/store.entity';
 
 export enum BillingTypeEnum {
   ON_CASHBACK,
@@ -19,8 +20,11 @@ export class Billing {
   @Field()
   feeCharges: number;
 
-  @Field()
+  @Field({ nullable: true })
   cashBack: number;
+
+  @Field({ nullable: true })
+  plan: BillingPlanEnum;
 
   @Field()
   groupShopId: string;

@@ -10,6 +10,7 @@ import { AnyScalar } from 'src/utils/any.scalarType';
 import { AddResourceListener } from './listeners/add-resource.listener';
 import { AddResourceEvent } from './events/add-resource.event';
 import { StoreSavedEvent } from './events/store-saved.event';
+import { StorePlanUpdatedEvent } from './events/plan-updated.event';
 
 @Module({
   imports: [
@@ -25,7 +26,13 @@ import { StoreSavedEvent } from './events/store-saved.event';
     AddResourceListener,
     AddResourceEvent,
     StoreSavedEvent,
+    StorePlanUpdatedEvent,
   ],
-  exports: [StoresService, AddResourceEvent, StoreSavedEvent],
+  exports: [
+    StoresService,
+    AddResourceEvent,
+    StoreSavedEvent,
+    StorePlanUpdatedEvent,
+  ],
 })
 export class StoresModule {}

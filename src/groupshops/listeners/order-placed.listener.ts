@@ -160,7 +160,7 @@ export class OrderPlacedListener {
     cashBackEvent.cashbackAmount = shopifyAmount;
     cashBackEvent.cashbackCharge = cashBackUsageChargeAmount;
     cashBackEvent.groupshop = this.groupshop;
-    cashBackEvent.revenue = refundAmount;
+    cashBackEvent.revenue = revenuePrice;
     cashBackEvent.orderId = member.orderId;
     cashBackEvent.netDiscount = netDiscount;
     cashBackEvent.store = this.store;
@@ -350,8 +350,8 @@ export class OrderPlacedListener {
         const groupShopCreated = new GroupShopCreated();
         groupShopCreated.groupshop = savedGs;
         groupShopCreated.store = event.store;
+        groupShopCreated.revenue = this.totalRevenue(lineItems, 0);
         this.eventEmitter.emit('groupshop.created', groupShopCreated);
-      }
     }
   }
 }

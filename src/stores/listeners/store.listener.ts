@@ -9,13 +9,14 @@ import {
   GS_PLAN3_END_COUNT,
 } from 'src/utils/constant';
 import { BillingPlanEnum } from '../entities/store.entity';
+import { StorePlanUpdatedEvent } from '../events/plan-updated.event';
 // import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { StoresService } from '../stores.service';
 
 @Injectable()
 export class StoreListener {
   constructor(
-    private eventEmitter: EventEmitter2,
+    private planUpdateEvent: StorePlanUpdatedEvent,
     // private gsService: GroupshopsService,
     private storeService: StoresService,
   ) {}
@@ -54,5 +55,10 @@ export class StoreListener {
       '🚀 ~ file: store.listener.ts ~ line 32 ~ StoreListener ~ updateStore ~ updatedStore',
       updatedStore,
     );
+
+    this.planUpdateEvent.store = event.store;
+    this.planUpdateEvent.groupshop = event.groupshop;
+    this.planUpdateEvent.revenue = event.revenue;
+    this.planUpdateEvent.emit();
   }
 }

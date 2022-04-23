@@ -1,4 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
+import { BillingPlanEnum } from 'src/stores/entities/store.entity';
 import { BillingTypeEnum } from '../entities/billing.entity';
 
 @InputType()
@@ -9,8 +10,11 @@ export class CreateBillingInput {
   @Field()
   feeCharges: number;
 
-  @Field()
-  cashBack: number;
+  @Field({ nullable: true })
+  cashBack?: number;
+
+  @Field({ nullable: true })
+  plan?: BillingPlanEnum;
 
   @Field()
   groupShopId: string;
@@ -20,4 +24,7 @@ export class CreateBillingInput {
 
   @Field()
   revenue?: number;
+
+  @Field({ defaultValue: false })
+  isPaid?: boolean;
 }

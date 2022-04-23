@@ -11,3 +11,10 @@ export const GS_PLAN2_END_COUNT = 1000;
 export const GS_PLAN3_START_COUNT = 1001;
 export const GS_PLAN3_END_COUNT = 2500;
 export const GS_PLAN4_START_COUNT = 2501;
+
+export const GS_FEES = [
+  0,
+  GS_CHARGE_FEE_GROWTH,
+  GS_CHARGE_FEE_GROWTH,
+  GS_CHARGE_FEE_UNICORN,
+];

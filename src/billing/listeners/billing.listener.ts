@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { GS_CHARGE_CASHBACK } from 'src/utils/constant';
+import { StorePlanUpdatedEvent } from 'src/stores/events/plan-updated.event';
+import { GS_CHARGE_CASHBACK, GS_FEES } from 'src/utils/constant';
 // import { EventEmitter2 } from '@nestjs/event-emitter';
 import { GroupShopCreated } from '../../groupshops/events/groupshop-created.event';
 import { BillingsService } from '../billing.service';
@@ -18,9 +19,9 @@ export class BillingListener {
     private billingService: BillingsService,
   ) {}
 
-  @OnEvent('groupshop.created')
-  async createBilling(event: GroupShopCreated) {
-    const { id: storeId, plan, totalGroupShop } = event.store;
+  @OnEvent('plan.updated')
+  async createBilling(event: StorePlanUpdatedEvent) {
+    const { id: storeId, plan } = event.store;
     const { id, members } = event.groupshop;
     console.log(
       '🚀 ~ file: billing.listener.ts ~ line 28 ~ BillingListener ~ createBilling ~ members',
@@ -28,9 +29,9 @@ export class BillingListener {
     );
     const payload: CreateBillingInput = {
       type: BillingTypeEnum.ON_GS_CREATION,
-      cashBack: 0,
-      feeCharges: 0,
-      revenue: 0,
+      plan,
+      feeCharges: GS_FEES[plan],
+      revenue: event.revenue,
       groupShopId: id,
       storeId,
     };
