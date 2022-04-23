@@ -283,9 +283,5 @@ export class BillingsService {
     return await manager.bulkWrite(Billing, billiingRecords);
   }
 
-  async bulkUpdate(billiingRecords: any) {
-    const manager = getMongoManager();
-
-    return await manager.bulkWrite(Billing, billiingRecords);
-  }
+  
 }

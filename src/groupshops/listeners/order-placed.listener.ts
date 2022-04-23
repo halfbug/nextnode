@@ -352,6 +352,7 @@ export class OrderPlacedListener {
         groupShopCreated.store = event.store;
         groupShopCreated.revenue = this.totalRevenue(lineItems, 0);
         this.eventEmitter.emit('groupshop.created', groupShopCreated);
+      }
     }
   }
 }

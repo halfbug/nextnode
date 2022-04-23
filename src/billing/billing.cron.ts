@@ -39,11 +39,11 @@ export class BillingUsageCargeCron {
         this.shopifyapi.accessToken = store.accessToken;
         const { body: shopifyRes } = await this.shopifyapi.appUsageRecordCreate(
           store.subscription?.['appSubscription']['lineItems'][0]['id'],
-          useageQuery.amountFeeCharge,
+          useageQuery['amountFeeCharge'],
           'groupshop free charge',
         );
         if (shopifyRes['appUsageRecordCreate']['appUsageRecord']) {
-          const billingUpdateRec = useageQuery.badgeIds.map((billingId) => {
+          const billingUpdateRec = useageQuery['badgeIds'].map((billingId) => {
             return {
               updateOne: {
                 filter: { id: billingId },
