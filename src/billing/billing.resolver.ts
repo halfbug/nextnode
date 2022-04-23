@@ -57,13 +57,19 @@ export class BillingsResolver {
     return this.billingService.findTotalGSMonthly(storeId);
   }
 
-  @Query(() => SingleDayBillingInput, { name: 'getBillingByDate' })
-  getBillingByDate(
+  @Query(() => [SingleDayBillingInput], { name: 'getBillingByDate' })
+  async getBillingByDate(
     @Args('storeId') storeId: string,
     @Args('startDate', { type: () => Date }) startDate: Date,
     @Args('endDate', { type: () => Date }) endDate: Date,
   ) {
-    return this.billingService.getBillingByDate(storeId, startDate, endDate);
+    const result = await this.billingService.getBillingByDate(
+      storeId,
+      startDate,
+      endDate,
+    );
+    console.log('🚀 getBillingByDate result', result);
+    return result;
   }
 
   @Mutation(() => Billing)

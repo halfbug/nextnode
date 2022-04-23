@@ -154,11 +154,11 @@ export class BillingsService {
   }
 
   async getBillingByDate(storeId: string, startDate: any, endDate: any) {
-  console.log("🚀 endDate", endDate)
-  console.log("🚀 startDate", startDate)
-  console.log("🚀 ~ storeId", storeId)
-//     const d = new Date('4/19/2022');
-// new Date(d.setDate(d.getDate() - 1));
+//   console.log("🚀 endDate", endDate)
+//   console.log("🚀 startDate", startDate)
+//   console.log("🚀 ~ storeId", storeId)
+// //     const d = new Date('4/19/2022');
+// // new Date(d.setDate(d.getDate() - 1));
 
     const agg = [
       {
@@ -273,8 +273,8 @@ export class BillingsService {
     // console.log("🚀 findMonthlyBilling ~ agg", agg)
     const manager = getMongoManager();
     const TotalRev = await manager.aggregate(Billing, agg).toArray();
-    console.log("🚀 get billing by date", TotalRev)
-    return TotalRev[0];
+    // console.log("🚀 get billing by date", TotalRev)
+    return TotalRev;
   }
 
   async bulkUpdate(billiingRecords: any) {

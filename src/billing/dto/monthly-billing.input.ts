@@ -3,10 +3,10 @@ import { BillingPlanEnum } from 'src/stores/entities/store.entity';
 
 @ObjectType()
 export class MonthYearType {
-  @Field()
+  @Field({ nullable: true })
   year?: number;
 
-  @Field()
+  @Field({ nullable: true })
   month?: number;
 
   @Field({ nullable: true })
@@ -47,24 +47,24 @@ export class Total {
 }
 @ObjectType()
 export class SingleDayBillingInput {
-  @Field()
+  @Field({ nullable: true })
   _id?: MonthYearType;
 
-  @Field()
+  @Field({ nullable: true })
   totalCashback?: number;
 
-  @Field()
+  @Field({ nullable: true })
   revenue?: number;
 
-  @Field()
+  @Field({ nullable: true })
   amountFeeCharge?: number;
 
-  @Field(() => BillingPlanEnum)
+  @Field(() => BillingPlanEnum, { nullable: true })
   plan?: BillingPlanEnum;
 
-  @Field()
+  @Field({ nullable: true })
   storeTotalGS?: number;
 
-  @Field()
+  @Field({ nullable: true })
   todaysTotalGS?: number;
 }
