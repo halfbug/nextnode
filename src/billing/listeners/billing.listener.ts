@@ -20,7 +20,7 @@ export class BillingListener {
   ) {}
 
   @OnEvent('plan.updated')
-  async createBilling(event: StorePlanUpdatedEvent) {
+  async createBillingRecord(event: StorePlanUpdatedEvent) {
     const { id: storeId, plan } = event.store;
     const { id, members } = event.groupshop;
     console.log(

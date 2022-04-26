@@ -168,8 +168,8 @@ export class BillingsService {
       }, {
         '$match': {
           'createdAt': {
-            '$gte': new Date('Fri, 01 Apr 2022 19:00:00 GMT'), 
-            '$lte': new Date('Mon, 25 Apr 2022 23:59:00 GMT')
+            '$gte': startDate, //new Date('Fri, 01 Apr 2022 19:00:00 GMT'), 
+            '$lte': endDate, //new Date('Mon, 25 Apr 2022 23:59:00 GMT')
           }
         }
       }, {

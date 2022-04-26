@@ -95,7 +95,13 @@ export class BillingsResolver {
     this.shopifyapi.shop = shop;
     this.shopifyapi.accessToken = accessToken;
     const subscription = await this.shopifyapi.AppSubscriptionCreate();
-    this.storeService.updateField({ shop }, { subscription });
+    this.storeService.updateField(
+      { shop },
+      {
+        subscription,
+        appTrialEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      },
+    );
     return { redirectUrl: subscription['confirmationUrl'] };
   }
 }

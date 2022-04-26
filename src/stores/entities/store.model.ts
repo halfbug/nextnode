@@ -56,4 +56,7 @@ export default class Store extends DefaultColumnsService {
 
   @Column({ nullable: true })
   subscription?: any[];
+
+  @Column({ nullable: true })
+  appTrialEnd: Date;
 }
