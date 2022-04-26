@@ -31,7 +31,7 @@ export class BillingListener {
       type: BillingTypeEnum.ON_GS_CREATION,
       plan,
       feeCharges: GS_FEES[plan],
-      revenue: event.revenue,
+      revenue: 0,
       groupShopId: id,
       storeId,
     };

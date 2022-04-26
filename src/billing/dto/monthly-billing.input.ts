@@ -46,6 +46,17 @@ export class Total {
   count?: number;
 }
 @ObjectType()
+export class FeeFromGS {
+  @Field(() => BillingPlanEnum, { nullable: true })
+  plan?: BillingPlanEnum;
+
+  @Field({ nullable: true })
+  totalGS?: number;
+
+  @Field({ nullable: true })
+  totalCharged?: number;
+}
+@ObjectType()
 export class SingleDayBillingInput {
   @Field({ nullable: true })
   _id?: MonthYearType;
@@ -57,14 +68,20 @@ export class SingleDayBillingInput {
   revenue?: number;
 
   @Field({ nullable: true })
-  amountFeeCharge?: number;
+  totalfeeByCashback?: number;
 
   @Field(() => BillingPlanEnum, { nullable: true })
-  plan?: BillingPlanEnum;
+  storePlan?: BillingPlanEnum;
 
   @Field({ nullable: true })
   storeTotalGS?: number;
 
   @Field({ nullable: true })
   todaysTotalGS?: number;
+
+  @Field(() => [FeeFromGS], { nullable: true })
+  feeformGroupshop?: FeeFromGS;
+
+  @Field({ nullable: true })
+  totalfeeByGS?: number;
 }

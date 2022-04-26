@@ -163,13 +163,13 @@ export class BillingsService {
     const agg = [
       {
         '$match': {
-          storeId
+          'storeId': storeId,
         }
       }, {
         '$match': {
           'createdAt': {
-            '$gte': startDate , 
-            '$lte': endDate 
+            '$gte': new Date('Fri, 01 Apr 2022 19:00:00 GMT'), 
+            '$lte': new Date('Mon, 25 Apr 2022 23:59:00 GMT')
           }
         }
       }, {
@@ -195,6 +195,7 @@ export class BillingsService {
           'createdAt': 1, 
           'updatedAt': 1, 
           'store': 1, 
+          'plan': 1, 
           'createdTodayGS': {
             '$cond': {
               'if': {
@@ -204,6 +205,28 @@ export class BillingsService {
               }, 
               'then': '$groupShopId', 
               'else': null
+            }
+          }, 
+          'feeByGS': {
+            '$cond': {
+              'if': {
+                '$eq': [
+                  '$type', 1
+                ]
+              }, 
+              'then': '$feeCharges', 
+              'else': 0
+            }
+          }, 
+          'feeByCashback': {
+            '$cond': {
+              'if': {
+                '$eq': [
+                  '$type', 0
+                ]
+              }, 
+              'then': '$feeCharges', 
+              'else': 0
             }
           }
         }
@@ -226,18 +249,35 @@ export class BillingsService {
           'revenue': {
             '$sum': '$revenue'
           }, 
-          'amountFeeCharge': {
-            '$sum': '$feeCharges'
+          'totalfeeByGS': {
+            '$sum': '$feeByGS'
           }, 
-          'plan': {
+          'totalfeeByCashback': {
+            '$sum': '$feeByCashback'
+          }, 
+          'storePlan': {
             '$first': '$store.plan'
+          }, 
+          'feeplan': {
+            '$push': {
+              '_id': '$id', 
+              'plan': '$plan', 
+              'fee': '$feeCharges', 
+              'type': '$type'
+            }
+          }, 
+          'uniquePlan': {
+            '$addToSet': '$plan'
           }, 
           'uniqueGroupshop': {
             '$addToSet': '$createdTodayGS'
           }, 
-          'badgeIds':{
+          'badgeIds': {
             '$addToSet': '$id'
-          },
+          }, 
+          'store': {
+            '$first': '$storeId'
+          }, 
           'storeTotalGS': {
             '$first': '$store.totalGroupShop'
           }
@@ -260,13 +300,62 @@ export class BillingsService {
         '$project': {
           'totalCashback': 1, 
           'revenue': 1, 
-          'amountFeeCharge': 1, 
-          'plan': 1, 
+          'uctotalfeeByCashback': 1, 
+          'storePlan': 1,
+          'totalfeeByCashback': 1,
+          'totalfeeByGS': 1,
           'todaysTotalGS': {
             '$size': '$todaysGS'
           }, 
-          'storeTotalGS': 1,
-          'badgeIds':1,
+          'storeTotalGS': 1, 
+          'badgeIds': 1, 
+          'feeformGroupshop': {
+            '$map': {
+              'input': '$uniquePlan', 
+              'as': 'plans', 
+              'in': {
+                '$mergeObjects': [
+                  {
+                    'plan': '$$plans'
+                  }, {
+                    'totalGS': {
+                      '$size': {
+                        '$filter': {
+                          'input': '$feeplan', 
+                          'cond': {
+                            '$eq': [
+                              '$$this.plan', '$$plans'
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }, {
+                    'totalCharged': {
+                      '$reduce': {
+                        'input': {
+                          '$filter': {
+                            'input': '$feeplan', 
+                            'cond': {
+                              '$eq': [
+                                '$$this.plan', '$$plans'
+                              ]
+                            }
+                          }
+                        }, 
+                        'initialValue': 0, 
+                        'in': {
+                          '$add': [
+                            '$$value', '$$this.fee'
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
         }
       }
     ];
