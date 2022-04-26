@@ -12,7 +12,7 @@ export class BillingUsageCargeCron {
     private readonly storesService: StoresService,
     private shopifyapi: ShopifyService,
   ) {}
-  @Cron(CronExpression.EVERY_30_SECONDS) // EVERY_DAY_AT_11AM)
+  @Cron(CronExpression.EVERY_DAY_AT_11AM) // EVERY_DAY_AT_11AM)
   async handleBillingCron() {
     // this.logger.error('Called every 30 seconds');
     this.logger.debug(`Started At : ${new Date()}`);
