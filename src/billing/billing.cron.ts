@@ -43,28 +43,35 @@ export class BillingUsageCargeCron {
         Logger.debug(useageQuery['totalfeeByGS'], 'totalfeeByGS');
         Logger.debug(totalCharge, 'total charge');
 
-        this.shopifyapi.shop = store.shop;
-        this.shopifyapi.accessToken = store.accessToken;
-        const { body: shopifyRes } = await this.shopifyapi.appUsageRecordCreate(
-          store.subscription?.['appSubscription']['lineItems'][0]['id'],
+        const usageCharge =
           Date.now() < store.appTrialEnd.getTime()
             ? useageQuery['totalfeeByCashback']
-            : totalCharge,
-          'groupshop free charge',
-        );
-        if (shopifyRes['appUsageRecordCreate']['appUsageRecord']) {
-          const billingUpdateRec = useageQuery['badgeIds'].map(
-            (billingId: string) => {
-              return {
-                updateOne: {
-                  filter: { id: billingId },
-                  update: { $set: { isPaid: true } },
-                },
-              };
-            },
-          );
+            : totalCharge;
 
-          this.billingService.bulkUpdate(billingUpdateRec);
+        if (usageCharge > 0) {
+          this.shopifyapi.shop = store.shop;
+          this.shopifyapi.accessToken = store.accessToken;
+          const { body: shopifyRes } =
+            await this.shopifyapi.appUsageRecordCreate(
+              store.subscription?.['appSubscription']['lineItems'][0]['id'],
+              usageCharge,
+              'groupshop free charge',
+            );
+
+          if (shopifyRes['appUsageRecordCreate']['appUsageRecord']) {
+            const billingUpdateRec = useageQuery['badgeIds'].map(
+              (billingId: string) => {
+                return {
+                  updateOne: {
+                    filter: { id: billingId },
+                    update: { $set: { isPaid: true } },
+                  },
+                };
+              },
+            );
+
+            this.billingService.bulkUpdate(billingUpdateRec);
+          }
         }
       }
     });
