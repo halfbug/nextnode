@@ -397,7 +397,8 @@ export class ShopifyService {
             returnUrl: `${this.configService.get('FRONT')}/${
               this.shop.split('.')[0]
             }/overview`,
-            test: !this.configService.get('BILLING_LIVE'),
+            test:
+              this.configService.get('BILLING_LIVE') === 'true' ? false : true,
             trialDays: 30,
             lineItems: [
               {

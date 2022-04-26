@@ -109,4 +109,9 @@ export class ShopifyStoreController {
     HOST: ${process.env.HOST}
     FRONT: ${process.env.FRONT}`;
   }
+
+  @Get('type')
+  async tesstme() {
+    return typeof this.configService.get('BILLING_LIVE');
+  }
 }
