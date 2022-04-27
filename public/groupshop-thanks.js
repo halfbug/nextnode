@@ -530,7 +530,7 @@ async function init() {
     }
     document.querySelectorAll('#gscashback').forEach((elem) => {
       console.log(elem);
-      elem.innerHTML = `$${cashback.toFixed(2).toString().replace('.00', '')}`;
+      elem.innerHTML = `$${Math.floor(cashback).toString().replace('.00', '')}`;
     });
     window.GSURL = window.FURL + url;
     document.querySelector(
