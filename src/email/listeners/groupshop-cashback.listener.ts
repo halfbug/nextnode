@@ -30,6 +30,7 @@ export class GroupshopCashbackListener {
     let orderline_items = [];
     //console.log('resData1111 : ' + JSON.stringify(res));
     const dealUrl = res.groupshop.url;
+    const shortLink = res.groupshop.shortUrl;
     const discountOne =
       res.store.activeCampaign.salesTarget.rewards[0].discount.replace('%', '');
     const discountTwo =
@@ -173,6 +174,7 @@ export class GroupshopCashbackListener {
       total_price: totalPrice,
       total_sale_price: orderData[0].price,
       dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
+      shortUrl: shortLink,
     };
 
     const body = JSON.stringify({

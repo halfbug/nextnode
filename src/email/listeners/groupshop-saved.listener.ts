@@ -169,6 +169,7 @@ export class GroupshopSavedListener {
       console.log('groupshop saved listener received');
       const campaigns_products = res.data.store.activeCampaign.products;
       const currentDiscount = res.groupdeal.discountCode.percentage;
+      const shortLink = res.groupdeal.shortUrl;
       const dealUrl = res.groupdeal.url;
       const maxDiscount = Math.floor((50 / 100) * order_price);
       let campaigns_line_items = [];
@@ -218,6 +219,7 @@ export class GroupshopSavedListener {
         customerName: custName,
         customerEmail: customerEmail,
         dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
+        shortUrl: shortLink,
         created_at: orderDate,
         order_number: res.data.order.name,
         total_price: order_price,
@@ -246,6 +248,7 @@ export class GroupshopSavedListener {
     } else {
       console.log('groupshop referrer listener received');
       const dealUrl = res.ugroupshop.url;
+      const shortLink = res.ugroupshop.shortUrl;
 
       const rdata = {
         logoImage: brandLogo,
@@ -256,6 +259,7 @@ export class GroupshopSavedListener {
         customerName: custName,
         customerEmail: customerEmail,
         dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
+        shortUrl: shortLink,
         created_at: orderDate,
         order_number: res.data.order.name,
         total_price: sumTotalPrice,

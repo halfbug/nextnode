@@ -183,6 +183,7 @@ export class CatController {
           imgPath[4],
         );
         const dealUrl = groupshop.url;
+        const shortLink = groupshop.shortUrl;
         const mdata = {
           customerEmail: customerEmail,
           customerName: custName,
@@ -195,6 +196,7 @@ export class CatController {
           currencyCode: currencySymbol,
           order_number: groupshop.orders[0].name,
           dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
+          shortUrl: shortLink,
           campaignsLineItems: campaigns_line_items,
           orderLineItems: order_line_items,
         };
@@ -231,6 +233,8 @@ export class CatController {
 
   @Get('campaign-insert')
   async campaignInsert() {
-    console.log('yes');
+    const link = 'http://localhost:3000/native-roots-dev/deal/R1M1OTgxMjcwOQ==';
+    const short = await this.kalavioService.generateShortLink(link);
+    return { short };
   }
 }

@@ -107,6 +107,9 @@ export class CreateGroupshopInput {
   url: string;
 
   @Field()
+  shortUrl?: string;
+
+  @Field()
   createdAt: Date;
 
   @Field()

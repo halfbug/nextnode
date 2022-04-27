@@ -22,9 +22,13 @@ export class GroupshopsService {
     private shopifyapi: ShopifyService,
   ) {}
   async create(createGroupshopInput: CreateGroupshopInput) {
+    console.log(
+      'createGroupshopInput : ' + JSON.stringify(createGroupshopInput),
+    );
     const groupshop = this.groupshopRepository.create(createGroupshopInput);
     groupshop.dealProducts = [new DealProductsInput()];
     groupshop.id = uuid();
+    groupshop.shortUrl = createGroupshopInput.shortUrl;
     groupshop.dealProducts = createGroupshopInput.dealProducts;
     groupshop.members = [new MemberInput()];
     groupshop.members = createGroupshopInput.members;

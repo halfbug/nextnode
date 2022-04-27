@@ -16,6 +16,7 @@ import { UploadImageModule } from 'src/shopify-store/ImageUpload/uploadimage.mod
     GroupshopCashbackListener,
     KalavioService,
   ],
+  exports: [KalavioService],
   controllers: [CatController],
 })
 export class EmailModule {}

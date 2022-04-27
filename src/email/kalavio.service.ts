@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { getMongoManager, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Groupshops } from 'src/groupshops/entities/groupshop.modal';
+import { lastValueFrom, map } from 'rxjs';
 
 @Injectable()
 export class KalavioService {
@@ -22,6 +23,35 @@ export class KalavioService {
     this.httpService.post(urlKlaviyo, body, options).subscribe(async (res) => {
       //console.log(res);
     });
+  }
+
+  async generateShortLink(link: string) {
+    const URL = '/links/public';
+    const apiUrl = `${this.configService.get('SHORT_LINK_BASE_URL')}${URL}`;
+    const options = {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: this.configService.get('SHORT_LINK_PUBLIC_KEY'),
+      },
+    };
+    const body = JSON.stringify({
+      allowDuplicates: true,
+      domain: 'grp.deals',
+      originalURL: link,
+      title: 'GroupShop',
+    });
+
+    const res = await lastValueFrom(
+      this.httpService.post(apiUrl, body, options).pipe(map((res) => res.data)),
+    );
+    console.log(
+      '🚀 ~ file: kalavio.service.ts ~ line 52 ~ KalavioService ~ generateShortLink ~ data',
+      res,
+    );
+
+    console.log('shortUrl : ' + res);
+    return res?.shortURL ?? link;
   }
 
   async getGroupdealByDate(date: string) {

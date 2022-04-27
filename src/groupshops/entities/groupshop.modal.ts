@@ -99,6 +99,9 @@ export class Groupshops extends DefaultColumnsService {
   @Column()
   url: string;
 
+  @Column()
+  shortUrl?: string;
+
   // @Column()
   // createdAt: string;
 
