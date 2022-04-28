@@ -128,4 +128,7 @@ export class Product {
 
   @Field({ nullable: true })
   outofstock?: boolean;
+
+  @Field({ nullable: true })
+  purchaseCount?: number;
 }
