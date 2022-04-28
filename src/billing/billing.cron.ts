@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
+import { BillingPlanEnum } from 'src/stores/entities/store.entity';
 import { StoresService } from 'src/stores/stores.service';
 import { BillingsService } from './billing.service';
 
@@ -12,6 +13,23 @@ export class BillingUsageCargeCron {
     private readonly storesService: StoresService,
     private shopifyapi: ShopifyService,
   ) {}
+
+  usageDescripton(plan: BillingPlanEnum, cashback, gscharge, totalCharge) {
+    switch (plan) {
+      case BillingPlanEnum.EXPLORE:
+        return `Explore (free for 30 days) + Cashback charge - $${cashback}`;
+
+      case BillingPlanEnum.LAUNCH:
+        return `Launch (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
+
+      case BillingPlanEnum.GROWTH:
+        return `Growth (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
+
+      case BillingPlanEnum.ENTERPRISE:
+        return `Unicorn  (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
+    }
+  }
+
   @Cron(CronExpression.EVERY_DAY_AT_11AM) // EVERY_DAY_AT_11AM)
   async handleBillingCron() {
     // this.logger.error('Called every 30 seconds');
@@ -55,7 +73,12 @@ export class BillingUsageCargeCron {
             await this.shopifyapi.appUsageRecordCreate(
               store.subscription?.['appSubscription']['lineItems'][0]['id'],
               usageCharge,
-              'groupshop free charge',
+              this.usageDescripton(
+                store.plan,
+                useageQuery['totalfeeByCashback'],
+                useageQuery['totalfeeByGS'],
+                totalCharge,
+              ),
             );
 
           if (shopifyRes['appUsageRecordCreate']['appUsageRecord']) {
