@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CampaignsService } from './campaigns.service';
 import { CampaignsResolver } from './campaigns.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,7 +13,7 @@ import { StoresModule } from 'src/stores/stores.module';
     TypeOrmModule.forFeature([Campaign]),
     DefaultColumnsService,
     InventoryModule,
-    StoresModule,
+    forwardRef(() => StoresModule),
   ],
   providers: [CampaignsResolver, CampaignsService],
   exports: [CampaignsService],

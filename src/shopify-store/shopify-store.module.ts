@@ -28,7 +28,7 @@ import { StoreSavedListener } from './listeners/store-saved.listener';
     ConfigModule,
     HttpModule,
     TypeOrmModule.forFeature([Store]),
-    StoresModule,
+    forwardRef(() => StoresModule),
     InventoryModule,
     CampaignsModule,
     forwardRef(() => GroupshopsModule),

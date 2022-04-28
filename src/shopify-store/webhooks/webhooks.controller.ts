@@ -16,6 +16,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderPlacedEvent } from '../events/order-placed.envent';
 import { ShopifyService } from '../shopify/shopify.service';
 import Orders from 'src/inventory/entities/orders.modal';
+import { UninstallService } from 'src/stores/uninstall.service';
+
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -26,6 +28,7 @@ export class WebhooksController {
     private orderService: OrdersService,
     private eventEmitter: EventEmitter2,
     private configSevice: ConfigService,
+    private uninstallSerivice: UninstallService,
   ) {}
 
   @Get('register')
@@ -140,15 +143,20 @@ export class WebhooksController {
   @Post('uninstalled?')
   async uninstalledApp(@Req() req, @Res() res) {
     const { shop } = req.query;
+    console.log(
+      '🚀 ~ file: webhooks.controller.ts ~ line 143 ~ WebhooksController ~ uninstalledApp ~ shop',
+      shop,
+    );
     const webdata = req.body;
     console.log(
       'WebhooksController ~ uninstalledApp ~ web hook data',
       JSON.stringify(webdata),
     );
-    const storeInfo = await this.storesService.findOneByName(shop);
-    const updateStore = new UpdateStoreInput();
-    updateStore.status = 'Unistalled';
-    await this.storesService.update(storeInfo.id, updateStore);
+    this.uninstallSerivice.deleteStoreByName(shop);
+    // const storeInfo = await this.storesService.findOneByName(shop);
+    // const updateStore = new UpdateStoreInput();
+    // updateStore.status = 'Unistalled';
+    // await this.storesService.update(storeInfo.id, updateStore);
     res.send('store updated..');
   }
 

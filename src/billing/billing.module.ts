@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { BillingsService } from './billing.service';
 import { BillingsResolver } from './billing.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,7 +12,7 @@ import { BillingUsageCargeCron } from './billing.cron';
   imports: [
     TypeOrmModule.forFeature([Billing]),
     DefaultColumnsService,
-    StoresModule,
+    forwardRef(() => StoresModule),
   ],
   providers: [
     BillingsResolver,
