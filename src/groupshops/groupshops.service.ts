@@ -153,7 +153,7 @@ export class GroupshopsService {
     const manager = getMongoManager();
     const gs = await manager.aggregate(Orders, agg).toArray();
     // console.log('🚀 ~ find qr deal link', gs);
-    return gs[0].groupshops[0];
+    return gs[0]?.groupshops[0];
   }
 
   async findOne(discountCode: string) {
