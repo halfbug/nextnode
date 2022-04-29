@@ -101,4 +101,10 @@ export class Store {
 
   @Field()
   appTrialEnd: Date;
+
+  @Field({ nullable: true })
+  currencyCode: string;
+
+  @Field({ nullable: true })
+  timezone: string;
 }

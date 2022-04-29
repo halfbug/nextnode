@@ -7,12 +7,14 @@ import { DefaultColumnsService } from 'src/utils/default-columns/default-columns
 import { StoresModule } from 'src/stores/stores.module';
 import { BillingListener } from './listeners/billing.listener';
 import { BillingUsageCargeCron } from './billing.cron';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Billing]),
     DefaultColumnsService,
     forwardRef(() => StoresModule),
+    HttpModule,
   ],
   providers: [
     BillingsResolver,

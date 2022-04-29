@@ -463,4 +463,27 @@ export class ShopifyService {
       Logger.error(err, 'AppUsageRecordCreate');
     }
   }
+
+  async storeDetail() {
+    try {
+      const client = await this.client(this.shop, this.accessToken);
+      const sdetail = await client.query({
+        data: {
+          query: `{
+            shop{
+              name,
+              ianaTimezone,
+              currencyCode,
+                  
+            }
+          }`,
+        },
+      });
+      Logger.debug(sdetail, ShopifyService.name);
+      return sdetail;
+    } catch (err) {
+      console.log(err.message);
+      Logger.error(err);
+    }
+  }
 }

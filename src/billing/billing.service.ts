@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getMongoManager, Repository } from 'typeorm';
 import { CreateBillingInput } from './dto/create-billing.input';
@@ -8,6 +8,10 @@ import { v4 as uuid } from 'uuid';
 import Billing from './entities/billing.model';
 import { StoresService } from 'src/stores/stores.service';
 import { Groupshops } from 'src/groupshops/entities/groupshop.modal';
+import { HttpService } from '@nestjs/axios';
+import { lastValueFrom, map } from 'rxjs';
+import { ConfigService } from '@nestjs/config';
+
 
 @Injectable()
 export class BillingsService {
@@ -15,6 +19,8 @@ export class BillingsService {
     @InjectRepository(Billing)
     private billingRepository: Repository<Billing>,
     private readonly sotresService: StoresService,
+    private httpService: HttpService,
+    private configService: ConfigService,
   ) {}
 
   async create(createBillingInput: CreateBillingInput) {
@@ -372,5 +378,22 @@ export class BillingsService {
     return await manager.bulkWrite(Billing, billiingRecords);
   }
 
-  
+  async currencyConversion(curfrom:string, amount:number) {
+    try{
+    const URL = `?access_key=${this.configService.get('FIXER_API_KEY')}&from=${curfrom}&to=USD&amount=${amount}&date=${(new Date()).toISOString().split('T')[0]}`;
+    const apiUrl = `${this.configService.get('FIXER_API_URL')}${URL}`;
+    
+    const res = await lastValueFrom(
+      this.httpService.get(apiUrl ).pipe(map((res) => res.data)),
+    );
+   
+ Logger.warn(res, BillingsService.name)
+    console.log('shortUrl : ' + res);
+    return res['result'] ?? 0 ;
+  }
+  catch(err){
+    return 0;
+    Logger.error(err,BillingsService.name)
+  }
+}
 }

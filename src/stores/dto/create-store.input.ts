@@ -85,4 +85,10 @@ export class CreateStoreInput {
 
   @Field(() => [Resource], { nullable: 'itemsAndList' })
   resources?: Resource[];
+
+  @Field({ nullable: true })
+  currencyCode: string;
+
+  @Field({ nullable: true })
+  timezone: string;
 }

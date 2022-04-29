@@ -39,7 +39,7 @@ export class BillingUsageCargeCron {
     stores.map(async (store) => {
       if (store.subscription) {
         // && store.plan > 0) {
-        Logger.debug(JSON.stringify(store.subscription));
+        // Logger.debug(JSON.stringify(store.subscription));
         const edate = new Date();
         const d = new Date();
         const sdate = new Date(d.setDate(d.getDate() - 1));
@@ -52,10 +52,16 @@ export class BillingUsageCargeCron {
           '🚀 ~ file: billing.cron.ts ~ line 30 ~ BillingUsageCargeCron ~ stores.map ~ useageQuery',
           useageQuery,
         );
-
+        // let cashbackUsage = '30';
+        let cashbackUsage = useageQuery['totalfeeByCashback'];
+        if (store.currencyCode !== 'USD' && cashbackUsage > 0) {
+          cashbackUsage = await this.billingService.currencyConversion(
+            store.currencyCode,
+            parseFloat(cashbackUsage),
+          );
+        }
         const totalCharge =
-          parseFloat(useageQuery['totalfeeByCashback']) +
-          parseFloat(useageQuery['totalfeeByGS']);
+          parseFloat(cashbackUsage) + parseFloat(useageQuery['totalfeeByGS']);
         Logger.debug(useageQuery['totalfeeByCashback'], 'totalfeeByCashback');
 
         Logger.debug(useageQuery['totalfeeByGS'], 'totalfeeByGS');
@@ -63,7 +69,7 @@ export class BillingUsageCargeCron {
 
         const usageCharge =
           Date.now() < store.appTrialEnd.getTime()
-            ? useageQuery['totalfeeByCashback']
+            ? parseFloat(cashbackUsage)
             : totalCharge;
 
         if (usageCharge > 0) {
@@ -75,7 +81,7 @@ export class BillingUsageCargeCron {
               usageCharge,
               this.usageDescripton(
                 store.plan,
-                useageQuery['totalfeeByCashback'],
+                cashbackUsage,
                 useageQuery['totalfeeByGS'],
                 totalCharge,
               ),
