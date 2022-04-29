@@ -63,7 +63,7 @@ export class GroupshopSavedListener {
     //console.log('orderData : ' + JSON.stringify(orderData));
     let order_line_items = [];
     let recDiscount = 0;
-
+    let milestoneStatus = 'pending';
     orderData[0].LineItems.map((items) => {
       const itemQuantity = items.quantity;
       if (memberLength === 0) {
@@ -74,12 +74,11 @@ export class GroupshopSavedListener {
         memberLength === 3
       ) {
         recDiscount = discount_1;
-      } else if (memberLength === 4) {
+      } else if (memberLength === 4 || memberLength === 5) {
         recDiscount = discount_2;
-      } else if (memberLength === 5) {
-        recDiscount = discount_3;
       } else {
         recDiscount = discount_1;
+        milestoneStatus = 'reached';
       }
       const calPrice = +((recDiscount / 100) * items.price)
         .toString()
@@ -117,7 +116,6 @@ export class GroupshopSavedListener {
 
     const leftDiscount = discount_3 - recDiscount;
     const uptoCashback = Math.floor((leftDiscount / 100) * order_price);
-
     const currencySymbol = getSymbolFromCurrency(
       orderData[0].currencyCode || 'USD',
     );
@@ -201,7 +199,9 @@ export class GroupshopSavedListener {
               'FRONT',
             )}${dealUrl}/product&${prdId}`,
             sale_price: salePrice,
-            discount_price: discountPrice,
+            discount_price: +discountPrice
+              .toString()
+              .match(/^-?\d+(?:\.\d{0,2})?/)[0],
           };
           campaigns_line_items = [
             ...campaigns_line_items,
@@ -214,8 +214,7 @@ export class GroupshopSavedListener {
         logoImage: brandLogo,
         shopUrl: res.data.store.shop,
         brandName: res.data.store.brandName,
-        shippingAddress:
-          ' 2972 Westheimer Rd. Santa Ana, Illinois 85486 United States',
+        shippingAddress: ' --- ',
         customerName: custName,
         customerEmail: customerEmail,
         dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
@@ -231,6 +230,7 @@ export class GroupshopSavedListener {
         discount2_price: discount_2_price,
         discount3_price: discount_3_price,
         max_discount: maxDiscount,
+        milestoneStatus: milestoneStatus,
         campaignsLineItems: campaigns_line_items,
         orderLineItems: order_line_items,
       };
@@ -254,8 +254,7 @@ export class GroupshopSavedListener {
         logoImage: brandLogo,
         brandName: res.data.store.brandName,
         shopUrl: res.data.store.shop,
-        shippingAddress:
-          ' 2972 Westheimer Rd. Santa Ana, Illinois 85486 United States',
+        shippingAddress: ' --- ',
         customerName: custName,
         customerEmail: customerEmail,
         dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
@@ -266,6 +265,7 @@ export class GroupshopSavedListener {
         total_sale_price: order_price,
         currencyCode: currencySymbol,
         getDiscount: recDiscount,
+        milestoneStatus: milestoneStatus,
         getUptoCashback: uptoCashback,
         orderLineItems: order_line_items,
       };

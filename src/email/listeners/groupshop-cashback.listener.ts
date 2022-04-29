@@ -186,6 +186,8 @@ export class GroupshopCashbackListener {
       properties: mdata,
     });
 
+    console.log('cashback : ' + JSON.stringify(mdata));
+
     this.kalavioService.sendKlaviyoEmail(body);
   }
 }

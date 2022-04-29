@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 console.log('v2 Script Triggered');
 // Define App Url
-// window.BURL = 'https://9f74-39-51-3-243.ngrok.io';
+window.BURL = 'https://9f74-39-51-3-243.ngrok.io';
 // window.FURL = 'http://localhost:3000';
 
 window.BURL = 'https://api-stage.groupshop.co';
@@ -530,7 +531,25 @@ async function init() {
     }
     document.querySelectorAll('#gscashback').forEach((elem) => {
       console.log(elem);
-      elem.innerHTML = `$${Math.floor(cashback).toString().replace('.00', '')}`;
+      var amountCal = `${Math.floor(cashback).toString().replace('.00', '')}`;
+      if (amountCal > 0) {
+        elem.innerHTML = `$${Math.floor(cashback)
+          .toString()
+          .replace('.00', '')}`;
+      } else {
+        var printMessage =
+          'Your friends get up to <strong>' +
+          mem.availedDiscount +
+          '% off</strong> when they shop on your link.';
+        document.querySelectorAll('.gs_content').forEach((elem1) => {
+          elem1.innerHTML = printMessage;
+        });
+        document
+          .querySelectorAll('.groupshop_left-block h3')
+          .forEach((elem2) => {
+            elem2.innerHTML = printMessage;
+          });
+      }
     });
     window.GSURL = window.FURL + url;
     document.querySelector(
