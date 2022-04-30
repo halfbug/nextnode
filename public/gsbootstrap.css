@@ -549,6 +549,7 @@ fieldset:disabled .groupshop_btn {
 }
 .groupshop_modal.groupshop_show .groupshop_modal-dialog {
 	transform: none;
+	margin: auto;
 }
 .groupshop_modal.groupshop_modal-static .groupshop_modal-dialog {
 	transform: scale(1.02);
