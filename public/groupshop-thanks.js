@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 console.log('v2 Script Triggered');
 // Define App Url
-window.BURL = 'https://9f74-39-51-3-243.ngrok.io';
+// window.BURL = 'https://9f74-39-51-3-243.ngrok.io';
 // window.FURL = 'http://localhost:3000';
+window.BURL = 'https://api-stage.groupshop.co';
+window.FURL = 'http://fornt-stage.groupshop.co';
 
-window.BURL = 'https://api.groupshop.co';
-window.FURL = 'http://appfront.groupshop.co';
+// window.BURL = 'https://api.groupshop.co';
+// window.FURL = 'http://appfront.groupshop.co';
 window.GSURL = window.FURL;
 /* @preserve
     _____ __ _     __                _
