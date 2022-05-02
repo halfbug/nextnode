@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getMongoManager, Repository } from 'typeorm';
 import { CreateCampaignInput } from './dto/create-campaign.input';
@@ -216,5 +216,99 @@ export class CampaignsService {
   // console.log(agg);
   const res =await manager.aggregate(Campaign, agg).toArray();
   return res[0];
+  }
+
+  async findAllWithDetails(storeId: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        '$match': {
+          'storeId': storeId,
+        }
+      }, {
+        '$lookup': {
+          'from': 'groupshops', 
+          'localField': 'id', 
+          'foreignField': 'campaignId', 
+          'as': 'groupshops'
+        }
+      }, {
+        '$addFields': {
+          'totalGroupshops': {
+            '$reduce': {
+              'input': '$groupshops', 
+              'initialValue': 0, 
+              'in': {
+                '$add': [
+                  '$$value', 1
+                ]
+              }
+            }
+          }
+        }
+      }, {
+        '$lookup': {
+          'from': 'billing', 
+          'localField': 'groupshops.id', 
+          'foreignField': 'groupShopId', 
+          'as': 'billings'
+        }
+      }, {
+        '$addFields': {
+          'detail': {
+            '$reduce': {
+              'input': '$billings', 
+              'initialValue': {
+                'tcashback': 0, 
+                'trevenue': 0
+              }, 
+              'in': {
+                'tcashback': {
+                  '$add': [
+                    '$$value.tcashback', '$$this.cashBack'
+                  ]
+                }, 
+                'trevenue': {
+                  '$add': [
+                    '$$value.trevenue', '$$this.revenue'
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }, {
+        '$set': {
+          'details': {
+            'totalGroupshops': {
+              '$ifNull': [
+                '$totalGroupshops', 0
+              ]
+            }, 
+            'totalCashback': {
+              '$ifNull': [
+                '$detail.tcashback', 0
+              ]
+            }, 
+            'totalRevenue': {
+              '$ifNull': [
+                '$detail.trevenue', 0
+              ]
+            }
+          }
+        }
+      }, {
+        '$project': {
+          'billings': 0, 
+          'groupshops': 0, 
+          'totalGroupshops': 0, 
+          'detail': 0
+        }
+      }
+    ];
+  // console.log(agg);
+  const res =await manager.aggregate(Campaign, agg).toArray();
+  Logger.debug({res}, CampaignsService.name)
+  return res;
   }
 }   
