@@ -18,7 +18,6 @@ import { ShopifyService } from '../shopify/shopify.service';
 import Orders from 'src/inventory/entities/orders.modal';
 import { UninstallService } from 'src/stores/uninstall.service';
 
-
 @Controller('webhooks')
 export class WebhooksController {
   constructor(
