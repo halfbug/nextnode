@@ -22,6 +22,8 @@ import { BillingModule } from 'src/billing/billing.module';
 import { ThemeAppExtensionController } from './theme-app-extension/theme-app-extension.controller';
 import { OldThemeFoundListener } from './listeners/old-theme-found.listener';
 import { StoreSavedListener } from './listeners/store-saved.listener';
+import { OrderCreatedEvent } from './events/order-created.event';
+import { OrderCreatedListener } from './listeners/order-created.listener';
 @Global()
 @Module({
   imports: [
@@ -43,12 +45,14 @@ import { StoreSavedListener } from './listeners/store-saved.listener';
     OldThemeFoundListener,
     StoreSavedListener,
     StoresModule,
+    OrderCreatedEvent,
+    OrderCreatedListener,
   ],
   controllers: [
     ShopifyStoreController,
     WebhooksController,
     ThemeAppExtensionController,
   ],
-  exports: [StoreService, ShopifyService],
+  exports: [StoreService, ShopifyService, OrderCreatedEvent],
 })
 export class ShopifyStoreModule {}
