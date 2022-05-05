@@ -1,8 +1,8 @@
 export const TEST = 'test';
 export const GS_CHARGE_CASHBACK = 10;
-export const GS_CHARGE_FEE_LAUNCH = 25;
-export const GS_CHARGE_FEE_GROWTH = 20;
-export const GS_CHARGE_FEE_UNICORN = 10;
+export const GS_CHARGE_FEE_LAUNCH = 0.25;
+export const GS_CHARGE_FEE_GROWTH = 0.2;
+export const GS_CHARGE_FEE_UNICORN = 0.1;
 // export const GS_CHARGE_FEE_CURRENCY_CODE = 'cent';
 export const GS_PLAN1_START_COUNT = 1;
 export const GS_PLAN1_END_COUNT = 100;

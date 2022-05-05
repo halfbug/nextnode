@@ -55,6 +55,20 @@ export class BillingsService {
           'storeId': storeId
         }
       }, {
+        '$addFields': {
+            'feeTotalCB': {
+                '$cond': {
+                    'if': {
+                        '$eq': [
+                            '$type', 0
+                        ]
+                    }, 
+                    'then': '$feeCharges', 
+                    'else': 0
+                }
+            }
+        }
+    }, {
         '$group': {
           '_id': {
             'year': {
@@ -71,7 +85,7 @@ export class BillingsService {
             '$sum': '$revenue'
           }, 
           'feeCharges': {
-            '$sum': '$feeCharges'
+            '$sum': '$feeTotalCB'
           }, 
           'count': {
             '$count': {}
