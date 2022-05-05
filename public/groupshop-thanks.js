@@ -517,11 +517,15 @@ async function init() {
       },
     });
 
-    const {
-      activeMember: mem,
-      url,
-      percentage,
-    } = await gsPost('member', { orderId, wurl: window.location.href });
+    let res;
+    let i = 0;
+
+    do {
+      res = await gsPost('member', { orderId, wurl: window.location.href });
+      i++;
+    } while (res.activeMember === null && i < 5);
+
+    const { activeMember: mem, url, percentage } = res;
 
     let cashback = 0;
     if (mem.role === 0) {
