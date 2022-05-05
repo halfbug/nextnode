@@ -68,7 +68,8 @@ export class ThemeAppExtensionController {
   @Post('member')
   async getMemberDetails(@Req() req, @Res() res) {
     try {
-      const { orderId } = req.body;
+      const { orderId, wurl } = req.body;
+      console.log('🚀  ~ wurl', wurl);
       console.log({ orderId });
 
       const {

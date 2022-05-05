@@ -521,7 +521,7 @@ async function init() {
       activeMember: mem,
       url,
       percentage,
-    } = await gsPost('member', { orderId });
+    } = await gsPost('member', { orderId, wurl: window.location.href });
 
     let cashback = 0;
     if (mem.role === 0) {
