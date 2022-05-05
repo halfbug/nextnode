@@ -51,6 +51,18 @@ export class GroupshopsService {
   findAll() {
     return this.groupshopRepository.find();
   }
+
+  findAllByDate(sdate: Date, edate: Date) {
+    return this.groupshopRepository.find({
+      where: {
+        createdAt: {
+          $gte: new Date(sdate),
+          $lt: new Date(edate),
+        },
+      },
+    });
+  }
+
   async getRunningGroupshop(campaignId, productId) {
     const agg = [
       {

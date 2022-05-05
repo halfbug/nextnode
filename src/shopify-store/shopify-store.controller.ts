@@ -1,4 +1,12 @@
-import { Controller, forwardRef, Get, Inject, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  forwardRef,
+  Get,
+  Inject,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { BillingsService } from 'src/billing/billing.service';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
@@ -99,9 +107,24 @@ export class ShopifyStoreController {
   }
 
   @Get('gs')
-  async gropshopTestUrl() {
-    const gs = await this.groupshopSrv.findAll();
-    return gs.map((g) => `${this.configService.get('FRONT')}${g.url} `);
+  async gropshopTestUrl(
+    @Query('sdate') sdate: string,
+    @Query('edate') edate: string,
+  ) {
+    const gs = await this.groupshopSrv.findAllByDate(
+      new Date(sdate),
+      new Date(edate),
+    );
+    return (
+      `<h3>total Groupshops : ${gs.length} </h3> <pre>` +
+      gs.map(
+        (g, idx) =>
+          `${idx + 1}. <a href="${this.configService.get('FRONT')}${g.url}">${
+            g.url
+          } </a> <br/>`,
+      ) +
+      '</pre>'
+    );
   }
   @Get('healthcheck')
   async testme() {
