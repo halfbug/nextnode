@@ -188,7 +188,7 @@ export class CatController {
           customerEmail: customerEmail,
           customerName: custName,
           leftCashback: calPrice,
-          shopUrl: groupshop.stores[0].shop,
+          shopUrl: `https://${groupshop.stores[0].shop}`,
           brandName: groupshop.stores[0].brandName,
           logoImage: brandLogo,
           getUptoDiscount: discountCalculate,

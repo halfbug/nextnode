@@ -212,7 +212,7 @@ export class GroupshopSavedListener {
 
       const mdata = {
         logoImage: brandLogo,
-        shopUrl: res.data.store.shop,
+        shopUrl: `https://${res.data.store.shop}`,
         brandName: res.data.store.brandName,
         shippingAddress: ' --- ',
         customerName: custName,
@@ -253,7 +253,7 @@ export class GroupshopSavedListener {
       const rdata = {
         logoImage: brandLogo,
         brandName: res.data.store.brandName,
-        shopUrl: res.data.store.shop,
+        shopUrl: `https://${res.data.store.shop}`,
         shippingAddress: ' --- ',
         customerName: custName,
         customerEmail: customerEmail,
