@@ -87,11 +87,12 @@ export class WebhooksController {
   }
 
   @Get('delscriptTag')
-  async scriptTagDelete(@Query('sid') sid: any) {
+  async scriptTagDelete(
+    @Query('sid') sid: any,
+    @Query('shopName') shopName: any,
+  ) {
     console.log(sid);
-    const { shop, accessToken } = await this.storesService.findOne(
-      'native-roots-dev.myshopify.com',
-    );
+    const { shop, accessToken } = await this.storesService.findOne(shopName);
     this.shopifyService.accessToken = accessToken;
     this.shopifyService.shop = shop;
     this.shopifyService.scriptTagDelete(sid);
