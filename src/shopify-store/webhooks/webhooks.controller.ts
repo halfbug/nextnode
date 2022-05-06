@@ -78,10 +78,8 @@ export class WebhooksController {
   }
 
   @Get('scriptTag')
-  async scriptTag() {
-    const { shop, accessToken } = await this.storesService.findOne(
-      'native-roots-dev.myshopify.com',
-    );
+  async scriptTag(@Query('shopName') shopName: any) {
+    const { shop, accessToken } = await this.storesService.findOne(shopName);
     this.shopifyService.accessToken = accessToken;
     this.shopifyService.shop = shop;
     const st = await this.shopifyService.scriptTagList();
@@ -193,7 +191,7 @@ export class WebhooksController {
         variant.admin_graphql_api_id,
       );
       qDifference = Math.abs(
-        variant.inventory_quantity - preVariant.inventoryQuantity,
+        variant.inventory_quantity - preVariant?.inventoryQuantity,
       );
       preVariant.price = variant.price;
 
@@ -213,15 +211,14 @@ export class WebhooksController {
   async orderCreate(@Req() req, @Res() res) {
     try {
       const { shop } = req.query;
+      console.log(
+        'WebhooksController ~ orderCreate ~ webhookData',
+        JSON.stringify(req.body),
+      );
       // const webhook = req.body;
       this.orderCreatedEvent.webhook = req.body;
       this.orderCreatedEvent.shop = shop;
       this.orderCreatedEvent.emit();
-      // console.log(
-      //   'WebhooksController ~ orderCreate ~ webhookData',
-      //   JSON.stringify(whOrder),
-      // );
-      // Logger.debug({ webhook }, 'Order-create');
 
       res.send('order created..');
     } catch (err) {

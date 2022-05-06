@@ -518,94 +518,94 @@ async function init() {
     });
 
     let res;
-    let i = 0;
 
-    do {
+    const pollit = setInterval(async () => {
       res = await gsPost('member', { orderId, wurl: window.location.href });
-      i++;
-    } while (res.activeMember === null && i < 5);
+      if (res.activeMember) {
+        clearInterval(pollit);
+        const { activeMember: mem, url, percentage } = res;
 
-    const { activeMember: mem, url, percentage } = res;
-
-    let cashback = 0;
-    if (mem.role === 0) {
-      cashback = Shopify.checkout.subtotal_price * 0.5;
-    } else {
-      cashback =
-        Shopify.checkout.subtotal_price *
-        (parseFloat(store.discount) / 100 - mem.availedDiscount / 100);
-    }
-    document.querySelectorAll('#gscashback').forEach((elem) => {
-      console.log(elem);
-      var amountCal = `${Math.floor(cashback).toString().replace('.00', '')}`;
-      if (amountCal > 0) {
-        elem.innerHTML = `$${Math.floor(cashback)
-          .toString()
-          .replace('.00', '')}`;
-      } else {
-        var printMessage =
-          'Your friends get up to <strong>' +
-          mem.availedDiscount +
-          '% off</strong> when they shop on your link.';
-        document.querySelectorAll('.gs_content').forEach((elem1) => {
-          elem1.innerHTML = printMessage;
+        let cashback = 0;
+        if (mem.role === 0) {
+          cashback = Shopify.checkout.subtotal_price * 0.5;
+        } else {
+          cashback =
+            Shopify.checkout.subtotal_price *
+            (parseFloat(store.discount) / 100 - mem.availedDiscount / 100);
+        }
+        document.querySelectorAll('#gscashback').forEach((elem) => {
+          console.log(elem);
+          var amountCal = `${Math.floor(cashback)
+            .toString()
+            .replace('.00', '')}`;
+          if (amountCal > 0) {
+            elem.innerHTML = `$${Math.floor(cashback)
+              .toString()
+              .replace('.00', '')}`;
+          } else {
+            var printMessage =
+              'Your friends get up to <strong>' +
+              mem.availedDiscount +
+              '% off</strong> when they shop on your link.';
+            document.querySelectorAll('.gs_content').forEach((elem1) => {
+              elem1.innerHTML = printMessage;
+            });
+            document
+              .querySelectorAll('.groupshop_left-block h3')
+              .forEach((elem2) => {
+                elem2.innerHTML = printMessage;
+              });
+          }
         });
-        document
-          .querySelectorAll('.groupshop_left-block h3')
-          .forEach((elem2) => {
-            elem2.innerHTML = printMessage;
-          });
+        window.GSURL = window.FURL + url;
+        document.querySelector(
+          '.get-start-thank-wrap',
+        ).innerHTML = `<div class="get-start-wrap"><a target="_blank" href="${window.GSURL}">Get Started</a></div>`;
+        document.getElementById('gs_link').setAttribute('href', window.GSURL);
+
+        const products = await gsPost('products', {
+          campaignId: store.campaignId,
+        });
+
+        // var glider = Glider(this);
+        console.log(products);
+        Array(3).map((v, indx) => glider.removeItem(0));
+        glider.removeItem(0);
+        glider.removeItem(1);
+        glider.removeItem(0);
+        glider.removeItem(0);
+        randomIndx = Math.floor(Math.random() * (products.length - 10)) + 1;
+        displayProd =
+          products.length > 10
+            ? products.slice(randomIndx, randomIndx + 11)
+            : products;
+
+        displayProd.map((prod) => {
+          const slide = document.createElement('a');
+          slide.href = window.GSURL;
+          slide.target = '_blank';
+          slide.className = 'gscard';
+          slide.innerHTML = `<img src="${
+            prod.featuredImage
+          }"alt="img"><span class="discount">${percentage}% OFF</span><h4>${prod.title.slice(
+            0,
+            15,
+          )}..</h4><span class="bold">$${(
+            prod.price -
+            (parseFloat(percentage) / 100) * prod.price
+          )
+            .toFixed(2)
+            .toString()
+            .replace('.00', '')}</span> <del>$${prod.price}</del>`;
+          glider.addItem(slide);
+          glider.refresh(true);
+          return prod;
+        });
+
+        glider.refresh(true);
       }
-    });
-    window.GSURL = window.FURL + url;
-    document.querySelector(
-      '.get-start-thank-wrap',
-    ).innerHTML = `<div class="get-start-wrap"><a target="_blank" href="${window.GSURL}">Get Started</a></div>`;
-    document.getElementById('gs_link').setAttribute('href', window.GSURL);
+    }, 3000);
 
-    const products = await gsPost('products', {
-      campaignId: store.campaignId,
-    });
-
-    // var glider = Glider(this);
-    console.log(products);
-    Array(3).map((v, indx) => glider.removeItem(0));
-    glider.removeItem(0);
-    glider.removeItem(1);
-    glider.removeItem(0);
-    glider.removeItem(0);
-    randomIndx = Math.floor(Math.random() * (products.length - 10)) + 1;
-    displayProd =
-      products.length > 10
-        ? products.slice(randomIndx, randomIndx + 11)
-        : products;
-
-    displayProd.map((prod) => {
-      const slide = document.createElement('a');
-      slide.href = window.GSURL;
-      slide.target = '_blank';
-      slide.className = 'gscard';
-      slide.innerHTML = `<img src="${
-        prod.featuredImage
-      }"alt="img"><span class="discount">${percentage}% OFF</span><h4>${prod.title.slice(
-        0,
-        15,
-      )}..</h4><span class="bold">$${(
-        prod.price -
-        (parseFloat(percentage) / 100) * prod.price
-      )
-        .toFixed(2)
-        .toString()
-        .replace('.00', '')}</span> <del>$${prod.price}</del>`;
-      glider.addItem(slide);
-      glider.refresh(true);
-      return prod;
-    });
-
-    //   console.log(cards.spit(','));
-    //   document.querySelector('.glider').innerHTML = cards;
-
-    glider.refresh(true);
     //   glider.destroy();
   }
   //   } catch (err) {
