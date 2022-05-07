@@ -1,8 +1,8 @@
 console.log('v2 Script Triggered');
 
 // Define App Url
-window.APPv2URL = 'https://api.groupshop.co';
-// window.APPv2URL = 'https://api-stage.groupshop.co';
+// window.APPv2URL = 'https://api.groupshop.co';
+window.APPv2URL = 'https://api-stage.groupshop.co';
 
 // App Status
 window.STATUS = true;
