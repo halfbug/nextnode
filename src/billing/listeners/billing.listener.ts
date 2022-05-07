@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
+import { RefAddedEvent } from 'src/groupshops/events/refferal-added.event';
 import { StorePlanUpdatedEvent } from 'src/stores/events/plan-updated.event';
 import { GS_CHARGE_CASHBACK, GS_FEES } from 'src/utils/constant';
 // import { EventEmitter2 } from '@nestjs/event-emitter';
 import { GroupShopCreated } from '../../groupshops/events/groupshop-created.event';
 import { BillingsService } from '../billing.service';
 import { CreateBillingInput } from '../dto/create-billing.input';
+import { UpdateBillingInput } from '../dto/update-billing.input';
 import { BillingTypeEnum } from '../entities/billing.entity';
 import { CashBackEvent } from '../events/cashback.event';
 
@@ -43,8 +45,6 @@ export class BillingListener {
   }
   @OnEvent('cashback.generated')
   async createBillingForCashBack(event: CashBackEvent) {
-    console.log(JSON.stringify(event));
-    console.log('...............');
     const { id, storeId } = event.groupshop;
     const { cashbackAmount, revenue, cashbackCharge } = event;
 
@@ -61,5 +61,47 @@ export class BillingListener {
       '🚀 ~ file: billing.listener.ts ~ line 57 ~ BillingListener ~ createBillingForCashBack ~ newBilling',
       newBilling,
     );
+  }
+  @OnEvent('refferal.added')
+  async updateBillingForRevenue(event: RefAddedEvent) {
+    console.log({ event });
+    console.log('=========refferal added==========');
+    console.log(JSON.stringify(event));
+    let totalPrice;
+    const { groupshop } = event;
+    const memLength = groupshop.members.length;
+    // calculate owner product price and update revenue when first referral comes
+    if (memLength === 2) {
+      const owner = groupshop.members[0];
+      totalPrice = owner.lineItems?.reduce(
+        (priceSum: number, { price, quantity }) =>
+          priceSum + quantity * parseFloat(price),
+        0,
+      );
+      const payload: any = { revenue: totalPrice };
+      const newBilling = await this.billingService.updateOne(
+        { groupShopId: groupshop.id, type: 1 },
+        payload,
+      );
+    }
+    const availedDiscount = groupshop.members[memLength - 1].availedDiscount;
+    console.log('groupshop.members', groupshop.members);
+    const totalPr = groupshop.members[memLength - 1].lineItems?.reduce(
+      (priceSum: number, { price, quantity }) => {
+        const thisPrice = priceSum + quantity * parseFloat(price);
+        console.log({ thisPrice });
+        return thisPrice - (+thisPrice * availedDiscount) / 100;
+      },
+      0,
+    );
+    const payload1: CreateBillingInput = {
+      type: BillingTypeEnum.ON_REFFERRAL_ADDED,
+      groupShopId: groupshop.id,
+      storeId: groupshop.storeId,
+      feeCharges: 0,
+      revenue: +totalPr,
+    };
+    const newBilling = await this.billingService.create(payload1);
+    console.log('🚀 BillingForRevenue', newBilling);
   }
 }

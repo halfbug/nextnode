@@ -8,6 +8,7 @@ import { StoresModule } from 'src/stores/stores.module';
 import { BillingListener } from './listeners/billing.listener';
 import { BillingUsageCargeCron } from './billing.cron';
 import { HttpModule } from '@nestjs/axios';
+import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { HttpModule } from '@nestjs/axios';
     DefaultColumnsService,
     forwardRef(() => StoresModule),
     HttpModule,
+    GroupshopsModule,
   ],
   providers: [
     BillingsResolver,

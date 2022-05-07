@@ -4,6 +4,7 @@ import { BillingPlanEnum } from 'src/stores/entities/store.entity';
 export enum BillingTypeEnum {
   ON_CASHBACK,
   ON_GS_CREATION,
+  ON_REFFERRAL_ADDED,
 }
 registerEnumType(BillingTypeEnum, {
   name: 'BillingTypeEnum',

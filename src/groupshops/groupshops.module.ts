@@ -9,6 +9,7 @@ import { DefaultColumnsService } from 'src/utils/default-columns/default-columns
 import { EmailModule } from 'src/email/email.module';
 import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
 import { UtilsModule } from 'src/utils/utils.module';
+import { RefAddedEvent } from './events/refferal-added.event';
 
 @Module({
   imports: [
@@ -18,7 +19,12 @@ import { UtilsModule } from 'src/utils/utils.module';
     forwardRef(() => ShopifyStoreModule),
     UtilsModule,
   ],
-  providers: [GroupshopsResolver, GroupshopsService, OrderPlacedListener],
-  exports: [GroupshopsService],
+  providers: [
+    GroupshopsResolver,
+    GroupshopsService,
+    OrderPlacedListener,
+    RefAddedEvent,
+  ],
+  exports: [GroupshopsService, RefAddedEvent],
 })
 export class GroupshopsModule {}

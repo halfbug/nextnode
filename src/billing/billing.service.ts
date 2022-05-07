@@ -164,6 +164,11 @@ export class BillingsService {
     await this.billingRepository.update({ id }, updateBillingInput);
     return await this.findOneById(id);
   }
+  
+  async updateOne(criteria: any, updateLiteral: any) {
+    const manager = getMongoManager();
+    manager.updateOne(Billing, criteria, { $set: updateLiteral });
+  }
 
   remove(id: string) {
     return this.billingRepository.delete(id);

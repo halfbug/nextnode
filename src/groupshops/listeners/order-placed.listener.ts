@@ -27,6 +27,7 @@ import { Groupshops, RefundStatusEnum } from '../entities/groupshop.modal';
 import { GroupShopCreated } from '../events/groupshop-created.event';
 import { GroupshopsService } from '../groupshops.service';
 import Store from 'src/stores/entities/store.model';
+import { RefAddedEvent } from '../events/refferal-added.event';
 
 @Injectable()
 export class OrderPlacedListener {
@@ -37,6 +38,7 @@ export class OrderPlacedListener {
     private gsService: GroupshopsService,
     private kalavioService: KalavioService,
     private crypt: EncryptDecryptService,
+    private addedRef: RefAddedEvent,
   ) {}
 
   accessToken: string;
@@ -141,11 +143,6 @@ export class OrderPlacedListener {
 
     const refundAmount = this.totalPricePercent(member.lineItems, netDiscount);
     const revenuePrice = this.totalRevenue(member.lineItems, netDiscount);
-    //((100 - discountPercentage) / 100) * totalPrice;
-    // refundAmount 10% = x
-    // shopify y = refundAmount - x (old amount)
-    //store x in new field cashBackcharge (old totalcachback)
-    // totalcashback = sum of X
 
     // cashback - gsfees
     const percentageGiven = (100 - GS_CHARGE_CASHBACK) / 100;
@@ -162,7 +159,8 @@ export class OrderPlacedListener {
     cashBackEvent.cashbackAmount = shopifyAmount;
     cashBackEvent.cashbackCharge = cashBackUsageChargeAmount;
     cashBackEvent.groupshop = this.groupshop;
-    cashBackEvent.revenue = revenuePrice;
+    // cashBackEvent.revenue = revenuePrice;
+    cashBackEvent.revenue = 0;
     cashBackEvent.orderId = member.orderId;
     cashBackEvent.netDiscount = netDiscount;
     cashBackEvent.store = this.store;
@@ -243,6 +241,7 @@ export class OrderPlacedListener {
 
     const gsMember = new MemberInput();
     gsMember.orderId = orderId;
+    gsMember.lineItems = lineItems;
 
     const totalCampaignProducts = campaignProducts.concat(
       dealProducts.map((p) => p.productId),
@@ -258,6 +257,7 @@ export class OrderPlacedListener {
         let ugroupshop = new UpdateGroupshopInput();
 
         ugroupshop = await this.gsService.findOneWithLineItems(discountCode);
+        console.log('🚀 ugroupshop groupshop', ugroupshop);
         const {
           discountCode: { title, priceRuleId },
           createdAt,
@@ -270,6 +270,15 @@ export class OrderPlacedListener {
           ugroupshop.discountCode.percentage,
         );
         ugroupshop.members = [...ugroupshop.members, gsMember];
+        // refferal added then emit  event to caluclate revenue
+        // if (
+        //   ugroupshop.members?.length === 2 ||
+        //   ugroupshop.members?.length === 3 ||
+        //   ugroupshop.members?.length === 5
+        // ) {
+        this.addedRef.groupshop = this.groupshop;
+        this.addedRef.emit();
+        // }
 
         ugroupshop.dealProducts = dealProducts;
         ugroupshop.totalProducts = totalCampaignProducts.length;
@@ -358,7 +367,8 @@ export class OrderPlacedListener {
         const groupShopCreated = new GroupShopCreated();
         groupShopCreated.groupshop = savedGs;
         groupShopCreated.store = event.store;
-        groupShopCreated.revenue = this.totalRevenue(lineItems, 0);
+        // groupShopCreated.revenue = this.totalRevenue(lineItems, 0);
+        groupShopCreated.revenue = 0;
         this.eventEmitter.emit('groupshop.created', groupShopCreated);
       }
     }
