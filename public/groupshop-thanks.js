@@ -604,7 +604,7 @@ async function init() {
 
         glider.refresh(true);
       }
-    }, 3000);
+    }, 1000);
 
     //   glider.destroy();
   }
