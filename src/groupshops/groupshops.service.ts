@@ -160,12 +160,25 @@ export class GroupshopsService {
           as: 'groupshops',
         },
       },
+      {
+        $lookup: {
+          from: 'store',
+          localField: 'shop',
+          foreignField: 'shop',
+          as: 'shops',
+        },
+      },
     ];
     // console.log(agg);
     const manager = getMongoManager();
     const gs = await manager.aggregate(Orders, agg).toArray();
     // console.log('🚀 ~ find qr deal link', gs);
-    return gs[0]?.groupshops[0];
+    const response = {
+      url: gs[0]?.groupshops[0].url,
+      brandname: gs[0]?.shops[0].logoImage,
+    };
+    console.log(JSON.stringify(response));
+    return response;
   }
 
   async findOne(discountCode: string) {

@@ -159,9 +159,13 @@ export class GroupshopSavedListener {
       mydate.getMinutes() +
       ' ' +
       hoursFormat;
-
-    const imgPath = res.data.store.logoImage.split('/');
-    const brandLogo = await this.uploadImageService.getSignedUrl(imgPath[4]);
+    let brandLogo = '';
+    if (res.data.store.logoImage != '') {
+      const imgPath = res.data.store.logoImage.split('/');
+      brandLogo = await this.uploadImageService.getSignedUrl(imgPath[4]);
+    } else {
+      brandLogo = '';
+    }
 
     if (res.post == 'yes') {
       console.log('groupshop saved listener received');

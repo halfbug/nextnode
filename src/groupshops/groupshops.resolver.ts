@@ -17,6 +17,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
+import { QRInput } from './dto/qr-code.input';
 
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
@@ -52,7 +53,7 @@ export class GroupshopsResolver {
     return this.GroupshopsService.totalGs(storeId);
   }
 
-  @Query(() => Groupshop, { name: 'getQrDealLink' })
+  @Query(() => QRInput, { name: 'getQrDealLink' })
   findQrDealLink(
     @Args('email') email: string,
     @Args('ordernumber') ordernumber: string,
