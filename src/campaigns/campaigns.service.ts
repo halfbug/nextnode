@@ -265,12 +265,12 @@ export class CampaignsService {
               'in': {
                 'tcashback': {
                   '$add': [
-                    '$$value.tcashback', '$$this.cashBack'
+                    '$$value.tcashback', {$ifNull: ['$$this.cashBack', 0]}
                   ]
                 }, 
                 'trevenue': {
                   '$add': [
-                    '$$value.trevenue', '$$this.revenue'
+                    '$$value.trevenue', {$ifNull: ['$$this.revenue', 0]}
                   ]
                 }
               }

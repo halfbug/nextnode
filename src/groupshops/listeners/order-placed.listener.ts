@@ -262,6 +262,7 @@ export class OrderPlacedListener {
           discountCode: { title, priceRuleId },
           createdAt,
           expiredAt,
+          id,
         } = ugroupshop;
         this.groupshop = ugroupshop as Groupshops;
 
@@ -270,15 +271,10 @@ export class OrderPlacedListener {
           ugroupshop.discountCode.percentage,
         );
         ugroupshop.members = [...ugroupshop.members, gsMember];
-        // refferal added then emit  event to caluclate revenue
-        // if (
-        //   ugroupshop.members?.length === 2 ||
-        //   ugroupshop.members?.length === 3 ||
-        //   ugroupshop.members?.length === 5
-        // ) {
+
         this.addedRef.groupshop = this.groupshop;
+        this.addedRef.groupshopId = id;
         this.addedRef.emit();
-        // }
 
         ugroupshop.dealProducts = dealProducts;
         ugroupshop.totalProducts = totalCampaignProducts.length;

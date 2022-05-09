@@ -64,7 +64,6 @@ export class BillingListener {
   }
   @OnEvent('refferal.added')
   async updateBillingForRevenue(event: RefAddedEvent) {
-    console.log({ event });
     console.log('=========refferal added==========');
     console.log(JSON.stringify(event));
     let totalPrice;
@@ -85,7 +84,7 @@ export class BillingListener {
       );
     }
     const availedDiscount = groupshop.members[memLength - 1].availedDiscount;
-    console.log('groupshop.members', groupshop.members);
+    console.log('groupshop.id', groupshop);
     const totalPr = groupshop.members[memLength - 1].lineItems?.reduce(
       (priceSum: number, { price, quantity }) => {
         const thisPrice = priceSum + quantity * parseFloat(price);
@@ -96,11 +95,15 @@ export class BillingListener {
     );
     const payload1: CreateBillingInput = {
       type: BillingTypeEnum.ON_REFFERRAL_ADDED,
-      groupShopId: groupshop.id,
+      groupShopId: event.groupshopId,
       storeId: groupshop.storeId,
       feeCharges: 0,
       revenue: +totalPr,
     };
+    console.log(
+      '🚀 ~ file: billing.listener.ts ~ line 99 ~ BillingListener ~ updateBillingForRevenue ~ event.groupshopId',
+      event.groupshopId,
+    );
     const newBilling = await this.billingService.create(payload1);
     console.log('🚀 BillingForRevenue', newBilling);
   }

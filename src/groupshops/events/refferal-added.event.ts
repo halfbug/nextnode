@@ -6,6 +6,7 @@ import { Groupshops } from '../entities/groupshop.modal';
 @Injectable()
 export class RefAddedEvent {
   public groupshop: Groupshops;
+  public groupshopId: string;
   constructor(private eventEmitter: EventEmitter2) {}
   emit() {
     this.eventEmitter.emit('refferal.added', this);
