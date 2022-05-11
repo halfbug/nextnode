@@ -43,46 +43,17 @@ export class StoresService {
       {
         $lookup: {
           from: 'campaign',
-          let: {
-            store_id: '$id',
-          },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $eq: ['$storeId', '$$store_id'],
-                },
-              },
-            },
-            {
-              $sort: {
-                'campaign.createdAt': -1,
-              },
-            },
-            // {
-            //   $limit: 10,
-            // },
-            {
-              $lookup: {
-                from: 'appsetting',
-                localField: 'rewards',
-                foreignField: 'salestargets.id',
-                as: 'salesTarget',
-              },
-            },
-            { $unwind: '$salesTarget' },
-            { $addFields: { salesTarget: '$salesTarget.salestargets' } },
-            { $unwind: '$salesTarget' },
-          ],
+          localField: 'id',
+          foreignField: 'storeId',
           as: 'campaigns',
         },
       },
     ];
     const res = await manager.aggregate(Store, agg).toArray();
-    // console.log(
-    //   '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
-    //   res,
-    // );
+    console.log(
+      '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
+      res[0].campaigns,
+    );
     return { ...res[0] };
   }
 
