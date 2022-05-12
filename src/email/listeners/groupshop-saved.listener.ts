@@ -271,6 +271,7 @@ export class GroupshopSavedListener {
         getDiscount: recDiscount,
         milestoneStatus: milestoneStatus,
         getUptoCashback: uptoCashback,
+        getUptoDiscount: leftDiscount,
         orderLineItems: order_line_items,
       };
 
