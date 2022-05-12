@@ -111,6 +111,8 @@ export class ShopifyService {
     id?: string,
   ) {
     // if (percentage) {
+    // console.log({ action });
+    // console.log({ percentage });
     const client = await this.client(shop, accessToken);
     let priceRule: any;
 
@@ -159,6 +161,7 @@ export class ShopifyService {
         },
       });
     else {
+      // console.log('inside update option');
       let variables: any = { id };
       if (percentage)
         variables = {
@@ -169,7 +172,7 @@ export class ShopifyService {
             },
           },
         };
-      if (products)
+      else if (products)
         variables = {
           id,
           priceRule: {
@@ -178,6 +181,9 @@ export class ShopifyService {
             },
           },
         };
+
+      console.log({ variables });
+      console.log(JSON.stringify(variables));
       priceRule = await client.query({
         data: {
           query: `mutation priceRuleUpdate($id: ID!,$priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {

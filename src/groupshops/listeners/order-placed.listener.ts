@@ -288,7 +288,7 @@ export class OrderPlacedListener {
           rewards,
         );
 
-        if (newDiscount) {
+        if (!!newDiscount) {
           ugroupshop.discountCode = await this.shopifyapi.setDiscountCode(
             shop,
             'Update',

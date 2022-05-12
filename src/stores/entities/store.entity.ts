@@ -61,7 +61,7 @@ export class Store {
   @Field()
   accessToken: string;
 
-  @Field({ defaultValue: 0, nullable: true })
+  @Field({ nullable: true })
   installationStep: number | null;
 
   @Field({ defaultValue: 0 })

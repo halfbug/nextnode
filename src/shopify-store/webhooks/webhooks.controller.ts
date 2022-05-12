@@ -191,10 +191,11 @@ export class WebhooksController {
       const preVariant = await this.inventryService.findId(
         variant.admin_graphql_api_id,
       );
+
       qDifference = Math.abs(
         variant.inventory_quantity - preVariant?.inventoryQuantity,
       );
-      preVariant.price = variant.price;
+      preVariant.price = variant?.price;
 
       preVariant.inventoryQuantity = variant.inventory_quantity;
       await this.inventryService.update(preVariant);

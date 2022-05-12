@@ -601,22 +601,25 @@ export class GroupshopsService {
       store: { shop, accessToken },
       gsproducts,
     } = gs;
-    await this.shopifyapi.setDiscountCode(
-      shop,
-      'Update',
-      accessToken,
-      null,
-      null,
-      gsproducts,
-      null,
-      null,
-      priceRuleId,
-    );
 
-    await this.groupshopRepository.update(
-      { id },
-      { totalProducts: gsproducts.length },
-    );
+    if (dealProducts.length > 0) {
+      await this.shopifyapi.setDiscountCode(
+        shop,
+        'Update',
+        accessToken,
+        null,
+        null,
+        gsproducts,
+        null,
+        null,
+        priceRuleId,
+      );
+
+      await this.groupshopRepository.update(
+        { id },
+        { totalProducts: gsproducts.length },
+      );
+    }
     return gs;
   }
 
