@@ -66,7 +66,17 @@ export class BillingsService {
                     'then': '$feeCharges', 
                     'else': 0
                 }
-            }
+            },
+            'createdMonthGS': {
+              '$cond': {
+                'if': {
+                  '$eq': ['$type', 1]
+                },
+                'then': 1,
+                'else': 0
+              }
+            },
+          
         }
     }, {
         '$group': {
@@ -89,7 +99,11 @@ export class BillingsService {
           }, 
           'count': {
             '$count': {}
+          },
+          'totalGS': {
+            '$sum': '$createdMonthGS'
           }
+        
         }
       }, {
         '$sort': {
@@ -415,4 +429,28 @@ export class BillingsService {
     Logger.error(err,BillingsService.name)
   }
 }
+
+async findTotalGS(storeId: string) {
+  const agg = [
+    {
+      '$match': {
+        'storeId': storeId,
+        'type': 1
+      }
+    }, {
+      '$group': {
+        '_id': '$storeId', 
+        'count': {
+          '$count': {}
+        }
+      }
+    }
+  ];
+  const manager = getMongoManager();
+  const TotalGS = await manager.aggregate(Billing, agg).toArray();
+  console.log("🚀 TotalGSBilling ~ TotalGS", TotalGS)
+  return TotalGS[0];
+
+}
+
 }

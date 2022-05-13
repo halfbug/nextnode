@@ -7,6 +7,7 @@ import {
   MonthlyBillingInput,
   SingleDayBillingInput,
   Total,
+  TotalGS,
   TotalRevenue,
 } from './dto/monthly-billing.input';
 import { AppSubscription } from './entities/app-subscription.input';
@@ -55,6 +56,11 @@ export class BillingsResolver {
   @Query(() => [Total], { name: 'findTotalGSMonthly' })
   findTotalGSMonthly(@Args('storeId') storeId: string) {
     return this.billingService.findTotalGSMonthly(storeId);
+  }
+
+  @Query(() => TotalGS, { name: 'findTotalGS' })
+  findTotalGS(@Args('storeId') storeId: string) {
+    return this.billingService.findTotalGS(storeId);
   }
 
   @Query(() => [SingleDayBillingInput], { name: 'getBillingByDate' })

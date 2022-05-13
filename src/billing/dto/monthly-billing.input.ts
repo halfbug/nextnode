@@ -28,6 +28,8 @@ export class MonthlyBillingInput {
 
   @Field()
   count?: number;
+  @Field()
+  totalGS?: number;
 }
 @ObjectType()
 export class TotalRevenue {
@@ -36,6 +38,14 @@ export class TotalRevenue {
 
   @Field()
   revenue?: number;
+}
+@ObjectType()
+export class TotalGS {
+  @Field()
+  _id?: string;
+
+  @Field()
+  count?: number;
 }
 @ObjectType()
 export class Total {
