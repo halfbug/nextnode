@@ -7,6 +7,7 @@ import { DefaultColumnsService } from 'src/utils/default-columns/default-columns
 import { InventoryService } from 'src/inventory/inventory.service';
 import { InventoryModule } from 'src/inventory/inventory.module';
 import { StoresModule } from 'src/stores/stores.module';
+import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { StoresModule } from 'src/stores/stores.module';
     DefaultColumnsService,
     InventoryModule,
     forwardRef(() => StoresModule),
+    GroupshopsModule,
   ],
   providers: [CampaignsResolver, CampaignsService],
   exports: [CampaignsService],

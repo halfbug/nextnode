@@ -638,4 +638,17 @@ export class GroupshopsService {
   async removeShop(storeId: string) {
     return await this.groupshopRepository.delete({ storeId });
   }
+
+  async getCampaignGS(campaignId) {
+    console.log('🚀 ~ getAllCampaignById', campaignId.id);
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          campaignId: campaignId.id,
+        },
+      },
+    ];
+    return await manager.aggregate(Groupshops, agg).toArray();
+  }
 }

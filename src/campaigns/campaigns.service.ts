@@ -7,11 +7,14 @@ import { UpdateCampaignInput } from './dto/update-campaign.input';
 import Campaign from './entities/campaign.model';
 import { v4 as uuid } from 'uuid';
 import { InventoryService } from 'src/inventory/inventory.service';
+import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { StoresService } from 'src/stores/stores.service';
+import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { ProductQueryInput } from 'src/inventory/dto/product-query.input';
 import {
   Reward,
 } from 'src/appsettings/entities/sales-target.model';
+import { Groupshops } from 'src/groupshops/entities/groupshop.modal';
 
 @Injectable()
 export class CampaignsService {
@@ -20,6 +23,8 @@ export class CampaignsService {
     private campaignRepository: Repository<Campaign>,
     private readonly inventoryService: InventoryService,
     private readonly sotresService: StoresService,
+    private shopifyapi: ShopifyService,
+    private groupshopsService: GroupshopsService,
   ) {}
 
   async setProducts(shop, criteria, prevProducts) {
@@ -138,8 +143,7 @@ export class CampaignsService {
       isActive,
     } = updateCampaignInput;
 
-    const { shop } = await this.sotresService.findOneById(storeId);
-
+    const { shop, accessToken } = await this.sotresService.findOneById(storeId); 
     const prevCampaign = await this.findOneById(id);
     const prevProducts = prevCampaign.products;
 
@@ -160,7 +164,8 @@ export class CampaignsService {
       );
     }
 
-    await this.campaignRepository.update({ id }, updateCampaignInput);    
+    await this.campaignRepository.update({ id }, updateCampaignInput);
+    await this.updateDiscountCode({ id }, products, shop, accessToken);    
 
     return await this.findOneById(id);
   }
@@ -172,6 +177,27 @@ export class CampaignsService {
   async removeShop(storeId: string) {
     return await this.campaignRepository.delete({ storeId });
   }
+
+  async updateDiscountCode(campaignId, products, shop, accessToken) {   
+    console.log("🚀 ~ campaignId", campaignId);    
+    const allComapigns = await this.groupshopsService.getCampaignGS(campaignId);
+    for (const key in allComapigns) {  
+      const priceRuleId = allComapigns[key].discountCode.priceRuleId;       
+      await this.shopifyapi.setDiscountCode(
+        shop,
+        'Update',
+        accessToken,
+        null,
+        null,
+        products,
+        null,
+        null,
+        priceRuleId,
+      );
+    }
+
+  }
+ 
   // this funtion will return best seller product of running active campaign
   async getBestSellerProducts(shop: string) {
     const manager = getMongoManager();
