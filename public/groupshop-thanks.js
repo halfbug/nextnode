@@ -507,7 +507,7 @@ async function init() {
     var glider = new Glider(document.querySelector('.glider'), {
       //   slidesToScroll: 3,
       slidesToShow: 'auto',
-      slidesToScroll: 0.5,
+      slidesToScroll: 1,
       itemWidth: 110,
       duration: 0.25,
       rewind: true,
