@@ -40,6 +40,9 @@ export class Campaign {
   products?: string[];
 
   @Field(() => [String], { nullable: true })
+  collections?: string[];
+
+  @Field(() => [String], { nullable: true })
   addableProducts?: string[];
 
   @Field({ nullable: true })

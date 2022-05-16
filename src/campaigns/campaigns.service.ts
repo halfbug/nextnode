@@ -140,6 +140,7 @@ export class CampaignsService {
     const {
       criteria,
       products,
+      collections,
       storeId,
       settings,
       socialLinks,

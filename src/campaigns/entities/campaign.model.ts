@@ -28,6 +28,9 @@ export default class Campaign extends DefaultColumnsService {
   products?: string[];
 
   @Column('string', { nullable: true })
+  collections?: string[];
+
+  @Column('string', { nullable: true })
   addableProducts?: string[];
 
   @Column('string', { nullable: true })
