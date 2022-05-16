@@ -18,6 +18,7 @@ import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 import { InventoryModule } from 'src/inventory/inventory.module';
 import { CampaignsModule } from 'src/campaigns/campaigns.module';
 import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
+import { CampaignInActiveListener } from './listeners/campaign-inactive.listener';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
     StoreSavedEvent,
     StorePlanUpdatedEvent,
     UninstallService,
+    CampaignInActiveListener,
   ],
   exports: [
     StoresService,

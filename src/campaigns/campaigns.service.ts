@@ -14,6 +14,8 @@ import { ProductQueryInput } from 'src/inventory/dto/product-query.input';
 import {
   Reward,
 } from 'src/appsettings/entities/sales-target.model';
+import { CampaignInactiveEvent } from 'src/billing/events/campaign-inactive.event';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Groupshops } from 'src/groupshops/entities/groupshop.modal';
 
 @Injectable()
@@ -23,6 +25,8 @@ export class CampaignsService {
     private campaignRepository: Repository<Campaign>,
     private readonly inventoryService: InventoryService,
     private readonly sotresService: StoresService,
+    private eventEmitter: EventEmitter2,
+
     private shopifyapi: ShopifyService,
     private groupshopsService: GroupshopsService,
   ) {}
@@ -163,8 +167,18 @@ export class CampaignsService {
         { isActive: false },
       );
     }
+       
 
-    await this.campaignRepository.update({ id }, updateCampaignInput);
+    await this.campaignRepository.update({ id }, updateCampaignInput);    
+    const campEvent = new CampaignInactiveEvent();
+    campEvent.id = id;
+    campEvent.storeId = storeId;
+    campEvent.isActive = isActive;
+  if (isActive === false) {
+      this.eventEmitter.emit('campaign.inactive', campEvent);
+    } else {
+      this.eventEmitter.emit('campaign.active', campEvent);
+    }
     await this.updateDiscountCode({ id }, products, shop, accessToken);    
 
     return await this.findOneById(id);
