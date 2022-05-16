@@ -110,7 +110,7 @@ export class BillingsService {
           '_id': -1
         }
       }
-    ];
+    ]; 
     console.log("🚀 findMonthlyBilling ~ agg", agg)
     const manager = getMongoManager();
     const gs = await manager.aggregate(Billing, agg).toArray();
@@ -395,6 +395,11 @@ export class BillingsService {
               }
             }
           }
+        }
+      },
+      {
+        '$sort': {
+          '_id': 1
         }
       }
     ];
