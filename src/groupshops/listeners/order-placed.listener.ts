@@ -248,7 +248,7 @@ export class OrderPlacedListener {
     );
 
     const title = OrderPlacedListener.formatTitle(name);
-    const expires = OrderPlacedListener.addDays(new Date(), 7);
+    const expires = OrderPlacedListener.addDays(new Date(), 14);
 
     //check order price is greater than $1
     if (+totalProductPrice > 1) {
