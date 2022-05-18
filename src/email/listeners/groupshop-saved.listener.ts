@@ -164,7 +164,9 @@ export class GroupshopSavedListener {
       const imgPath = res.data.store.logoImage.split('/');
       brandLogo = await this.uploadImageService.getSignedUrl(imgPath[4]);
     } else {
-      brandLogo = '';
+      brandLogo = `${this.configService.get(
+        'HOST',
+      )}/public/images/default-logo.png`;
     }
 
     if (res.post == 'yes') {

@@ -37,7 +37,7 @@ export class KalavioService {
     };
     const body = JSON.stringify({
       allowDuplicates: true,
-      domain: 'grp.deals',
+      domain: 'group.shop',
       originalURL: link,
       title: 'GroupShop',
     });

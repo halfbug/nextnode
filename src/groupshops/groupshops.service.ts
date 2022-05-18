@@ -437,6 +437,7 @@ export class GroupshopsService {
           storeId: 1,
           totalProducts: 1,
           url: 1,
+          shortUrl: 1,
           expiredAt: 1,
           dealProducts: 1,
           discountCode: 1,
