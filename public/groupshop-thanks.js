@@ -7,7 +7,7 @@ window.BURL = 'https://api-stage.groupshop.co';
 window.FURL = 'http://front-stage.groupshop.co';
 
 // window.BURL = 'https://api.groupshop.co';
-// window.FURL = 'http://appfront.groupshop.co';
+// window.FURL = 'http://app.groupshop.co';
 window.GSURL = window.FURL;
 /* @preserve
     _____ __ _     __                _
@@ -474,7 +474,7 @@ function addLeftBlock() {
 <div class="get-start-thank-wrap">
   <div class="image-placeholder" style="height: 40px !important;"> .</div>
 </div>
-<div class="powerby mont">Powered by <a class="ty-share-this-deal" href="javascript:void(0)"><img src="https://app.groupshop.co/images/GROUPSHOP-logo.svg"></a></div>`;
+<div class="powerby mont">Powered by <a class="ty-share-this-deal" href="javascript:void(0)"><img src="${window.BURL}/images/GROUPSHOP-logo.svg"></a></div>`;
 
   var target = document.querySelector('.content-box:first-child');
   target.prepend(leftBlock);
@@ -486,7 +486,7 @@ function addRightBlock(brandName) {
   <div  class="gs_brandbar">
   <div class="gs_branding"></div>
   </div>
-  <p class="gs_content">Earn up to <strong class="bold"><span id="gscashback">...</span> cashback </strong> and access <strong class="bold">exclusive discounts</strong> every time you shop with friends! <img src="https://beta.groupshop.co/images/3-frnd-icon.svg"></p><p style="font-size: 14px;line-height: 18px;text-align: center;letter-spacing: 0.5px;color: #000000;padding: 0 12px;margin-bottom: 25px;font-family: Mulish;font-weight: 400;">Thanks to your ${brandName} purchase, you unlocked 🔑 access to a personalized shop for you and your friends.</p><div style="margin: auto;width:100%; text-align: center;"><a id="gs_link" style="color:#fff;background: #000;padding: 15px 30px;border-radius: 5px;display: inline-block;font-size: 14px;font-weight: 600;margin-bottom: 10px;font-family: DM Sans, sans-serif;letter-spacing: 1px;" target="_blank">CHECK OUT YOUR GROUPSHOP</a></div></div>`;
+  <p class="gs_content">Earn up to <strong class="bold"><span id="gscashback">...</span> cashback </strong> and access <strong class="bold">exclusive discounts</strong> every time you shop with friends! <img src="${window.BURL}/images/3-frnd-icon.svg"></p><p style="font-size: 14px;line-height: 18px;text-align: center;letter-spacing: 0.5px;color: #000000;padding: 0 12px;margin-bottom: 25px;font-family: Mulish;font-weight: 400;">Thanks to your ${brandName} purchase, you unlocked 🔑 access to a personalized shop for you and your friends.</p><div style="margin: auto;width:100%; text-align: center;"><a id="gs_link" style="color:#fff;background: #000;padding: 15px 30px;border-radius: 5px;display: inline-block;font-size: 14px;font-weight: 600;margin-bottom: 10px;font-family: DM Sans, sans-serif;letter-spacing: 1px;" target="_blank">CHECK OUT YOUR GROUPSHOP</a></div></div>`;
   var target = document.querySelector('.order-summary__sections');
   target.append(rightBlock);
 }

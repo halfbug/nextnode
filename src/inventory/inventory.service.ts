@@ -79,10 +79,10 @@ export class InventoryService {
       },
     ];
     const tp = await this.inventoryManager.aggregate(Inventory, agg).toArray();
-    console.log(
-      '🚀 ~ file: inventory.service.ts ~ line 55 ~ InventoryService ~ findTotalProducts ~ tp',
-      tp,
-    );
+    // console.log(
+    //   '🚀 ~ file: inventory.service.ts ~ line 55 ~ InventoryService ~ findTotalProducts ~ tp',
+    //   tp,
+    // );
     return tp[0];
   }
 
