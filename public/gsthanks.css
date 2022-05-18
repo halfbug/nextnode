@@ -213,7 +213,7 @@ a:active {
 	top: 17px;
 }
 .gs_branding {
-	background: url(https://api.groupshop.co/images/grpshp-png.png);
+	background: url(https://api.groupshop.co/public/images/grpshp-png.png);
 	background-size: 22%;
 	display: inline-block;
 	position: relative;

@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="./images/groupshop.png" width="320" alt="Groupshop Logo" /></a>
+  <a href="http://nestjs.com/" target="blank"><img src="./public/images/groupshop.png" width="320" alt="Groupshop Logo" /></a>
 </p>
 
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
