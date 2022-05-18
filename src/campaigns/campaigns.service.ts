@@ -180,7 +180,7 @@ export class CampaignsService {
     } else {
       this.eventEmitter.emit('campaign.active', campEvent);
     }
-    await this.updateDiscountCode({ id }, products, shop, accessToken);    
+    if (products && products.length > 0) await this.updateDiscountCode({ id }, products, shop, accessToken);    
 
     return await this.findOneById(id);
   }
