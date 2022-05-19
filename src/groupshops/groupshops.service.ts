@@ -215,6 +215,21 @@ export class GroupshopsService {
         },
       },
       {
+        $addFields: {
+          lineItemsDetails: {
+            $filter: {
+              input: '$lineItemsDetails',
+              as: 'j',
+              cond: {
+                $not: {
+                  $in: ['$$j.product.id', '$store.hideProducts'],
+                },
+              },
+            },
+          },
+        },
+      },
+      {
         $lookup: {
           from: 'inventory',
           localField: 'lineItemsDetails.product.id',
@@ -332,8 +347,6 @@ export class GroupshopsService {
                   '$$me',
                   {
                     products: {
-                      // $arrayElemAt: [
-                      //   {
                       $map: {
                         input: '$$me.lineItems',
                         in: {
@@ -351,9 +364,6 @@ export class GroupshopsService {
                           ],
                         },
                       },
-                      //   },
-                      //   0,
-                      // ],
                     },
                   },
                 ],
@@ -384,11 +394,41 @@ export class GroupshopsService {
         },
       },
       {
+        $addFields: {
+          campaignProducts: {
+            $filter: {
+              input: '$campaignProducts',
+              as: 'j',
+              cond: {
+                $not: {
+                  $in: ['$$j.id', '$store.hideProducts'],
+                },
+              },
+            },
+          },
+        },
+      },
+      {
         $lookup: {
           from: 'inventory',
           localField: 'dealProducts.productId',
           foreignField: 'id',
           as: 'dealsProducts',
+        },
+      },
+      {
+        $addFields: {
+          dealsProducts: {
+            $filter: {
+              input: '$dealsProducts',
+              as: 'j',
+              cond: {
+                $not: {
+                  $in: ['$$j.id', '$store.hideProducts'],
+                },
+              },
+            },
+          },
         },
       },
       {
@@ -424,7 +464,6 @@ export class GroupshopsService {
           orderDetails: 0,
           dealsProducts: 0,
           campaignProducts: 0,
-          // 'members.lineItems': 0,
         },
       },
       {
@@ -437,7 +476,6 @@ export class GroupshopsService {
           storeId: 1,
           totalProducts: 1,
           url: 1,
-          shortUrl: 1,
           expiredAt: 1,
           dealProducts: 1,
           discountCode: 1,

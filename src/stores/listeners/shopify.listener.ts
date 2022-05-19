@@ -19,6 +19,7 @@ export class ShopifyAPIListener {
     store.shopifySessionId = event.session.id;
     store.installationStep = 0;
     store.resources = [];
+    store.hideProducts = [];
     this.storeService.create(store).then((sstore) => {
       console.log('store---------------------------saved');
       console.log(sstore);

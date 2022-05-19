@@ -58,6 +58,9 @@ export default class Store extends DefaultColumnsService {
   subscription?: any[];
 
   @Column({ nullable: true })
+  hideProducts?: string[];
+
+  @Column({ nullable: true })
   appTrialEnd: Date;
 
   @Column({ nullable: true })

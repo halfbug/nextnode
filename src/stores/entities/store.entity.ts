@@ -82,6 +82,9 @@ export class Store {
   @Field(() => [Campaign], { nullable: 'itemsAndList' })
   campaigns?: Campaign[];
 
+  @Field(() => [String], { nullable: 'itemsAndList' })
+  hideProducts?: string[];
+
   @Field(() => Campaign, { nullable: true })
   activeCampaign?: Campaign;
 

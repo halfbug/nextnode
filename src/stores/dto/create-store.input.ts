@@ -89,6 +89,9 @@ export class CreateStoreInput {
   @Field({ nullable: true })
   currencyCode: string;
 
+  @Field(() => [String], { nullable: true })
+  hideProducts?: string[];
+
   @Field({ nullable: true })
   timezone: string;
 }
