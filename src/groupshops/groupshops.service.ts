@@ -462,12 +462,19 @@ export class GroupshopsService {
       if (ind === 0) {
         dPopular.push(item);
       } else {
-        if (dPopular.find((prd) => prd.id !== item.id)) {
+        if (!dPopular.find((prd) => prd.id === item.id)) {
+          console.log(!dPopular.find((prd) => prd.id !== item.id));
+          console.log('item here', item.id);
+
           dPopular.push(item);
         }
       }
     });
     gs[0].popularProducts = dPopular;
+    console.log(
+      '🚀 ~ file: groupshops.service.ts ~ line 471 ~ GroupshopsService ~ findOne ~ dPopular',
+      dPopular,
+    );
 
     return gs[0];
   }
