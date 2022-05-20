@@ -221,9 +221,16 @@ export class GroupshopsService {
               input: '$lineItemsDetails',
               as: 'j',
               cond: {
-                $not: {
-                  $in: ['$$j.product.id', '$store.hideProducts'],
-                },
+                $and: [
+                  {
+                    $gte: ['$$j.price', '1'],
+                  },
+                  {
+                    $not: {
+                      $in: ['$$j.id', '$store.hideProducts'],
+                    },
+                  },
+                ],
               },
             },
           },
@@ -400,9 +407,16 @@ export class GroupshopsService {
               input: '$campaignProducts',
               as: 'j',
               cond: {
-                $not: {
-                  $in: ['$$j.id', '$store.hideProducts'],
-                },
+                $and: [
+                  {
+                    $gte: ['$$j.price', '1'],
+                  },
+                  {
+                    $not: {
+                      $in: ['$$j.id', '$store.hideProducts'],
+                    },
+                  },
+                ],
               },
             },
           },
@@ -423,9 +437,16 @@ export class GroupshopsService {
               input: '$dealsProducts',
               as: 'j',
               cond: {
-                $not: {
-                  $in: ['$$j.id', '$store.hideProducts'],
-                },
+                $and: [
+                  {
+                    $gte: ['$$j.price', '1'],
+                  },
+                  {
+                    $not: {
+                      $in: ['$$j.id', '$store.hideProducts'],
+                    },
+                  },
+                ],
               },
             },
           },
@@ -475,6 +496,7 @@ export class GroupshopsService {
           campaignId: 1,
           storeId: 1,
           totalProducts: 1,
+          shortUrl: 1,
           url: 1,
           expiredAt: 1,
           dealProducts: 1,
