@@ -123,7 +123,7 @@ export class GroupShop {
   @Field()
   url: string;
 
-  @Field()
+  @Field({ nullable: true })
   shortUrl?: string;
 
   @Field()
