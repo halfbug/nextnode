@@ -223,7 +223,7 @@ export class GroupshopsService {
               cond: {
                 $and: [
                   {
-                    $gte: ['$$j.price', '1'],
+                    $gte: ['$$j.price', '1.01'],
                   },
                   {
                     $not: {
@@ -409,7 +409,7 @@ export class GroupshopsService {
               cond: {
                 $and: [
                   {
-                    $gte: ['$$j.price', '1'],
+                    $gte: ['$$j.price', '1.01'],
                   },
                   {
                     $not: {
@@ -439,7 +439,7 @@ export class GroupshopsService {
               cond: {
                 $and: [
                   {
-                    $gte: ['$$j.price', '1'],
+                    $gte: ['$$j.price', '1.01'],
                   },
                   {
                     $not: {
