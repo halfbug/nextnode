@@ -51,6 +51,13 @@ export class GroupshopsService {
   findAll() {
     return this.groupshopRepository.find();
   }
+  find(code: string) {
+    return this.groupshopRepository.findOne({
+      where: {
+        'discountCode.title': code,
+      },
+    });
+  }
 
   findAllByDate(sdate: Date, edate: Date) {
     return this.groupshopRepository.find({
@@ -523,8 +530,8 @@ export class GroupshopsService {
         dPopular.push(item);
       } else {
         if (!dPopular.find((prd) => prd.id === item.id)) {
-          console.log(!dPopular.find((prd) => prd.id !== item.id));
-          console.log('item here', item.id);
+          // console.log(!dPopular.find((prd) => prd.id !== item.id));
+          // console.log('item here', item.id);
 
           dPopular.push(item);
         }
@@ -533,7 +540,7 @@ export class GroupshopsService {
     gs[0].popularProducts = dPopular;
     console.log(
       '🚀 ~ file: groupshops.service.ts ~ line 471 ~ GroupshopsService ~ findOne ~ dPopular',
-      dPopular,
+      gs[0],
     );
 
     return gs[0];

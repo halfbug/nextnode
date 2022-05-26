@@ -18,3 +18,6 @@ export const GS_FEES = [
   GS_CHARGE_FEE_GROWTH,
   GS_CHARGE_FEE_UNICORN,
 ];
+
+export const FIRST_EXPIRE_DAYS = 14;
+export const SECOND_EXPIRE_DAYS = 7;

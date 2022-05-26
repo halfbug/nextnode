@@ -18,6 +18,7 @@ import {
 } from '@nestjs/common';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import { QRInput } from './dto/qr-code.input';
+import { addDays, getDateDifference } from 'src/utils/functions';
 
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
@@ -62,7 +63,23 @@ export class GroupshopsResolver {
   }
 
   @Query(() => Groupshop, { name: 'groupshop' })
-  async findOne(@Args('code') code: string) {
+  async findOne(@Args('code') code: string, @Args('status') status: string) {
+    console.log('code status', code, status);
+    if (status === 'activated') {
+      //load gs, currentdate > expiredate, update expire = currdate+7
+      const groupshop = await this.GroupshopsService.find(
+        await this.crypt.decrypt(code),
+      );
+      const isExpired = !(getDateDifference(groupshop.expiredAt).time > -1);
+      if (isExpired) {
+        //update
+        const newExpiredate = addDays(new Date(), 7);
+        this.GroupshopsService.update({
+          expiredAt: newExpiredate,
+          id: groupshop.id,
+        });
+      }
+    }
     return await this.GroupshopsService.findOne(await this.crypt.decrypt(code));
   }
 

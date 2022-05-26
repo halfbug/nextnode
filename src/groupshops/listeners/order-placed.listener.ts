@@ -148,6 +148,10 @@ export class OrderPlacedListener {
     const percentageGiven = (100 - GS_CHARGE_CASHBACK) / 100;
     const cashBackUsageCharge = GS_CHARGE_CASHBACK / 100; //convert percentage in amount
     const cashBackUsageChargeAmount = refundAmount * cashBackUsageCharge;
+    console.log(
+      '🚀 ~ file: order-placed.listener.ts ~ line 151 ~ OrderPlacedListener ~ calculateRefund ~ refundAmount',
+      refundAmount,
+    );
     const shopifyAmount = Math.floor(refundAmount - cashBackUsageChargeAmount);
     console.log(
       '🚀 ~ file: order-placed.listener.ts ~ line 116  calculateRefund ~ refundAmount',
