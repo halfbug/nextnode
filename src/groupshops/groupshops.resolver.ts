@@ -67,17 +67,24 @@ export class GroupshopsResolver {
     console.log('code status', code, status);
     if (status === 'activated') {
       //load gs, currentdate > expiredate, update expire = currdate+7
-      const groupshop = await this.GroupshopsService.find(
-        await this.crypt.decrypt(code),
-      );
+      const Dcode = await this.crypt.decrypt(code);
+      const groupshop = await this.GroupshopsService.find(Dcode);
       const isExpired = !(getDateDifference(groupshop.expiredAt).time > -1);
       if (isExpired) {
         //update
         const newExpiredate = addDays(new Date(), 7);
-        this.GroupshopsService.update({
-          expiredAt: newExpiredate,
-          id: groupshop.id,
-        });
+        const updateGS = await this.GroupshopsService.updateExpireDate(
+          {
+            expiredAt: newExpiredate,
+            id: groupshop.id,
+          },
+          Dcode,
+        );
+        // console.log(
+        //   '🚀 ~ file: groupshops.resolver.ts ~ line 81 ~ GroupshopsResolver ~ findOne ~ updateGS',
+        //   updateGS,
+        // );
+        return updateGS;
       }
     }
     return await this.GroupshopsService.findOne(await this.crypt.decrypt(code));

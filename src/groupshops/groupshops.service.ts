@@ -538,10 +538,10 @@ export class GroupshopsService {
       }
     });
     gs[0].popularProducts = dPopular;
-    console.log(
-      '🚀 ~ file: groupshops.service.ts ~ line 471 ~ GroupshopsService ~ findOne ~ dPopular',
-      gs[0],
-    );
+    // console.log(
+    //   '🚀 ~ file: groupshops.service.ts ~ line 471 ~ GroupshopsService ~ findOne ~ dPopular',
+    //   gs[0],
+    // );
 
     return gs[0];
   }
@@ -677,7 +677,7 @@ export class GroupshopsService {
       gsproducts,
     } = gs;
 
-    if (dealProducts.length > 0) {
+    if (dealProducts && dealProducts.length > 0) {
       await this.shopifyapi.setDiscountCode(
         shop,
         'Update',
@@ -696,6 +696,18 @@ export class GroupshopsService {
       );
     }
     return gs;
+  }
+
+  async updateExpireDate(
+    updateGroupshopInput: UpdateGroupshopInput,
+    code: string,
+  ) {
+    const { id } = updateGroupshopInput;
+
+    delete updateGroupshopInput.id;
+    await this.groupshopRepository.update({ id }, updateGroupshopInput);
+    const gs = await this.findWithStore(id);
+    return await this.findOne(code);
   }
 
   // updateDealProducts(addDealProductInput: AddDealProductInput) {
