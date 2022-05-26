@@ -22,6 +22,9 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailModule } from './email/email.module';
+import { GsCommonModule } from './gs-common/gs-common.module';
+import { Lifecycle } from './gs-common/entities/lifecycle.modal';
+import { Visitors } from './gs-common/entities/visitors.modal';
 
 @Module({
   imports: [
@@ -58,6 +61,8 @@ import { EmailModule } from './email/email.module';
             Appsetting,
             Groupshops,
             Billing,
+            Lifecycle,
+            Visitors,
           ],
         };
       },
@@ -79,6 +84,7 @@ import { EmailModule } from './email/email.module';
       serveRoot: '/public/', //last slash was important
     }),
     EmailModule,
+    GsCommonModule,
   ],
 })
 export class AppModule {}

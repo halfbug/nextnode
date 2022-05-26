@@ -10,6 +10,7 @@ import { EmailModule } from 'src/email/email.module';
 import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
 import { UtilsModule } from 'src/utils/utils.module';
 import { RefAddedEvent } from './events/refferal-added.event';
+import { GsCommonModule } from 'src/gs-common/gs-common.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { RefAddedEvent } from './events/refferal-added.event';
     DefaultColumnsService,
     forwardRef(() => ShopifyStoreModule),
     UtilsModule,
+    forwardRef(() => GsCommonModule),
   ],
   providers: [
     GroupshopsResolver,

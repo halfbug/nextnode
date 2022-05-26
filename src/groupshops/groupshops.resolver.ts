@@ -15,9 +15,11 @@ import {
   ExecutionContext,
   Ip,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import { QRInput } from './dto/qr-code.input';
+import { ViewedInterceptor } from 'src/gs-common/viewed.inceptor';
 import { addDays, getDateDifference } from 'src/utils/functions';
 
 export const ReqDecorator = createParamDecorator(
@@ -62,6 +64,7 @@ export class GroupshopsResolver {
     return this.GroupshopsService.findfindQrDealLinkAll(email, ordernumber);
   }
 
+  @UseInterceptors(ViewedInterceptor)
   @Query(() => Groupshop, { name: 'groupshop' })
   async findOne(@Args('code') code: string, @Args('status') status: string) {
     console.log('code status', code, status);

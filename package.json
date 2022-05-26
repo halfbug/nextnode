@@ -34,6 +34,7 @@
 		"@nestjs/swagger": "^5.1.5",
 		"@nestjs/typeorm": "^8.0.2",
 		"@shopify/shopify-api": "^1.4.1",
+		"@supercharge/request-ip": "^1.2.0",
 		"@types/mongodb": "4.0.7",
 		"apollo-server-express": "^3.4.0",
 		"aws-sdk": "^2.1030.0",

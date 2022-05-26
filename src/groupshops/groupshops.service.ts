@@ -540,7 +540,7 @@ export class GroupshopsService {
     gs[0].popularProducts = dPopular;
     // console.log(
     //   '🚀 ~ file: groupshops.service.ts ~ line 471 ~ GroupshopsService ~ findOne ~ dPopular',
-    //   gs[0],
+    //   dPopular,
     // );
 
     return gs[0];
