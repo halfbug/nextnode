@@ -56,7 +56,7 @@ export class StoreListener {
       updatedStore,
     );
 
-    this.planUpdateEvent.store = event.store;
+    this.planUpdateEvent.store = updatedStore;
     this.planUpdateEvent.groupshop = event.groupshop;
     this.planUpdateEvent.revenue = event.revenue;
     this.planUpdateEvent.emit();

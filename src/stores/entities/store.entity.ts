@@ -102,7 +102,7 @@ export class Store {
   @Field(() => String, { nullable: true })
   shopifySubscription?: Resource[];
 
-  @Field()
+  @Field({ nullable: true })
   appTrialEnd: Date;
 
   @Field({ nullable: true })

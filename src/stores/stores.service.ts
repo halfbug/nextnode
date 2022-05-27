@@ -50,10 +50,10 @@ export class StoresService {
       },
     ];
     const res = await manager.aggregate(Store, agg).toArray();
-    console.log(
-      '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
-      res[0].campaigns,
-    );
+    // console.log(
+    //   '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
+    //   res[0].campaigns,
+    // );
     return { ...res[0] };
   }
 

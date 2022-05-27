@@ -10,7 +10,6 @@ import {
   GS_PLAN3_END_COUNT,
 } from 'src/utils/constant';
 import { BillingPlanEnum } from '../entities/store.entity';
-import { StorePlanUpdatedEvent } from '../events/plan-updated.event';
 // import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { StoresService } from '../stores.service';
 

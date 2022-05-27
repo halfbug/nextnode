@@ -4,7 +4,6 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ShopifyService } from '../shopify/shopify.service';
 import { AddResourceEvent } from 'src/stores/events/add-resource.event';
 import { StoreSavedEvent } from 'src/stores/events/store-saved.event';
-import { StorePlanUpdatedEvent } from 'src/stores/events/plan-updated.event';
 import { OrderCreatedEvent } from '../events/order-created.event';
 import { OrdersService } from 'src/inventory/orders.service';
 import {

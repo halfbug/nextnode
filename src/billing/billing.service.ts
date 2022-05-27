@@ -56,29 +56,41 @@ export class BillingsService {
         }
       }, {
         '$addFields': {
-            'feeTotalCB': {
-                '$cond': {
-                    'if': {
-                        '$eq': [
-                            '$type', 0
-                        ]
-                    }, 
-                    'then': '$feeCharges', 
-                    'else': 0
-                }
-            },
-            'createdMonthGS': {
-              '$cond': {
-                'if': {
-                  '$eq': ['$type', 1]
-                },
-                'then': 1,
-                'else': 0
-              }
-            },
-          
+          'feeTotalCB': {
+            '$cond': {
+              'if': {
+                '$eq': [
+                  '$type', 0
+                ]
+              }, 
+              'then': '$feeCharges', 
+              'else': 0
+            }
+          }, 
+          'feeTotalGS': {
+            '$cond': {
+              'if': {
+                '$eq': [
+                  '$type', 1
+                ]
+              }, 
+              'then': '$feeCharges', 
+              'else': 0
+            }
+          }, 
+          'createdMonthGS': {
+            '$cond': {
+              'if': {
+                '$eq': [
+                  '$type', 1
+                ]
+              }, 
+              'then': 1, 
+              'else': 0
+            }
+          }
         }
-    }, {
+      }, {
         '$group': {
           '_id': {
             'year': {
@@ -97,13 +109,29 @@ export class BillingsService {
           'feeCharges': {
             '$sum': '$feeTotalCB'
           }, 
+          'feeChargesGS': {
+            '$sum': '$feeTotalGS'
+          }, 
           'count': {
             '$count': {}
-          },
+          }, 
           'totalGS': {
             '$sum': '$createdMonthGS'
           }
-        
+        }
+      }, {
+        '$project': {
+          'totalCharges': {
+            '$add': [
+              '$feeCharges', '$feeChargesGS'
+            ]
+          }, 
+          'cashBack': 1, 
+          'revenue': 1, 
+          'feeCharges': 15, 
+          'feeChargesGS': 1, 
+          'count': 1, 
+          'totalGS': 1
         }
       }, {
         '$sort': {
