@@ -75,7 +75,10 @@ function displayBanner(price) {
     window.APPv2URL
   }/public/images/GROUPSHOP-logo.svg" class="link-logo"></div> <div class="grp-shop-text">Shop with friends, <br> get <strong>$${parseFloat(
     price,
-  ).toFixed(2)} cashback</strong></div>`;
+  )
+    .toFixed(2)
+    .toString()
+    .replace('.00', '')} cashback</strong></div>`;
   banner.className = 'yellow_banner';
   banner.id = 'grp-shop-section-2';
   banner.setAttribute('data-gs-toggle', 'groupshop_modal');
@@ -146,6 +149,18 @@ function injectStyleSheet(url) {
   document.head.appendChild(style);
 }
 
+function getSelectedVariant(variants) {
+  const options = document.querySelector(`.product-form__variants`);
+
+  const currentVariantID = parseInt(
+    options.selectedOptions[0].value.trim().toLowerCase(),
+  );
+
+  const variant = variants.filter((e) => e.id === currentVariantID)[0];
+
+  return variant || false;
+}
+
 async function init() {
   try {
     // fetch store detail
@@ -153,12 +168,12 @@ async function init() {
     console.log('🚀 ~ file: groupshop-pdp.js ~ line 124 ~ init ~ store', store);
     if (store.status === 'Active') {
       const {
+        product: { variants, id: product_id },
         product: {
-          variants: [product],
-          id: product_id,
+          variants: [firstVariant],
         },
       } = await fetchProduct();
-
+      const product = getSelectedVariant(variants) || firstVariant;
       fetchGroupshopURL(store.id, store.campaignId, product_id).then((res) => {
         if (!!res.url) {
           var elem = document.getElementById('today-offer-gs');

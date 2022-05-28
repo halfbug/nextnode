@@ -451,7 +451,12 @@ function injectStyleSheet(url) {
 function addLeftBlock() {
   leftBlock = document.createElement('div');
   leftBlock.className = 'groupshop_left-block';
-  leftBlock.innerHTML = `<h3>Get up to <strong><span id="gscashback">...</span> cashback</strong> when you invite your friends to shop</h3><div class="glider-contain">
+  leftBlock.innerHTML = `
+  <h3>
+  <span class="image-placeholder" style="height: 45px !important;width: 100% !important;">&nbsp;</span>
+  </h3>
+  
+  <div class="glider-contain">
   <div class="glider">
     <div class="image-placeholder">
         <h4>...</h4>
@@ -472,7 +477,7 @@ function addLeftBlock() {
   
 </div>
 <div class="get-start-thank-wrap">
-  <div class="image-placeholder" style="height: 40px !important;"> .</div>
+  <div class="image-placeholder" style="height: 40px !important;">&nbsp</div>
 </div>
 <div class="powerby mont">Powered by <a class="ty-share-this-deal" href="javascript:void(0)"><img src="${window.BURL}/public/images/GROUPSHOP-logo.svg"></a></div>`;
 
@@ -480,15 +485,26 @@ function addLeftBlock() {
   target.prepend(leftBlock);
 }
 
-function addRightBlock(brandName) {
-  const rightBlock = document.createElement('div');
-  rightBlock.innerHTML = `<div class="groupshop_right-block">
-  <div  class="gs_brandbar">
-  <div class="gs_branding"></div>
+function addRightBlock(brandName, isLoaded, cashback) {
+  if (isLoaded) {
+    document.querySelector(
+      '.groupshop_right-block',
+    ).innerHTML = `<div  class="gs_brandbar">
+  <div class="gs_branding">${cashback}</div>
   </div>
-  <p class="gs_content">Earn up to <strong class="bold"><span id="gscashback">...</span> cashback </strong> and access <strong class="bold">exclusive discounts</strong> every time you shop with friends! <img src="${window.BURL}/public/images/3-frnd-icon.svg"></p><p style="font-size: 14px;line-height: 18px;text-align: center;letter-spacing: 0.5px;color: #000000;padding: 0 12px;margin-bottom: 25px;font-family: Mulish;font-weight: 400;">Thanks to your ${brandName} purchase, you unlocked 🔑 access to a personalized shop for you and your friends.</p><div style="margin: auto;width:100%; text-align: center;"><a id="gs_link" style="color:#fff;background: #000;padding: 15px 30px;border-radius: 5px;display: inline-block;font-size: 14px;font-weight: 600;margin-bottom: 10px;font-family: DM Sans, sans-serif;letter-spacing: 1px;" target="_blank">CHECK OUT YOUR GROUPSHOP</a></div></div>`;
-  var target = document.querySelector('.order-summary__sections');
-  target.append(rightBlock);
+  <p class="gs_content">Earn up to <strong class="bold"><span id="gscashback">...</span> cashback </strong> and access <strong class="bold">exclusive discounts</strong> every time you shop with friends! <img src="${window.BURL}/public/images/3-frnd-icon.svg"></p><p style="font-size: 14px;line-height: 18px;text-align: center;letter-spacing: 0.5px;color: #000000;padding: 0 12px;margin-bottom: 25px;font-family: Mulish;font-weight: 400;">Thanks to your ${brandName} purchase, you unlocked 🔑 access to a personalized shop for you and your friends.</p><div style="margin: auto;width:100%; text-align: center;"><a id="gs_link" style="color:#fff;background: #000;padding: 15px 30px;border-radius: 5px;display: inline-block;font-size: 14px;font-weight: 600;margin-bottom: 10px;font-family: DM Sans, sans-serif;letter-spacing: 1px;" target="_blank">CHECK OUT YOUR GROUPSHOP</a></div>`;
+  } else {
+    const rightBlock = document.createElement('div');
+    rightBlock.innerHTML = `<div class="groupshop_right-block">
+    <div style="display: flex;flex-direction: column;">
+    <div class="image-placeholder" style="height: 40px !important;align-self: center;">&nbsp;</div>
+    <div class="image-placeholder" style="height: 100px !important;align-self: center;width: 100% !important;">&nbsp;</div>
+    <div class="image-placeholder" style="height: 40px !important;/* width: 100% !important; */align-self: center;">&nbsp;</div>
+    </div></div>`;
+
+    var target = document.querySelector('.order-summary__sections');
+    target.append(rightBlock);
+  }
 }
 
 async function init() {
@@ -496,13 +512,13 @@ async function init() {
   // fetch store detail
   const store = await fetchStore(Shopify.shop);
   console.log('🚀 ~ file: groupshop-pdp.js ~ line 124 ~ init ~ store', store);
-  if (store.status === 'Active') {
+  if (['Active', 'Inactive'].includes(store.status)) {
     //create products slider
     injectStyleSheet('gsthanks.css');
     injectStyleSheet('glider.min.css');
 
     addLeftBlock();
-    addRightBlock(store.brandName);
+    addRightBlock(store.brandName, false, '');
 
     var glider = new Glider(document.querySelector('.glider'), {
       //   slidesToScroll: 3,
@@ -518,8 +534,10 @@ async function init() {
     });
 
     let res;
+    let indx;
 
     const pollit = setInterval(async () => {
+      indx++;
       res = await gsPost('member', { orderId, wurl: window.location.href });
       if (res.activeMember) {
         clearInterval(pollit);
@@ -533,30 +551,51 @@ async function init() {
             Shopify.checkout.subtotal_price *
             (parseFloat(store.discount) / 100 - mem.availedDiscount / 100);
         }
-        document.querySelectorAll('#gscashback').forEach((elem) => {
-          console.log(elem);
-          var amountCal = `${Math.floor(cashback)
-            .toString()
-            .replace('.00', '')}`;
-          if (amountCal > 0) {
-            elem.innerHTML = `$${Math.floor(cashback)
-              .toString()
-              .replace('.00', '')}`;
-          } else {
-            var printMessage =
-              'Your friends get up to <strong>' +
-              mem.availedDiscount +
-              '% off</strong> when they shop on your link.';
-            document.querySelectorAll('.gs_content').forEach((elem1) => {
-              elem1.innerHTML = printMessage;
-            });
-            document
-              .querySelectorAll('.groupshop_left-block h3')
-              .forEach((elem2) => {
-                elem2.innerHTML = printMessage;
-              });
-          }
-        });
+
+        var amountCal = `${Math.floor(cashback).toString().replace('.00', '')}`;
+        var leftHeadTxt = '';
+        if (+amountCal > 0) {
+          leftHeadTxt = `
+         Get up to{' '}
+         <strong>
+           <span>${amountCal}</span> cashback
+         </strong>{' '}
+         when you invite your friends to shop
+       `;
+        } else {
+          leftHeadTxt =
+            'Your friends get up to <strong>' +
+            mem.availedDiscount +
+            '% off</strong> when they shop on your link.';
+        }
+        document.querySelector('.groupshop_left-block h3').innerHTML =
+          leftHeadTxt;
+        document.querySelector('.groupshop_left-block h3').className = 'active';
+        addRightBlock(store.brandName, true, amountCal);
+        // document.querySelectorAll('#gscashback').forEach((elem) => {
+        //   console.log(elem);
+        //   var amountCal = `${Math.floor(cashback)
+        //     .toString()
+        //     .replace('.00', '')}`;
+        //   if (amountCal > 0) {
+        //     elem.innerHTML = `$${Math.floor(cashback)
+        //       .toString()
+        //       .replace('.00', '')}`;
+        //   } else {
+        //     var printMessage =
+        //       'Your friends get up to <strong>' +
+        //       mem.availedDiscount +
+        //       '% off</strong> when they shop on your link.';
+        //     document.querySelectorAll('.gs_content').forEach((elem1) => {
+        //       elem1.innerHTML = printMessage;
+        //     });
+        //     document
+        //       .querySelectorAll('.groupshop_left-block h3')
+        //       .forEach((elem2) => {
+        //         elem2.innerHTML = printMessage;
+        //       });
+        //   }
+        // });
         window.GSURL = window.FURL + url;
         document.querySelector(
           '.get-start-thank-wrap',
@@ -603,6 +642,10 @@ async function init() {
         });
 
         glider.refresh(true);
+      } else if (indx === 3) {
+        clearInterval(pollit);
+        document.querySelector('.groupshop_left-block').remove();
+        document.querySelector('.groupshop_right-block').remove();
       }
     }, 1000);
 
