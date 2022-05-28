@@ -490,9 +490,9 @@ function addRightBlock(brandName, isLoaded, cashback) {
     document.querySelector(
       '.groupshop_right-block',
     ).innerHTML = `<div  class="gs_brandbar">
-  <div class="gs_branding">${cashback}</div>
+  <div class="gs_branding"></div>
   </div>
-  <p class="gs_content">Earn up to <strong class="bold"><span id="gscashback">...</span> cashback </strong> and access <strong class="bold">exclusive discounts</strong> every time you shop with friends! <img src="${window.BURL}/public/images/3-frnd-icon.svg"></p><p style="font-size: 14px;line-height: 18px;text-align: center;letter-spacing: 0.5px;color: #000000;padding: 0 12px;margin-bottom: 25px;font-family: Mulish;font-weight: 400;">Thanks to your ${brandName} purchase, you unlocked 🔑 access to a personalized shop for you and your friends.</p><div style="margin: auto;width:100%; text-align: center;"><a id="gs_link" style="color:#fff;background: #000;padding: 15px 30px;border-radius: 5px;display: inline-block;font-size: 14px;font-weight: 600;margin-bottom: 10px;font-family: DM Sans, sans-serif;letter-spacing: 1px;" target="_blank">CHECK OUT YOUR GROUPSHOP</a></div>`;
+  <p class="gs_content">Earn up to <strong class="bold"><span id="gscashback">$ ${cashback}</span> cashback </strong> and access <strong class="bold">exclusive discounts</strong> every time you shop with friends! <img src="${window.BURL}/public/images/3-frnd-icon.svg"></p><p style="font-size: 14px;line-height: 18px;text-align: center;letter-spacing: 0.5px;color: #000000;padding: 0 12px;margin-bottom: 25px;font-family: Mulish;font-weight: 400;">Thanks to your ${brandName} purchase, you unlocked 🔑 access to a personalized shop for you and your friends.</p><div style="margin: auto;width:100%; text-align: center;"><a id="gs_link" style="color:#fff;background: #000;padding: 15px 30px;border-radius: 5px;display: inline-block;font-size: 14px;font-weight: 600;margin-bottom: 10px;font-family: DM Sans, sans-serif;letter-spacing: 1px;" target="_blank">CHECK OUT YOUR GROUPSHOP</a></div>`;
   } else {
     const rightBlock = document.createElement('div');
     rightBlock.innerHTML = `<div class="groupshop_right-block">
@@ -556,10 +556,10 @@ async function init() {
         var leftHeadTxt = '';
         if (+amountCal > 0) {
           leftHeadTxt = `
-         Get up to{' '}
+         Get up to
          <strong>
-           <span>${amountCal}</span> cashback
-         </strong>{' '}
+           <span>$ ${amountCal}</span> cashback
+         </strong>
          when you invite your friends to shop
        `;
         } else {
@@ -572,6 +572,7 @@ async function init() {
           leftHeadTxt;
         document.querySelector('.groupshop_left-block h3').className = 'active';
         addRightBlock(store.brandName, true, amountCal);
+        document.querySelector('.gs_content').innerHTML = leftHeadTxt;
         // document.querySelectorAll('#gscashback').forEach((elem) => {
         //   console.log(elem);
         //   var amountCal = `${Math.floor(cashback)
