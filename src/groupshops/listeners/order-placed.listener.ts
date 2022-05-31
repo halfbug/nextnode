@@ -234,22 +234,9 @@ export class OrderPlacedListener {
     this.order = event.order;
     this.store = event.store;
 
-    const dealProducts = lineItems
-      .filter((item) => !campaignProducts.includes(item.product.id))
-      .map((nitem) => ({
-        productId: nitem.product.id,
-        type: ProductTypeEnum.deal,
-        addedBy: customer.firstName,
-        customerIP: customer.ip,
-      }));
-
     const gsMember = new MemberInput();
     gsMember.orderId = orderId;
     gsMember.lineItems = lineItems;
-
-    const totalCampaignProducts = campaignProducts.concat(
-      dealProducts.map((p) => p.productId),
-    );
 
     const title = OrderPlacedListener.formatTitle(name);
     const expires = OrderPlacedListener.addDays(new Date(), 14);
@@ -267,8 +254,12 @@ export class OrderPlacedListener {
           createdAt,
           expiredAt,
           id,
+          dealProducts,
         } = ugroupshop;
         this.groupshop = ugroupshop as Groupshops;
+        const totalCampaignProducts = campaignProducts.concat(
+          dealProducts.map((p) => p.productId),
+        );
 
         gsMember.role = RoleTypeEnum.referral;
         gsMember.availedDiscount = parseFloat(
@@ -319,6 +310,17 @@ export class OrderPlacedListener {
         groupshopSavedEvent.ugroupshop = ugroupshop;
         this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
       } else {
+        const dealProducts = lineItems
+          .filter((item) => !campaignProducts.includes(item.product.id))
+          .map((nitem) => ({
+            productId: nitem.product.id,
+            type: ProductTypeEnum.deal,
+            addedBy: customer.firstName,
+            customerIP: customer.ip,
+          }));
+        const totalCampaignProducts = campaignProducts.concat(
+          dealProducts.map((p) => p.productId),
+        );
         const cryptURL = `/${
           shop.split('.')[0]
         }/deal/${await this.crypt.encrypt(title)}`;
@@ -326,6 +328,7 @@ export class OrderPlacedListener {
         const fulllink = `${this.configSevice.get('FRONT')}${cryptURL}`;
         const shortLink = await this.kalavioService.generateShortLink(fulllink);
         console.log('myshort wwww: ' + shortLink);
+
         const newGroupshop = new CreateGroupshopInput();
         newGroupshop.storeId = id;
         newGroupshop.campaignId = campaignId;
