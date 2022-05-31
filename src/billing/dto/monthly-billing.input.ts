@@ -1,5 +1,5 @@
 import { ObjectType, Field } from '@nestjs/graphql';
-import { BillingPlanEnum } from 'src/stores/entities/store.entity';
+import { BillingPlanEnum, Store } from 'src/stores/entities/store.entity';
 
 @ObjectType()
 export class MonthYearType {
@@ -101,4 +101,7 @@ export class SingleDayBillingInput {
 
   @Field({ nullable: true })
   totalfeeByGS?: number;
+
+  @Field({ nullable: true })
+  store?: Store;
 }

@@ -139,7 +139,7 @@ export class BillingsService {
         }
       }
     ]; 
-    console.log("🚀 findMonthlyBilling ~ agg", agg)
+    // console.log("🚀 findMonthlyBilling ~ agg", agg)
     const manager = getMongoManager();
     const gs = await manager.aggregate(Billing, agg).toArray();
     // console.log("🚀 findMonthlyBilling ~ gs", gs)
@@ -190,7 +190,7 @@ export class BillingsService {
         }
       }
     ];
-    console.log("🚀 findMonthlyBilling ~ agg", agg)
+    // console.log("🚀 findMonthlyBilling ~ agg", agg)
     const manager = getMongoManager();
     const TotalRev = await manager.aggregate(Billing, agg).toArray();
     console.log("🚀 findMonthlyBilling ~ TotalRevenue", TotalRev)
@@ -343,10 +343,28 @@ export class BillingsService {
             '$addToSet': '$id'
           }, 
           'store': {
-            '$first': '$storeId'
+            '$first': '$store'
           }, 
           'storeTotalGS': {
             '$first': '$store.totalGroupShop'
+          }
+        }
+      }, {
+        '$addFields': {
+          'uniquePlan': {
+            '$cond': {
+              'if': {
+                '$gt': [
+                  {
+                    '$size': '$uniquePlan'
+                  }, 0
+                ]
+              }, 
+              'then': '$uniquePlan', 
+              'else': [
+                '$storePlan'
+              ]
+            }
           }
         }
       }, {
@@ -371,6 +389,7 @@ export class BillingsService {
           'storePlan': 1,
           'totalfeeByCashback': 1,
           'totalfeeByGS': 1,
+          'store': 1,
           'todaysTotalGS': {
             '$size': '$todaysGS'
           }, 
@@ -431,10 +450,10 @@ export class BillingsService {
         }
       }
     ];
-    // console.log("🚀 findMonthlyBilling ~ agg", agg)
+    // console.log("🚀 findBillingBydate ~ agg", agg)
     const manager = getMongoManager();
     const TotalRev = await manager.aggregate(Billing, agg).toArray();
-    // console.log("🚀 get billing by date", TotalRev)
+    console.log("🚀 get billing by date", TotalRev)
     return TotalRev;
   }
 

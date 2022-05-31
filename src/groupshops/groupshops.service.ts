@@ -469,7 +469,7 @@ export class GroupshopsService {
       {
         $addFields: {
           popularProducts: {
-            $concatArrays: ['$popularProducts', '$dealsProducts'],
+            $concatArrays: ['$dealsProducts', '$popularProducts'],
           },
         },
       },
