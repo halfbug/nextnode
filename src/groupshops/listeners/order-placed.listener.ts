@@ -236,7 +236,13 @@ export class OrderPlacedListener {
 
     const gsMember = new MemberInput();
     gsMember.orderId = orderId;
-    gsMember.lineItems = lineItems;
+    // filter out items that price is less than or eq to 1
+    const newLineItems = lineItems.filter(({ price }) => +price > 1);
+    gsMember.lineItems = newLineItems;
+    console.log(
+      '🚀 ~ file: order-placed.listener.ts ~ line 242 ~ OrderPlacedListener ~ createGroupShop ~ newLineItems',
+      newLineItems,
+    );
 
     const title = OrderPlacedListener.formatTitle(name);
     const expires = OrderPlacedListener.addDays(new Date(), 14);
@@ -310,7 +316,7 @@ export class OrderPlacedListener {
         groupshopSavedEvent.ugroupshop = ugroupshop;
         this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
       } else {
-        const dealProducts = lineItems
+        const dealProducts = newLineItems
           .filter((item) => !campaignProducts.includes(item.product.id))
           .map((nitem) => ({
             productId: nitem.product.id,
