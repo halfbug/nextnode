@@ -643,7 +643,7 @@ async function init() {
         });
 
         glider.refresh(true);
-      } else if (indx === 3) {
+      } else if (indx === 5) {
         clearInterval(pollit);
         document.querySelector('.groupshop_left-block').remove();
         document.querySelector('.groupshop_right-block').remove();
