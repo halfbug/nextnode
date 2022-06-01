@@ -151,14 +151,15 @@ function injectStyleSheet(url) {
 
 function getSelectedVariant(variants) {
   const options = document.querySelector(`.product-form__variants`);
+  if (options) {
+    const currentVariantID = parseInt(
+      options.selectedOptions[0].value.trim().toLowerCase(),
+    );
 
-  const currentVariantID = parseInt(
-    options.selectedOptions[0].value.trim().toLowerCase(),
-  );
+    const variant = variants.filter((e) => e.id === currentVariantID)[0];
 
-  const variant = variants.filter((e) => e.id === currentVariantID)[0];
-
-  return variant || false;
+    return variant;
+  } else return false;
 }
 
 async function init() {
