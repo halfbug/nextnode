@@ -264,7 +264,7 @@ export class OrderPlacedListener {
         } = ugroupshop;
         this.groupshop = ugroupshop as Groupshops;
         const totalCampaignProducts = campaignProducts.concat(
-          dealProducts.map((p) => p.productId),
+          dealProducts?.map((p) => p.productId) || [],
         );
 
         gsMember.role = RoleTypeEnum.referral;
