@@ -89,7 +89,14 @@ export class ThemeAppExtensionController {
         '🚀 ~ file: theme-app-extension.controller.ts ~ line 69 ~ ThemeAppExtensionController ~ getMemberDetails ~ activeMember',
         activeMember,
       );
-      res.send(JSON.stringify({ activeMember, url, percentage }));
+      res.send(
+        JSON.stringify({
+          activeMember,
+          url,
+          percentage,
+          members: members.length,
+        }),
+      );
     } catch (err) {
       res.send(JSON.stringify({ activeMember: null, url: null }));
     }

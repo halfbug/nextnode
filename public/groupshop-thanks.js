@@ -534,14 +534,14 @@ async function init() {
     });
 
     let res;
-    let indx;
+    let indx = 0;
 
     const pollit = setInterval(async () => {
       indx++;
       res = await gsPost('member', { orderId, wurl: window.location.href });
       if (res.activeMember) {
         clearInterval(pollit);
-        const { activeMember: mem, url, percentage } = res;
+        const { activeMember: mem, url, percentage, members } = res;
 
         let cashback = 0;
         if (mem.role === 0) {
@@ -554,7 +554,7 @@ async function init() {
 
         var amountCal = `${Math.floor(cashback).toString().replace('.00', '')}`;
         var leftHeadTxt = '';
-        if (+amountCal > 0) {
+        if (+amountCal > 0 && members < 6) {
           leftHeadTxt = `
          Get up to
          <strong>
@@ -565,7 +565,7 @@ async function init() {
         } else {
           leftHeadTxt =
             'Your friends get up to <strong>' +
-            mem.availedDiscount +
+            percentage +
             '% off</strong> when they shop on your link.';
         }
         document.querySelector('.groupshop_left-block h3').innerHTML =
