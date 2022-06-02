@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OnEvent } from '@nestjs/event-emitter';
 // import moment from 'moment';
@@ -204,182 +204,188 @@ export class OrderPlacedListener {
 
   @OnEvent('order.placed')
   async createGroupShop(event: OrderPlacedEvent) {
-    console.log(
-      '🚀 ~ file: order-placed.listener.ts ~ line 18 ~ OrderPlacedListener ~ createGroupShop ~ event',
-      event,
-    );
-    const {
-      order: {
-        discountCode,
-        name,
-        customer,
-        id: orderId,
-        price: totalProductPrice,
-      },
-      store: {
-        shop,
-        accessToken,
-        activeCampaign: {
-          id: campaignId,
-          salesTarget: { rewards },
-          products: campaignProducts,
+    try {
+      console.log(
+        '🚀 ~ file: order-placed.listener.ts ~ line 18 ~ OrderPlacedListener ~ createGroupShop ~ event',
+        event,
+      );
+      const {
+        order: {
+          discountCode,
+          name,
+          customer,
+          id: orderId,
+          price: totalProductPrice,
         },
-        id,
-      },
-      lineItems,
-    } = event;
-    console.log('totalProductPrice : ' + totalProductPrice);
-    this.accessToken = accessToken;
-    this.shop = shop;
-    this.order = event.order;
-    this.store = event.store;
-
-    const gsMember = new MemberInput();
-    gsMember.orderId = orderId;
-    // filter out items that price is less than or eq to 1
-    const newLineItems = lineItems.filter(({ price }) => +price > 1);
-    gsMember.lineItems = newLineItems;
-    console.log(
-      '🚀 ~ file: order-placed.listener.ts ~ line 242 ~ OrderPlacedListener ~ createGroupShop ~ newLineItems',
-      newLineItems,
-    );
-
-    const title = OrderPlacedListener.formatTitle(name);
-    const expires = OrderPlacedListener.addDays(new Date(), 14);
-
-    //check order price is greater than $1
-    if (+totalProductPrice > 1) {
-      if (discountCode) {
-        // const updateGroupshop = await this.gsService.findOne(discountCode);
-        let ugroupshop = new UpdateGroupshopInput();
-
-        ugroupshop = await this.gsService.findOneWithLineItems(discountCode);
-        console.log('🚀 ugroupshop groupshop', ugroupshop);
-        const {
-          discountCode: { title, priceRuleId },
-          createdAt,
-          expiredAt,
+        store: {
+          shop,
+          accessToken,
+          activeCampaign: {
+            id: campaignId,
+            salesTarget: { rewards },
+            products: campaignProducts,
+          },
           id,
-          dealProducts,
-        } = ugroupshop;
-        this.groupshop = ugroupshop as Groupshops;
-        const totalCampaignProducts = campaignProducts.concat(
-          dealProducts?.map((p) => p.productId) || [],
-        );
+        },
+        lineItems,
+      } = event;
+      console.log('totalProductPrice : ' + totalProductPrice);
+      this.accessToken = accessToken;
+      this.shop = shop;
+      this.order = event.order;
+      this.store = event.store;
 
-        gsMember.role = RoleTypeEnum.referral;
-        gsMember.availedDiscount = parseFloat(
-          ugroupshop.discountCode.percentage,
-        );
-        ugroupshop.members = [...ugroupshop.members, gsMember];
+      const gsMember = new MemberInput();
+      gsMember.orderId = orderId;
+      // filter out items that price is less than or eq to 1
+      const newLineItems = lineItems.filter(({ price }) => +price > 1);
+      gsMember.lineItems = newLineItems;
+      console.log(
+        '🚀 ~ file: order-placed.listener.ts ~ line 242 ~ OrderPlacedListener ~ createGroupShop ~ newLineItems',
+        newLineItems,
+      );
 
-        this.addedRef.groupshop = this.groupshop;
-        this.addedRef.groupshopId = id;
-        this.addedRef.emit();
+      const title = OrderPlacedListener.formatTitle(name);
+      const expires = OrderPlacedListener.addDays(new Date(), 14);
 
-        ugroupshop.dealProducts = dealProducts;
-        ugroupshop.totalProducts = totalCampaignProducts.length;
-        ugroupshop.members = this.setPreviousMembersRefund(
-          ugroupshop.members,
-          ugroupshop.discountCode,
-        );
+      //check order price is greater than $1
+      if (+totalProductPrice > 1) {
+        if (discountCode) {
+          // const updateGroupshop = await this.gsService.findOne(discountCode);
+          let ugroupshop = new UpdateGroupshopInput();
 
-        const newDiscount = this.getNextMemberDiscount(
-          ugroupshop.members.length,
-          rewards,
-        );
-
-        if (!!newDiscount) {
-          ugroupshop.discountCode = await this.shopifyapi.setDiscountCode(
-            shop,
-            'Update',
-            accessToken,
-            title,
-            parseInt(newDiscount),
-            totalCampaignProducts,
+          ugroupshop = await this.gsService.findOneWithLineItems(discountCode);
+          console.log('🚀 ugroupshop groupshop', ugroupshop);
+          const {
+            discountCode: { title, priceRuleId },
             createdAt,
             expiredAt,
-            priceRuleId,
+            id,
+            dealProducts,
+          } = ugroupshop;
+          this.groupshop = ugroupshop as Groupshops;
+          const totalCampaignProducts = campaignProducts.concat(
+            dealProducts?.map((p) => p.productId) || [],
           );
+
+          gsMember.role = RoleTypeEnum.referral;
+          gsMember.availedDiscount = parseFloat(
+            ugroupshop.discountCode.percentage,
+          );
+          ugroupshop.members = [...ugroupshop.members, gsMember];
+
+          this.addedRef.groupshop = this.groupshop;
+          this.addedRef.groupshopId = id;
+          this.addedRef.emit();
+
+          ugroupshop.dealProducts = dealProducts;
+          ugroupshop.totalProducts = totalCampaignProducts.length;
+          ugroupshop.members = this.setPreviousMembersRefund(
+            ugroupshop.members,
+            ugroupshop.discountCode,
+          );
+
+          const newDiscount = this.getNextMemberDiscount(
+            ugroupshop.members.length,
+            rewards,
+          );
+
+          if (!!newDiscount) {
+            ugroupshop.discountCode = await this.shopifyapi.setDiscountCode(
+              shop,
+              'Update',
+              accessToken,
+              title,
+              parseInt(newDiscount),
+              totalCampaignProducts,
+              createdAt,
+              expiredAt,
+              priceRuleId,
+            );
+            const gsMilestone = new MilestoneInput();
+            gsMilestone.activatedAt = new Date();
+            gsMilestone.discount = `${newDiscount}`;
+            ugroupshop.milestones = [...ugroupshop.milestones, gsMilestone];
+          }
+          await this.gsService.update(ugroupshop);
+
+          const groupshopSavedEvent = new GroupshopSavedEvent();
+          console.log('Referrer Order');
+          groupshopSavedEvent.data = event;
+          groupshopSavedEvent.post = 'no';
+          groupshopSavedEvent.groupdeal = newDiscount;
+          groupshopSavedEvent.ugroupshop = ugroupshop;
+          this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
+        } else {
+          const dealProducts = newLineItems
+            .filter((item) => !campaignProducts.includes(item.product.id))
+            .map((nitem) => ({
+              productId: nitem.product.id,
+              type: ProductTypeEnum.deal,
+              addedBy: customer.firstName,
+              customerIP: customer.ip,
+            }));
+          const totalCampaignProducts = campaignProducts.concat(
+            dealProducts.map((p) => p.productId),
+          );
+          const cryptURL = `/${
+            shop.split('.')[0]
+          }/deal/${await this.crypt.encrypt(title)}`;
+
+          const fulllink = `${this.configSevice.get('FRONT')}${cryptURL}`;
+          const shortLink = await this.kalavioService.generateShortLink(
+            fulllink,
+          );
+          console.log('myshort wwww: ' + shortLink);
+
+          const newGroupshop = new CreateGroupshopInput();
+          newGroupshop.storeId = id;
+          newGroupshop.campaignId = campaignId;
+          newGroupshop.discountCode = await this.shopifyapi.setDiscountCode(
+            shop,
+            'Create',
+            accessToken,
+            title,
+            parseInt(rewards[0].discount),
+            totalCampaignProducts,
+            new Date(),
+            expires,
+          );
+          newGroupshop.dealProducts = [new DealProductsInput()];
+          newGroupshop.dealProducts = dealProducts;
+          newGroupshop.totalProducts = totalCampaignProducts.length;
+          newGroupshop.url = cryptURL;
+          newGroupshop.shortUrl = shortLink;
+          newGroupshop.createdAt = new Date();
+          newGroupshop.expiredAt = expires;
+          // newGroupshop.
+          gsMember.availedDiscount = 0;
+          gsMember.role = RoleTypeEnum.owner;
+          newGroupshop.members = [gsMember];
           const gsMilestone = new MilestoneInput();
           gsMilestone.activatedAt = new Date();
-          gsMilestone.discount = `${newDiscount}`;
-          ugroupshop.milestones = [...ugroupshop.milestones, gsMilestone];
+          gsMilestone.discount = rewards[0].discount;
+          newGroupshop.milestones = [gsMilestone];
+          // this.gsService.create(newGroupshop);
+
+          const groupshopSavedEvent = new GroupshopSavedEvent();
+          console.log('GroupshopSavedEvent Start');
+          groupshopSavedEvent.data = event;
+          groupshopSavedEvent.post = 'yes';
+          groupshopSavedEvent.groupdeal = newGroupshop;
+          this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
+
+          const savedGs = await this.gsService.create(newGroupshop);
+          const groupShopCreated = new GroupShopCreated();
+          groupShopCreated.groupshop = savedGs;
+          groupShopCreated.store = event.store;
+          // groupShopCreated.revenue = this.totalRevenue(lineItems, 0);
+          groupShopCreated.revenue = 0;
+          this.eventEmitter.emit('groupshop.created', groupShopCreated);
         }
-        await this.gsService.update(ugroupshop);
-
-        const groupshopSavedEvent = new GroupshopSavedEvent();
-        console.log('Referrer Order');
-        groupshopSavedEvent.data = event;
-        groupshopSavedEvent.post = 'no';
-        groupshopSavedEvent.groupdeal = newDiscount;
-        groupshopSavedEvent.ugroupshop = ugroupshop;
-        this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
-      } else {
-        const dealProducts = newLineItems
-          .filter((item) => !campaignProducts.includes(item.product.id))
-          .map((nitem) => ({
-            productId: nitem.product.id,
-            type: ProductTypeEnum.deal,
-            addedBy: customer.firstName,
-            customerIP: customer.ip,
-          }));
-        const totalCampaignProducts = campaignProducts.concat(
-          dealProducts.map((p) => p.productId),
-        );
-        const cryptURL = `/${
-          shop.split('.')[0]
-        }/deal/${await this.crypt.encrypt(title)}`;
-
-        const fulllink = `${this.configSevice.get('FRONT')}${cryptURL}`;
-        const shortLink = await this.kalavioService.generateShortLink(fulllink);
-        console.log('myshort wwww: ' + shortLink);
-
-        const newGroupshop = new CreateGroupshopInput();
-        newGroupshop.storeId = id;
-        newGroupshop.campaignId = campaignId;
-        newGroupshop.discountCode = await this.shopifyapi.setDiscountCode(
-          shop,
-          'Create',
-          accessToken,
-          title,
-          parseInt(rewards[0].discount),
-          totalCampaignProducts,
-          new Date(),
-          expires,
-        );
-        newGroupshop.dealProducts = [new DealProductsInput()];
-        newGroupshop.dealProducts = dealProducts;
-        newGroupshop.totalProducts = totalCampaignProducts.length;
-        newGroupshop.url = cryptURL;
-        newGroupshop.shortUrl = shortLink;
-        newGroupshop.createdAt = new Date();
-        newGroupshop.expiredAt = expires;
-        // newGroupshop.
-        gsMember.availedDiscount = 0;
-        gsMember.role = RoleTypeEnum.owner;
-        newGroupshop.members = [gsMember];
-        const gsMilestone = new MilestoneInput();
-        gsMilestone.activatedAt = new Date();
-        gsMilestone.discount = rewards[0].discount;
-        newGroupshop.milestones = [gsMilestone];
-        // this.gsService.create(newGroupshop);
-
-        const groupshopSavedEvent = new GroupshopSavedEvent();
-        console.log('GroupshopSavedEvent Start');
-        groupshopSavedEvent.data = event;
-        groupshopSavedEvent.post = 'yes';
-        groupshopSavedEvent.groupdeal = newGroupshop;
-        this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
-
-        const savedGs = await this.gsService.create(newGroupshop);
-        const groupShopCreated = new GroupShopCreated();
-        groupShopCreated.groupshop = savedGs;
-        groupShopCreated.store = event.store;
-        // groupShopCreated.revenue = this.totalRevenue(lineItems, 0);
-        groupShopCreated.revenue = 0;
-        this.eventEmitter.emit('groupshop.created', groupShopCreated);
       }
+    } catch (err) {
+      Logger.error(err, OrderPlacedListener.name);
     }
   }
 }
