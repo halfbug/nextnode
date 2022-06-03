@@ -203,6 +203,9 @@ export class InventoryService {
             {
               status: 'ACTIVE',
             },
+            {
+              outofstock: false,
+            },
           ],
         },
       },
