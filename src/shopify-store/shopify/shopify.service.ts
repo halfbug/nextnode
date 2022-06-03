@@ -399,7 +399,7 @@ export class ShopifyService {
             }
           }`,
           variables: {
-            name: 'Groupshop Super Duper Usage Plan',
+            name: 'Explore (free for 30 days) + Cashback charge',
             returnUrl: `${this.configService.get('FRONT')}/${
               this.shop.split('.')[0]
             }/overview`,

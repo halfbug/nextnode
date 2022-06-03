@@ -38,68 +38,66 @@ export class BillingUsageCargeCron {
 
     stores.map(async (store) => {
       if (store.subscription) {
-        // && store.plan > 0) {
-        // Logger.debug(JSON.stringify(store.subscription));
-        const edate = new Date();
-        const d = new Date();
-        const sdate = new Date(d.setDate(d.getDate() - 1));
-        const useageQuery = (
-          await this.billingService.getBillingByDate(store.id, sdate, edate)
-        )?.[0];
+        const allstoresBilling = await this.billingService.getAllStoreBilling();
+        const useageQuery = allstoresBilling.find(
+          (storeBilling) => storeBilling.store === store.id,
+        );
 
         Logger.warn(store.shop, 'BillingUsageCargeCron');
         console.log(
           '🚀 ~ file: billing.cron.ts ~ line 30 ~ BillingUsageCargeCron ~ stores.map ~ useageQuery',
           useageQuery,
         );
-        // let cashbackUsage = '30';
-        let cashbackUsage = useageQuery['totalfeeByCashback'];
-        if (store.currencyCode !== 'USD' && cashbackUsage > 0) {
-          cashbackUsage = await this.billingService.currencyConversion(
-            store.currencyCode,
-            parseFloat(cashbackUsage),
-          );
-        }
-        const totalCharge =
-          parseFloat(cashbackUsage) + parseFloat(useageQuery['totalfeeByGS']);
-        Logger.debug(useageQuery['totalfeeByCashback'], 'totalfeeByCashback');
-
-        Logger.debug(useageQuery['totalfeeByGS'], 'totalfeeByGS');
-        Logger.debug(totalCharge, 'total charge');
-
-        const usageCharge =
-          Date.now() < store.appTrialEnd.getTime()
-            ? parseFloat(cashbackUsage)
-            : totalCharge;
-
-        if (usageCharge > 0) {
-          this.shopifyapi.shop = store.shop;
-          this.shopifyapi.accessToken = store.accessToken;
-          const { body: shopifyRes } =
-            await this.shopifyapi.appUsageRecordCreate(
-              store.subscription?.['appSubscription']['lineItems'][0]['id'],
-              usageCharge,
-              this.usageDescripton(
-                store.plan,
-                cashbackUsage,
-                useageQuery['totalfeeByGS'],
-                totalCharge,
-              ),
+        if (useageQuery) {
+          // let cashbackUsage = '30';
+          let cashbackUsage = useageQuery['totalfeeByCashback'];
+          if (store.currencyCode !== 'USD' && cashbackUsage > 0) {
+            cashbackUsage = await this.billingService.currencyConversion(
+              store.currencyCode,
+              parseFloat(cashbackUsage),
             );
+          }
+          const totalCharge =
+            parseFloat(cashbackUsage) + parseFloat(useageQuery['totalfeeByGS']);
+          Logger.debug(useageQuery['totalfeeByCashback'], 'totalfeeByCashback');
 
-          if (shopifyRes['appUsageRecordCreate']['appUsageRecord']) {
-            const billingUpdateRec = useageQuery['badgeIds'].map(
-              (billingId: string) => {
-                return {
-                  updateOne: {
-                    filter: { id: billingId },
-                    update: { $set: { isPaid: true } },
-                  },
-                };
-              },
-            );
+          Logger.debug(useageQuery['totalfeeByGS'], 'totalfeeByGS');
+          Logger.debug(totalCharge, 'total charge');
 
-            this.billingService.bulkUpdate(billingUpdateRec);
+          const usageCharge =
+            Date.now() < store.appTrialEnd.getTime()
+              ? parseFloat(cashbackUsage)
+              : totalCharge;
+
+          if (usageCharge > 0) {
+            this.shopifyapi.shop = store.shop;
+            this.shopifyapi.accessToken = store.accessToken;
+            const { body: shopifyRes } =
+              await this.shopifyapi.appUsageRecordCreate(
+                store.subscription?.['appSubscription']['lineItems'][0]['id'],
+                usageCharge,
+                this.usageDescripton(
+                  store.plan,
+                  cashbackUsage,
+                  useageQuery['totalfeeByGS'],
+                  totalCharge,
+                ),
+              );
+
+            if (shopifyRes['appUsageRecordCreate']['appUsageRecord']) {
+              const billingUpdateRec = useageQuery['badgeIds'].map(
+                (billingId: string) => {
+                  return {
+                    updateOne: {
+                      filter: { id: billingId },
+                      update: { $set: { isPaid: true } },
+                    },
+                  };
+                },
+              );
+
+              this.billingService.bulkUpdate(billingUpdateRec);
+            }
           }
         }
       }
