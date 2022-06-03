@@ -34,7 +34,7 @@ export class GroupshopsService {
     groupshop.members = createGroupshopInput.members;
     groupshop.milestones = [new MilestoneInput()];
     groupshop.milestones = createGroupshopInput.milestones;
-    // groupshop.members.map
+    // groupshop.members.map...
 
     return this.groupshopRepository.save(groupshop);
   }

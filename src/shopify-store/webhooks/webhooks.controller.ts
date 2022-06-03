@@ -159,7 +159,7 @@ export class WebhooksController {
       });
       // console.log(JSON.stringify(req.body));
       // console.log(req.query);
-      res.send('values updated');
+      // res.send('values updated');
     } catch (err) {
       console.log(JSON.stringify(err));
     } finally {
@@ -185,7 +185,7 @@ export class WebhooksController {
       // const updateStore = new UpdateStoreInput();
       // updateStore.status = 'Unistalled';
       // await this.storesService.update(storeInfo.id, updateStore);
-      res.send('store updated..');
+      // res.send('store updated..');
     } catch (err) {
       console.log(JSON.stringify(err));
     } finally {
@@ -225,22 +225,24 @@ export class WebhooksController {
         const preVariant = await this.inventryService.findId(
           variant.admin_graphql_api_id,
         );
+        if (preVariant) {
+          qDifference = Math.abs(
+            variant.inventory_quantity - preVariant?.inventoryQuantity,
+          );
+          preVariant.price = variant?.price;
 
-        qDifference = Math.abs(
-          variant.inventory_quantity - preVariant?.inventoryQuantity,
-        );
-        preVariant.price = variant?.price;
-
-        preVariant.inventoryQuantity = variant.inventory_quantity;
-        await this.inventryService.update(preVariant);
-        await this.inventryService.updateInventory(
-          rproduct.admin_graphql_api_id,
-          qDifference,
-        );
+          preVariant.inventoryQuantity = variant.inventory_quantity;
+          await this.inventryService.update(preVariant);
+          await this.inventryService.updateInventory(
+            rproduct.admin_graphql_api_id,
+            qDifference,
+          );
+        }
+        // add code for new variant.
       });
       await this.inventryService.update(nprod);
 
-      res.send('product updated..');
+      // res.send('product updated..');
     } catch (err) {
       console.log(JSON.stringify(err));
     } finally {
@@ -261,7 +263,7 @@ export class WebhooksController {
       this.orderCreatedEvent.shop = shop;
       this.orderCreatedEvent.emit();
 
-      res.send('order created..');
+      // res.send('order created..');
     } catch (err) {
       console.log(JSON.stringify(err));
     } finally {
@@ -282,7 +284,7 @@ export class WebhooksController {
       const { result } = await this.inventryService.remove(
         JSON.stringify(rproduct.id),
       );
-      res.send(result.deletedCount);
+      // res.send(result.deletedCount);
     } catch (err) {
       console.log(JSON.stringify(err));
     } finally {

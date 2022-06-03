@@ -50,7 +50,7 @@ export class ThemeAppExtensionController {
     } catch (err) {
       Logger.error(err);
     } finally {
-      res.status(HttpStatus.OK).send();
+      // res.status(HttpStatus.OK).send();
     }
   }
 
@@ -73,7 +73,7 @@ export class ThemeAppExtensionController {
     } catch (err) {
       res.send(JSON.stringify({ id: null, url: null }));
     } finally {
-      res.status(HttpStatus.OK).send();
+      // res.status(HttpStatus.OK).send();
     }
   }
 
@@ -112,7 +112,7 @@ export class ThemeAppExtensionController {
     } catch (err) {
       res.send(JSON.stringify({ activeMember: null, url: null }));
     } finally {
-      res.status(HttpStatus.OK).send();
+      // res.status(HttpStatus.OK).send();
     }
   }
 
@@ -130,7 +130,7 @@ export class ThemeAppExtensionController {
     } catch (err) {
       res.send(JSON.stringify({ products: null }));
     } finally {
-      res.status(HttpStatus.OK).send();
+      // res.status(HttpStatus.OK).send();
     }
   }
 }
