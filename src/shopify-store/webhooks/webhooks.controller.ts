@@ -1,4 +1,13 @@
-import { Controller, Get, Logger, Post, Query, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Logger,
+  Post,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { CreateInventoryInput } from 'src/inventory/dto/create-inventory.input';
 import {
   CreateOrderInput,
@@ -34,26 +43,27 @@ export class WebhooksController {
 
   @Get('register')
   async register() {
-    const { shop, accessToken } = await this.storesService.findOne(
-      'native-roots-dev.myshopify.com',
-    );
-    console.log(
-      '🚀 ~ file: webhooks.controller.ts ~ line 11 ~ WebhooksController ~ register ~ shop',
-      shop,
-    );
-    console.log('yes register');
-    const rhook = await this.shopifyService.registerHook(
-      shop,
-      accessToken,
-      // '/webhooks/product-update',
-      // 'PRODUCTS_UPDATE',
-      '/webhooks/order-create',
-      'ORDERS_CREATE',
-    );
-    console.log(rhook);
-    const client = await this.shopifyService.client(shop, accessToken);
-    const qwbh = await client.query({
-      data: `{
+    try {
+      const { shop, accessToken } = await this.storesService.findOne(
+        'native-roots-dev.myshopify.com',
+      );
+      console.log(
+        '🚀 ~ file: webhooks.controller.ts ~ line 11 ~ WebhooksController ~ register ~ shop',
+        shop,
+      );
+      console.log('yes register');
+      const rhook = await this.shopifyService.registerHook(
+        shop,
+        accessToken,
+        // '/webhooks/product-update',
+        // 'PRODUCTS_UPDATE',
+        '/webhooks/order-create',
+        'ORDERS_CREATE',
+      );
+      console.log(rhook);
+      const client = await this.shopifyService.client(shop, accessToken);
+      const qwbh = await client.query({
+        data: `{
         webhookSubscription(id: "gid://shopify/WebhookSubscription/1100885262502") {
           id
           topic
@@ -68,22 +78,29 @@ export class WebhooksController {
           }
         }
       }`,
-    });
-    console.log(
-      '🚀 ~ file: webhooks.controller.ts ~ line 47 ~ WebhooksController ~ register ~ qwbh',
-      JSON.stringify(qwbh),
-    );
+      });
+      console.log(
+        '🚀 ~ file: webhooks.controller.ts ~ line 47 ~ WebhooksController ~ register ~ qwbh',
+        JSON.stringify(qwbh),
+      );
 
-    return 'yes done';
+      return 'yes done';
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
   }
 
   @Get('scriptTag')
   async scriptTag(@Query('shopName') shopName: any) {
-    const { shop, accessToken } = await this.storesService.findOne(shopName);
-    this.shopifyService.accessToken = accessToken;
-    this.shopifyService.shop = shop;
-    const st = await this.shopifyService.scriptTagList();
-    return st;
+    try {
+      const { shop, accessToken } = await this.storesService.findOne(shopName);
+      this.shopifyService.accessToken = accessToken;
+      this.shopifyService.shop = shop;
+      const st = await this.shopifyService.scriptTagList();
+      return st;
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
   }
 
   @Get('delscriptTag')
@@ -91,122 +108,144 @@ export class WebhooksController {
     @Query('sid') sid: any,
     @Query('shopName') shopName: any,
   ) {
-    console.log(sid);
-    const { shop, accessToken } = await this.storesService.findOne(shopName);
-    this.shopifyService.accessToken = accessToken;
-    this.shopifyService.shop = shop;
-    this.shopifyService.scriptTagDelete(sid);
-    return 'check console' + sid;
+    try {
+      console.log(sid);
+      const { shop, accessToken } = await this.storesService.findOne(shopName);
+      this.shopifyService.accessToken = accessToken;
+      this.shopifyService.shop = shop;
+      this.shopifyService.scriptTagDelete(sid);
+      return 'check console' + sid;
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
   }
 
   @Post('product-create?')
   async createProducts(@Req() req, @Res() res) {
-    const { shop } = req.query;
-    const rproduct = req.body;
-    console.log('Webhook : PRODUCT_CREATED, Shop: ', shop);
-    const prodinfo = await this.inventryService.findOne(shop, 'Product');
-    const nprod = new CreateInventoryInput();
+    try {
+      const { shop } = req.query;
+      const rproduct = req.body;
+      console.log('Webhook : PRODUCT_CREATED, Shop: ', shop);
+      const prodinfo = await this.inventryService.findOne(shop, 'Product');
+      const nprod = new CreateInventoryInput();
 
-    // add product
-    nprod.id = rproduct?.admin_graphql_api_id;
-    nprod.createdAtShopify = rproduct?.created_at;
-    nprod.publishedAt = rproduct?.published_at;
-    nprod.title = rproduct?.title;
-    nprod.currencyCode = prodinfo?.currencyCode;
-    nprod.shop = shop;
-    nprod.recordType = 'Product';
-    nprod.status = rproduct?.status?.toUpperCase();
-    nprod.price = rproduct?.variants[0]?.price;
-    nprod.featuredImage = rproduct?.image?.src;
+      // add product
+      nprod.id = rproduct?.admin_graphql_api_id;
+      nprod.createdAtShopify = rproduct?.created_at;
+      nprod.publishedAt = rproduct?.published_at;
+      nprod.title = rproduct?.title;
+      nprod.currencyCode = prodinfo?.currencyCode;
+      nprod.shop = shop;
+      nprod.recordType = 'Product';
+      nprod.status = rproduct?.status?.toUpperCase();
+      nprod.price = rproduct?.variants[0]?.price;
+      nprod.featuredImage = rproduct?.image?.src;
 
-    await this.inventryService.create(nprod);
+      await this.inventryService.create(nprod);
 
-    //add variat
-    const vprod = nprod;
-    rproduct.variants.map(async (variant) => {
-      vprod.id = variant.admin_graphql_api_id;
-      vprod.title = variant?.title;
-      vprod.parentId = rproduct?.admin_graphql_api_id;
-      vprod.recordType = 'ProductVariant';
-      vprod.createdAtShopify = variant?.created_at;
-      vprod.publishedAt = rproduct?.published_at;
-      vprod.price = variant?.variants[0]?.price;
-      vprod.inventoryQuantity = variant?.inventory_quantity;
+      //add variat
+      const vprod = nprod;
+      rproduct.variants.map(async (variant) => {
+        vprod.id = variant.admin_graphql_api_id;
+        vprod.title = variant?.title;
+        vprod.parentId = rproduct?.admin_graphql_api_id;
+        vprod.recordType = 'ProductVariant';
+        vprod.createdAtShopify = variant?.created_at;
+        vprod.publishedAt = rproduct?.published_at;
+        vprod.price = variant?.variants[0]?.price;
+        vprod.inventoryQuantity = variant?.inventory_quantity;
 
-      await this.inventryService.create(vprod);
-    });
-    // console.log(JSON.stringify(req.body));
-    // console.log(req.query);
-    res.send('values updated');
+        await this.inventryService.create(vprod);
+      });
+      // console.log(JSON.stringify(req.body));
+      // console.log(req.query);
+      res.send('values updated');
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
   }
 
   @Post('uninstalled?')
   async uninstalledApp(@Req() req, @Res() res) {
-    const { shop } = req.query;
-    console.log(
-      '🚀 ~ file: webhooks.controller.ts ~ line 143 ~ WebhooksController ~ uninstalledApp ~ shop',
-      shop,
-    );
-    const webdata = req.body;
-    console.log(
-      'WebhooksController ~ uninstalledApp ~ web hook data',
-      JSON.stringify(webdata),
-    );
-    this.uninstallSerivice.deleteStoreByName(shop);
-    // const storeInfo = await this.storesService.findOneByName(shop);
-    // const updateStore = new UpdateStoreInput();
-    // updateStore.status = 'Unistalled';
-    // await this.storesService.update(storeInfo.id, updateStore);
-    res.send('store updated..');
+    try {
+      const { shop } = req.query;
+      console.log(
+        '🚀 ~ file: webhooks.controller.ts ~ line 143 ~ WebhooksController ~ uninstalledApp ~ shop',
+        shop,
+      );
+      const webdata = req.body;
+      console.log(
+        'WebhooksController ~ uninstalledApp ~ web hook data',
+        JSON.stringify(webdata),
+      );
+      this.uninstallSerivice.deleteStoreByName(shop);
+      // const storeInfo = await this.storesService.findOneByName(shop);
+      // const updateStore = new UpdateStoreInput();
+      // updateStore.status = 'Unistalled';
+      // await this.storesService.update(storeInfo.id, updateStore);
+      res.send('store updated..');
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
   }
 
   @Post('product-update?')
   async productUpdate(@Req() req, @Res() res) {
-    const { shop } = req.query;
-    const rproduct = req.body;
-    console.log(
-      'WebhooksController ~ productUpdate ~ rproduct',
-      JSON.stringify(rproduct),
-    );
-    console.log(
-      'WebhooksController ~ productUpdate ~ rproduct variants',
-      JSON.stringify(rproduct.variants),
-    );
-    const nprod = new UpdateInventoryInput();
-    nprod.id = rproduct.id;
-    nprod.id = rproduct?.admin_graphql_api_id;
-    nprod.createdAtShopify = rproduct?.created_at;
-    nprod.publishedAt = rproduct?.published_at;
-    nprod.title = rproduct?.title;
-    nprod.status = rproduct?.status?.toUpperCase();
-    nprod.price = rproduct?.variants[0]?.price; //
-    nprod.featuredImage = rproduct?.image?.src;
-    let qDifference: number;
-    const isAvailable = rproduct.variants.some(
-      (item) => item.inventory_quantity > 0,
-    );
-    nprod.outofstock = !isAvailable;
-
-    rproduct.variants.map(async (variant) => {
-      const preVariant = await this.inventryService.findId(
-        variant.admin_graphql_api_id,
+    try {
+      const { shop } = req.query;
+      const rproduct = req.body;
+      console.log(
+        'WebhooksController ~ productUpdate ~ rproduct',
+        JSON.stringify(rproduct),
       );
-
-      qDifference = Math.abs(
-        variant.inventory_quantity - preVariant?.inventoryQuantity,
+      console.log(
+        'WebhooksController ~ productUpdate ~ rproduct variants',
+        JSON.stringify(rproduct.variants),
       );
-      preVariant.price = variant?.price;
-
-      preVariant.inventoryQuantity = variant.inventory_quantity;
-      await this.inventryService.update(preVariant);
-      await this.inventryService.updateInventory(
-        rproduct.admin_graphql_api_id,
-        qDifference,
+      const nprod = new UpdateInventoryInput();
+      nprod.id = rproduct.id;
+      nprod.id = rproduct?.admin_graphql_api_id;
+      nprod.createdAtShopify = rproduct?.created_at;
+      nprod.publishedAt = rproduct?.published_at;
+      nprod.title = rproduct?.title;
+      nprod.status = rproduct?.status?.toUpperCase();
+      nprod.price = rproduct?.variants[0]?.price; //
+      nprod.featuredImage = rproduct?.image?.src;
+      let qDifference: number;
+      const isAvailable = rproduct.variants.some(
+        (item) => item.inventory_quantity > 0,
       );
-    });
-    await this.inventryService.update(nprod);
+      nprod.outofstock = !isAvailable;
 
-    res.send('product updated..');
+      rproduct.variants.map(async (variant) => {
+        const preVariant = await this.inventryService.findId(
+          variant.admin_graphql_api_id,
+        );
+
+        qDifference = Math.abs(
+          variant.inventory_quantity - preVariant?.inventoryQuantity,
+        );
+        preVariant.price = variant?.price;
+
+        preVariant.inventoryQuantity = variant.inventory_quantity;
+        await this.inventryService.update(preVariant);
+        await this.inventryService.updateInventory(
+          rproduct.admin_graphql_api_id,
+          qDifference,
+        );
+      });
+      await this.inventryService.update(nprod);
+
+      res.send('product updated..');
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
   }
 
   @Post('order-create?')
@@ -225,21 +264,46 @@ export class WebhooksController {
       res.send('order created..');
     } catch (err) {
       console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
     }
   }
 
   @Post('product-delete?')
   async productDelete(@Req() req, @Res() res) {
-    const { shop } = req.query;
-    const rproduct = req.body;
-    console.log(
-      'WebhooksController ~ productDelete ~ rproduct',
-      JSON.stringify(rproduct),
-    );
+    try {
+      const { shop } = req.query;
+      const rproduct = req.body;
+      console.log(
+        'WebhooksController ~ productDelete ~ rproduct',
+        JSON.stringify(rproduct),
+      );
 
-    const { result } = await this.inventryService.remove(
-      JSON.stringify(rproduct.id),
-    );
-    res.send(result.deletedCount);
+      const { result } = await this.inventryService.remove(
+        JSON.stringify(rproduct.id),
+      );
+      res.send(result.deletedCount);
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
+
+  @Post('order-update?')
+  async orderUpdate(@Req() req, @Res() res) {
+    try {
+      const { shop } = req.query;
+      const rorders = req.body;
+      console.log(
+        'WebhooksController ~ orderUpdate ~ rorders',
+        JSON.stringify(rorders),
+      );
+      res.status(HttpStatus.OK).send();
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
   }
 }

@@ -1,4 +1,12 @@
-import { Controller, Get, Logger, Post, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Logger,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
 import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { ConfigService } from '@nestjs/config';
@@ -41,6 +49,8 @@ export class ThemeAppExtensionController {
       );
     } catch (err) {
       Logger.error(err);
+    } finally {
+      res.status(HttpStatus.OK).send();
     }
   }
 
@@ -62,6 +72,8 @@ export class ThemeAppExtensionController {
       );
     } catch (err) {
       res.send(JSON.stringify({ id: null, url: null }));
+    } finally {
+      res.status(HttpStatus.OK).send();
     }
   }
 
@@ -99,6 +111,8 @@ export class ThemeAppExtensionController {
       );
     } catch (err) {
       res.send(JSON.stringify({ activeMember: null, url: null }));
+    } finally {
+      res.status(HttpStatus.OK).send();
     }
   }
 
@@ -115,6 +129,8 @@ export class ThemeAppExtensionController {
       res.send(JSON.stringify(products));
     } catch (err) {
       res.send(JSON.stringify({ products: null }));
+    } finally {
+      res.status(HttpStatus.OK).send();
     }
   }
 }
