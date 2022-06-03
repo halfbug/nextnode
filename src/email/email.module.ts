@@ -8,6 +8,7 @@ import { KalavioService } from './kalavio.service';
 import { UploadImageService } from 'src/shopify-store/ImageUpload/uploadimage.service';
 
 import { UploadImageModule } from 'src/shopify-store/ImageUpload/uploadimage.module';
+import { KalavioResolver } from './kalavio.resolver';
 
 @Module({
   imports: [HttpModule, InventoryModule, UploadImageModule],
@@ -15,6 +16,7 @@ import { UploadImageModule } from 'src/shopify-store/ImageUpload/uploadimage.mod
     GroupshopSavedListener,
     GroupshopCashbackListener,
     KalavioService,
+    KalavioResolver,
   ],
   exports: [KalavioService],
   controllers: [CatController],

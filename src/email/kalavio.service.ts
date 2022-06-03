@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { HttpService } from '@nestjs/axios';
 import { getMongoManager, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Groupshops } from 'src/groupshops/entities/groupshop.modal';
 import { lastValueFrom, map } from 'rxjs';
+import { CreateSignUpInput } from './dto/create-signup.input';
 
 @Injectable()
 export class KalavioService {
@@ -23,6 +25,45 @@ export class KalavioService {
     this.httpService.post(urlKlaviyo, body, options).subscribe(async (res) => {
       //console.log(res);
     });
+  }
+
+  async klaviyoSignUp(createSignUpInput) {
+    const listId = this.configService.get('KLAVIYO_LIST_ID');
+    const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
+    const urlKlaviyo = `${this.configService.get(
+      'KLAVIYO_BASE_URL',
+    )}${'/v2/list/'}${listId}${'/subscribe?api_key='}${PRIVATE_KEY}`;
+    console.log(urlKlaviyo);
+    const options = {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const body = JSON.stringify({
+      profiles: [
+        {
+          email: createSignUpInput.email,
+        },
+      ],
+    });
+    try {
+      const res = await lastValueFrom(
+        this.httpService
+          .post(urlKlaviyo, body, options)
+          .pipe(map((res) => res.data)),
+      );
+      const status = res.length > 0 ? true : false;
+
+      const result = {
+        email: status === true ? res[0]?.id : '',
+      };
+      return result;
+    } catch (err) {
+      Logger.error(err);
+      return false;
+    }
   }
 
   async generateShortLink(link: string) {
