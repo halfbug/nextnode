@@ -164,7 +164,7 @@ export class BillingsService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
-    console.log('🚀 total GSs in month ~ gs', gs);
+    // console.log('🚀 total GSs in month ~ gs', gs);
     return gs;
   }
 
@@ -187,15 +187,15 @@ export class BillingsService {
     // console.log("🚀 findMonthlyBilling ~ agg", agg)
     const manager = getMongoManager();
     const TotalRev = await manager.aggregate(Billing, agg).toArray();
-    console.log('🚀 findMonthlyBilling ~ TotalRevenue', TotalRev);
+    // console.log('🚀 findMonthlyBilling ~ TotalRevenue', TotalRev);
     return TotalRev[0];
   }
 
   async update(id: string, updateBillingInput: UpdateBillingInput) {
-    console.log(
-      '🚀 ~ file:BillingsService updateBillingInput',
-      updateBillingInput,
-    );
+    // console.log(
+    //   '🚀 ~ file:BillingsService updateBillingInput',
+    //   updateBillingInput,
+    // );
 
     await this.billingRepository.update({ id }, updateBillingInput);
     return await this.findOneById(id);
@@ -214,13 +214,7 @@ export class BillingsService {
     return await this.billingRepository.delete({ storeId });
   }
 
-  async getBillingByDate(storeId: string, startDate: any, endDate: any) {
-    //   console.log("🚀 endDate", endDate)
-    //   console.log("🚀 startDate", startDate)
-    //   console.log("🚀 ~ storeId", storeId)
-    // //     const d = new Date('4/19/2022');
-    // // new Date(d.setDate(d.getDate() - 1));
-
+  async getBillingByDate(storeId: string, sdate: any, edate: any) {
     const agg = [
       {
         $match: {
@@ -230,8 +224,8 @@ export class BillingsService {
       {
         $match: {
           createdAt: {
-            $gte: startDate, //new Date('Fri, 01 Apr 2022 19:00:00 GMT'),
-            $lte: endDate, //new Date('Mon, 25 Apr 2022 23:59:00 GMT')
+            $gte: sdate, //new Date('Fri, 01 Apr 2022 19:00:00 GMT'),
+            $lte: edate, //new Date('Mon, 25 Apr 2022 23:59:00 GMT')
           },
         },
       },
@@ -442,7 +436,7 @@ export class BillingsService {
     // console.log("🚀 findBillingBydate ~ agg", agg)
     const manager = getMongoManager();
     const TotalRev = await manager.aggregate(Billing, agg).toArray();
-    console.log('🚀 get billing by date', TotalRev);
+    // console.log('🚀 get billing by date', TotalRev);
     return TotalRev;
   }
 

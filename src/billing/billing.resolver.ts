@@ -13,6 +13,7 @@ import {
 import { AppSubscription } from './entities/app-subscription.input';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { StoresService } from 'src/stores/stores.service';
+import { Days, monthsArr } from 'src/utils/functions';
 
 @Resolver(() => Billing)
 export class BillingsResolver {
@@ -66,13 +67,34 @@ export class BillingsResolver {
   @Query(() => [SingleDayBillingInput], { name: 'getBillingByDate' })
   async getBillingByDate(
     @Args('storeId') storeId: string,
-    @Args('startDate', { type: () => Date }) startDate: Date,
-    @Args('endDate', { type: () => Date }) endDate: Date,
+    @Args('month') month: string,
+    @Args('year') year: string,
   ) {
+    const yearNum = +year;
+    const startDay = Days(
+      new Date(`${monthsArr(+month - 1).mon} 1, ${yearNum}`).getDay(),
+    );
+    const curMonth = monthsArr(+month - 1).initial;
+    const lastdate = monthsArr(+month - 1).endDate;
+    const sdate = new Date(
+      `${startDay}, 01 ${curMonth} ${yearNum} 00:00:00 GMT`,
+    );
+    const edate = new Date(
+      `${startDay}, ${lastdate} ${curMonth} ${yearNum} 23:59:00 GMT`,
+    );
+    console.log('sdate', `${startDay}, 01 ${curMonth} ${yearNum} 00:00:00 GMT`);
+    console.log(
+      'edate',
+      `${startDay}, ${lastdate} ${curMonth} ${yearNum} 23:59:00 GMT`,
+    );
+    console.log('year', `${yearNum}`);
+
+    // new Date('Fri, 01 Apr 2022 19:00:00 GMT)
+    // new Date('Mon, 30 Apr 2022 23:59:00 GMT')
     const result = await this.billingService.getBillingByDate(
       storeId,
-      startDate,
-      endDate,
+      sdate,
+      edate,
     );
     console.log('🚀 getBillingByDate result', result);
     return result;

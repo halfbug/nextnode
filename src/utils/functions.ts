@@ -24,3 +24,25 @@ export function addDays(date: Date, number: number) {
   const newDate = new Date(date);
   return new Date(newDate.setDate(newDate.getDate() + number));
 }
+
+export function monthsArr(mon: number) {
+  const months = [
+    { initial: 'Jan', mon: 'January', endDate: 31 },
+    { initial: 'Feb', mon: 'February', endDate: 28 },
+    { initial: 'Mar', mon: 'March', endDate: 31 },
+    { initial: 'Apr', mon: 'April', endDate: 30 },
+    { initial: 'May', mon: 'May', endDate: 31 },
+    { initial: 'Jun', mon: 'June', endDate: 30 },
+    { initial: 'Jul', mon: 'July', endDate: 31 },
+    { initial: 'Aug', mon: 'August', endDate: 31 },
+    { initial: 'Sep', mon: 'September', endDate: 30 },
+    { initial: 'Oct', mon: 'October', endDate: 31 },
+    { initial: 'Nov', mon: 'November', endDate: 30 },
+    { initial: 'Dec', mon: 'December', endDate: 31 },
+  ];
+  return months[mon];
+}
+export function Days(day: number) {
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return dayNames[day];
+}

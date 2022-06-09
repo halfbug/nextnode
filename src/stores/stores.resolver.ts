@@ -30,10 +30,10 @@ export class StoresResolver {
     );
     const withCampaigns = selectedFileds.includes('campaigns');
     const res = await this.storesService.findOneWithCampaings(shop);
-    console.log(
-      '🚀 ~ file: stores.resolver.ts ~ line 28 ~ StoresResolver ~ findOne ~ res',
-      res,
-    );
+    // console.log(
+    //   '🚀 ~ file: stores.resolver.ts ~ line 28 ~ StoresResolver ~ findOne ~ res',
+    //   res,
+    // );
     if (withCampaigns) return res;
     else return this.storesService.findOneByName(shop);
   }
