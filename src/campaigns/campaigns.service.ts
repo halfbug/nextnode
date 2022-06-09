@@ -240,20 +240,33 @@ export class CampaignsService {
   }
   async findOneWithProducts(id: string) {
     const manager = getMongoManager();
-    const agg = [
-      {
-          '$match': {
-              'id': id
-          }
-      }, {
-          '$lookup': {
-              'from': 'inventory', 
-              'localField': 'products', 
-              'foreignField': 'id', 
-              'as': 'products'
+    const agg = [{
+      $match: {
+          id: id
+      }
+  }, {
+      $lookup: {
+          from: 'inventory',
+          localField: 'products',
+          foreignField: 'id',
+          as: 'products'
+      }
+  }, {
+      $addFields: {
+          products: {
+              $filter: {
+                  input: '$products',
+                  as: 'j',
+                  cond: {
+                      $gte: [
+                          '$$j.price',
+                          '1.0'
+                      ]
+                  }
+              }
           }
       }
-  ];
+  }];
   // console.log(agg);
   const res =await manager.aggregate(Campaign, agg).toArray();
   return res[0];
