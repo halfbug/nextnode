@@ -10,17 +10,18 @@ export class UploadImageService {
   }
 
   async upload(file) {
-    const { originalname } = file;
+    const { originalname, mimetype } = file;
     const S3bucket = this.s3Provider.getBucketName();
-    return await this.uploadS3(file.buffer, S3bucket, originalname);
+    return await this.uploadS3(file.buffer, S3bucket, originalname, mimetype);
   }
 
-  async uploadS3(file, bucket, name) {
+  async uploadS3(file, bucket, name, mimetype) {
     const s3 = this.s3Provider.getS3();
     const s3Params = {
       Bucket: bucket,
       Key: String(name),
       Body: file,
+      ContentType: mimetype,
     };
 
     const data = await this.uploadImageToS3(s3, s3Params);

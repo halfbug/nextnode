@@ -162,12 +162,15 @@ export class GroupshopSavedListener {
     let brandLogo = '';
     if (res.data.store.logoImage != '') {
       const imgPath = res.data.store.logoImage.split('/');
-      brandLogo = await this.uploadImageService.getSignedUrl(imgPath[4]);
+      //brandLogo = await this.uploadImageService.getSignedUrl(imgPath[4]);
+      brandLogo = `${this.configService.get('LOGO_PATH')}/${imgPath[4]}`;
     } else {
       brandLogo = `${this.configService.get(
         'HOST',
       )}/public/images/default-logo.png`;
     }
+
+    console.log(brandLogo);
 
     if (res.post == 'yes') {
       console.log('groupshop saved listener received');
