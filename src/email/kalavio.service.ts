@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { Groupshops } from 'src/groupshops/entities/groupshop.modal';
 import { lastValueFrom, map } from 'rxjs';
 import { CreateSignUpInput } from './dto/create-signup.input';
+import * as qrcode from 'qrcode';
 
 @Injectable()
 export class KalavioService {
@@ -93,6 +94,15 @@ export class KalavioService {
 
     console.log('shortUrl : ' + res);
     return res?.shortURL ?? link;
+  }
+
+  async generateQrCode(text: string) {
+    try {
+      return await qrcode.toDataURL(text);
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
   }
 
   async getGroupdealByDate(date: string) {

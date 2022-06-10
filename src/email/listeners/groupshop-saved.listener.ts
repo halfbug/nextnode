@@ -181,6 +181,7 @@ export class GroupshopSavedListener {
       const maxDiscount = Math.floor((50 / 100) * order_price);
       let campaigns_line_items = [];
 
+      const qrImage = await this.kalavioService.generateQrCode(shortLink);
       const campaigns_items = campaigns_products.slice(0, 2);
       await Promise.all(
         campaigns_items.map(async (id) => {
@@ -218,7 +219,7 @@ export class GroupshopSavedListener {
           ];
         }),
       );
-
+      console.log(qrImage);
       const mdata = {
         logoImage: brandLogo,
         shopUrl: `https://${res.data.store.shop}`,
@@ -228,6 +229,7 @@ export class GroupshopSavedListener {
         customerEmail: customerEmail,
         dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
         shortUrl: shortLink,
+        qrImage: qrImage,
         created_at: orderDate,
         order_number: res.data.order.name,
         total_price: order_price,
@@ -258,6 +260,7 @@ export class GroupshopSavedListener {
       console.log('groupshop referrer listener received');
       const dealUrl = res.ugroupshop.url;
       const shortLink = res.ugroupshop.shortUrl;
+      const qrImage = await this.kalavioService.generateQrCode(shortLink);
 
       const rdata = {
         logoImage: brandLogo,
@@ -268,6 +271,7 @@ export class GroupshopSavedListener {
         customerEmail: customerEmail,
         dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
         shortUrl: shortLink,
+        qrImage: qrImage,
         created_at: orderDate,
         order_number: res.data.order.name,
         total_price: sumTotalPrice,
