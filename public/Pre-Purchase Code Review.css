@@ -1,0 +1,93 @@
+/* Groupshop Pre-Purchase Code  Fix */
+
+/* Product Page Banner */
+
+.link-logo {
+  width: 94px;
+}
+
+/* Product Page Pop-Up  */
+
+.groupshop_modal-content {
+  /* height: 90vh; REMOVE THIS LINE */
+}
+
+.gspdpmodel .modal-content-gss {
+  /* padding: 0px !important;  REMOVE THIS LINE */
+  padding: 40px 40px !important; /* KEEP THIS PADDING */
+}
+
+/* THE CLOSE BUTTON NEEDS TO BE MOVED UP ONE LEVEL IN THE HTML STRUCTURE.
+  SHOULD LIVE DIRECTLY UNDER groupshop_modal-content NOT UNDER groupshop_modal-body modal-content-gss */
+
+.groupshop_btn-close {
+  position: absolute;
+  z-index: 1099;
+  right: 0;
+  top: 0;
+  padding: 0.25em 1.25em;
+}
+
+.rbb-popup-logo2 {
+  padding-left: 20px;
+  margin-left: 20px;
+}
+
+.second-logo {
+  height: 42px;
+}
+
+.how-complete-0 {
+  padding: 0 35px;
+}
+
+@media only screen and (max-width: 1440px) {
+  .dont_pay_full {
+    /* font-size: 18px;  REMOVE THIS font-size should be 24px - APPLY 18PX TO MOBILE ONLY */
+    /* font-size: 20px; REMOVE THIS  */
+    /* line-height: 24px; REMOVE THIS  */
+    line-height: 1.3;
+  }
+}
+
+.rb-text-2 {
+  margin-top: 24px;
+  line-height: 1.4;
+  text-align: center;
+  color: #000000;
+  /* padding: 0 33px; REMOVE THIS  */
+  /* padding: 0 25px;  REMOVE THIS */
+  /* line-height: 18px; REMOVE THIS */
+}
+
+.rb-how-modal {
+  padding: 20px 0px;
+}
+
+.how-complete-4 {
+  /* margin-top: 15px; REMOVE THIS */
+  /* margin-top: 27px; REMOVE THIS */
+}
+
+@media only screen and (max-width: 1440px) .how-complete-4 {
+  /* margin-top: 25px; REMOVE THIS */
+}
+
+.how-complete-wrap-4 /* DELETE THIS HTML LEVEL IT SERVES NO PURPOSE */
+
+/* REMOVE THE <BR> TAG INSIDE THIS SPAN */
+span.shop-with-1 {
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+/* .how-complete-5 {
+    margin-top: 30px;
+}
+
+@media only screen and (min-width: 1400px)  {
+.how-complete-5 {
+    margin-top: 30px;
+}
+} */
