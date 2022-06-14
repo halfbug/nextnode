@@ -239,6 +239,12 @@ export class WebhooksController {
         vprod.recordType = 'ProductVariant';
         vprod.createdAtShopify = variant?.created_at;
         vprod.publishedAt = rproduct?.published_at;
+        vprod.featuredImage = rproduct?.image?.src;
+        const img = new ProductImage();
+        img.src =
+          rproduct?.image && rproduct?.image.src ? rproduct?.image.src : null;
+
+        vprod.image = img;
         vprod.price = variant?.price;
         vprod.inventoryQuantity = variant?.inventory_quantity;
         // const seOptions = [];
