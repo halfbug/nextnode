@@ -538,6 +538,9 @@ fieldset:disabled .groupshop_btn {
   overflow-y: auto;
   pointer-events: none;
   outline: 0;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
 }
 
 .groupshop_modal-dialog {
@@ -557,7 +560,9 @@ fieldset:disabled .groupshop_btn {
 }
 .groupshop_modal.groupshop_show .groupshop_modal-dialog {
   transform: none;
-  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .groupshop_modal.groupshop_modal-static .groupshop_modal-dialog {
   transform: scale(1.02);
@@ -589,8 +594,9 @@ fieldset:disabled .groupshop_btn {
   background-color: #fff;
   background-clip: padding-box;
   border: 1px solid var(--gs-border-color);
-  border-radius: 0.5rem;
   outline: 0;
+  height: 90vh;
+  overflow: auto;
 }
 
 .groupshop_modal-backdrop {
@@ -652,7 +658,6 @@ fieldset:disabled .groupshop_btn {
 
 @media (min-width: 576px) {
   .groupshop_modal-dialog {
-    max-width: 500px;
     margin: 1.75rem auto;
   }
 
@@ -809,9 +814,6 @@ fieldset:disabled .groupshop_btn {
   .groupshop_modal-fullscreen-xxl-down .groupshop_modal-footer {
     border-radius: 0;
   }
-}
-.groupshop_modal-content {
-  overflow-x: auto;
 }
 
 /*# sourceMappingURL=bootstrap.css.map */

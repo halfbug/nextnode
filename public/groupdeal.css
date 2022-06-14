@@ -183,12 +183,11 @@
   font-family: "Mulish", sans-serif;
 }
 .how-complete-0 {
-  /*padding: 0 65px;*/
+  padding: 0 35px;
   text-align: center;
-  /*padding-top: 0px;*/
 }
 .how-complete-4 {
-  margin-top: 27px;
+  margin-top: 20px;
   text-align: center;
 }
 .dont_pay_full {
@@ -224,15 +223,14 @@
   background-position: 0% 81%;
 }
 .rb-text-2 {
-  margin-top: 16px;
+  margin-top: 24px;
   font-family: Mulish;
   font-style: normal;
   font-weight: normal;
   font-size: 16px;
-  line-height: 1.3;
+  line-height: 1.4;
   text-align: center;
   color: #000000;
-  padding: 0 25px;
 }
 .to-start {
   position: relative;
@@ -280,7 +278,7 @@
   color: #000000;
 }
 .rb-how-modal {
-  padding: 0 35px;
+  padding: 20px 0px;
 }
 .rb-howshop:nth-child(2) {
   margin: 25px 0px;
@@ -313,7 +311,7 @@
   float: right;
 }
 .second-logo {
-  height: 52px;
+  height: 42px;
   width: 100%;
 }
 .rbb-popup-head-wrap {
@@ -337,8 +335,8 @@
   cursor: pointer;
 }
 .rbb-popup-logo2 {
-  padding-left: 15px;
-  margin-left: 15px;
+  padding-left: 20px;
+  margin-left: 20px;
   border-left: 1px solid #e0e0e0;
 }
 
@@ -356,9 +354,7 @@
   padding-left: 10px;
   margin-top: 5px;
 }
-.gspdpmodel .modal-dialog-gss {
-  width: 460px;
-}
+
 /*Is_Flex*/
 .modal-dialog-centered-gss {
   /*    display: flex;
@@ -379,7 +375,7 @@
   font-style: normal;
   font-weight: 500;
   font-size: 18px;
-  line-height: 1.3px;
+  line-height: 1.4;
   text-align: center;
   color: #000000;
 }
@@ -390,7 +386,6 @@
   margin-bottom: 10px;
 }
 .keep-shop {
-  /*font-family: Montserrat;*/
   font-family: "DM Sans", sans-serif;
   font-style: normal;
   font-weight: 700;
@@ -468,14 +463,7 @@
   .rb-howshop:nth-child(2) {
     /*margin: 14px 0px;*/
   }
-  .dont_pay_full {
-    /*font-size: 24px;
-        line-height: 1.3;*/
-  }
 
-  .rb-text-2 {
-    /*font-size: 16px;*/
-  }
   .how-shop-desc {
     /*        font-size: 15px;
         line-height: 18px;*/
@@ -551,10 +539,7 @@
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
-  .how-complete-4 {
-    /*margin-top: 12px;*/
-    text-align: center;
-  }
+
   span.shop-with-1 br {
     display: none;
   }
@@ -586,10 +571,6 @@
     background-repeat: no-repeat;
     background-position: 0% 81%;
   }
-  .rb-how-modal {
-    padding: 0 0px;
-  }
-
   .how-complete-0 {
     padding: 0 15px;
   }
@@ -1104,9 +1085,6 @@
     line-height: 22px;
   }
 }
-.gspdpmodel .modal-header-gss {
-  /*padding: 20px 0px 0px;*/
-}
 .modal-header-gss {
   position: relative;
 }
@@ -1404,11 +1382,6 @@
   position: relative;
 }
 
-.groupshop_btn-close {
-  position: absolute;
-  left: 293px;
-}
-
 .yellow_banner {
   display: flex;
   align-items: center;
@@ -1425,7 +1398,7 @@
 }
 
 .link-logo {
-  width: 104px;
+  width: 94px;
   height: 8px;
   display: inline-block;
   padding: 0px;
@@ -1533,21 +1506,18 @@
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
-  padding: 40px 40px;
-  /*Is_Flex*/
+  padding: 20px 40px !important;
 }
 .gspdpmodel .modal-header-gss {
   text-align: center;
   background: #fff;
   border: none !important;
   padding: 10px 0 0px;
-  /*is_flex*/
   display: flex;
   flex-flow: row nowrap;
   justify-content: center;
   padding: 10px 0 0;
-  /*margin-bottom: 14px;*/
-  /*is_flex*/
+  width: 100%;
 }
 
 .gspdpmodel#dealcartmodel .gs-modal-body {
@@ -1574,7 +1544,7 @@
 }
 @media only screen and (max-width: 1930px) and (min-width: 1430px) {
   .gspdpmodel .modal-content-gss {
-    padding-bottom: 30px;
+    /* padding-bottom: 30px; */
   }
 }
 
@@ -1588,12 +1558,7 @@
 .modal-header-gss {
   position: relative;
 }
-.groupshop_btn-close {
-  position: absolute;
-  /* right: 2px; */
-  /* left: 327px; */
-  top: 8px;
-}
+
 .groupshop_btn-close:focus {
   outline: none;
   box-shadow: none;
