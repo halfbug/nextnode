@@ -91,9 +91,7 @@ function displayBanner(price) {
   // );
   var target =
     [...document.forms].find((frm) => frm.action.includes('cart/add')) ??
-    (document.getElementsByClassName('detail')[0].parentElement && [
-      document.getElementsByClassName('detail')[0].parentElement,
-    ]);
+    (document.getElementsByClassName('detail')[0].parentElement);
   target.before(banner);
 }
 
