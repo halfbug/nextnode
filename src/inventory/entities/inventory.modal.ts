@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
+import { SelectedOption } from './product.entity';
 // import { InputType } from '@nestjsgraphql';
 
 @Entity()
@@ -96,4 +97,7 @@ export default class Inventory extends DefaultColumnsService {
 
   @Column({ nullable: true })
   price: string;
+
+  @Column(() => SelectedOption)
+  selectedOptions?: SelectedOption[];
 }

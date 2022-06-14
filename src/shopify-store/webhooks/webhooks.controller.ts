@@ -27,6 +27,7 @@ import { ShopifyService } from '../shopify/shopify.service';
 import Orders from 'src/inventory/entities/orders.modal';
 import { UninstallService } from 'src/stores/uninstall.service';
 import { OrderCreatedEvent } from '../events/order-created.event';
+import { SelectedOption } from 'src/inventory/entities/product.entity';
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -98,6 +99,49 @@ export class WebhooksController {
       this.shopifyService.shop = shop;
       const st = await this.shopifyService.scriptTagList();
       return st;
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
+  }
+  @Get('product')
+  async product(@Query('shopName') shopName: any, @Query('id') id: any) {
+    try {
+      const { shop, accessToken } = await this.storesService.findOne(shopName);
+      this.shopifyService.accessToken = accessToken;
+      // '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';
+      this.shopifyService.shop = shop;
+      const client = await this.shopifyService.client(shop, accessToken);
+      const Prd = await client.query({
+        data: {
+          query: `{
+            product(id: "gid://shopify/Product/7374317256870") {
+              title
+              options{
+                name
+                values
+              }
+              variants(first: 10) {
+                edges {
+                  node {
+                    selectedOptions {
+                      name
+                      value
+                    }
+                  }
+                }
+              }
+            }
+          }`,
+        },
+      });
+      const variants = Prd.body;
+
+      console.log('-------------list product variant');
+      console.log(JSON.stringify(variants));
+      return JSON.stringify(Prd);
+
+      // const st = await this.shopifyService.();
+      // return st;
     } catch (err) {
       console.log(JSON.stringify(err));
     }
@@ -207,7 +251,7 @@ export class WebhooksController {
         JSON.stringify(rproduct.variants),
       );
       const nprod = new UpdateInventoryInput();
-      nprod.id = rproduct.id;
+      // nprod.id = rproduct.id;
       nprod.id = rproduct?.admin_graphql_api_id;
       nprod.createdAtShopify = rproduct?.created_at;
       nprod.publishedAt = rproduct?.published_at;
@@ -220,26 +264,40 @@ export class WebhooksController {
         (item) => item.inventory_quantity > 0,
       );
       nprod.outofstock = !isAvailable;
+      nprod.options = rproduct.options.map(
+        ({ id, name, position, values }) => ({
+          id,
+          name,
+          position,
+          values,
+        }),
+      );
 
+      this.inventryService.removeVariants(rproduct?.admin_graphql_api_id);
       rproduct.variants.map(async (variant) => {
-        const preVariant = await this.inventryService.findId(
-          variant.admin_graphql_api_id,
-        );
-        if (preVariant) {
-          qDifference = Math.abs(
-            variant.inventory_quantity - preVariant?.inventoryQuantity,
-          );
-          preVariant.price = variant?.price;
+        const vprod = new CreateInventoryInput();
+        vprod.id = variant.admin_graphql_api_id;
+        vprod.title = variant?.title;
+        vprod.parentId = rproduct?.admin_graphql_api_id;
+        vprod.recordType = 'ProductVariant';
+        vprod.createdAtShopify = variant?.created_at;
+        vprod.publishedAt = rproduct?.published_at;
+        vprod.price = variant?.price;
+        vprod.inventoryQuantity = variant?.inventory_quantity;
+        // const seOptions = [];
+        // console.log(seOptions, 'seOptions');
+        // vprod.selectedOptions = [new SelectedOption()];
+        vprod.selectedOptions = rproduct.options.map((item, index) => {
+          const sOpt = new SelectedOption();
+          sOpt.name = item.name;
+          sOpt.value = variant[`option${index + 1}`];
+          return sOpt;
+        });
+        console.log(vprod.selectedOptions, 'vprod');
 
-          preVariant.inventoryQuantity = variant.inventory_quantity;
-          await this.inventryService.update(preVariant);
-          await this.inventryService.updateInventory(
-            rproduct.admin_graphql_api_id,
-            qDifference,
-          );
-        }
-        // add code for new variant.
+        await this.inventryService.create(vprod);
       });
+
       await this.inventryService.update(nprod);
 
       // res.send('product updated..');
@@ -291,21 +349,21 @@ export class WebhooksController {
       res.status(HttpStatus.OK).send();
     }
   }
-
-  @Post('order-update?')
-  async orderUpdate(@Req() req, @Res() res) {
-    try {
-      const { shop } = req.query;
-      const rorders = req.body;
-      console.log(
-        'WebhooksController ~ orderUpdate ~ rorders',
-        JSON.stringify(rorders),
-      );
-      res.status(HttpStatus.OK).send();
-    } catch (err) {
-      console.log(JSON.stringify(err));
-    } finally {
-      res.status(HttpStatus.OK).send();
-    }
-  }
+  // for future use
+  // @Post('order-update?')
+  // async orderUpdate(@Req() req, @Res() res) {
+  //   try {
+  //     const { shop } = req.query;
+  //     const rorders = req.body;
+  //     console.log(
+  //       'WebhooksController ~ orderUpdate ~ rorders',
+  //       JSON.stringify(rorders),
+  //     );
+  //     res.status(HttpStatus.OK).send();
+  //   } catch (err) {
+  //     console.log(JSON.stringify(err));
+  //   } finally {
+  //     res.status(HttpStatus.OK).send();
+  //   }
+  // }
 }

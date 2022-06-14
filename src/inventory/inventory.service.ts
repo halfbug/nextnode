@@ -19,9 +19,11 @@ export class InventoryService {
 
   create(createInventoryInput: CreateInventoryInput): Promise<Inventory> {
     const inventory = this.inventoryRepository.create(createInventoryInput);
+    inventory.selectedOptions = [...createInventoryInput.selectedOptions];
+
     console.log(
       '🚀 ~ file: inventory.service.ts ~ line 21 ~ InventoryService ~ create ~ inventory',
-      inventory,
+      inventory.selectedOptions,
     );
 
     return this.inventoryRepository.save(inventory);
@@ -50,6 +52,11 @@ export class InventoryService {
     return await this.inventoryManager.deleteMany(Inventory, {
       $or: [{ id: { $regex: id } }, { parentId: { $regex: id } }],
     });
+  }
+
+  async removeVariants(id: string) {
+    console.log(id, 'removevariants');
+    return await this.inventoryManager.deleteMany(Inventory, { parentId: id });
   }
 
   async removeShop(shop: string) {
