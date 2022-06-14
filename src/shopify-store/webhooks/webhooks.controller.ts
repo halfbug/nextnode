@@ -230,7 +230,7 @@ export class WebhooksController {
         }),
       );
 
-      this.inventryService.removeVariants(rproduct?.admin_graphql_api_id);
+      await this.inventryService.removeVariants(rproduct?.admin_graphql_api_id);
       rproduct.variants.map(async (variant) => {
         const vprod = new CreateInventoryInput();
         vprod.id = variant.admin_graphql_api_id;
@@ -322,7 +322,7 @@ export class WebhooksController {
       //       selectedOptions,
       //   ),
       // );
-      this.inventryService.removeVariants(pid);
+      await this.inventryService.removeVariants(pid);
       // console.log('🚀 pid', pid);
 
       variants.map(

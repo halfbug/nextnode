@@ -17,7 +17,7 @@ export class InventoryService {
     // this.inventoryManager = getMongoManager();
   }
 
-  create(createInventoryInput: CreateInventoryInput): Promise<Inventory> {
+  async create(createInventoryInput: CreateInventoryInput): Promise<Inventory> {
     const inventory = this.inventoryRepository.create(createInventoryInput);
     inventory.selectedOptions = [...createInventoryInput.selectedOptions];
     inventory.image = createInventoryInput.image ?? null;
@@ -27,7 +27,7 @@ export class InventoryService {
       inventory,
     );
 
-    return this.inventoryRepository.save(inventory);
+    return await this.inventoryRepository.save(inventory);
   }
 
   async update(updateInvenotryInput: UpdateInventoryInput) {
