@@ -20,10 +20,11 @@ export class InventoryService {
   create(createInventoryInput: CreateInventoryInput): Promise<Inventory> {
     const inventory = this.inventoryRepository.create(createInventoryInput);
     inventory.selectedOptions = [...createInventoryInput.selectedOptions];
+    inventory.image = createInventoryInput.image ?? null;
 
     console.log(
       '🚀 ~ file: inventory.service.ts ~ line 21 ~ InventoryService ~ create ~ inventory',
-      inventory.selectedOptions,
+      inventory,
     );
 
     return this.inventoryRepository.save(inventory);

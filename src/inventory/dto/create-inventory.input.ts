@@ -1,5 +1,9 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
-import { ProductOption, SelectedOption } from '../entities/product.entity';
+import {
+  ProductImage,
+  ProductOption,
+  SelectedOption,
+} from '../entities/product.entity';
 
 @InputType()
 export class CreateInventoryInput {
@@ -53,4 +57,10 @@ export class CreateInventoryInput {
 
   @Field(() => [SelectedOption], { nullable: 'itemsAndList' })
   selectedOptions?: SelectedOption[];
+
+  @Field()
+  displayName?: string;
+
+  @Field(() => ProductImage, { nullable: true })
+  image?: ProductImage;
 }

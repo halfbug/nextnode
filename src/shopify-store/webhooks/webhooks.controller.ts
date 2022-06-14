@@ -27,7 +27,11 @@ import { ShopifyService } from '../shopify/shopify.service';
 import Orders from 'src/inventory/entities/orders.modal';
 import { UninstallService } from 'src/stores/uninstall.service';
 import { OrderCreatedEvent } from '../events/order-created.event';
-import { SelectedOption } from 'src/inventory/entities/product.entity';
+import {
+  ProductImage,
+  SelectedOption,
+} from 'src/inventory/entities/product.entity';
+import Product from 'src/campaigns/entities/product.model';
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -99,49 +103,6 @@ export class WebhooksController {
       this.shopifyService.shop = shop;
       const st = await this.shopifyService.scriptTagList();
       return st;
-    } catch (err) {
-      console.log(JSON.stringify(err));
-    }
-  }
-  @Get('product')
-  async product(@Query('shopName') shopName: any, @Query('id') id: any) {
-    try {
-      const { shop, accessToken } = await this.storesService.findOne(shopName);
-      this.shopifyService.accessToken = accessToken;
-      // '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';
-      this.shopifyService.shop = shop;
-      const client = await this.shopifyService.client(shop, accessToken);
-      const Prd = await client.query({
-        data: {
-          query: `{
-            product(id: "gid://shopify/Product/7374317256870") {
-              title
-              options{
-                name
-                values
-              }
-              variants(first: 10) {
-                edges {
-                  node {
-                    selectedOptions {
-                      name
-                      value
-                    }
-                  }
-                }
-              }
-            }
-          }`,
-        },
-      });
-      const variants = Prd.body;
-
-      console.log('-------------list product variant');
-      console.log(JSON.stringify(variants));
-      return JSON.stringify(Prd);
-
-      // const st = await this.shopifyService.();
-      // return st;
     } catch (err) {
       console.log(JSON.stringify(err));
     }
@@ -246,10 +207,6 @@ export class WebhooksController {
         'WebhooksController ~ productUpdate ~ rproduct',
         JSON.stringify(rproduct),
       );
-      console.log(
-        'WebhooksController ~ productUpdate ~ rproduct variants',
-        JSON.stringify(rproduct.variants),
-      );
       const nprod = new UpdateInventoryInput();
       // nprod.id = rproduct.id;
       nprod.id = rproduct?.admin_graphql_api_id;
@@ -293,7 +250,7 @@ export class WebhooksController {
           sOpt.value = variant[`option${index + 1}`];
           return sOpt;
         });
-        console.log(vprod.selectedOptions, 'vprod');
+        console.log(variant, 'vprod');
 
         await this.inventryService.create(vprod);
       });
@@ -305,6 +262,116 @@ export class WebhooksController {
       console.log(JSON.stringify(err));
     } finally {
       res.status(HttpStatus.OK).send();
+    }
+  }
+
+  @Get('product')
+  async product(@Query('shopName') shopName: any, @Query('id') id: any) {
+    try {
+      const { shop, accessToken } = await this.storesService.findOne(shopName);
+      this.shopifyService.accessToken = accessToken;
+      // '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';
+      this.shopifyService.shop = shop;
+      const client = await this.shopifyService.client(shop, accessToken);
+      const Prd = await client.query({
+        data: {
+          query: `query product($id: ID!){
+            product(id: $id) {
+              title
+              id
+              options{
+                name
+                values
+              }
+              variants(first: 10) {
+                edges {
+                  node {
+                    selectedOptions {
+                      name
+                      value
+                    }
+                    image {
+                      src
+                    }
+                    title
+                    price
+                    inventoryQuantity
+                    id
+                    createdAt
+                    image {
+                      src
+                    }
+
+                  }
+                }
+              }
+            }
+          }`,
+          variables: {
+            id: id,
+          },
+        },
+      });
+      const data1: any = Prd.body;
+      const prod = data1.data.product;
+      const variants = data1.data.product.variants.edges;
+      const pid = data1.data.product.id;
+      // console.log(
+      //   variants.map(
+      //     ({ node: { selectedOptions, title, inventoryQuantity, price } }) =>
+      //       selectedOptions,
+      //   ),
+      // );
+      this.inventryService.removeVariants(pid);
+      // console.log('🚀 pid', pid);
+
+      variants.map(
+        async ({
+          node: {
+            selectedOptions,
+            title,
+            inventoryQuantity,
+            price,
+            id: vid,
+            createdAt,
+            image,
+          },
+        }) => {
+          const vprod = new CreateInventoryInput();
+          vprod.id = vid;
+          vprod.title = title;
+          vprod.displayName = `${prod.title} Variant ${title}`;
+          vprod.parentId = id;
+          vprod.recordType = 'ProductVariant';
+          vprod.createdAtShopify = createdAt;
+          // vprod.publishedAt = rproduct?.published_at;
+          vprod.price = price;
+          vprod.shop = shopName;
+          // image
+          const img = new ProductImage();
+          img.src = image && image.src ? image.src : null;
+
+          vprod.image = img;
+          vprod.featuredImage = image && image.src ? image.src : null;
+          vprod.inventoryQuantity = inventoryQuantity;
+          vprod.selectedOptions = selectedOptions.map((item, index) => {
+            const sOpt = new SelectedOption();
+            sOpt.name = item.name;
+            sOpt.value = item.value;
+            return sOpt;
+          });
+          console.log(vprod, 'vprod');
+          await this.inventryService.create(vprod);
+        },
+      );
+      // console.log(JSON.stringify(variants));
+      return `${JSON.stringify(Prd)}
+      this product reloaded successfully in groupshop inventory`;
+
+      // const st = await this.shopifyService.();
+      // return st;
+    } catch (err) {
+      console.log(JSON.stringify(err));
     }
   }
 
