@@ -20,13 +20,37 @@ export class BillingUsageCargeCron {
         return `Explore (free for 30 days) + Cashback charge - $${cashback}`;
 
       case BillingPlanEnum.LAUNCH:
-        return `Launch (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
+        // return `Launch (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
+        return `Groupshop Launch Plan >> ${new Date().toLocaleDateString(
+          'en-US',
+          {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          },
+        )} - ${totalCharge}(GS Charge - $${gscharge}  + CB Charge - $${cashback})`;
 
       case BillingPlanEnum.GROWTH:
-        return `Growth (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
+        // return `Growth (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
+        return `Groupshop Growth Plan >> ${new Date().toLocaleDateString(
+          'en-US',
+          {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          },
+        )} - ${totalCharge}(GS Charge - $${gscharge}  + CB Charge - $${cashback})`;
 
       case BillingPlanEnum.ENTERPRISE:
-        return `Unicorn  (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
+        // return `Unicorn  (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
+        return `Groupshop Unicorn Plan >> ${new Date().toLocaleDateString(
+          'en-US',
+          {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          },
+        )} - ${totalCharge}(GS Charge - $${gscharge}  + CB Charge - $${cashback})`;
     }
   }
 

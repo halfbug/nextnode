@@ -461,7 +461,7 @@ export class BillingsService {
 
       Logger.warn(res, BillingsService.name);
       console.log('shortUrl : ' + res);
-      return res['result'] ?? 0;
+      return parseFloat(res['result'].toFixed(2)) ?? 0;
     } catch (err) {
       return 0;
       Logger.error(err, BillingsService.name);
