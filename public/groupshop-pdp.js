@@ -86,12 +86,12 @@ function displayBanner(price) {
   banner.setAttribute('data-gs-backdrop', 'static');
 
   // get element on page and add banner before it
-  // var target = [...document.forms].find((frm) =>
-  //   frm.action.includes('cart/add'),
-  // );
-  var target =
-    [...document.forms].find((frm) => frm.action.includes('cart/add')) ??
-    (document.getElementsByClassName('detail')[0].parentElement);
+  var target = [...document.forms].find((frm) =>
+    frm.action.includes('cart/add'),
+  );
+  // var target =
+  //   [...document.forms].find((frm) => frm.action.includes('cart/add')) ??
+  //   document.getElementsByClassName('detail')[0].parentElement;
   target.before(banner);
 }
 
