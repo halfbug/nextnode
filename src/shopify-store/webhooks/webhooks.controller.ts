@@ -340,7 +340,9 @@ export class WebhooksController {
       nprod.price = variants[0].node?.price; //
       nprod.featuredImage = prod?.featuredImage?.src;
       let qDifference: number;
-      const isAvailable = variants.some((item) => item.inventoryQuantity > 0);
+      const isAvailable = variants.some(
+        ({ node: { inventoryQuantity } }) => inventoryQuantity > 0,
+      );
       nprod.outofstock = !isAvailable;
       nprod.options = prod.options.map(({ id, name, position, values }) => ({
         id,
