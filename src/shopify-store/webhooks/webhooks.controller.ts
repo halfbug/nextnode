@@ -285,7 +285,14 @@ export class WebhooksController {
             product(id: $id) {
               title
               id
+              status
+              createdAt
+              publishedAt
+              featuredImage {
+                src
+              }
               options{
+                id
                 name
                 values
               }
@@ -322,14 +329,29 @@ export class WebhooksController {
       const prod = data1.data.product;
       const variants = data1.data.product.variants.edges;
       const pid = data1.data.product.id;
-      // console.log(
-      //   variants.map(
-      //     ({ node: { selectedOptions, title, inventoryQuantity, price } }) =>
-      //       selectedOptions,
-      //   ),
-      // );
+
+      const nprod = new UpdateInventoryInput();
+      // nprod.id = rproduct.id;
+      nprod.id = id;
+      nprod.createdAtShopify = prod?.createdAt;
+      nprod.publishedAt = prod?.publishedAt;
+      nprod.title = prod?.title;
+      nprod.status = prod?.status?.toUpperCase();
+      nprod.price = variants[0].node?.price; //
+      nprod.featuredImage = prod?.featuredImage?.src;
+      let qDifference: number;
+      const isAvailable = variants.some((item) => item.inventoryQuantity > 0);
+      nprod.outofstock = !isAvailable;
+      nprod.options = prod.options.map(({ id, name, position, values }) => ({
+        id,
+        name,
+        position,
+        values,
+      }));
+      await this.inventryService.update(nprod);
+
       await this.inventryService.removeVariants(pid);
-      // console.log('🚀 pid', pid);
+      console.log('🚀 nprod', nprod);
 
       variants.map(
         async ({
