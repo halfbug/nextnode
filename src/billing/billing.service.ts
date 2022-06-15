@@ -547,7 +547,7 @@ export class BillingsService {
     // console.log("🚀 findMonthlyBilling ~ agg", agg)
     const manager = getMongoManager();
     const allStoreBilling = await manager.aggregate(Billing, agg).toArray();
-    console.log('🚀 all store billing', allStoreBilling);
+    // console.log('🚀 all store billing', allStoreBilling);
     return allStoreBilling;
   }
 }

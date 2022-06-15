@@ -462,8 +462,19 @@ export class ShopifyService {
         },
       });
       Logger.debug(AppUsageRecordCreate, 'Response-AppUsageRecordCreate');
-      if (AppUsageRecordCreate.body['data']['appUsageRecordCreate'])
-        return AppUsageRecordCreate.body['data']['appUsageRecordCreate'];
+      // if (
+      //   AppUsageRecordCreate.body['data']['appUsageRecordCreate'][
+      //     'appUsageRecord'
+      //   ]
+      // ) {
+      //   console.log('inside');
+      return AppUsageRecordCreate.body['data']['appUsageRecordCreate'][
+        'appUsageRecord'
+      ];
+      // } else
+      //   return {
+      //    appUsageRecordCreate: { appUsageRecord: false },
+      //   };
     } catch (err) {
       // console.log(err.message);
       Logger.error(err, 'AppUsageRecordCreate');

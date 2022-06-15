@@ -54,50 +54,68 @@ export class BillingUsageCargeCron {
     }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_6AM) // EVERY_DAY_AT_11AM)
+  @Cron(CronExpression.EVERY_DAY_AT_6AM) ///EVERY_DAY_AT_6AM) // EVERY_10_SECONDS)
   async handleBillingCron() {
-    // this.logger.error('Called every 30 seconds');
-    this.logger.debug(`Started At : ${new Date()}`);
-    const stores = await this.storesService.findActiveAll();
+    try {
+      // this.logger.error('Called every 30 seconds');
+      this.logger.debug(`Started At : ${new Date()}`);
+      const stores = await this.storesService.findActiveAll();
 
-    stores.map(async (store) => {
-      if (store.subscription) {
-        const allstoresBilling = await this.billingService.getAllStoreBilling();
-        const useageQuery = allstoresBilling.find(
-          (storeBilling) => storeBilling.store === store.id,
-        );
+      const allstoresBilling = await this.billingService.getAllStoreBilling();
+      console.log(
+        '🚀 ~ file: billing.cron.ts ~ line 70 ~ BillingUsageCargeCron ~ stores.map ~ allstoresBilling',
+        allstoresBilling,
+      );
+      stores.map(async (store) => {
+        if (store.subscription) {
+          // console.log(
+          //   '🚀 ~ file: billing.cron.ts ~ line 65 ~ BillingUsageCargeCron ~ stores.map ~ store',
+          //   store,
+          // );
+          const useageQuery = allstoresBilling.find(
+            (storeBilling) => storeBilling.store === store.id,
+          );
 
-        Logger.warn(store.shop, 'BillingUsageCargeCron');
-        console.log(
-          '🚀 ~ file: billing.cron.ts ~ line 30 ~ BillingUsageCargeCron ~ stores.map ~ useageQuery',
-          useageQuery,
-        );
-        if (useageQuery) {
-          // let cashbackUsage = '30';
-          let cashbackUsage = useageQuery['totalfeeByCashback'];
-          if (store.currencyCode !== 'USD' && cashbackUsage > 0) {
-            cashbackUsage = await this.billingService.currencyConversion(
-              store.currencyCode,
-              parseFloat(cashbackUsage),
+          Logger.warn(`${store.shop} - ${store.id}`, 'BillingUsageCargeCron');
+          console.log(
+            '🚀 ~ file: billing.cron.ts ~ line 30 ~ BillingUsageCargeCron ~ stores.map ~ useageQuery',
+            useageQuery,
+          );
+          if (useageQuery) {
+            // let cashbackUsage = '30';
+            let cashbackUsage = useageQuery['totalfeeByCashback'];
+            if (store.currencyCode !== 'USD' && cashbackUsage > 0) {
+              cashbackUsage = await this.billingService.currencyConversion(
+                store.currencyCode,
+                parseFloat(cashbackUsage),
+              );
+            }
+            const totalCharge =
+              parseFloat(cashbackUsage) +
+              parseFloat(useageQuery['totalfeeByGS']);
+            Logger.debug(
+              useageQuery['totalfeeByCashback'],
+              'totalfeeByCashback',
             );
-          }
-          const totalCharge =
-            parseFloat(cashbackUsage) + parseFloat(useageQuery['totalfeeByGS']);
-          Logger.debug(useageQuery['totalfeeByCashback'], 'totalfeeByCashback');
 
-          Logger.debug(useageQuery['totalfeeByGS'], 'totalfeeByGS');
-          Logger.debug(totalCharge, 'total charge');
+            Logger.debug(useageQuery['totalfeeByGS'], 'totalfeeByGS');
+            Logger.debug(totalCharge, 'total charge');
 
-          const usageCharge =
-            Date.now() < store.appTrialEnd.getTime()
-              ? parseFloat(cashbackUsage)
-              : totalCharge;
+            console.log(
+              '🚀 ~ ~ store.appTrialEnd.getTime()',
+              store.appTrialEnd.getTime(),
+            );
 
-          if (usageCharge > 0) {
-            this.shopifyapi.shop = store.shop;
-            this.shopifyapi.accessToken = store.accessToken;
-            const { body: shopifyRes } =
-              await this.shopifyapi.appUsageRecordCreate(
+            const usageCharge =
+              Date.now() < store.appTrialEnd.getTime()
+                ? parseFloat(cashbackUsage)
+                : totalCharge;
+            Logger.log(usageCharge, BillingUsageCargeCron.name);
+
+            if (usageCharge > 0) {
+              this.shopifyapi.shop = store.shop;
+              this.shopifyapi.accessToken = store.accessToken;
+              const shopifyRes = await this.shopifyapi.appUsageRecordCreate(
                 store.subscription?.['appSubscription']['lineItems'][0]['id'],
                 usageCharge,
                 this.usageDescripton(
@@ -107,26 +125,34 @@ export class BillingUsageCargeCron {
                   totalCharge,
                 ),
               );
-
-            if (shopifyRes['appUsageRecordCreate']['appUsageRecord']) {
-              const billingUpdateRec = useageQuery['badgeIds'].map(
-                (billingId: string) => {
-                  return {
-                    updateOne: {
-                      filter: { id: billingId },
-                      update: { $set: { isPaid: true } },
-                    },
-                  };
-                },
+              console.log(
+                '🚀 ~ file: billing.cron.ts ~ line 119 ~ BillingUsageCargeCron ~ stores.map ~ shopifyRes',
+                shopifyRes,
               );
+              // if (shopifyRes['appUsageRecordCreate']['appUsageRecord']) {
+              if (shopifyRes) {
+                console.log('inside');
+                const billingUpdateRec = useageQuery['badgeIds'].map(
+                  (billingId: string) => {
+                    return {
+                      updateOne: {
+                        filter: { id: billingId },
+                        update: { $set: { isPaid: true } },
+                      },
+                    };
+                  },
+                );
 
-              this.billingService.bulkUpdate(billingUpdateRec);
+                this.billingService.bulkUpdate(billingUpdateRec);
+              }
             }
           }
         }
-      }
-    });
-    //
-    // Logger.debug('cron srunning', BillingUsageCargeCron.name);
+      });
+      //
+      // Logger.debug('cron srunning', BillingUsageCargeCron.name);
+    } catch (err) {
+      Logger.error(err, BillingUsageCargeCron.name);
+    }
   }
 }
