@@ -89,9 +89,6 @@ function displayBanner(price) {
   var target = [...document.forms].find((frm) =>
     frm.action.includes('cart/add'),
   );
-  // var target =
-  //   [...document.forms].find((frm) => frm.action.includes('cart/add')) ??
-  //   document.getElementsByClassName('detail')[0].parentElement;
   target.before(banner);
 }
 
@@ -107,15 +104,20 @@ function addModal() {
 
   gsModal.innerHTML = ` <div class="groupshop_modal-dialog  modal-dialog-gss modal-dialog-centered-gss">
     <div class="groupshop_modal-content">
+    <button type="button" class="groupshop_btn-close" data-gs-dismiss="groupshop_modal" aria-label="Close"></button>
       <div class="groupshop_modal-body modal-content-gss">
-      
         <div class="modal-header-gss">
-        <button type="button" class="groupshop_btn-close" data-gs-dismiss="groupshop_modal" aria-label="Close"></button>
         <div class="rbb-popup-head-wrap"><div class="rbb-popup-head"><div class="rbb-popup-logo"><embed src="${window.APPv2URL}/public/images/GROUPSHOP-logo.svg" class="rb-main-logo"></div>
         <div class="rbb-popup-logo2" id="brand-logo">
         <img src="${window.APPv2URL}/public/images/default-image.jpg" width="20" height="30" class="second-logo addtc-np" >
         </div>
-        </div></div></div><div id="main-popup-gss" class="gs-modal-body" style="background-color:#ffffff" ;=""><div class="how-complete-0"><span class="dont_pay_full"><span class="gradient-pay">Pay less</span> when you <span class="gradient-pay">shop with friends</span></span></div><div class="rb-text-2">You and your friends can <strong>earn up to 90% cashback and discounts</strong> when you shop together through Groupshop!</div><div class="to-start-wrap"><div class="to-start">To start earning</div></div><div class="rb-how-modal">													 <div class="rb-howshop">													    <div class="how-shop-img"><embed src="${window.APPv2URL}/public/images/cart-pdp.svg"></div>													    <div class="how-shop-desc">Complete your order</div>													 </div>													 <div class="rb-howshop">													    <div class="how-shop-img"><embed src="${window.APPv2URL}/public/images/newmail.svg"></div>													    <div class="how-shop-desc">Share your Groupshop link with friends to give them access to <strong>exclusive discounts.</strong></div>													 </div>													 <div class="rb-howshop">													    <div class="how-shop-img"><embed src="${window.APPv2URL}/public/images/newemoji.svg"></div>													    <div class="how-shop-desc">Earn up to <strong>90% cashback</strong> when friends shop</div>													 </div>													</div><div class="how-complete-4 sec-4"><div class="how-complete-wrap-4"><span class="shop-with-1">The more friends, the more rewards for &nbsp;<br>everyone. It’s that simple!</span></div></div><div class="how-complete-5 sec-5"><a class="keep-shop" data-gs-dismiss="groupshop_modal" aria-label="Close">Keep shopping</a></div>
+        </div></div></div><div id="main-popup-gss" class="gs-modal-body" style="background-color:#ffffff" ;=""><div class="how-complete-0"><span class="dont_pay_full"><span class="gradient-pay">Pay less</span> when you <span class="gradient-pay">shop with friends</span></span></div>
+        <div class="rb-text-2"><strong>Earn up to 100% cashback and access exclusive discounts</strong> when you shop with friends using Groupshop!</div>
+        <div class="to-start-wrap"><div class="to-start">To start earning</div></div><div class="rb-how-modal">													 <div class="rb-howshop">													    
+        <div class="how-shop-img">
+        <embed src="${window.APPv2URL}/public/images/cart-pdp.svg"></div>
+        <div class="how-shop-desc">Complete your order to get a link to your unique Groupshop store.
+        </div>													 </div>													 <div class="rb-howshop">													    <div class="how-shop-img"><embed src="${window.APPv2URL}/public/images/newmail.svg"></div>													    <div class="how-shop-desc">Share your Groupshop link with friends to give them access to <strong>exclusive discounts.</strong></div>													 </div>													 <div class="rb-howshop">													    <div class="how-shop-img"><embed src="${window.APPv2URL}/public/images/newemoji.svg"></div>													    <div class="how-shop-desc">Earn up to <strong>100% cashback</strong> when friends shop.</div>													 </div>													</div><div class="how-complete-4 sec-4"><div class="how-complete-wrap-4"><span class="shop-with-1">The more friends, the more rewards for everyone. It’s that simple!</span></div></div><div class="how-complete-5 sec-5"><a class="keep-shop" data-gs-dismiss="groupshop_modal" aria-label="Close">Keep shopping</a></div>
         <div class="footer-end" id="today-offer-gs">
         </div><div id="pdp-ajax-res"></div></div><div id="inner-detail-popup" class="gs-modal-body" style="background-color:#ffffff; display:none"><div class="how-work-wrap"><div class="how-work-text">How does it work</div></div><div class="info-box-wrap mb-53"><div class="info-box"><span class="info-num">1</span><div class="info-part-1 info-text">Start by adding products to your cart and then complete your purchase</div><div class="info-part-2 info-text"><span class="info-footer">SHOP</span><span class="info-icon"><span class="info-icon-bg">
           <img src="{{ 'cart-pdp.svg' | asset_url }}" width="104" height="8" loading="lazy">
