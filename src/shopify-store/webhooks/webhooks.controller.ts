@@ -130,7 +130,7 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const rproduct = req.body;
-      console.log('Webhook : PRODUCT_CREATED, Shop: ', shop);
+      // console.log('Webhook : PRODUCT_CREATED, Shop: ', shop);
       const prodinfo = await this.inventryService.findOne(shop, 'Product');
       const nprod = new CreateInventoryInput();
 
@@ -256,7 +256,6 @@ export class WebhooksController {
           sOpt.value = variant[`option${index + 1}`];
           return sOpt;
         });
-        console.log(variant, 'vprod');
 
         await this.inventryService.create(vprod);
       });
@@ -354,7 +353,6 @@ export class WebhooksController {
       await this.inventryService.update(nprod);
 
       await this.inventryService.removeVariants(pid);
-      console.log('🚀 nprod', nprod);
 
       variants.map(
         async ({
@@ -391,16 +389,11 @@ export class WebhooksController {
             sOpt.value = item.value;
             return sOpt;
           });
-          console.log(vprod, 'vprod');
           await this.inventryService.create(vprod);
         },
       );
-      // console.log(JSON.stringify(variants));
       return `${JSON.stringify(Prd)}
       this product reloaded successfully in groupshop inventory`;
-
-      // const st = await this.shopifyService.();
-      // return st;
     } catch (err) {
       console.log(JSON.stringify(err));
     }
