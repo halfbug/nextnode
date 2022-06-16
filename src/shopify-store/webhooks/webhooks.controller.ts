@@ -295,6 +295,7 @@ export class WebhooksController {
                 id
                 name
                 values
+                position
               }
               variants(first: 10) {
                 edges {
