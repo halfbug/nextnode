@@ -23,12 +23,13 @@ export class BillingListener {
 
   @OnEvent('plan.updated')
   async createBillingRecord(event: StorePlanUpdatedEvent) {
-    const { id: storeId, plan } = event.store;
+    const { id: storeId, plan, appTrialEnd } = event.store;
     const { id, members } = event.groupshop;
     console.log(
       '🚀 ~ file: billing.listener.ts ~ line 28 ~ BillingListener ~ createBilling ~ members',
       members,
     );
+
     const payload: CreateBillingInput = {
       type: BillingTypeEnum.ON_GS_CREATION,
       plan,
@@ -36,7 +37,7 @@ export class BillingListener {
       revenue: 0,
       groupShopId: id,
       storeId,
-      isPaid: plan === 0 ? true : false,
+      isPaid: plan === 0 || Date.now() < appTrialEnd.getTime() ? true : false,
     };
     const newBilling = await this.billingService.create(payload);
     console.log(
