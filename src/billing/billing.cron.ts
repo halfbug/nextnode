@@ -122,7 +122,7 @@ export class BillingUsageCargeCron {
                   store.plan,
                   cashbackUsage,
                   useageQuery['totalfeeByGS'],
-                  totalCharge,
+                  totalCharge.toFixed(2),
                 ),
               );
               console.log(
