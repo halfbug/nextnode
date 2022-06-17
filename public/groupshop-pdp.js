@@ -180,12 +180,12 @@ async function init() {
         },
       } = await fetchProduct();
       const product = getSelectedVariant(variants) || firstVariant;
-      fetchGroupshopURL(store.id, store.campaignId, product_id).then((res) => {
-        if (!!res.url) {
-          var elem = document.getElementById('today-offer-gs');
-          elem.innerHTML = `<a target="_blank" class="join-vur-shop" id="looking-groupdeal" href="${res.url}">Or join an existing Groupshop and get <br>up to ${store.discount} off today <span class="footer-arrow"></span></a>`;
-        }
-      });
+      // fetchGroupshopURL(store.id, store.campaignId, product_id).then((res) => {
+      //   if (!!res.url) {
+      //     var elem = document.getElementById('today-offer-gs');
+      //     elem.innerHTML = `<a target="_blank" class="join-vur-shop" id="looking-groupdeal" href="${res.url}">Or join an existing Groupshop and get <br>up to ${store.discount} off today <span class="footer-arrow"></span></a>`;
+      //   }
+      // });
 
       fetchStoreLogo(store.logoImage.split('/')[4]).then(({ data: url }) => {
         if (!!url) {
