@@ -36,6 +36,7 @@ export class BillingListener {
       revenue: 0,
       groupShopId: id,
       storeId,
+      isPaid: plan === 0 ? true : false,
     };
     const newBilling = await this.billingService.create(payload);
     console.log(
@@ -55,6 +56,7 @@ export class BillingListener {
       groupShopId: id,
       revenue,
       storeId,
+      isPaid: false,
     };
     const newBilling = await this.billingService.create(payload);
     console.log(
