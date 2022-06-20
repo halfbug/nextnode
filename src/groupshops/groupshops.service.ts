@@ -300,7 +300,19 @@ export class GroupshopsService {
                             input: '$orderDetails',
                             as: 'j',
                             cond: {
-                              $eq: ['$$this.orderId', '$$j.id'],
+                              $and: [
+                                {
+                                  $eq: ['$$this.orderId', '$$j.id'],
+                                },
+                                {
+                                  $not: {
+                                    $in: [
+                                      '$$this.lineItems.product.id',
+                                      '$store.hideProducts',
+                                    ],
+                                  },
+                                },
+                              ],
                             },
                           },
                         },
