@@ -170,7 +170,7 @@ export class GroupshopSavedListener {
       )}/public/images/default-logo.png`;
     }
 
-    console.log(brandLogo);
+    // console.log(brandLogo);
 
     if (res.post == 'yes') {
       console.log('groupshop saved listener received');

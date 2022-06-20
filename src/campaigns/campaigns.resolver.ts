@@ -25,6 +25,12 @@ export class CampaignsResolver {
     return await this.campaignsService.findAllWithDetails(storeId);
   }
 
+  @Query(() => [Campaign], { name: 'overviews' })
+  async findOverviewAll(@Args('storeId') storeId: string) {
+    const data = await this.campaignsService.findOverviewDetails(storeId);
+    return data;
+  }
+
   @Query(() => Campaign, { name: 'campaign' })
   findOne(@Args('id', { type: () => String }) id: string) {
     return this.campaignsService.findOne(id);

@@ -232,6 +232,32 @@ export class OrdersService {
     return await manager.aggregate(Orders, agg).toArray();
   }
 
+  async getOrderCount(shop: string) {
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              confirmed: true,
+            },
+            {
+              shop: shop,
+            },
+          ],
+        },
+      },
+      {
+        $count: 'countTotalOrders',
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Orders, agg).toArray();
+    const response = {
+      countTotalOrders: gs[0]?.countTotalOrders || 0,
+    };
+    return response;
+  }
+
   async create(createOrderInput: CreateOrderInput) {
     try {
       const order = this.ordersRepository.create(createOrderInput);

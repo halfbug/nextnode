@@ -104,6 +104,12 @@ export class Member {
 }
 
 @ObjectType()
+export class TotalOrders {
+  @Field({ nullable: true })
+  countTotalOrders?: string;
+}
+
+@ObjectType()
 export class GroupShop {
   @Field(() => ID)
   id: string;

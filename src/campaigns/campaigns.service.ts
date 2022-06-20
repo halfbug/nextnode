@@ -365,4 +365,23 @@ export class CampaignsService {
   Logger.debug({res}, CampaignsService.name)
   return res;
   }
+
+  async findOverviewDetails(storeId: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        '$match': {
+          '$and': [
+            {
+              'isActive': true
+            }, {
+              'storeId': storeId
+            }
+          ]
+        }
+      }
+    ];
+  const res = await manager.aggregate(Campaign, agg).toArray();
+  return res;
+  }
 }   

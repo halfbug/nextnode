@@ -54,6 +54,12 @@ export class BillingsResolver {
     return this.billingService.findTotalRevenue(storeId);
   }
 
+  @Query(() => [MonthlyBillingInput], { name: 'overviewMetrics' })
+  overviewMetrics(@Args('storeId') storeId: string) {
+    const result = this.billingService.overviewMetrics(storeId);
+    return result;
+  }
+
   @Query(() => [Total], { name: 'findTotalGSMonthly' })
   findTotalGSMonthly(@Args('storeId') storeId: string) {
     return this.billingService.findTotalGSMonthly(storeId);

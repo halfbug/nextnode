@@ -168,6 +168,84 @@ export class BillingsService {
     return gs;
   }
 
+  async overviewMetrics(storeId: string) {
+    const agg = [
+      {
+        $match: {
+          storeId: storeId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'visitors',
+          localField: 'groupshopId',
+          foreignField: 'groupShopId',
+          as: 'visitors',
+        },
+      },
+      {
+        $addFields: {
+          feeTotalCB: {
+            $cond: {
+              if: {
+                $eq: ['$type', 0],
+              },
+              then: '$feeCharges',
+              else: 0,
+            },
+          },
+          feeTotalGS: {
+            $cond: {
+              if: {
+                $eq: ['$type', 1],
+              },
+              then: '$feeCharges',
+              else: 0,
+            },
+          },
+          createdMonthGS: {
+            $cond: {
+              if: {
+                $eq: ['$type', 1],
+              },
+              then: 1,
+              else: 0,
+            },
+          },
+          totalVisitors: {
+            $size: '$visitors',
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          cashBack: {
+            $sum: '$cashBack',
+          },
+          revenue: {
+            $sum: '$revenue',
+          },
+          feeCharges: {
+            $sum: '$feeTotalCB',
+          },
+          feeChargesGS: {
+            $sum: '$feeTotalGS',
+          },
+          totalGS: {
+            $sum: '$createdMonthGS',
+          },
+          totalVisitors: {
+            $first: '$totalVisitors',
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Billing, agg).toArray();
+    return gs;
+  }
+
   async findTotalRevenue(storeId: string) {
     const agg = [
       {
