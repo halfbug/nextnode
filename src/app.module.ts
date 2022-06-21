@@ -22,6 +22,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailModule } from './email/email.module';
+import { PartnersModule } from './partners/partners.module';
+import { Partnergroupshop } from './partners/entities/partner.modal';
 import { GsCommonModule } from './gs-common/gs-common.module';
 import { Lifecycle } from './gs-common/entities/lifecycle.modal';
 import { Visitors } from './gs-common/entities/visitors.modal';
@@ -58,6 +60,7 @@ import { Visitors } from './gs-common/entities/visitors.modal';
             Inventory,
             Campaign,
             Orders,
+            Partnergroupshop,
             Appsetting,
             Groupshops,
             Billing,
@@ -84,6 +87,7 @@ import { Visitors } from './gs-common/entities/visitors.modal';
       serveRoot: '/public/', //last slash was important
     }),
     EmailModule,
+    PartnersModule,
     GsCommonModule,
   ],
 })

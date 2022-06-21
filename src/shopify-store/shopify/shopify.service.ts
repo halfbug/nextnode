@@ -503,4 +503,32 @@ export class ShopifyService {
       Logger.error(err);
     }
   }
+
+  async getCustomerByEmail(shop, accessToken, email: string) {
+    try {
+      const client = await this.client(shop, accessToken);
+      const cdetail = await client.query({
+        data: {
+          query: `{
+            customers(first: 1, query:"${email}") {
+              edges {
+                node {
+                  id
+                  lastName                 
+                  firstName
+                  email                     
+                }
+              }
+            }
+          }`,
+        },
+      });
+      // console.log({ cdetail });
+      Logger.debug(cdetail, ShopifyService.name);
+      return cdetail;
+    } catch (err) {
+      console.log(err.message);
+      Logger.error(err);
+    }
+  }
 }

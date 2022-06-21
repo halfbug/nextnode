@@ -26,6 +26,10 @@ export class StoresService {
     return this.storeRepository.find({ where: { status: 'Active' } });
   }
 
+  async findById(id: string) {
+    return this.storeRepository.findOne({ id });
+  }
+
   findOne(shop: string) {
     return this.storeRepository.findOne({ shop });
   }
