@@ -66,7 +66,7 @@ export class ShopifyStoreController {
   async whoami(@Query('name') name: any) {
     const { brandName, shop, id, activeCampaign } =
       await this.storesService.findOneWithActiveCampaing(name);
-
+    console.log({ brandName, shop, id, activeCampaign });
     const imgPath = activeCampaign.settings.imageUrl.split('/')[4];
 
     const photo = await this.imageService.getSignedUrl(imgPath);
