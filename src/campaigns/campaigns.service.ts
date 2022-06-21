@@ -358,6 +358,10 @@ export class CampaignsService {
           'totalGroupshops': 0, 
           'detail': 0
         }
+      }, {
+        '$sort': {
+          'createdAt': -1
+        }
       }
     ];
   // console.log(agg);

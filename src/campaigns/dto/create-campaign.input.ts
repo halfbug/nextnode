@@ -30,8 +30,8 @@ export class CreateCampaignInput {
   @Field({ nullable: true })
   status: string;
 
-  @Field({ defaultValue: 0 })
-  createdAt: string;
+  @Field({ defaultValue: new Date() })
+  createdAt: Date;
 
   @Field({ nullable: true })
   criteria: string;
