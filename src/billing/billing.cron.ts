@@ -54,7 +54,7 @@ export class BillingUsageCargeCron {
     }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_5PM) ///EVERY_DAY_AT_6AM) // EVERY_10_SECONDS)
+  @Cron('0 00 12 * * 7') //CronExpression.EVERY_DAY_AT_5PM) ///EVERY_DAY_AT_6AM) // EVERY_10_SECONDS)
   async handleBillingCron() {
     try {
       // this.logger.error('Called every 30 seconds');
