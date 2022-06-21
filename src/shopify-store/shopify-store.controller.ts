@@ -17,6 +17,7 @@ import { OrdersService } from 'src/inventory/orders.service';
 import { StoresService } from 'src/stores/stores.service';
 import { ShopifyService } from './shopify/shopify.service';
 import { StoreService } from './store/store.service';
+import { UploadImageService } from './ImageUpload/uploadimage.service';
 
 @Controller()
 export class ShopifyStoreController {
@@ -32,6 +33,7 @@ export class ShopifyStoreController {
     private billingService: BillingsService,
     private shopifyService: ShopifyService,
     private configService: ConfigService,
+    private imageService: UploadImageService,
   ) {}
 
   // @Get()
@@ -60,6 +62,16 @@ export class ShopifyStoreController {
     return this.storeService.callback(req, res, req.query.shop);
   }
 
+  @Get('me')
+  async whoami(@Query('name') name: any) {
+    const { brandName, shop, id, activeCampaign } =
+      await this.storesService.findOneWithActiveCampaing(name);
+
+    const imgPath = activeCampaign.settings.imageUrl.split('/')[4];
+
+    const photo = await this.imageService.getSignedUrl(imgPath);
+    return { brandName, shop, id, photo };
+  }
   @Get('load-products')
   async getStoreProducts() {
     const result = await this.storeService.loadProducts();
