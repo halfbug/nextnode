@@ -42,8 +42,8 @@ export class BillingUsageCargeCron {
         )} - ${totalCharge}(GS Charge - $${gscharge}  + CB Charge - $${cashback})`;
 
       case BillingPlanEnum.ENTERPRISE:
-        // return `Unicorn  (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
-        return `Groupshop Unicorn Plan >> ${new Date().toLocaleDateString(
+        // return `Enterprise  (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
+        return `Groupshop Enterprise Plan >> ${new Date().toLocaleDateString(
           'en-US',
           {
             year: 'numeric',
