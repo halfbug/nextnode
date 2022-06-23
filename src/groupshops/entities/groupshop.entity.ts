@@ -110,6 +110,12 @@ export class TotalOrders {
 }
 
 @ObjectType()
+export class GsOrders {
+  @Field(() => [Member])
+  members: Member[];
+}
+
+@ObjectType()
 export class GroupShop {
   @Field(() => ID)
   id: string;

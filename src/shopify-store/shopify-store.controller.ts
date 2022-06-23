@@ -18,7 +18,8 @@ import { StoresService } from 'src/stores/stores.service';
 import { ShopifyService } from './shopify/shopify.service';
 import { StoreService } from './store/store.service';
 import { UploadImageService } from './ImageUpload/uploadimage.service';
-
+import { HttpService } from '@nestjs/axios';
+import { lastValueFrom, map } from 'rxjs';
 @Controller()
 export class ShopifyStoreController {
   constructor(
@@ -34,6 +35,7 @@ export class ShopifyStoreController {
     private shopifyService: ShopifyService,
     private configService: ConfigService,
     private imageService: UploadImageService,
+    private httpService: HttpService,
   ) {}
 
   // @Get()
@@ -148,5 +150,17 @@ export class ShopifyStoreController {
   @Get('type')
   async tesstme() {
     return typeof this.configService.get('BILLING_LIVE');
+  }
+
+  @Get('orderinput')
+  async orderinput(@Query('id') id: string) {
+    const orderRes = await this.groupshopSrv.getOrderDetails(id);
+    const accessToken = orderRes[0]?.storeData.accessToken;
+    const shop = orderRes[0]?.storeData.shop;
+    const apiUrl = `https://${shop}/admin/api/2021-10/orders/${id}.json?access_token=${accessToken}`;
+    const res = await lastValueFrom(
+      this.httpService.get(apiUrl).pipe(map((res) => res.data)),
+    );
+    return res;
   }
 }

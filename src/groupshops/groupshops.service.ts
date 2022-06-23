@@ -750,4 +750,39 @@ export class GroupshopsService {
     ];
     return await manager.aggregate(Groupshops, agg).toArray();
   }
+
+  async findGsOrders(groupshopUrl: string) {
+    const response = await this.groupshopRepository.findOne({
+      where: {
+        url: groupshopUrl,
+      },
+    });
+    console.log(JSON.stringify(response));
+    return response.members;
+  }
+
+  async getOrderDetails(orderid: string) {
+    const agg = [
+      {
+        $match: {
+          'members.orderId': `gid://shopify/Order/${orderid}`,
+        },
+      },
+      {
+        $lookup: {
+          from: 'store',
+          localField: 'storeId',
+          foreignField: 'id',
+          as: 'storeData',
+        },
+      },
+      {
+        $unwind: {
+          path: '$storeData',
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    return await manager.aggregate(Groupshops, agg).toArray();
+  }
 }
