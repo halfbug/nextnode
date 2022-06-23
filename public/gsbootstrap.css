@@ -4,7 +4,7 @@
  * Copyright 2011-2022 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
-:root {
+ :root {
   --gs-blue: #0d6efd;
   --gs-indigo: #6610f2;
   --gs-purple: #6f42c1;
@@ -514,7 +514,7 @@ fieldset:disabled .groupshop_btn {
 }
 .groupshop_btn-close:focus {
   outline: 0;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  box-shadow: none;
   opacity: 1;
 }
 .groupshop_btn-close:disabled,
@@ -599,7 +599,7 @@ fieldset:disabled .groupshop_btn {
   background-clip: padding-box;
   border: 1px solid var(--gs-border-color);
   outline: 0;
-  height: 90vh;
+  max-height: 90vh;
   overflow: auto;
 }
 
