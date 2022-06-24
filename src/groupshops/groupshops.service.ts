@@ -151,6 +151,53 @@ export class GroupshopsService {
 
     return totalGS;
   }
+
+  async getuniqueClicks(storeId: string) {
+    const agg = [
+      {
+        $match: {
+          storeId: storeId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'visitors',
+          localField: 'id',
+          foreignField: 'groupshopId',
+          as: 'result',
+        },
+      },
+      {
+        $project: {
+          uniqueClicks: {
+            $size: '$result',
+          },
+          numOrders: {
+            $size: '$members',
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          uniqueClicks: {
+            $sum: '$uniqueClicks',
+          },
+          totalOrderCount: {
+            $sum: '$numOrders',
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    const response = {
+      uniqueVisitors: gs[0]?.uniqueClicks || 0,
+      totalOrders: gs[0]?.totalOrderCount || 0,
+    };
+    return response;
+  }
+
   async findfindQrDealLinkAll(email: string, ordernumber: string) {
     const agg = [
       {

@@ -37,12 +37,6 @@ export class MonthlyBillingInput {
 
   @Field()
   totalCharges?: number;
-
-  @Field({ nullable: true })
-  totalPurchases?: number;
-
-  @Field({ nullable: true })
-  totalVisitors?: number;
 }
 
 @ObjectType()
