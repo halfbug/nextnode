@@ -445,9 +445,6 @@ fieldset:disabled .groupshop_btn {
 	--gs-btn-border-radius: 0.25rem;
 }
 
-.groupshop_fade {
-	transition: opacity 0.15s linear;
-}
 @media (prefers-reduced-motion: reduce) {
 	.groupshop_fade {
 		transition: none;
