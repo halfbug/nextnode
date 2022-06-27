@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="./public/images/groupshop.png" width="320" alt="Groupshop Logo" /></a>
+  <a href="http://nestjs.com/" target="blank"><img src="./public/images/GROUPSHOP-logo.svg" width="320" alt="Groupshop Logo" /></a>
 </p>
 
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
@@ -11,7 +11,7 @@
 
 
 ## Description
-A GroupShop backend API using techstack :
+A GroupShop backend API techstack :
  - [Nest](https://github.com/nestjs/nest) framework.
  - TypeScript.
  - GraphQL
