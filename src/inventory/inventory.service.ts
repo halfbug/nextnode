@@ -18,9 +18,15 @@ export class InventoryService {
   }
 
   async create(createInventoryInput: CreateInventoryInput): Promise<Inventory> {
+    // console.log(
+    //   '🚀 ~ file: inventory.service.ts ~ line 21 ~ InventoryService ~ create ~ CreateInventoryInput',
+    //   createInventoryInput,
+    // );
     const inventory = this.inventoryRepository.create(createInventoryInput);
-    inventory.selectedOptions = [...createInventoryInput.selectedOptions];
-    inventory.image = createInventoryInput.image ?? null;
+    if (createInventoryInput.recordType === 'ProductVariant') {
+      inventory.selectedOptions = [...createInventoryInput.selectedOptions];
+      inventory.image = createInventoryInput.image ?? null;
+    }
 
     console.log(
       '🚀 ~ file: inventory.service.ts ~ line 21 ~ InventoryService ~ create ~ inventory',

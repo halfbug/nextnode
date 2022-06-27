@@ -100,4 +100,6 @@ export default class Inventory extends DefaultColumnsService {
 
   @Column(() => SelectedOption)
   selectedOptions?: SelectedOption[];
+  @Column()
+  src?: string;
 }

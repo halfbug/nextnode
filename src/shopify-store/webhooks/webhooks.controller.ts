@@ -290,13 +290,22 @@ export class WebhooksController {
               featuredImage {
                 src
               }
-              options{
+              images(first:10, reverse: true){
+                edges{
+                  node{
+                    src
+                    id
+                    originalSrc
+                  }
+                }
+              }
+            options{
                 id
                 name
                 values
                 position
               }
-              variants(first: 10) {
+              variants(first: 25) {
                 edges {
                   node {
                     selectedOptions {
@@ -328,6 +337,7 @@ export class WebhooksController {
       const data1: any = Prd.body;
       const prod = data1.data.product;
       const variants = data1.data.product.variants.edges;
+      const images = data1.data.product.images.edges;
       const pid = data1.data.product.id;
 
       const nprod = new UpdateInventoryInput();
@@ -392,6 +402,19 @@ export class WebhooksController {
           await this.inventryService.create(vprod);
         },
       );
+
+      images.map(async ({ node: { id: vid, src } }) => {
+        const vprod = new CreateInventoryInput();
+        vprod.id = vid;
+        vprod.parentId = id;
+        vprod.recordType = 'ProductImage';
+        vprod.shop = shopName;
+        // image
+        vprod.src = src;
+
+        await this.inventryService.create(vprod);
+      });
+
       return `${JSON.stringify(Prd)}
       this product reloaded successfully in groupshop inventory`;
     } catch (err) {
