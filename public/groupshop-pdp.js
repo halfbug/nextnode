@@ -89,7 +89,8 @@ function displayBanner(price) {
   var target = [...document.forms].find((frm) =>
     frm.action.includes('cart/add'),
   );
-  target.before(banner);
+
+  if (window.location.hostname !== 'jelcie.com') target.before(banner);
 }
 
 function addModal() {

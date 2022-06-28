@@ -7,7 +7,11 @@ import {
   GqlExecutionContext,
 } from '@nestjs/graphql';
 import { GroupshopsService } from './groupshops.service';
-import { GroupShop as Groupshop, Member } from './entities/groupshop.entity';
+import {
+  GroupShop as Groupshop,
+  Member,
+  uniqueClicks,
+} from './entities/groupshop.entity';
 import { CreateGroupshopInput } from './dto/create-groupshops.input';
 import { UpdateGroupshopInput } from './dto/update-groupshops.input';
 import {
@@ -62,6 +66,11 @@ export class GroupshopsResolver {
     @Args('ordernumber') ordernumber: string,
   ) {
     return this.GroupshopsService.findfindQrDealLinkAll(email, ordernumber);
+  }
+
+  @Query(() => uniqueClicks, { name: 'getUniqueClicks' })
+  getuniqueClicks(@Args('shop') shop: string) {
+    return this.GroupshopsService.getuniqueClicks(shop);
   }
 
   @Query(() => [Member], { name: 'getGsOrders' })

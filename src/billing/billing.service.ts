@@ -176,14 +176,6 @@ export class BillingsService {
         },
       },
       {
-        $lookup: {
-          from: 'visitors',
-          localField: 'groupshopId',
-          foreignField: 'groupShopId',
-          as: 'visitors',
-        },
-      },
-      {
         $addFields: {
           feeTotalCB: {
             $cond: {
@@ -212,9 +204,6 @@ export class BillingsService {
               else: 0,
             },
           },
-          totalVisitors: {
-            $size: '$visitors',
-          },
         },
       },
       {
@@ -235,12 +224,10 @@ export class BillingsService {
           totalGS: {
             $sum: '$createdMonthGS',
           },
-          totalVisitors: {
-            $first: '$totalVisitors',
-          },
         },
       },
     ];
+
     const manager = getMongoManager();
     const gs = await manager.aggregate(Billing, agg).toArray();
     return gs;

@@ -110,6 +110,15 @@ export class TotalOrders {
 }
 
 @ObjectType()
+export class uniqueClicks {
+  @Field({ nullable: true })
+  uniqueVisitors?: string;
+
+  @Field({ nullable: true })
+  totalOrders?: string;
+}
+
+@ObjectType()
 export class GsOrders {
   @Field(() => [Member])
   members: Member[];
