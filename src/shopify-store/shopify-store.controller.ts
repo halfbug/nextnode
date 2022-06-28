@@ -142,7 +142,7 @@ export class ShopifyStoreController {
   }
   @Get('healthcheck')
   async testme() {
-    return `server is running properly on
+    return `server is running properly with CI/CD on
     HOST: ${process.env.HOST}
     FRONT: ${process.env.FRONT}`;
   }
