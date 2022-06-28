@@ -95,6 +95,73 @@ export class WebhooksController {
     }
   }
 
+  @Get('price-rule')
+  async getPriceRuleById(
+    @Query('shopName') shopName: any,
+    @Query('id') id: any,
+  ) {
+    // return 'yes inside';
+    try {
+      const { shop, accessToken } = await this.storesService.findOne(shopName);
+      this.shopifyService.accessToken = accessToken;
+      // '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';
+      this.shopifyService.shop = shop;
+      const client = await this.shopifyService.client(shop, accessToken);
+      const qres = await client.query({
+        data: {
+          query: `query priceRule($id: ID!){
+          
+            priceRule(id: $id) {
+              id
+            title
+            target
+            startsAt
+            endsAt
+            status
+            summary
+            }
+        
+      }`,
+          variables: {
+            id: id,
+          },
+        },
+      });
+      console.log('🚀 ~ price rule detail', JSON.stringify(qres));
+
+      return qres;
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
+  }
+  @Get('price-rule-edit')
+  async updatePriceRuleById(
+    @Query('shopName') shopName: any,
+    @Query('id') id: any,
+  ) {
+    // return 'yes inside';
+    try {
+      const { shop, accessToken } = await this.storesService.findOne(shopName);
+      this.shopifyService.accessToken = accessToken;
+      // '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';
+      this.shopifyService.shop = shop;
+      return await this.shopifyService.setDiscountCode(
+        shop,
+        'Update',
+        accessToken,
+        'GS7966642363',
+        null,
+        null,
+        new Date('2022-06-08T00:55:27.781+00:00'),
+        new Date('2022-07-01T17:29:04.929+00:00'),
+        id,
+      );
+
+      // return qres;
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
+  }
   @Get('scriptTag')
   async scriptTag(@Query('shopName') shopName: any) {
     try {
@@ -113,16 +180,16 @@ export class WebhooksController {
     @Query('sid') sid: any,
     @Query('shopName') shopName: any,
   ) {
-    try {
-      console.log(sid);
-      const { shop, accessToken } = await this.storesService.findOne(shopName);
-      this.shopifyService.accessToken = accessToken;
-      this.shopifyService.shop = shop;
-      this.shopifyService.scriptTagDelete(sid);
-      return 'check console' + sid;
-    } catch (err) {
-      console.log(JSON.stringify(err));
-    }
+    // try {
+    // console.log(sid);
+    const { shop, accessToken } = await this.storesService.findOne(shopName);
+    this.shopifyService.accessToken = accessToken;
+    this.shopifyService.shop = shop;
+    return await this.shopifyService.scriptTagDelete(sid);
+    // return 'check console' + sid;
+    // } catch (err) {
+    // console.log(JSON.stringify(err));
+    // }
   }
 
   @Post('product-create?')

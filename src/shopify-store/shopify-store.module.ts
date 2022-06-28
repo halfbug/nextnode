@@ -24,6 +24,7 @@ import { OldThemeFoundListener } from './listeners/old-theme-found.listener';
 import { StoreSavedListener } from './listeners/store-saved.listener';
 import { OrderCreatedEvent } from './events/order-created.event';
 import { OrderCreatedListener } from './listeners/order-created.listener';
+import { GSUpdatePriceRuleListener } from './listeners/groupshop-updatePricerule.listener';
 @Global()
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { OrderCreatedListener } from './listeners/order-created.listener';
     StoresModule,
     OrderCreatedEvent,
     OrderCreatedListener,
+    GSUpdatePriceRuleListener,
   ],
   controllers: [
     ShopifyStoreController,

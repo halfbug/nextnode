@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { UpdateGroupshopInput } from 'src/groupshops/dto/update-groupshops.input';
+import { GSUpdatePriceRuleEvent } from 'src/groupshops/events/groupshop-update-price-rule.event';
 import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { FIRST_EXPIRE_DAYS } from 'src/utils/constant';
 import { addDays } from 'src/utils/functions';
@@ -15,6 +16,7 @@ export class GSLoadedListener {
     private readonly vistorsrv: VistorsService,
     private readonly lifecyclesrv: LifecycleService,
     private readonly groupshopsrv: GroupshopsService,
+    private readonly gsUpdatePriceRuleEvt: GSUpdatePriceRuleEvent,
   ) {}
 
   @OnEvent('groupshop.loaded')
@@ -48,6 +50,9 @@ export class GSLoadedListener {
       this.lifecyclesrv.create(gs.id, EventType.expired, gsExpireAt);
       //    2.3 update visitor service.
       this.vistorsrv.create(gs.id, ip);
+      //   2.4 update price-rule on shopify
+      this.gsUpdatePriceRuleEvt.groupshop = gs;
+      this.gsUpdatePriceRuleEvt.emit();
     } else {
       // 3. find view with ip.
       const isIPExist = !!(await this.vistorsrv.findOne(ip));

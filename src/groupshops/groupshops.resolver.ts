@@ -25,6 +25,9 @@ import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt
 import { QRInput } from './dto/qr-code.input';
 import { ViewedInterceptor } from 'src/gs-common/viewed.inceptor';
 import { addDays, getDateDifference } from 'src/utils/functions';
+import { LifecycleService } from 'src/gs-common/lifecycle.service';
+import { EventType } from 'src/gs-common/entities/lifecycle.modal';
+import { GSUpdatePriceRuleEvent } from './events/groupshop-update-price-rule.event';
 
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
@@ -36,6 +39,8 @@ export class GroupshopsResolver {
   constructor(
     private readonly GroupshopsService: GroupshopsService,
     private readonly crypt: EncryptDecryptService,
+    private readonly lifecyclesrv: LifecycleService,
+    private readonly gsUpdatePriceRuleEvt: GSUpdatePriceRuleEvent,
   ) {}
 
   @Mutation(() => Groupshop)
@@ -89,7 +94,7 @@ export class GroupshopsResolver {
       const groupshop = await this.GroupshopsService.find(Dcode);
       const isExpired = !(getDateDifference(groupshop.expiredAt).time > -1);
       if (isExpired) {
-        //update
+        //update groupshop expire date
         const newExpiredate = addDays(new Date(), 7);
         const updateGS = await this.GroupshopsService.updateExpireDate(
           {
@@ -102,6 +107,17 @@ export class GroupshopsResolver {
         //   '🚀 ~ file: groupshops.resolver.ts ~ line 81 ~ GroupshopsResolver ~ findOne ~ updateGS',
         //   updateGS,
         // );
+
+        // add lifcycle event for revised groupshop
+        this.lifecyclesrv.create(groupshop.id, EventType.revised, new Date());
+        this.lifecyclesrv.create(
+          groupshop.id,
+          EventType.expired,
+          newExpiredate,
+        );
+        // update price rule end date.
+        this.gsUpdatePriceRuleEvt.groupshop = updateGS;
+        this.gsUpdatePriceRuleEvt.emit();
         return updateGS;
       }
     }

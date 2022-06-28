@@ -11,6 +11,7 @@ import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
 import { UtilsModule } from 'src/utils/utils.module';
 import { RefAddedEvent } from './events/refferal-added.event';
 import { GsCommonModule } from 'src/gs-common/gs-common.module';
+import { GSUpdatePriceRuleEvent } from './events/groupshop-update-price-rule.event';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { GsCommonModule } from 'src/gs-common/gs-common.module';
     GroupshopsService,
     OrderPlacedListener,
     RefAddedEvent,
+    GSUpdatePriceRuleEvent,
   ],
-  exports: [GroupshopsService, RefAddedEvent],
+  exports: [GroupshopsService, RefAddedEvent, GSUpdatePriceRuleEvent],
 })
 export class GroupshopsModule {}
