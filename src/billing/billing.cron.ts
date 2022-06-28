@@ -120,7 +120,7 @@ export class BillingUsageCargeCron {
                 usageCharge,
                 this.usageDescripton(
                   store.plan,
-                  cashbackUsage,
+                  cashbackUsage.toFixed(2),
                   useageQuery['totalfeeByGS'],
                   totalCharge.toFixed(2),
                 ),
