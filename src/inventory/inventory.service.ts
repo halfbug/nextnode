@@ -464,4 +464,21 @@ export class InventoryService {
     return res;
     // return await manager.aggregate(Inventory, agg).toArray();
   }
+
+  // it find all products, variants, collection, images
+  async findAllProductsOnly(shop: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          shop,
+          recordType: 'Product',
+        },
+      },
+    ];
+    const res = await manager.aggregate(Inventory, agg).toArray();
+    // console.log('🚀 ~ file: InventoryService ~ findAllProducts ~ res', res);
+    return res;
+    // return await manager.aggregate(Inventory, agg).toArray();
+  }
 }

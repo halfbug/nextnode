@@ -45,7 +45,155 @@ export class WebhooksController {
     private uninstallSerivice: UninstallService,
     private orderCreatedEvent: OrderCreatedEvent,
   ) {}
+  async refreshSingleProduct(shop, accessToken, id, shopName) {
+    try {
+      this.shopifyService.accessToken = accessToken;
+      // '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';
+      this.shopifyService.shop = shop;
+      const client = await this.shopifyService.client(shop, accessToken);
+      const Prd = await client.query({
+        data: {
+          query: `query product($id: ID!){
+          product(id: $id) {
+            title
+            id
+            status
+            createdAt
+            publishedAt
+            featuredImage {
+              src
+            }
+            images(first:10, reverse: true){
+              edges{
+                node{
+                  src
+                  id
+                  originalSrc
+                }
+              }
+            }
+          options{
+              id
+              name
+              values
+              position
+            }
+            variants(first: 30, reverse: true) {
+              edges {
+                node {
+                  selectedOptions {
+                    name
+                    value
+                  }
+                  image {
+                    src
+                  }
+                  title
+                  price
+                  inventoryQuantity
+                  id
+                  createdAt
+                  image {
+                    src
+                  }
 
+                }
+              }
+            }
+          }
+        }`,
+          variables: {
+            id: id,
+          },
+        },
+      });
+      const data1: any = Prd.body;
+      const prod = data1.data.product;
+      const variants = data1.data.product.variants.edges;
+      const images = data1.data.product.images.edges;
+      const pid = data1.data.product.id;
+
+      const nprod = new UpdateInventoryInput();
+      // nprod.id = rproduct.id;
+      nprod.id = id;
+      nprod.createdAtShopify = prod?.createdAt;
+      nprod.publishedAt = prod?.publishedAt;
+      nprod.title = prod?.title;
+      nprod.status = prod?.status?.toUpperCase();
+      nprod.price = variants[0].node?.price; //
+      nprod.featuredImage = prod?.featuredImage?.src;
+      let qDifference: number;
+      const isAvailable = variants.some(
+        ({ node: { inventoryQuantity } }) => inventoryQuantity > 0,
+      );
+      nprod.outofstock = !isAvailable;
+      nprod.options = prod.options.map(({ id, name, position, values }) => ({
+        id,
+        name,
+        position,
+        values,
+      }));
+      await this.inventryService.update(nprod);
+
+      await this.inventryService.removeVariants(pid);
+
+      variants.map(
+        async ({
+          node: {
+            selectedOptions,
+            title,
+            inventoryQuantity,
+            price,
+            id: vid,
+            createdAt,
+            image,
+          },
+        }) => {
+          const vprod = new CreateInventoryInput();
+          vprod.id = vid;
+          vprod.title = title;
+          vprod.displayName = `${prod.title} Variant ${title}`;
+          vprod.parentId = id;
+          vprod.recordType = 'ProductVariant';
+          vprod.createdAtShopify = createdAt;
+          // vprod.publishedAt = rproduct?.published_at;
+          vprod.price = price;
+          vprod.shop = shopName;
+          // image
+          const img = new ProductImage();
+          img.src = image && image.src ? image.src : null;
+
+          vprod.image = img;
+          vprod.featuredImage = image && image.src ? image.src : null;
+          vprod.inventoryQuantity = inventoryQuantity;
+          vprod.selectedOptions = selectedOptions.map((item, index) => {
+            const sOpt = new SelectedOption();
+            sOpt.name = item.name;
+            sOpt.value = item.value;
+            return sOpt;
+          });
+          await this.inventryService.create(vprod);
+        },
+      );
+
+      images.map(async ({ node: { id: vid, src } }) => {
+        const vprod = new CreateInventoryInput();
+        vprod.id = vid;
+        vprod.parentId = id;
+        vprod.recordType = 'ProductImage';
+        vprod.shop = shopName;
+        // image
+        vprod.src = src;
+
+        await this.inventryService.create(vprod);
+      });
+
+      return `${JSON.stringify(Prd)}
+    this product reloaded successfully in groupshop inventory`;
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
+  }
   @Get('register')
   async register() {
     try {
@@ -372,7 +520,7 @@ export class WebhooksController {
                 values
                 position
               }
-              variants(first: 25) {
+              variants(first: 30, reverse: true) {
                 edges {
                   node {
                     selectedOptions {
@@ -547,4 +695,198 @@ export class WebhooksController {
   //     res.status(HttpStatus.OK).send();
   //   }
   // }
+
+  // @Get('load-inventory')
+  // async loadInventory(@Query('shopName') shopName: any) {
+  //   try {
+  //     const { shop, accessToken } = await this.storesService.findOne(shopName);
+  //     this.shopifyService.accessToken = accessToken;
+  //     this.shopifyService.shop = shop;
+  //     const client = await this.shopifyService.client(shop, accessToken);
+
+  //     const data = await client.query({
+  //       data: `{
+  //         products(first: 2, reverse: true) {
+  //           edges {
+  //             node {
+  //               title
+  //               id
+  //               status
+  //               description
+  //               createdAt
+  //               publishedAt
+  //               featuredImage {
+  //                 src
+  //               }
+  //               totalVariants
+  //               totalInventory
+  //               images(first:10, reverse: true){
+  //                 edges{
+  //                   node{
+  //                     src
+  //                     id
+  //                   }
+  //                 }
+  //               }
+  //               options{
+  //                 id
+  //                 name
+  //                 values
+  //                 position
+  //               }
+  //               variants(first: 30, reverse: true) {
+  //                 edges {
+  //                   node {
+  //                     title
+  //                     id
+  //                     inventoryQuantity
+  //                     price
+  //                     createdAt
+  //                     selectedOptions {
+  //                       name
+  //                       value
+  //                     }
+  //                     image {
+  //                       src
+  //                     }
+  //                   }
+  //                 }
+  //               }
+
+  //               }
+  //           }
+  //         }
+  //       }`,
+  //     });
+  //     const data1: any = data.body;
+  //     const prods = data1.data.products;
+
+  //     // prods.map(
+  //     //   async ({
+  //     //     edges: {
+  //     //       node: {
+  //     //         selectedOptions,
+  //     //         title,
+  //     //         inventoryQuantity,
+  //     //         price,
+  //     //         id,
+  //     //         createdAt,
+  //     //         image,
+  //     //         publishedAt,
+  //     //         status,
+  //     //         featuredImage,
+  //     //         options,
+  //     //         totalVariants,
+  //     //         totalInventory,
+  //     //         variants,
+  //     //         images,
+  //     //       },
+  //     //     },
+  //     //   }) => {
+  //     //     const variantsReceived = variants.edges;
+  //     //     const imagesReceived = images.edges;
+
+  //     //     const nprod = new UpdateInventoryInput();
+  //     //     // nprod.id = rproduct.id;
+  //     //     nprod.id = id;
+  //     //     nprod.createdAtShopify = createdAt;
+  //     //     nprod.publishedAt = publishedAt;
+  //     //     nprod.title = title;
+  //     //     nprod.status = status?.toUpperCase();
+  //     //     // nprod.price = variants[0].node?.price; //
+  //     //     nprod.featuredImage = featuredImage?.src;
+  //     //     nprod.totalVariants = totalVariants;
+  //     //     nprod.totalInventory = totalInventory;
+  //     //     const isAvailable = variantsReceived.some(
+  //     //       ({ node: { inventoryQuantity } }) => inventoryQuantity > 0,
+  //     //     );
+  //     //     nprod.outofstock = !isAvailable;
+  //     //     nprod.options = options.map(({ id, name, position, values }) => ({
+  //     //       id,
+  //     //       name,
+  //     //       position,
+  //     //       values,
+  //     //     }));
+  //     //     await this.inventryService.update(nprod);
+  //     //     await this.inventryService.removeVariants(id);
+  //     //     variantsReceived.map(
+  //     //       async ({
+  //     //         node: {
+  //     //           selectedOptions,
+  //     //           title: vtitle,
+  //     //           inventoryQuantity: vinventoryQuantity,
+  //     //           price,
+  //     //           id: vid,
+  //     //           createdAt: vcreatedAt,
+  //     //           image,
+  //     //         },
+  //     //       }) => {
+  //     //         const vprod = new CreateInventoryInput();
+  //     //         vprod.id = vid;
+  //     //         vprod.title = vtitle;
+  //     //         vprod.displayName = `${title} Variant ${vtitle}`;
+  //     //         vprod.parentId = id;
+  //     //         vprod.recordType = 'ProductVariant';
+  //     //         vprod.createdAtShopify = vcreatedAt;
+  //     //         // vprod.publishedAt = rproduct?.published_at;
+  //     //         vprod.price = price;
+  //     //         vprod.shop = shopName;
+  //     //         // image
+  //     //         const img = new ProductImage();
+  //     //         img.src = image && image.src ? image.src : null;
+  //     //         vprod.image = img;
+  //     //         vprod.featuredImage = image && image.src ? image.src : null;
+  //     //         vprod.inventoryQuantity = inventoryQuantity;
+  //     //         vprod.selectedOptions = selectedOptions.map((item, index) => {
+  //     //           const sOpt = new SelectedOption();
+  //     //           sOpt.name = item.name;
+  //     //           sOpt.value = item.value;
+  //     //           return sOpt;
+  //     //         });
+  //     //         await this.inventryService.create(vprod);
+  //     //       },
+  //     //     );
+
+  //     //     imagesReceived.map(async ({ node: { id: imid, src } }) => {
+  //     //       const vprod = new CreateInventoryInput();
+  //     //       vprod.id = imid;
+  //     //       vprod.parentId = id;
+  //     //       vprod.recordType = 'ProductImage';
+  //     //       vprod.shop = shopName;
+  //     //       // image
+  //     //       vprod.src = src;
+
+  //     //       await this.inventryService.create(vprod);
+  //     //     });
+  //     //   },
+  //     // );
+
+  //     return `${JSON.stringify(data)}
+  //     this shop reloaded successfully in groupshop inventory`;
+  //   } catch (err) {
+  //     console.log(JSON.stringify(err));
+  //   }
+  // }
+
+  @Get('load-products')
+  async loadProducts(@Query('shopName') shopName: any) {
+    try {
+      const { shop, accessToken } = await this.storesService.findOne(shopName);
+      const products = await this.inventryService.findAllProductsOnly(shop);
+      console.log(
+        '🚀 ~ webhooks.controller.ts ~ line 812 ~ loadProducts ~ products',
+        products[0].recordType,
+      );
+      // eslint-disable-next-line prefer-const
+      let resStr = '';
+      products.map(({ id, title }) => {
+        console.log(title);
+        const res = this.refreshSingleProduct(shop, accessToken, id, shopName);
+        resStr = `${resStr} ${JSON.stringify(res)}`;
+      });
+      return JSON.stringify(resStr);
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
+  }
 }
