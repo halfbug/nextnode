@@ -155,12 +155,14 @@ export class CampaignsService {
     if (products && criteria === 'custom') {
       updateCampaignInput.products = [...new Set(products)];
     } else {
+     
       const updatedProducts: string[] = await this.setProducts(
         shop,
         criteria,
         prevProducts,
       );
       updateCampaignInput.products = updatedProducts;
+      
     }
     if (isActive === true) {
       await this.campaignRepository.update(
@@ -171,6 +173,7 @@ export class CampaignsService {
        
 
     await this.campaignRepository.update({ id }, updateCampaignInput);    
+    
     const campEvent = new CampaignInactiveEvent();
     campEvent.id = id;
     campEvent.storeId = storeId;
@@ -180,7 +183,8 @@ export class CampaignsService {
     } else {
       this.eventEmitter.emit('campaign.active', campEvent);
     }
-    if (products && products.length > 0) await this.updateDiscountCode({ id }, products, shop, accessToken);    
+    if (prevCampaign.criteria !== updateCampaignInput.criteria) await this.updateDiscountCode({ id }, updateCampaignInput.products, shop, accessToken);    
+    
 
     return await this.findOneById(id);
   }
@@ -197,14 +201,17 @@ export class CampaignsService {
     console.log("🚀 ~ campaignId", campaignId);    
     const allComapigns = await this.groupshopsService.getCampaignGS(campaignId);
     for (const key in allComapigns) {  
-      const priceRuleId = allComapigns[key].discountCode.priceRuleId;       
+      const priceRuleId = allComapigns[key].discountCode.priceRuleId; 
+      // get all deal products
+      const gsDealProduucts = allComapigns[key].dealProducts.map(prd => prd.productId)
+
       await this.shopifyapi.setDiscountCode(
         shop,
         'Update',
         accessToken,
         null,
         null,
-        products,
+        [...new Set([...products, ...gsDealProduucts])],
         null,
         null,
         priceRuleId,
@@ -366,7 +373,7 @@ export class CampaignsService {
     ];
   // console.log(agg);
   const res =await manager.aggregate(Campaign, agg).toArray();
-  Logger.debug({res}, CampaignsService.name)
+  // Logger.debug({res}, CampaignsService.name)
   return res;
   }
 
