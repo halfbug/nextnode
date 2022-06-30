@@ -70,9 +70,9 @@ export class ShopifyStoreController {
       await this.storesService.findOneWithActiveCampaing(name);
     console.log({ brandName, shop, id, activeCampaign });
     const photo = activeCampaign.settings.imageUrl.split('/')[4];
-
-    // const photo = await this.imageService.getSignedUrl(imgPath);
-    return { brandName, shop, id, photo };
+    const maxReward = activeCampaign.salesTarget.rewards[2].discount;
+    // const photo = await this.imageService.getSignedUrl(imgPath );
+    return { brandName, shop, id, photo, maxReward };
   }
   @Get('load-products')
   async getStoreProducts() {
