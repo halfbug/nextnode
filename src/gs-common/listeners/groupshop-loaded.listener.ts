@@ -4,7 +4,7 @@ import { UpdateGroupshopInput } from 'src/groupshops/dto/update-groupshops.input
 import { GSUpdatePriceRuleEvent } from 'src/groupshops/events/groupshop-update-price-rule.event';
 import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { FIRST_EXPIRE_DAYS } from 'src/utils/constant';
-import { addDays } from 'src/utils/functions';
+import { addDays, getDateDifference } from 'src/utils/functions';
 import { EventType } from '../entities/lifecycle.modal';
 import { GSLoadedEvent } from '../events/groupshop-loaded.event';
 import { LifecycleService } from '../lifecycle.service';
@@ -36,15 +36,17 @@ export class GSLoadedListener {
       '🚀 ~ file: viewed.inceptor.ts ~ line 54 ~ ViewedInterceptor ~ tap ~ gsviews',
       gsviews,
     );
+    // 1.5 groupshop should not be expired
+    const isNotExpired = getDateDifference(gs.expiredAt).time > -1;
 
     // 2. on zero views add a start event in life cycle
-    if (gsviews?.length === 0) {
+    if (gsviews?.length === 0 && isNotExpired) {
       //    2.1. update groupshop expire time.
       const gsExpireAt = addDays(new Date(), FIRST_EXPIRE_DAYS);
       const upgs = new UpdateGroupshopInput();
       upgs.id = gs.id;
       upgs.expiredAt = gsExpireAt;
-      this.groupshopsrv.update(upgs);
+      await this.groupshopsrv.update(upgs);
       //    2.2 add started at and expired at event in lifecycle collection.
       this.lifecyclesrv.create(gs.id, EventType.started);
       this.lifecyclesrv.create(gs.id, EventType.expired, gsExpireAt);
@@ -52,6 +54,7 @@ export class GSLoadedListener {
       this.vistorsrv.create(gs.id, ip);
       //   2.4 update price-rule on shopify
       this.gsUpdatePriceRuleEvt.groupshop = gs;
+      this.gsUpdatePriceRuleEvt.endDate = gsExpireAt;
       this.gsUpdatePriceRuleEvt.emit();
     } else {
       // 3. find view with ip.

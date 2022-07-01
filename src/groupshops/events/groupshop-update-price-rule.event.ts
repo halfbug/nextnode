@@ -6,6 +6,7 @@ import { Groupshops } from 'src/groupshops/entities/groupshop.modal';
 @Injectable()
 export class GSUpdatePriceRuleEvent {
   public groupshop?: Groupshops;
+  public endDate?: Date;
   constructor(private eventEmitter: EventEmitter2) {}
   emit() {
     this.eventEmitter.emit('groupshop.UpdatePriceRule', this);

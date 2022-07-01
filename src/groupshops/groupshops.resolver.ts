@@ -117,6 +117,7 @@ export class GroupshopsResolver {
         );
         // update price rule end date.
         this.gsUpdatePriceRuleEvt.groupshop = updateGS;
+        this.gsUpdatePriceRuleEvt.endDate = addDays(new Date(), 7);
         this.gsUpdatePriceRuleEvt.emit();
         return updateGS;
       }

@@ -22,7 +22,9 @@ export class GSUpdatePriceRuleListener {
         createdAt,
         expiredAt,
       },
+      endDate,
     } = event;
+    const expireDate = endDate ?? expiredAt;
     const { shop, accessToken } = await this.storeService.findById(storeId);
     this.shopifyapi.accessToken = accessToken;
     this.shopifyapi.shop = shop;
@@ -34,7 +36,7 @@ export class GSUpdatePriceRuleListener {
       null,
       null,
       createdAt,
-      expiredAt,
+      expireDate,
       priceRuleId,
     );
   }
