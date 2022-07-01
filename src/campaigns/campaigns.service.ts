@@ -183,7 +183,7 @@ export class CampaignsService {
     } else {
       this.eventEmitter.emit('campaign.active', campEvent);
     }
-    if (prevCampaign.criteria !== updateCampaignInput.criteria) await this.updateDiscountCode({ id }, updateCampaignInput.products, shop, accessToken);    
+    if (updateCampaignInput.criteria && (prevCampaign.criteria !== updateCampaignInput.criteria)) await this.updateDiscountCode({ id }, updateCampaignInput.products, shop, accessToken);    
     
 
     return await this.findOneById(id);
