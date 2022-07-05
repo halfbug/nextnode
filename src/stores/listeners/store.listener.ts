@@ -23,11 +23,11 @@ export class StoreListener {
 
   @OnEvent('groupshop.created')
   async updateStore(event: GroupShopCreated) {
-    console.log(
-      '🚀 ~ file: store.listener.ts ~ line 21 ~ GSCreatedListener ~ updateStore ~ event',
-      event,
-    );
-    console.log('................................');
+    // console.log(
+    //   '🚀 ~ file: store.listener.ts ~ line 21 ~ GSCreatedListener ~ updateStore ~ event',
+    //   event,
+    // );
+    // console.log('................................');
     // update store totalgroupshop after this groupshop created
 
     const { id, totalGroupShop } = event.store;
@@ -51,10 +51,10 @@ export class StoreListener {
     }
     const payload = { id, plan, totalGroupShop: newCount };
     const updatedStore = await this.storeService.update(id, payload);
-    console.log(
-      '🚀 ~ file: store.listener.ts ~ line 32 ~ StoreListener ~ updateStore ~ updatedStore',
-      updatedStore,
-    );
+    // console.log(
+    //   '🚀 ~ file: store.listener.ts ~ line 32 ~ StoreListener ~ updateStore ~ updatedStore',
+    //   updatedStore,
+    // );
 
     this.planUpdateEvent.store = updatedStore;
     this.planUpdateEvent.groupshop = event.groupshop;

@@ -28,10 +28,10 @@ export class InventoryService {
       inventory.image = createInventoryInput.image ?? null;
     }
 
-    console.log(
-      '🚀 ~ file: inventory.service.ts ~ line 21 ~ InventoryService ~ create ~ inventory',
-      inventory,
-    );
+    // console.log(
+    //   '🚀 ~ file: inventory.service.ts ~ line 21 ~ InventoryService ~ create ~ inventory',
+    //   inventory,
+    // );
 
     return await this.inventoryRepository.save(inventory);
   }

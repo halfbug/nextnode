@@ -25,10 +25,10 @@ export class BillingListener {
   async createBillingRecord(event: StorePlanUpdatedEvent) {
     const { id: storeId, plan, appTrialEnd } = event.store;
     const { id, members } = event.groupshop;
-    console.log(
-      '🚀 ~ file: billing.listener.ts ~ line 28 ~ BillingListener ~ createBilling ~ members',
-      members,
-    );
+    // console.log(
+    //   '🚀 ~ file: billing.listener.ts ~ line 28 ~ BillingListener ~ createBilling ~ members',
+    //   members,
+    // );
 
     const payload: CreateBillingInput = {
       type: BillingTypeEnum.ON_GS_CREATION,
@@ -40,10 +40,10 @@ export class BillingListener {
       isPaid: plan === 0 || Date.now() < appTrialEnd.getTime() ? true : false,
     };
     const newBilling = await this.billingService.create(payload);
-    console.log(
-      '🚀 ~ file: billing.listener.ts ~ line 35 ~ BillingListener ~ createBilling ~ newBilling',
-      newBilling,
-    );
+    // console.log(
+    //   '🚀 ~ file: billing.listener.ts ~ line 35 ~ BillingListener ~ createBilling ~ newBilling',
+    //   newBilling,
+    // );
   }
   @OnEvent('cashback.generated')
   async createBillingForCashBack(event: CashBackEvent) {
@@ -60,15 +60,15 @@ export class BillingListener {
       isPaid: false,
     };
     const newBilling = await this.billingService.create(payload);
-    console.log(
-      '🚀 ~ file: billing.listener.ts ~ line 57 ~ BillingListener ~ createBillingForCashBack ~ newBilling',
-      newBilling,
-    );
+    // console.log(
+    //   '🚀 ~ file: billing.listener.ts ~ line 57 ~ BillingListener ~ createBillingForCashBack ~ newBilling',
+    //   newBilling,
+    // );
   }
   @OnEvent('refferal.added')
   async updateBillingForRevenue(event: RefAddedEvent) {
-    console.log('=========refferal added==========');
-    console.log(JSON.stringify(event));
+    // console.log('=========refferal added==========');
+    // console.log(JSON.stringify(event));
     let totalPrice;
     const { groupshop } = event;
     const memLength = groupshop.members.length;
@@ -103,10 +103,10 @@ export class BillingListener {
       feeCharges: 0,
       revenue: +totalPr,
     };
-    console.log(
-      '🚀 ~ file: billing.listener.ts ~ line 99 ~ BillingListener ~ updateBillingForRevenue ~ event.groupshopId',
-      event.groupshopId,
-    );
+    // console.log(
+    //   '🚀 ~ file: billing.listener.ts ~ line 99 ~ BillingListener ~ updateBillingForRevenue ~ event.groupshopId',
+    //   event.groupshopId,
+    // );
     const newBilling = await this.billingService.create(payload1);
     console.log('🚀 BillingForRevenue', newBilling);
   }

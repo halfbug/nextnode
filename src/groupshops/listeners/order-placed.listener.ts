@@ -66,17 +66,24 @@ export class OrderPlacedListener {
     );
   }
 
-  totalPricePercent(lineItems, discountPercentage) {
+  totalPricePercent(
+    lineItems: any[],
+    discountPercentage: number,
+    role: RoleTypeEnum,
+  ) {
     const totalPrice = lineItems?.reduce(
-      (priceSum: number, { price, quantity }) =>
-        priceSum + quantity * parseFloat(price),
+      (priceSum: number, { discountedPrice, price, quantity }) => {
+        if (role === RoleTypeEnum.owner)
+          return priceSum + quantity * parseFloat(discountedPrice);
+        else return priceSum + quantity * parseFloat(price);
+      },
       0,
     );
     const netPrice = (discountPercentage / 100) * totalPrice;
     return netPrice < 1 ? netPrice : Math.floor(netPrice);
   }
 
-  totalRevenue(lineItems, discountPercentage) {
+  totalRevenue(lineItems: any[], discountPercentage: number) {
     const totalPrice = lineItems?.reduce(
       (priceSum: number, { price, quantity }) =>
         priceSum + quantity * parseFloat(price),
@@ -141,7 +148,11 @@ export class OrderPlacedListener {
     const netDiscount = milestone * 100 - member.availedDiscount;
     // 100 -
 
-    const refundAmount = this.totalPricePercent(member.lineItems, netDiscount);
+    const refundAmount = this.totalPricePercent(
+      member.lineItems,
+      netDiscount,
+      member.role,
+    );
     const revenuePrice = this.totalRevenue(member.lineItems, netDiscount);
 
     // cashback - gsfees
@@ -240,21 +251,23 @@ export class OrderPlacedListener {
       // filter out items that price is less than or eq to 1
       const newLineItems = lineItems.filter(({ price }) => +price > 1);
       gsMember.lineItems = newLineItems;
-      console.log(
-        '🚀 ~ file: order-placed.listener.ts ~ line 242 ~ OrderPlacedListener ~ createGroupShop ~ newLineItems',
-        newLineItems,
-      );
+      // console.log(
+      //   '🚀 ~ file: order-placed.listener.ts ~ line 242 ~ OrderPlacedListener ~ createGroupShop ~ newLineItems',
+      //   newLineItems,
+      // );
 
       const title = OrderPlacedListener.formatTitle(name);
       const expires = OrderPlacedListener.addDays(new Date(), 14);
-
+      let ownerDiscount = false;
       //check order price is greater than $1
       if (+totalProductPrice > 1) {
+        let ugroupshop = null;
         if (discountCode) {
           // const updateGroupshop = await this.gsService.findOne(discountCode);
-          let ugroupshop = new UpdateGroupshopInput();
-
+          ugroupshop = new UpdateGroupshopInput();
           ugroupshop = await this.gsService.findOneWithLineItems(discountCode);
+        }
+        if (ugroupshop) {
           console.log('🚀 ugroupshop groupshop', ugroupshop);
           const {
             discountCode: { title, priceRuleId },
@@ -265,7 +278,7 @@ export class OrderPlacedListener {
           } = ugroupshop;
           this.groupshop = ugroupshop as Groupshops;
           const totalCampaignProducts = campaignProducts.concat(
-            dealProducts?.map((p) => p.productId) || [],
+            dealProducts?.map((p: { productId: any }) => p.productId) || [],
           );
 
           gsMember.role = RoleTypeEnum.referral;
@@ -317,6 +330,7 @@ export class OrderPlacedListener {
           groupshopSavedEvent.ugroupshop = ugroupshop;
           this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
         } else {
+          ownerDiscount = !!discountCode && true;
           const dealProducts = newLineItems
             .filter((item) => !campaignProducts.includes(item.product.id))
             .map((nitem) => ({
@@ -328,9 +342,9 @@ export class OrderPlacedListener {
           const totalCampaignProducts = campaignProducts.concat(
             dealProducts.map((p) => p.productId),
           );
-          const cryptURL = `/${
-            shop.split('.')[0]
-          }/deal/${await this.crypt.encrypt(title)}`;
+          const cryptURL = `/${shop.split('.')[0]}/deal/${this.crypt.encrypt(
+            title,
+          )}`;
 
           const fulllink = `${this.configSevice.get('FRONT')}${cryptURL}`;
           const shortLink = await this.kalavioService.generateShortLink(

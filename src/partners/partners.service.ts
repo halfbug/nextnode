@@ -25,9 +25,9 @@ export class PartnerService {
     private storesService: StoresService,
   ) {}
   async create(createPartnersInput: CreatePartnersInput) {
-    console.log(
-      'createGroupshopInput : ' + JSON.stringify(createPartnersInput),
-    );
+    // console.log(
+    //   'createGroupshopInput : ' + JSON.stringify(createPartnersInput),
+    // );
     const partner = this.partnerRepository.create(createPartnersInput);
 
     const { shop, accessToken } = await this.storesService.findById(

@@ -38,7 +38,7 @@ export class UploadImageController {
   @Get('')
   @ApiResponse({ status: HttpStatus.CREATED, type: ImageResponseDTO })
   async getImageUrl(@Req() req, @Res() response) {
-    console.log(req.query);
+    // console.log(req.query);
     // response.send(req.query);
     const { key } = req.query;
 

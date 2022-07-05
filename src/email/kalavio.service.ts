@@ -89,12 +89,12 @@ export class KalavioService {
     const res = await lastValueFrom(
       this.httpService.post(apiUrl, body, options).pipe(map((res) => res.data)),
     );
-    console.log(
-      '🚀 ~ file: kalavio.service.ts ~ line 52 ~ KalavioService ~ generateShortLink ~ data',
-      res,
-    );
+    // console.log(
+    //   '🚀 ~ file: kalavio.service.ts ~ line 52 ~ KalavioService ~ generateShortLink ~ data',
+    //   res,
+    // );
 
-    console.log('shortUrl : ' + res);
+    // console.log('shortUrl : ' + res);
     return res?.shortURL ?? link;
   }
 

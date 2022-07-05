@@ -173,7 +173,7 @@ export class GroupshopSavedListener {
     // console.log(brandLogo);
 
     if (res.post == 'yes') {
-      console.log('groupshop saved listener received');
+      // console.log('groupshop saved listener received');
       const campaigns_products = res.data.store.activeCampaign.products;
       const currentDiscount = res.groupdeal.discountCode.percentage;
       const shortLink = res.groupdeal.shortUrl;

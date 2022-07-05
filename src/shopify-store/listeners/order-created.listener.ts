@@ -77,7 +77,25 @@ export class OrderCreatedListener {
           newItem.variant.id = `gid://shopify/ProductVariant/${item.variant_id}`;
           newItem.price = item.price;
           newItem.quantity = item.quantity;
-          newItem.totalDiscounts = item.total_discount;
+          newItem.totalDiscounts = item.discount_allocations.reduce(
+            (total: number, da: any) => {
+              return total + +da.amount;
+            },
+            0,
+          );
+          newItem.discountedPrice = +item.price - +newItem.totalDiscounts;
+          newItem.discountInfo = item.discount_allocations.map((dinfo) => ({
+            amount: dinfo.amount,
+            code: whOrder.discount_applications[
+              dinfo.discount_application_index
+            ].code,
+            type: whOrder.discount_applications[
+              dinfo.discount_application_index
+            ].value_type,
+            value:
+              whOrder.discount_applications[dinfo.discount_application_index]
+                .value,
+          }));
           newItem.shopifyCreatedAt = whOrder.created_at;
           return await this.orderService.create(newItem);
           // return newItem;

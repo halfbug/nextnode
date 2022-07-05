@@ -31,10 +31,13 @@ export class DiscountInfo {
   amount: string;
   @Field({ nullable: true })
   type: string;
+  @Field({ nullable: true })
+  vaule: string;
   constructor(dc?: DiscountInfo | null) {
     this.code = dc?.code;
     this.amount = dc?.amount;
     this.type = dc?.type;
+    this.vaule = dc?.vaule;
   }
 }
 @ObjectType('Order')
@@ -55,6 +58,8 @@ export class CreateOrderInput {
   shop?: string;
   @Field({ nullable: true })
   totalPrice?: string;
+  @Field({ nullable: true })
+  discountedPrice?: number;
   @Field({ nullable: true })
   parentId?: string;
   @Field(() => LineProduct)

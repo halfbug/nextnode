@@ -56,6 +56,9 @@ export default class Orders extends DefaultColumnsService {
   @Column({ nullable: true })
   price?: string;
   @Column({ nullable: true })
+  discountedPrice?: number;
+
+  @Column({ nullable: true })
   quantity?: number;
   @Column({ nullable: true })
   currencyCode?: string;

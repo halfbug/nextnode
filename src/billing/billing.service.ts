@@ -525,7 +525,7 @@ export class BillingsService {
       );
 
       Logger.warn(res, BillingsService.name);
-      console.log('shortUrl : ' + res);
+      // console.log('shortUrl : ' + res);
       return parseFloat(res['result'].toFixed(2)) ?? 0;
     } catch (err) {
       return 0;
