@@ -76,7 +76,7 @@ export class CampaignsService {
     );
 
     /// update all campaign
-    if (isActive === true) await this.campaignRepository.update({ isActive: true, storeId }, { isActive: false });
+    if (isActive === true) await this.campaignRepository.update({ isActive: true, storeId }, { isActive: false, expiredAt: new Date() });
     
     createCampaignInput.products = products;
     // const campaign = this.campaignRepository.create(createCampaignInput);
@@ -167,10 +167,10 @@ export class CampaignsService {
     if (isActive === true) {
       await this.campaignRepository.update(
         { isActive: true, storeId },
-        { isActive: false },
+        { isActive: false, expiredAt: new Date() },
       );
     }
-       
+    updateCampaignInput.expiredAt = (isActive === false) ? new Date() : null ;   
 
     await this.campaignRepository.update({ id }, updateCampaignInput);    
     
@@ -368,7 +368,7 @@ export class CampaignsService {
       }, {
         '$sort': {
           'createdAt': -1
-        }
+          }
       }
     ];
   // console.log(agg);
@@ -394,5 +394,166 @@ export class CampaignsService {
     ];
   const res = await manager.aggregate(Campaign, agg).toArray();
   return res;
+  }
+
+  async overviewMetrics(storeId: string, startFrom, toDate) {
+    if(startFrom === "-"){
+      const d = new Date();
+      const year = d.getFullYear();
+      const month = ("0" + (d.getMonth() + 1)).slice(-2);
+      const day = ("0" + d.getDate()).slice(-2)
+      const fullDate  = `${year}${'-'}${month}${'-'}${day}`;
+      startFrom = "2021-01-21";
+      toDate = fullDate;
+    }   
+    const agg = [
+      {
+        '$match': {
+          '$and': [
+            {
+              'storeId': storeId
+            }, {
+              'createdAt': {
+                '$gte': new Date(`${startFrom}${'T00:00:01'}`)
+              }
+            }, {
+              '$or': [
+                {
+                  'expiredAt': {
+                    '$lte': new Date(`${toDate}${'T23:59:59'}`)
+                  }
+                }, {
+                  'expiredAt': null
+                }
+              ]
+            }
+          ]
+        }
+      }, {
+        '$lookup': {
+          'from': 'groupshops', 
+          'localField': 'id', 
+          'foreignField': 'campaignId', 
+          'as': 'groupshops'
+        }
+      }, {
+        '$lookup': {
+          'from': 'billing', 
+          'localField': 'groupshops.id', 
+          'foreignField': 'groupShopId', 
+          'as': 'billings'
+        }
+      }, {
+        '$unwind': {
+          'path': '$billings'
+        }
+      }, {
+        '$group': {
+          '_id': null, 
+          'cashBack': {
+            '$sum': '$billings.cashBack'
+          }, 
+          'revenue': {
+            '$sum': '$billings.revenue'
+          }
+        }
+      }
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Campaign, agg).toArray();    
+    return gs;
+  }
+
+  async getuniqueClicks(storeId: string, startFrom, toDate) {
+    if(startFrom === "-"){
+      const d = new Date();
+      const year = d.getFullYear();
+      const month = ("0" + (d.getMonth() + 1)).slice(-2);
+      const day = ("0" + d.getDate()).slice(-2)
+      const fullDate  = `${year}${'-'}${month}${'-'}${day}`;
+      startFrom = "2021-01-21";
+      toDate = fullDate;
+    }
+    const agg = [
+      {
+        '$match': {
+          '$and': [
+            {
+              'storeId': storeId
+            }, {
+              'createdAt': {
+                '$gte': new Date(`${startFrom}${'T00:00:01'}`)
+              }
+            }, {
+              '$or': [
+                {
+                  'expiredAt': {
+                    '$lte': new Date(`${toDate}${'T23:59:59'}`)
+                  }
+                }, {
+                  'expiredAt': null
+                }
+              ]
+            }
+          ]
+        }
+      }, {
+        '$lookup': {
+          'from': 'groupshops', 
+          'localField': 'id', 
+          'foreignField': 'campaignId', 
+          'as': 'groupshops'
+        }
+      }, {
+        '$unwind': {
+          'path': '$groupshops'
+        }
+      }, {
+        '$lookup': {
+          'from': 'visitors', 
+          'localField': 'groupshops.id', 
+          'foreignField': 'groupshopId', 
+          'as': 'result'
+        }
+      }, {
+        '$project': {
+          'uniqueClicks': {
+            '$size': '$result'
+          }, 
+          'numOrders': {
+            '$cond': {
+              'if': {
+                '$gt': [
+                  {
+                    '$size': '$groupshops.members'
+                  }, 1
+                ]
+              }, 
+              'then': {
+                '$size': '$groupshops.members'
+              }, 
+              'else': 0
+            }
+          }
+        }
+      }, {
+        '$group': {
+          '_id': null, 
+          'uniqueClicks': {
+            '$sum': '$uniqueClicks'
+          }, 
+          'totalOrderCount': {
+            '$sum': '$numOrders'
+          }
+        }
+      }
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Campaign, agg).toArray();
+    const response = {
+      uniqueVisitors: gs[0]?.uniqueClicks || 0,
+      totalOrders: gs[0]?.totalOrderCount || 0,
+    }; 
+    return response;
   }
 }   

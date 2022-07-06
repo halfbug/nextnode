@@ -44,4 +44,7 @@ export default class Campaign extends DefaultColumnsService {
 
   @Column({ nullable: true })
   socialLinks?: SocialLinks;
+
+  @Column({ nullable: true })
+  expiredAt?: Date;
 }

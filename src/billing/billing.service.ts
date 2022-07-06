@@ -168,7 +168,7 @@ export class BillingsService {
     return gs;
   }
 
-  async overviewMetrics(storeId: string) {
+  async campaignMetric(storeId: string, campaignId: string) {
     const agg = [
       {
         $match: {
@@ -176,34 +176,16 @@ export class BillingsService {
         },
       },
       {
-        $addFields: {
-          feeTotalCB: {
-            $cond: {
-              if: {
-                $eq: ['$type', 0],
-              },
-              then: '$feeCharges',
-              else: 0,
-            },
-          },
-          feeTotalGS: {
-            $cond: {
-              if: {
-                $eq: ['$type', 1],
-              },
-              then: '$feeCharges',
-              else: 0,
-            },
-          },
-          createdMonthGS: {
-            $cond: {
-              if: {
-                $eq: ['$type', 1],
-              },
-              then: 1,
-              else: 0,
-            },
-          },
+        $lookup: {
+          from: 'groupshops',
+          localField: 'groupShopId',
+          foreignField: 'id',
+          as: 'result',
+        },
+      },
+      {
+        $match: {
+          'result.campaignId': campaignId,
         },
       },
       {
@@ -215,19 +197,9 @@ export class BillingsService {
           revenue: {
             $sum: '$revenue',
           },
-          feeCharges: {
-            $sum: '$feeTotalCB',
-          },
-          feeChargesGS: {
-            $sum: '$feeTotalGS',
-          },
-          totalGS: {
-            $sum: '$createdMonthGS',
-          },
         },
       },
     ];
-
     const manager = getMongoManager();
     const gs = await manager.aggregate(Billing, agg).toArray();
     return gs;

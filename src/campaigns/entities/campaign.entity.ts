@@ -58,5 +58,23 @@ export class Campaign {
   socialLinks?: SocialLinks;
 
   @Field({ nullable: true })
+  expiredAt?: Date;
+
+  @Field({ nullable: true })
   details?: Details;
+}
+
+@ObjectType()
+export class Metrics {
+  @Field({ nullable: true })
+  cashBack?: number;
+
+  @Field({ nullable: true })
+  revenue?: number;
+
+  @Field({ nullable: true })
+  uniqueVisitors?: string;
+
+  @Field({ nullable: true })
+  totalOrders?: string;
 }

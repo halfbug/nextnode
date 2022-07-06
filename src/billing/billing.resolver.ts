@@ -54,9 +54,15 @@ export class BillingsResolver {
     return this.billingService.findTotalRevenue(storeId);
   }
 
-  @Query(() => [MonthlyBillingInput], { name: 'overviewMetrics' })
-  overviewMetrics(@Args('storeId') storeId: string) {
-    const result = this.billingService.overviewMetrics(storeId);
+  @Query(() => [MonthlyBillingInput], { name: 'campaignMetric' })
+  async campaignMetric(
+    @Args('storeId') storeId: string,
+    @Args('campaignId') campaignId: string,
+  ) {
+    const result = await this.billingService.campaignMetric(
+      storeId,
+      campaignId,
+    );
     return result;
   }
 

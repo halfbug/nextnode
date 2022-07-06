@@ -17,7 +17,7 @@ export class MonthlyBillingInput {
   @Field()
   _id?: MonthYearType;
 
-  @Field()
+  @Field({ nullable: true })
   feeCharges?: number;
 
   @Field()
@@ -29,10 +29,10 @@ export class MonthlyBillingInput {
   @Field()
   count?: number;
 
-  @Field()
+  @Field({ nullable: true })
   totalGS?: number;
 
-  @Field()
+  @Field({ nullable: true })
   feeChargesGS?: number;
 
   @Field()

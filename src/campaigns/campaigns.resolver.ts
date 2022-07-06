@@ -1,8 +1,9 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { CampaignsService } from './campaigns.service';
-import { Campaign } from './entities/campaign.entity';
+import { Campaign, Metrics } from './entities/campaign.entity';
 import { CreateCampaignInput } from './dto/create-campaign.input';
 import { UpdateCampaignInput } from './dto/update-campaign.input';
+import { uniqueClicks } from 'src/groupshops/entities/groupshop.entity';
 
 @Resolver(() => Campaign)
 export class CampaignsResolver {
@@ -34,6 +35,34 @@ export class CampaignsResolver {
   @Query(() => Campaign, { name: 'campaign' })
   findOne(@Args('id', { type: () => String }) id: string) {
     return this.campaignsService.findOne(id);
+  }
+
+  @Query(() => [Metrics], { name: 'overviewMetrics' })
+  async overviewMetrics(
+    @Args('storeId') storeId: string,
+    @Args('startFrom') startFrom: string,
+    @Args('toDate') toDate: string,
+  ) {
+    const result = await this.campaignsService.overviewMetrics(
+      storeId,
+      startFrom,
+      toDate,
+    );
+    return result;
+  }
+
+  @Query(() => uniqueClicks, { name: 'getUniqueClicks' })
+  async getuniqueClicks(
+    @Args('storeId') storeId: string,
+    @Args('startFrom') startFrom: string,
+    @Args('toDate') toDate: string,
+  ) {
+    const result = await this.campaignsService.getuniqueClicks(
+      storeId,
+      startFrom,
+      toDate,
+    );
+    return result;
   }
 
   @Mutation(() => Campaign)

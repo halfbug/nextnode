@@ -152,11 +152,11 @@ export class GroupshopsService {
     return totalGS;
   }
 
-  async getuniqueClicks(storeId: string) {
+  async getCampaignUniqueClicks(campaignId: string) {
     const agg = [
       {
         $match: {
-          storeId: storeId,
+          campaignId: campaignId,
         },
       },
       {

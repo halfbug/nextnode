@@ -73,9 +73,9 @@ export class GroupshopsResolver {
     return this.GroupshopsService.findfindQrDealLinkAll(email, ordernumber);
   }
 
-  @Query(() => uniqueClicks, { name: 'getUniqueClicks' })
-  getuniqueClicks(@Args('shop') shop: string) {
-    return this.GroupshopsService.getuniqueClicks(shop);
+  @Query(() => uniqueClicks, { name: 'getCampaignUniqueClicks' })
+  getCampaignUniqueClicks(@Args('campaignId') campaignId: string) {
+    return this.GroupshopsService.getCampaignUniqueClicks(campaignId);
   }
 
   @Query(() => [Member], { name: 'getGsOrders' })

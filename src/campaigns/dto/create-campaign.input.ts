@@ -34,6 +34,9 @@ export class CreateCampaignInput {
   createdAt: Date;
 
   @Field({ nullable: true })
+  expiredAt: Date;
+
+  @Field({ nullable: true })
   criteria: string;
 
   @Field({ nullable: true })
