@@ -153,8 +153,16 @@ export class GroupshopCashbackListener {
       .toString()
       .match(/^-?\d+(?:\.\d{0,2})?/)[0];
 
-    const imgPath = res.store.logoImage.split('/');
-    const brandLogo = await this.uploadImageService.getSignedUrl(imgPath[4]);
+    let brandLogo = '';
+    if (res.store.logoImage != '') {
+      const imgPath = res.store.logoImage.split('/');
+      //brandLogo = await this.uploadImageService.getSignedUrl(imgPath[4]);
+      brandLogo = `${this.configService.get('LOGO_PATH')}/${imgPath[4]}`;
+    } else {
+      brandLogo = `${this.configService.get(
+        'HOST',
+      )}/public/images/default-logo.png`;
+    }
 
     const mdata = {
       earnedcashback: res.cashbackAmount
