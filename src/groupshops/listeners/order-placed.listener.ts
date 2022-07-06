@@ -67,15 +67,33 @@ export class OrderPlacedListener {
   }
 
   totalPricePercent(
-    lineItems: any[],
+    lineItems: Orders[],
     discountPercentage: number,
     role: RoleTypeEnum,
   ) {
     const totalPrice = lineItems?.reduce(
-      (priceSum: number, { discountedPrice, price, quantity }) => {
+      (
+        priceSum: number,
+        { discountedPrice, price, quantity, discountInfo },
+      ) => {
+        // check if owner have another discount used
+        // so we consider discounted price as selling price
         if (role === RoleTypeEnum.owner)
-          return priceSum + quantity * parseFloat(discountedPrice);
-        else return priceSum + quantity * parseFloat(price);
+          return priceSum + quantity * discountedPrice;
+        else {
+          // calculate price if the referral use other discounts as well
+          // so we subtract other discount value from orignal price and consider it as selling price
+          const fprice =
+            discountInfo.length > 1
+              ? parseFloat(price) -
+                discountInfo.reduce((psum: number, discount: any) => {
+                  if (discount.code.includes('script'))
+                    return psum + +discount.amount;
+                  else return psum;
+                }, 0)
+              : parseFloat(price);
+          return priceSum + quantity * fprice;
+        }
       },
       0,
     );

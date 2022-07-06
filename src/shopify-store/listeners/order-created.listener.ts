@@ -84,14 +84,20 @@ export class OrderCreatedListener {
             0,
           );
           newItem.discountedPrice = +item.price - +newItem.totalDiscounts;
+          newItem.discountCode = whOrder.discount_codes[0]?.code;
           newItem.discountInfo = item.discount_allocations.map((dinfo) => ({
             amount: dinfo.amount,
-            code: whOrder.discount_applications[
-              dinfo.discount_application_index
-            ].code,
-            type: whOrder.discount_applications[
-              dinfo.discount_application_index
-            ].value_type,
+            code:
+              whOrder.discount_applications[dinfo.discount_application_index]
+                .code ??
+              whOrder.discount_applications[dinfo.discount_application_index]
+                .title,
+            type:
+              whOrder.discount_applications[dinfo.discount_application_index]
+                .type +
+              '-' +
+              whOrder.discount_applications[dinfo.discount_application_index]
+                .value_type,
             value:
               whOrder.discount_applications[dinfo.discount_application_index]
                 .value,
