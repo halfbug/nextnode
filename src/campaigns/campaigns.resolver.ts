@@ -37,13 +37,13 @@ export class CampaignsResolver {
     return this.campaignsService.findOne(id);
   }
 
-  @Query(() => [Metrics], { name: 'overviewMetrics' })
-  async overviewMetrics(
+  @Query(() => [Metrics], { name: 'overviewCampaignMetric' })
+  async overviewCampaignMetric(
     @Args('storeId') storeId: string,
     @Args('startFrom') startFrom: string,
     @Args('toDate') toDate: string,
   ) {
-    const result = await this.campaignsService.overviewMetrics(
+    const result = await this.campaignsService.overviewCampaignMetric(
       storeId,
       startFrom,
       toDate,
@@ -51,13 +51,13 @@ export class CampaignsResolver {
     return result;
   }
 
-  @Query(() => uniqueClicks, { name: 'getUniqueClicks' })
-  async getuniqueClicks(
+  @Query(() => uniqueClicks, { name: 'getUniqueCampaignClicks' })
+  async getUniqueCampaignClicks(
     @Args('storeId') storeId: string,
     @Args('startFrom') startFrom: string,
     @Args('toDate') toDate: string,
   ) {
-    const result = await this.campaignsService.getuniqueClicks(
+    const result = await this.campaignsService.getUniqueCampaignClicks(
       storeId,
       startFrom,
       toDate,

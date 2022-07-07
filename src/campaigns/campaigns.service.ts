@@ -16,7 +16,6 @@ import {
 } from 'src/appsettings/entities/sales-target.model';
 import { CampaignInactiveEvent } from 'src/billing/events/campaign-inactive.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Groupshops } from 'src/groupshops/entities/groupshop.modal';
 
 @Injectable()
 export class CampaignsService {
@@ -396,16 +395,18 @@ export class CampaignsService {
   return res;
   }
 
-  async overviewMetrics(storeId: string, startFrom, toDate) {
-    if(startFrom === "-"){
-      const d = new Date();
-      const year = d.getFullYear();
-      const month = ("0" + (d.getMonth() + 1)).slice(-2);
-      const day = ("0" + d.getDate()).slice(-2)
-      const fullDate  = `${year}${'-'}${month}${'-'}${day}`;
-      startFrom = "2021-01-21";
+
+  async overviewCampaignMetric(storeId: string, startFrom, toDate) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    fullDate = `${year}${'-'}${month}${'-'}${day}`;
+    if (startFrom === '-') {
+      startFrom = '2021-01-21';
       toDate = fullDate;
-    }   
+    }
     const agg = [
       {
         '$match': {
@@ -423,7 +424,7 @@ export class CampaignsService {
                     '$lte': new Date(`${toDate}${'T23:59:59'}`)
                   }
                 }, {
-                  'expiredAt': null
+                  'expiredAt': fullDate === toDate ? null : '',
                 }
               ]
             }
@@ -460,18 +461,19 @@ export class CampaignsService {
       }
     ];
     const manager = getMongoManager();
-    const gs = await manager.aggregate(Campaign, agg).toArray();    
+    const gs = await manager.aggregate(Campaign, agg).toArray();
     return gs;
   }
 
-  async getuniqueClicks(storeId: string, startFrom, toDate) {
-    if(startFrom === "-"){
-      const d = new Date();
-      const year = d.getFullYear();
-      const month = ("0" + (d.getMonth() + 1)).slice(-2);
-      const day = ("0" + d.getDate()).slice(-2)
-      const fullDate  = `${year}${'-'}${month}${'-'}${day}`;
-      startFrom = "2021-01-21";
+  async getUniqueCampaignClicks(storeId: string, startFrom, toDate) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    fullDate = `${year}${'-'}${month}${'-'}${day}`;
+    if (startFrom === '-') {
+      startFrom = '2021-01-21';
       toDate = fullDate;
     }
     const agg = [
@@ -491,7 +493,7 @@ export class CampaignsService {
                     '$lte': new Date(`${toDate}${'T23:59:59'}`)
                   }
                 }, {
-                  'expiredAt': null
+                  'expiredAt': fullDate === toDate ? null : '',
                 }
               ]
             }
@@ -556,4 +558,5 @@ export class CampaignsService {
     }; 
     return response;
   }
-}   
+
+} 

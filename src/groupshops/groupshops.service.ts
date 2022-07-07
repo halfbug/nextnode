@@ -834,6 +834,232 @@ export class GroupshopsService {
     return response.members;
   }
 
+  async getuniqueClicks(storeId: string, startFrom, toDate) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    fullDate = `${year}${'-'}${month}${'-'}${day}`;
+    if (startFrom === '-') {
+      startFrom = '2021-01-21';
+      toDate = fullDate;
+    }
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              storeId: storeId,
+            },
+            {
+              createdAt: {
+                $gte: new Date(`${startFrom}${'T00:00:01'}`),
+              },
+            },
+            {
+              $or: [
+                {
+                  createdAt: {
+                    $lte: new Date(`${toDate}${'T23:59:59'}`),
+                  },
+                },
+                {
+                  expiredAt: fullDate === toDate ? null : '',
+                },
+              ],
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'visitors',
+          localField: 'id',
+          foreignField: 'groupshopId',
+          as: 'result',
+        },
+      },
+      {
+        $project: {
+          uniqueClicks: {
+            $size: '$result',
+          },
+          numOrders: {
+            $cond: {
+              if: {
+                $gt: [
+                  {
+                    $size: '$members',
+                  },
+                  1,
+                ],
+              },
+              then: {
+                $size: '$members',
+              },
+              else: 0,
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          uniqueClicks: {
+            $sum: '$uniqueClicks',
+          },
+          totalOrderCount: {
+            $sum: '$numOrders',
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    const response = {
+      uniqueVisitors: gs[0]?.uniqueClicks || 0,
+      totalOrders: gs[0]?.totalOrderCount || 0,
+    };
+    return response;
+  }
+
+  async overviewMetrics(storeId: string, startFrom, toDate) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    fullDate = `${year}${'-'}${month}${'-'}${day}`;
+    if (startFrom === '-') {
+      startFrom = '2021-01-21';
+      toDate = fullDate;
+    }
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              storeId: storeId,
+            },
+            {
+              createdAt: {
+                $gte: new Date(`${startFrom}${'T00:00:01'}`),
+              },
+            },
+            {
+              $or: [
+                {
+                  createdAt: {
+                    $lte: new Date(`${toDate}${'T23:59:59'}`),
+                  },
+                },
+                {
+                  expiredAt: fullDate === toDate ? null : '',
+                },
+              ],
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'billing',
+          localField: 'id',
+          foreignField: 'groupShopId',
+          as: 'billings',
+        },
+      },
+      {
+        $unwind: {
+          path: '$billings',
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          cashBack: {
+            $sum: '$billings.cashBack',
+          },
+          revenue: {
+            $sum: '$billings.revenue',
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    return gs;
+  }
+
+  async campaignMetric(storeId: string, startFrom, toDate) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    fullDate = `${year}${'-'}${month}${'-'}${day}`;
+    if (startFrom === '-') {
+      startFrom = '2021-01-21';
+      toDate = fullDate;
+    }
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              storeId: storeId,
+            },
+            {
+              createdAt: {
+                $gte: new Date(`${startFrom}${'T00:00:01'}`),
+              },
+            },
+            {
+              $or: [
+                {
+                  createdAt: {
+                    $lte: new Date(`${toDate}${'T23:59:59'}`),
+                  },
+                },
+                {
+                  expiredAt: fullDate === toDate ? null : '',
+                },
+              ],
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'billing',
+          localField: 'id',
+          foreignField: 'groupShopId',
+          as: 'billings',
+        },
+      },
+      {
+        $unwind: {
+          path: '$billings',
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          cashBack: {
+            $sum: '$billings.cashBack',
+          },
+          revenue: {
+            $sum: '$billings.revenue',
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    return gs;
+  }
+
   async getOrderDetails(orderid: string) {
     const agg = [
       {

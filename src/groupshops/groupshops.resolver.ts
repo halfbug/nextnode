@@ -28,6 +28,7 @@ import { addDays, getDateDifference } from 'src/utils/functions';
 import { LifecycleService } from 'src/gs-common/lifecycle.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { GSUpdatePriceRuleEvent } from './events/groupshop-update-price-rule.event';
+import { Metrics } from 'src/campaigns/entities/campaign.entity';
 
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
@@ -82,6 +83,34 @@ export class GroupshopsResolver {
   findGsOrders(@Args('groupshopUrl') groupshopUrl: string) {
     console.log(groupshopUrl);
     return this.GroupshopsService.findGsOrders(groupshopUrl);
+  }
+
+  @Query(() => uniqueClicks, { name: 'getUniqueClicks' })
+  async getuniqueClicks(
+    @Args('storeId') storeId: string,
+    @Args('startFrom') startFrom: string,
+    @Args('toDate') toDate: string,
+  ) {
+    const result = await this.GroupshopsService.getuniqueClicks(
+      storeId,
+      startFrom,
+      toDate,
+    );
+    return result;
+  }
+
+  @Query(() => [Metrics], { name: 'overviewMetrics' })
+  async overviewMetrics(
+    @Args('storeId') storeId: string,
+    @Args('startFrom') startFrom: string,
+    @Args('toDate') toDate: string,
+  ) {
+    const result = await this.GroupshopsService.overviewMetrics(
+      storeId,
+      startFrom,
+      toDate,
+    );
+    return result;
   }
 
   @UseInterceptors(ViewedInterceptor)
