@@ -46,3 +46,19 @@ export function Days(day: number) {
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   return dayNames[day];
 }
+export function DateFormats(month: string, year: string) {
+  const yearNum = +year;
+  const startDay = Days(
+    new Date(`${monthsArr(+month - 1).mon} 1, ${yearNum}`).getDay(),
+  );
+  const curMonth = monthsArr(+month - 1).initial;
+  const lastdate = monthsArr(+month - 1).endDate;
+  const sdate = new Date(`${startDay}, 01 ${curMonth} ${yearNum} 00:00:00 GMT`);
+  const edate = new Date(
+    `${startDay}, ${lastdate} ${curMonth} ${yearNum} 23:59:00 GMT`,
+  );
+  return {
+    sdate,
+    edate,
+  };
+}

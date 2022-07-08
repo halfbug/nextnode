@@ -52,7 +52,7 @@ export class TotalGS {
   @Field()
   _id?: string;
 
-  @Field()
+  @Field({ nullable: true })
   count?: number;
 }
 @ObjectType()

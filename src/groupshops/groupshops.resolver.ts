@@ -29,6 +29,7 @@ import { LifecycleService } from 'src/gs-common/lifecycle.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { GSUpdatePriceRuleEvent } from './events/groupshop-update-price-rule.event';
 import { Metrics } from 'src/campaigns/entities/campaign.entity';
+import { TotalGS } from 'src/billing/dto/monthly-billing.input';
 
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
@@ -165,4 +166,21 @@ export class GroupshopsResolver {
   // removeGroupshop(@Args('id', { type: () => Int }) id: number) {
   //   return this.GroupshopsService.remove(id);
   // }
+  @Query(() => TotalGS, { name: 'countOfGsMonthly' })
+  async countOfGsMonthly1(
+    @Args('storeId') storeId: string,
+    @Args('month') month: string,
+    @Args('year') year: string,
+  ) {
+    const res = await this.GroupshopsService.countOfGsMonthly(
+      storeId,
+      month,
+      year,
+    );
+    console.log(
+      '🚀 ~ file: billing.resolver.ts ~ line 140 ~ BillingsResolver ~ res',
+      res,
+    );
+    return res;
+  }
 }

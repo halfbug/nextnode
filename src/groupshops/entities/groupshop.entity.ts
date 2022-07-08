@@ -177,3 +177,11 @@ export class GroupShop {
   @Field(() => [Product], { nullable: 'itemsAndList' })
   bestSeller?: Product[];
 }
+@ObjectType()
+export class TotalGS {
+  @Field()
+  _id?: string;
+
+  @Field({ nullable: true })
+  count?: number;
+}

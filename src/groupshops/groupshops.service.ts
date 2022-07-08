@@ -13,6 +13,7 @@ import { v4 as uuid } from 'uuid';
 import { AddDealProductInput } from './dto/add-deal-product.input';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import Orders from 'src/inventory/entities/orders.modal';
+import { DateFormats } from 'src/utils/functions';
 
 @Injectable()
 export class GroupshopsService {
@@ -1070,5 +1071,37 @@ export class GroupshopsService {
     ];
     const manager = getMongoManager();
     return await manager.aggregate(Groupshops, agg).toArray();
+  }
+  async countOfGsMonthly(storeId: string, month, year) {
+    const { sdate, edate } = DateFormats(month, year);
+
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              storeId: storeId,
+            },
+            {
+              createdAt: {
+                // $gte: new Date('Wed, 01 Jul 2022 19:00:00 GMT'),
+                // $lte: new Date('Thu, 30 Jul 2022 23:59:00 GMT'),
+                $gte: sdate,
+                $lte: edate,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $count: 'count',
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    console.log('🚀 total GSs in updateStore ~ gs', gs);
+    console.log('🚀 total GSs in updateStore ~ date', sdate, edate);
+    console.log('🚀 total GSs in updateStore ~ month', month, year);
+    return gs[0];
   }
 }

@@ -10,6 +10,7 @@ import { Groupshops } from 'src/groupshops/entities/groupshop.modal';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom, map } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
+import { TotalGS } from './dto/monthly-billing.input';
 
 @Injectable()
 export class BillingsService {

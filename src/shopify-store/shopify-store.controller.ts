@@ -98,7 +98,7 @@ export class ShopifyStoreController {
   @Get('refresh')
   async dbfresh() {
     try {
-      const shop = 'stuff-toys-shop.myshopify.com';
+      const shop = 'native-roots-dev.myshopify.com';
       const store = await this.storesService.findOne(shop);
       this.shopifyService.accessToken = store.accessToken;
       this.shopifyService.shop = shop;
