@@ -377,9 +377,17 @@ export class WebhooksController {
 
         await this.inventryService.create(vprod);
       });
-      // console.log(JSON.stringify(req.body));
-      // console.log(req.query);
-      // res.send('values updated');
+      rproduct.images.map((img) => {
+        const vprod = new CreateInventoryInput();
+        vprod.id = img.admin_graphql_api_id;
+        vprod.parentId = rproduct.admin_graphql_api_id;
+        vprod.recordType = 'ProductImage';
+        vprod.shop = shop;
+        // image
+        vprod.src = img.src;
+
+        this.inventryService.create(vprod);
+      });
     } catch (err) {
       console.log(JSON.stringify(err));
     } finally {
@@ -455,6 +463,7 @@ export class WebhooksController {
         vprod.createdAtShopify = variant?.created_at;
         vprod.publishedAt = rproduct?.published_at;
         vprod.featuredImage = rproduct?.image?.src;
+        vprod.shop = shop;
         const img = new ProductImage();
         img.src =
           rproduct?.image && rproduct?.image.src ? rproduct?.image.src : null;
@@ -473,6 +482,18 @@ export class WebhooksController {
         });
 
         await this.inventryService.create(vprod);
+      });
+
+      rproduct.images.map((img) => {
+        const vprod = new CreateInventoryInput();
+        vprod.id = img.admin_graphql_api_id;
+        vprod.parentId = rproduct.admin_graphql_api_id;
+        vprod.recordType = 'ProductImage';
+        vprod.shop = shop;
+        // image
+        vprod.src = img.src;
+
+        this.inventryService.create(vprod);
       });
 
       await this.inventryService.update(nprod);
