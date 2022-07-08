@@ -170,20 +170,7 @@ export class GroupshopsService {
       {
         $project: {
           uniqueClicks: {
-            $cond: {
-              if: {
-                $gt: [
-                  {
-                    $size: '$members',
-                  },
-                  1,
-                ],
-              },
-              then: {
-                $size: '$result',
-              },
-              else: 0,
-            },
+            $size: '$members',
           },
           numOrders: {
             $cond: {
