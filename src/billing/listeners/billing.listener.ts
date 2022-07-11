@@ -39,6 +39,7 @@ export class BillingListener {
       storeId,
       isPaid: plan === 0 || Date.now() < appTrialEnd.getTime() ? true : false,
     };
+    console.log('🚀 ~ fileBillingListener  ~ payload', payload);
     const newBilling = await this.billingService.create(payload);
     // console.log(
     //   '🚀 ~ file: billing.listener.ts ~ line 35 ~ BillingListener ~ createBilling ~ newBilling',
@@ -49,6 +50,7 @@ export class BillingListener {
   async createBillingForCashBack(event: CashBackEvent) {
     const { id, storeId } = event.groupshop;
     const { cashbackAmount, revenue, cashbackCharge } = event;
+    console.log('🚀 ~ fileBillingListener  ~ event', event);
 
     const payload: CreateBillingInput = {
       type: BillingTypeEnum.ON_CASHBACK,
@@ -71,6 +73,7 @@ export class BillingListener {
     // console.log(JSON.stringify(event));
     let totalPrice;
     const { groupshop } = event;
+    console.log('🚀 ~ fileBillingListener  ~ event', event);
     const memLength = groupshop.members.length;
     // calculate owner product price and update revenue when first referral comes
     if (memLength === 2) {

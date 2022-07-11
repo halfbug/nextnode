@@ -121,7 +121,7 @@ export class BillingsService {
           },
           cashBack: 1,
           revenue: 1,
-          feeCharges: 15,
+          feeCharges: 1,
           feeChargesGS: 1,
           count: 1,
           totalGS: 1,
