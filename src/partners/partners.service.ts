@@ -15,6 +15,7 @@ import {
   DiscountCodeInput,
 } from 'src/groupshops/dto/create-groupshops.input';
 import { StoresService } from 'src/stores/stores.service';
+import { GSPCreatedEvent } from './events/create-partner-groupshop.event';
 
 @Injectable()
 export class PartnerService {
@@ -23,6 +24,7 @@ export class PartnerService {
     private partnerRepository: Repository<Partnergroupshop>,
     private shopifyapi: ShopifyService,
     private storesService: StoresService,
+    private gspEvent: GSPCreatedEvent,
   ) {}
   async create(createPartnersInput: CreatePartnersInput) {
     // console.log(
@@ -78,7 +80,13 @@ export class PartnerService {
     partner.partnerCommission = createPartnersInput.partnerCommission;
     partner.isActive = true;
     partner.createdAt = createPartnersInput.createdAt;
-    return this.partnerRepository.save(partner);
+    const newGSP = await this.partnerRepository.save(partner);
+    this.gspEvent.groupshop = newGSP;
+    this.gspEvent.shop = shop;
+    this.gspEvent.accessToken = accessToken;
+    this.gspEvent.email = createPartnersInput.partnerDetails['email'];
+    this.gspEvent.emit();
+    return newGSP;
   }
 
   findAll(storeId: string) {
