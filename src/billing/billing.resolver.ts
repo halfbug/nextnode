@@ -14,6 +14,7 @@ import { AppSubscription } from './entities/app-subscription.input';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { StoresService } from 'src/stores/stores.service';
 import { DateFormats, Days, monthsArr } from 'src/utils/functions';
+import { Metrics } from 'src/campaigns/entities/campaign.entity';
 
 @Resolver(() => Billing)
 export class BillingsResolver {
@@ -62,6 +63,20 @@ export class BillingsResolver {
     const result = await this.billingService.campaignMetric(
       storeId,
       campaignId,
+    );
+    return result;
+  }
+
+  @Query(() => [Metrics], { name: 'overviewMetrics' })
+  async overviewMetrics(
+    @Args('storeId') storeId: string,
+    @Args('startFrom') startFrom: string,
+    @Args('toDate') toDate: string,
+  ) {
+    const result = await this.billingService.overviewMetrics(
+      storeId,
+      startFrom,
+      toDate,
     );
     return result;
   }

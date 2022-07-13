@@ -206,6 +206,72 @@ export class BillingsService {
     return gs;
   }
 
+  async overviewMetrics(storeId: string, startFrom, toDate) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    fullDate = `${year}${'-'}${month}${'-'}${day}`;
+    if (startFrom === '-') {
+      startFrom = '2021-01-21';
+      toDate = fullDate;
+    }
+    const agg = [
+      {
+        $match: {
+          storeId: storeId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'groupshops',
+          localField: 'groupShopId',
+          foreignField: 'id',
+          as: 'result',
+        },
+      },
+      {
+        $match: {
+          $and: [
+            {
+              'result.createdAt': {
+                $gte: new Date(`${startFrom}${'T00:00:01'}`),
+              },
+            },
+            {
+              $or: [
+                {
+                  'result.createdAt': {
+                    $lte: new Date(`${toDate}${'T23:59:59'}`),
+                  },
+                },
+                {
+                  'result.expiredAt': fullDate === toDate ? null : '',
+                },
+              ],
+            },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          cashBack: {
+            $sum: '$cashBack',
+          },
+          revenue: {
+            $sum: '$revenue',
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Billing, agg).toArray();
+    console.log(gs);
+    return gs;
+  }
+
   async findTotalRevenue(storeId: string) {
     const agg = [
       {

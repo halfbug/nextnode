@@ -28,7 +28,6 @@ import { addDays, getDateDifference } from 'src/utils/functions';
 import { LifecycleService } from 'src/gs-common/lifecycle.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { GSUpdatePriceRuleEvent } from './events/groupshop-update-price-rule.event';
-import { Metrics } from 'src/campaigns/entities/campaign.entity';
 import { TotalGS } from 'src/billing/dto/monthly-billing.input';
 
 export const ReqDecorator = createParamDecorator(
@@ -93,20 +92,6 @@ export class GroupshopsResolver {
     @Args('toDate') toDate: string,
   ) {
     const result = await this.GroupshopsService.getuniqueClicks(
-      storeId,
-      startFrom,
-      toDate,
-    );
-    return result;
-  }
-
-  @Query(() => [Metrics], { name: 'overviewMetrics' })
-  async overviewMetrics(
-    @Args('storeId') storeId: string,
-    @Args('startFrom') startFrom: string,
-    @Args('toDate') toDate: string,
-  ) {
-    const result = await this.GroupshopsService.overviewMetrics(
       storeId,
       startFrom,
       toDate,
