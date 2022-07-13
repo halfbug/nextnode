@@ -120,6 +120,10 @@ export class GroupshopSavedListener {
       orderData[0].currencyCode || 'USD',
     );
 
+    const sms_marketing_consent =
+      res.data.order?.customer?.sms_marketing || null;
+    const phone_number = res.data.order?.customer?.phone || null;
+
     let custName = orderData[0].customer.firstName;
     if (custName === '') {
       custName = orderData[0].customer.lasttName;
@@ -229,6 +233,8 @@ export class GroupshopSavedListener {
         customerEmail: customerEmail,
         dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
         shortUrl: shortLink,
+        sms_marketing_consent: sms_marketing_consent,
+        phone_number: phone_number,
         qrImage: qrImage,
         created_at: orderDate,
         order_number: res.data.order.name,
@@ -271,6 +277,8 @@ export class GroupshopSavedListener {
         customerEmail: customerEmail,
         dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
         shortUrl: shortLink,
+        sms_marketing_consent: sms_marketing_consent,
+        phone_number: phone_number,
         qrImage: qrImage,
         created_at: orderDate,
         order_number: res.data.order.name,

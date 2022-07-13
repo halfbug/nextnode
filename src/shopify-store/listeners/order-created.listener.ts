@@ -63,6 +63,8 @@ export class OrderCreatedListener {
       newOrder.customer.ip = whOrder?.browser_ip;
       newOrder.customer.phone =
         whOrder.customer?.phone ?? whOrder.shipping_address?.phone;
+      newOrder.customer.sms_marketing =
+        whOrder?.customer?.sms_marketing_consent?.state || null;
       const newOrderSaved = await this.orderService.create(newOrder);
 
       const lineItems = await Promise.all(

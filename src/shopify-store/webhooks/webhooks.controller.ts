@@ -19,11 +19,13 @@ import { UpdateInventoryInput } from 'src/inventory/dto/update-inventory.input';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { OrdersService } from 'src/inventory/orders.service';
 import { UpdateStoreInput } from 'src/stores/dto/update-store.input';
+import { UpdateOrderInput } from 'src/inventory/dto/update-order.input';
 import { StoresService } from 'src/stores/stores.service';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderPlacedEvent } from '../events/order-placed.envent';
 import { ShopifyService } from '../shopify/shopify.service';
+import { KalavioService } from 'src/email/kalavio.service';
 import Orders from 'src/inventory/entities/orders.modal';
 import { UninstallService } from 'src/stores/uninstall.service';
 import { OrderCreatedEvent } from '../events/order-created.event';
@@ -40,6 +42,7 @@ export class WebhooksController {
     private shopifyService: ShopifyService,
     private inventryService: InventoryService,
     private orderService: OrdersService,
+    private kalavioService: KalavioService,
     private eventEmitter: EventEmitter2,
     private configSevice: ConfigService,
     private uninstallSerivice: UninstallService,
@@ -699,6 +702,31 @@ export class WebhooksController {
       res.status(HttpStatus.OK).send();
     }
   }
+
+  @Post('customer-update?')
+  async customerUpdate(@Req() req, @Res() res) {
+    try {
+      const { shop } = req.query;
+      const cust = req.body;
+      console.log(
+        'WebhooksController ~ customerUpdate ~ customer',
+        JSON.stringify(cust),
+      );
+      const email = cust.email;
+      const sms_marketing = cust?.sms_marketing_consent?.state || null;
+      const uorder = new UpdateOrderInput();
+      uorder.shop = shop;
+      uorder.email = email;
+      uorder.sms_marketing = sms_marketing;
+      await this.orderService.smsUpdate(uorder);
+      await this.kalavioService.klaviyoProfileUpdate(uorder);
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
+
   // for future use
   // @Post('order-update?')
   // async orderUpdate(@Req() req, @Res() res) {

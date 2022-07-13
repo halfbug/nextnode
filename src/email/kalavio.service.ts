@@ -69,6 +69,38 @@ export class KalavioService {
     }
   }
 
+  async klaviyoProfileUpdate(input) {
+    const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
+    const customerEmail = input.email;
+    const urlKlaviyo = `${this.configService.get(
+      'KLAVIYO_BASE_URL',
+    )}${'/v2/people/search?email='}${customerEmail}${'&api_key='}${PRIVATE_KEY}`;
+    const options = {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const getProfile = await lastValueFrom(
+      this.httpService.get(urlKlaviyo).pipe(map((res) => res.data)),
+    );
+    const ProfileId = getProfile?.id || null;
+    if (ProfileId !== null) {
+      const profileUrlKlaviyo = `${this.configService.get(
+        'KLAVIYO_BASE_URL',
+      )}${'/v1/person/'}${ProfileId}${'?sms_marketing_status='}${
+        input.sms_marketing
+      }${'&api_key='}${PRIVATE_KEY}`;
+      console.log(profileUrlKlaviyo);
+      await lastValueFrom(
+        this.httpService
+          .put(profileUrlKlaviyo, options)
+          .pipe(map((res) => res.data)),
+      );
+    }
+  }
+
   async generateShortLink(link: string) {
     const URL = '/links/public';
     const apiUrl = `${this.configService.get('SHORT_LINK_BASE_URL')}${URL}`;

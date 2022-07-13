@@ -20,6 +20,8 @@ export class Customer {
   ip?: string;
   @Field({ nullable: true })
   phone: string;
+  @Field({ nullable: true })
+  sms_marketing: string;
 }
 
 @InputType('DiscountInfoInput')

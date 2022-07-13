@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getMongoManager, Repository } from 'typeorm';
 import { CreateOrderInput, DiscountInfo } from './dto/create-order.input';
+import { UpdateOrderInput } from './dto/update-order.input';
 import Orders from './entities/orders.modal';
 
 @Injectable()
@@ -265,6 +266,21 @@ export class OrdersService {
       order.discountInfo = createOrderInput.discountInfo;
 
       return await this.ordersRepository.save(order);
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
+  }
+
+  async smsUpdate(updateOrderInput: UpdateOrderInput) {
+    const criteria = {
+      shop: updateOrderInput.shop,
+      'customer.email': updateOrderInput.email,
+    };
+    try {
+      const manager = getMongoManager();
+      manager.updateMany(Orders, criteria, {
+        $set: { 'customer.sms_marketing': updateOrderInput.sms_marketing },
+      });
     } catch (err) {
       console.log(JSON.stringify(err));
     }

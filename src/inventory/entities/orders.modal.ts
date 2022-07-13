@@ -19,6 +19,8 @@ export class Customer {
   ip?: string;
   @Column({ nullable: true })
   phone: string;
+  @Column({ nullable: true })
+  sms_marketing: string;
 }
 
 export class DiscountInfo {

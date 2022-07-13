@@ -134,6 +134,9 @@ export class GroupshopCashbackListener {
       orderData[0]?.currencyCode || 'USD',
     );
 
+    const sms_marketing_consent = orderData[0].customer?.sms_marketing || null;
+    const phone_number = orderData[0].customer?.phone || null;
+
     let custName = orderData[0].customer.firstName;
     if (custName === '') {
       custName = orderData[0].customer.lasttName;
@@ -173,6 +176,8 @@ export class GroupshopCashbackListener {
       brandName: res.store.brandName,
       shopUrl: `https://${res.store.shop}`,
       logoImage: brandLogo,
+      sms_marketing_consent: sms_marketing_consent,
+      phone_number: phone_number,
       order_number: orderData[0].name,
       customerName: custName,
       orderLineItems: orderline_items,

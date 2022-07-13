@@ -12,6 +12,7 @@ import Store from 'src/stores/entities/store.model';
 import { StoresModule } from 'src/stores/stores.module';
 import { InvenotrySavedListener } from './listeners/inventory-saved.listener';
 import { InventoryModule } from 'src/inventory/inventory.module';
+import { EmailModule } from 'src/email/email.module';
 
 // import { AwsService } from './aws.service';
 import { UploadImageModule } from './ImageUpload/uploadimage.module';
@@ -33,6 +34,7 @@ import { GSUpdatePriceRuleListener } from './listeners/groupshop-updatePricerule
     TypeOrmModule.forFeature([Store]),
     forwardRef(() => StoresModule),
     InventoryModule,
+    EmailModule,
     CampaignsModule,
     forwardRef(() => GroupshopsModule),
     UploadImageModule,

@@ -171,7 +171,7 @@ export class GroupshopsService {
       {
         $project: {
           uniqueClicks: {
-            $size: '$members',
+            $size: '$result',
           },
           numOrders: {
             $cond: {

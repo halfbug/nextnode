@@ -209,6 +209,16 @@ export class InvenotrySavedListener {
         .then(() => {
           console.log('webhook PRODUCTS_DELETE-> registered for shop', shop);
         });
+      this.shopifyapi
+        .registerHook(
+          shop,
+          accessToken,
+          '/webhooks/customer-update',
+          'CUSTOMERS_UPDATE',
+        )
+        .then(() => {
+          console.log('webhook CUSTOMERS_UPDATE -> registered for shop', shop);
+        });
       console.log('webhook registered');
     } catch (err) {
       console.log(JSON.stringify(err));
