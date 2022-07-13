@@ -79,7 +79,7 @@ export class OrderPlacedListener {
         // check if owner have another discount used
         // so we consider discounted price as selling price
         if (role === RoleTypeEnum.owner)
-          return priceSum + quantity * discountedPrice;
+          return priceSum + quantity * (discountedPrice ?? parseFloat(price));
         else {
           // calculate price if the referral use other discounts as well
           // so we subtract other discount value from orignal price and consider it as selling price
