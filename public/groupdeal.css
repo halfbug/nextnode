@@ -164,6 +164,7 @@
   background: #eeff5c;
   margin-right: 14px;
   display: flex;
+  padding: 11px 8px;
 }
 .gspdpmodel {
   z-index: 99999;
@@ -357,10 +358,10 @@
 
 /*Is_Flex*/
 .modal-dialog-centered-gss {
-  /*    display: flex;
-    flex-flow: column nowrap;
-    align-items: center;
-    justify-content: center;*/
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
   overflow: auto;
   /*max-height: calc(100% - 64px);*/
   max-width: 100%;
@@ -1394,7 +1395,8 @@
   padding-top: 10px;
   padding-bottom: 10px;
   padding-left: 10px;
-  margin-top: 5px;
+  margin: 10px 0px;
+  background-color: whitesmoke;
 }
 
 .link-logo {
@@ -1521,7 +1523,7 @@
 }
 
 .gspdpmodel#dealcartmodel .gs-modal-body {
-  /*padding: 5px ​24px 0px 24px;*/
+  /*padding: 5px 24px 0px 24px;*/
   padding: 1rem 0;
   max-height: fit-content;
   color: #111111;
