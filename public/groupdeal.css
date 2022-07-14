@@ -164,7 +164,7 @@
   background: #eeff5c;
   margin-right: 14px;
   display: flex;
-  padding: 11px 8px;
+  padding: 4px 8px;
 }
 .gspdpmodel {
   z-index: 99999;
@@ -1396,7 +1396,7 @@
   padding-bottom: 10px;
   padding-left: 10px;
   margin: 10px 0px;
-  background-color: whitesmoke;
+  background-color: white;
 }
 
 .link-logo {
