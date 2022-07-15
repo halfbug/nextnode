@@ -198,47 +198,45 @@ export class WebhooksController {
     }
   }
   @Get('register')
-  async register() {
+  async register(@Query('shopName') shopName: any) {
     try {
-      const { shop, accessToken } = await this.storesService.findOne(
-        'native-roots-dev.myshopify.com',
-      );
+      const { shop, accessToken } = await this.storesService.findOne(shopName);
       console.log(
         '🚀 ~ file: webhooks.controller.ts ~ line 11 ~ WebhooksController ~ register ~ shop',
         shop,
       );
-      console.log('yes register');
       const rhook = await this.shopifyService.registerHook(
         shop,
         accessToken,
         // '/webhooks/product-update',
         // 'PRODUCTS_UPDATE',
-        '/webhooks/order-create',
-        'ORDERS_CREATE',
+        '/webhooks/customer-update',
+        'CUSTOMERS_UPDATE',
       );
+      console.log('yes register');
       console.log(rhook);
-      const client = await this.shopifyService.client(shop, accessToken);
-      const qwbh = await client.query({
-        data: `{
-        webhookSubscription(id: "gid://shopify/WebhookSubscription/1100885262502") {
-          id
-          topic
-          endpoint {
-            __typename
-            ... on WebhookHttpEndpoint {
-              callbackUrl
-            }
-            ... on WebhookEventBridgeEndpoint {
-              arn
-            }
-          }
-        }
-      }`,
-      });
-      console.log(
-        '🚀 ~ file: webhooks.controller.ts ~ line 47 ~ WebhooksController ~ register ~ qwbh',
-        JSON.stringify(qwbh),
-      );
+      // const client = await this.shopifyService.client(shop, accessToken);
+      // const qwbh = await client.query({
+      //   data: `{
+      //   webhookSubscription(id: "gid://shopify/WebhookSubscription/1100885262502") {
+      //     id
+      //     topic
+      //     endpoint {
+      //       __typename
+      //       ... on WebhookHttpEndpoint {
+      //         callbackUrl
+      //       }
+      //       ... on WebhookEventBridgeEndpoint {
+      //         arn
+      //       }
+      //     }
+      //   }
+      // }`,
+      // });
+      // console.log(
+      //   '🚀 ~ file: webhooks.controller.ts ~ line 47 ~ WebhooksController ~ register ~ qwbh',
+      //   JSON.stringify(qwbh),
+      // );
 
       return 'yes done';
     } catch (err) {
