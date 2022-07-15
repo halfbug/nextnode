@@ -195,6 +195,10 @@ export class GroupshopCashbackListener {
       event: 'Groupshop Cashback Notification',
       customer_properties: {
         $email: customerEmail,
+        $phone_number: phone_number,
+        $first_name: orderData[0].customer.firstName,
+        $last_name: orderData[0].customer.lasttName,
+        sms_marketing_consent: sms_marketing_consent,
       },
       properties: mdata,
     });

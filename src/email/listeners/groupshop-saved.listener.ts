@@ -257,9 +257,14 @@ export class GroupshopSavedListener {
         event: 'Groupshop Order Trigger',
         customer_properties: {
           $email: customerEmail,
+          $phone_number: phone_number,
+          $first_name: orderData[0].customer.firstName,
+          $last_name: orderData[0].customer.lasttName,
+          sms_marketing_consent: sms_marketing_consent,
         },
         properties: mdata,
       });
+      console.log(JSON.stringify(body));
 
       this.kalavioService.sendKlaviyoEmail(body);
     } else {
@@ -297,6 +302,10 @@ export class GroupshopSavedListener {
         event: 'Groupshop Referrer Order Trigger',
         customer_properties: {
           $email: customerEmail,
+          $phone_number: phone_number,
+          $first_name: orderData[0].customer.firstName,
+          $last_name: orderData[0].customer.lasttName,
+          sms_marketing_consent: sms_marketing_consent,
         },
         properties: rdata,
       });
