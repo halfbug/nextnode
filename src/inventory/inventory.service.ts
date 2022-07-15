@@ -38,7 +38,21 @@ export class InventoryService {
 
   async update(updateInvenotryInput: UpdateInventoryInput) {
     const { id } = updateInvenotryInput;
-    return await this.inventoryRepository.update({ id }, updateInvenotryInput);
+    // return await this.inventoryRepository.update({ id }, updateInvenotryInput);
+    // return await this.inventoryRepository.save(updateInvenotryInput);
+    const manager = getMongoManager();
+    try {
+      return await manager.updateOne(
+        Inventory,
+        { id },
+        { $set: { ...updateInvenotryInput } },
+        {
+          upsert: true,
+        },
+      );
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async updateInventory(id: string, dif: number) {
@@ -56,14 +70,33 @@ export class InventoryService {
   }
 
   async remove(id: string) {
+    console.log(
+      '%c ',
+      'font-size: 1px; padding: 240px 123.5px; background-size: 247px 480px; background: no-repeat url(https://i2.wp.com/i.giphy.com/media/11ZSwQNWba4YF2/giphy-downsized.gif?w=770&amp;ssl=1);',
+      id,
+    );
     return await this.inventoryManager.deleteMany(Inventory, {
       $or: [{ id: { $regex: id } }, { parentId: { $regex: id } }],
     });
   }
 
+  async removeChildren(id: string) {
+    console.log(id, 'remove children');
+    return await this.inventoryManager.deleteMany(Inventory, { parentId: id });
+  }
   async removeVariants(id: string) {
     console.log(id, 'removevariants');
-    return await this.inventoryManager.deleteMany(Inventory, { parentId: id });
+    return await this.inventoryManager.deleteMany(Inventory, {
+      $and: [
+        { parentId: id },
+        {
+          $or: [
+            { recordType: 'ProductVariant' },
+            { recordType: 'ProductImage' },
+          ],
+        },
+      ],
+    });
   }
 
   async removeShop(shop: string) {

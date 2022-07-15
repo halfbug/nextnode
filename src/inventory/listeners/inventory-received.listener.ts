@@ -67,6 +67,7 @@ export class InventoryReceivedListener {
         const inventorySavedEvent = new InventorySavedEvent();
         inventorySavedEvent.shop = event.shop;
         inventorySavedEvent.accessToken = event.accessToken;
+        inventorySavedEvent.type = 'saved';
         this.eventEmitter.emit('inventory.saved', inventorySavedEvent);
       });
   }

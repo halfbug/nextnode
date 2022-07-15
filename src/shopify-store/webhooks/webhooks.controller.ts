@@ -34,6 +34,12 @@ import {
   SelectedOption,
 } from 'src/inventory/entities/product.entity';
 import Product from 'src/campaigns/entities/product.model';
+import { HttpService } from '@nestjs/axios';
+import readJsonLines from 'read-json-lines-sync';
+import { Inventory } from 'src/inventory/entities/inventory.entity';
+import InventoryModal from 'src/inventory/entities/inventory.modal';
+import { InventorySavedEvent } from 'src/inventory/events/inventory-saved.event';
+import { OrdersSavedEvent } from 'src/inventory/events/orders-saved.event';
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -47,6 +53,7 @@ export class WebhooksController {
     private configSevice: ConfigService,
     private uninstallSerivice: UninstallService,
     private orderCreatedEvent: OrderCreatedEvent,
+    private httpService: HttpService,
   ) {}
   async refreshSingleProduct(shop, accessToken, id, shopName) {
     try {
@@ -346,7 +353,7 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const rproduct = req.body;
-      // console.log('Webhook : PRODUCT_CREATED, Shop: ', shop);
+      console.log('Webhook : PRODUCT_CREATED : ', JSON.stringify(rproduct));
       const prodinfo = await this.inventryService.findOne(shop, 'Product');
       const nprod = new CreateInventoryInput();
 
@@ -366,15 +373,21 @@ export class WebhooksController {
 
       //add variat
       const vprod = nprod;
-      rproduct.variants.map(async (variant) => {
+      rproduct.variants?.map(async (variant) => {
         vprod.id = variant.admin_graphql_api_id;
         vprod.title = variant?.title;
         vprod.parentId = rproduct?.admin_graphql_api_id;
         vprod.recordType = 'ProductVariant';
         vprod.createdAtShopify = variant?.created_at;
         vprod.publishedAt = rproduct?.published_at;
-        vprod.price = variant?.variants[0]?.price;
+        vprod.price = variant.price;
         vprod.inventoryQuantity = variant?.inventory_quantity;
+        vprod.selectedOptions = rproduct.options.map((item, index) => {
+          const sOpt = new SelectedOption();
+          sOpt.name = item.name;
+          sOpt.value = variant[`option${index + 1}`];
+          return sOpt;
+        });
 
         await this.inventryService.create(vprod);
       });
@@ -455,7 +468,7 @@ export class WebhooksController {
       );
 
       await this.inventryService.removeVariants(rproduct?.admin_graphql_api_id);
-      rproduct.variants.map(async (variant) => {
+      rproduct.variants?.map(async (variant) => {
         const vprod = new CreateInventoryInput();
         vprod.id = variant.admin_graphql_api_id;
         vprod.title = variant?.title;
@@ -932,6 +945,228 @@ export class WebhooksController {
         resStr = `${resStr} ${JSON.stringify(res)}`;
       });
       return JSON.stringify(resStr);
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
+  }
+
+  @Get('bulkimport')
+  async bulkProducts(@Query('shopName') shopName: any) {
+    try {
+      // http://localhost:5000/webhooks/bulkimport?shopName=native-roots-dev.myshopify.com
+      const { shop, accessToken } = await this.storesService.findOne(shopName);
+      const client = await this.shopifyService.client(shop, accessToken);
+      const qres = await client.query({
+        data: {
+          query: `mutation {
+          bulkOperationRunQuery(
+            query:"""
+            {
+              products(first: 2000, reverse: true)  {
+                    edges {
+                      node {
+                        id
+                        title
+                        status
+                        description
+                        options{
+                          id
+                          name
+                          name
+                          position
+                          values
+                        }
+                        featuredImage{
+                          src
+                        }
+                        images(first:20, reverse: true){
+                          edges{
+                            node{
+                              src
+                              id
+                            }
+                          }
+                        }
+                        priceRangeV2{
+                          maxVariantPrice{
+                            amount
+                            currencyCode
+                            
+                          }
+                          minVariantPrice{
+                            amount
+                            currencyCode
+                          }
+                        }
+                        totalVariants
+                        totalInventory
+                        status
+                        publishedAt
+                        onlineStoreUrl
+                        createdAtShopify : createdAt
+                        collections(first: 1000, reverse: true){
+                          edges{
+                            node{
+                              id
+                              title
+                              description
+                              productsCount
+                              sortOrder
+                            }
+                          }
+                        }
+                        variants(first: 1000, reverse: true)  {
+                          edges {
+                            node {
+                              id
+                              title
+                              displayName
+                              inventoryQuantity
+                              price
+                              selectedOptions{
+                                name
+                                value
+                              }
+                              shopifyCreatedAt :createdAt
+                              image{
+                                src
+                                
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+            """
+          ) {
+            bulkOperation {
+              id
+              status
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }`,
+        },
+      });
+      // console.log(event);
+      // console.log(JSON.stringify(qres));
+      // console.log(qres.body['data']['bulkOperationRunQuery']['bulkOperation']);
+      // const dopoll = true;
+      if (
+        qres.body['data']['bulkOperationRunQuery']['bulkOperation'][
+          'status'
+        ] === 'CREATED'
+      ) {
+        const pollit = setInterval(async () => {
+          const poll = await client.query({
+            data: {
+              query: `query {
+            currentBulkOperation {
+              id
+              status
+              errorCode
+              createdAt
+              completedAt
+              objectCount
+              fileSize
+              url
+              partialDataUrl
+            }
+          }`,
+            },
+          });
+
+          console.log(poll.body['data']['currentBulkOperation']);
+          if (
+            poll.body['data']['currentBulkOperation']['status'] === 'COMPLETED'
+          ) {
+            clearInterval(pollit);
+
+            // fire inventory received event
+            const url = poll.body['data']['currentBulkOperation'].url;
+            this.httpService.get(url).subscribe(async (res) => {
+              const inventoryArray = readJsonLines(res.data);
+              // 1- get all inventory
+              const inventArr = inventoryArray.map((inventory) => {
+                // add record type
+                inventory.featuredImage = inventory?.featuredImage?.src;
+                inventory.price =
+                  inventory?.priceRangeV2?.maxVariantPrice?.amount ||
+                  inventory.price;
+                inventory.currencyCode =
+                  inventory?.priceRangeV2?.maxVariantPrice?.currencyCode;
+
+                //rename inventory __parentId
+                if (inventory.__parentId) {
+                  inventory.parentId = inventory.__parentId;
+                  delete inventory.__parentId;
+                }
+                // add shop to inventory
+                inventory.shop = shop;
+
+                // add record type
+                inventory.recordType = inventory.id.split('/')[3];
+
+                inventory.createdAt = new Date();
+                inventory.updatedAt = new Date();
+                return inventory;
+              });
+
+              // 2. Get products
+              const products = inventArr.filter(
+                (item) => item.recordType === 'Product',
+              );
+
+              products.map((product) => {
+                console.log(
+                  '\x1b[36m%s\x1b[0m',
+                  '------ product.title : ',
+
+                  product.title,
+                );
+                // this.inventryService.remove(product.id);
+                product.purchaseCount = 0;
+                this.inventryService.update(product);
+                this.inventryService.removeChildren(product.id);
+                this.inventryService.insertMany(
+                  inventArr.filter((item) => item.parentId === product.id),
+                );
+              });
+              console.log('color: #26bfa5;', '------------------------------');
+              console.log(
+                '%cwebhooks.controller.ts line:1114 total inventory received',
+                'color: #007acc;',
+                inventArr.length,
+              );
+              console.log(
+                '%cwebhooks.controller.ts line:1119 total products',
+                'color: white; background-color: #007acc;',
+                products.length,
+              );
+              // OrdersSavedEvent -- Purchase Count
+              const ordersSavedEvent = new OrdersSavedEvent();
+              ordersSavedEvent.shop = shop;
+              ordersSavedEvent.accessToken = accessToken;
+              this.eventEmitter.emit('orders.saved', ordersSavedEvent);
+              // InventorySavedEvent -- out of stock
+              const inventorySavedEvent = new InventorySavedEvent();
+              inventorySavedEvent.shop = shop;
+              inventorySavedEvent.accessToken = accessToken;
+              inventorySavedEvent.type = 'outofstock';
+              this.eventEmitter.emit(
+                'inventory.outofstock',
+                inventorySavedEvent,
+              );
+            });
+          }
+        }, 3000);
+      } else console.log(JSON.stringify(qres.body['data']));
+      return JSON.stringify(JSON.stringify(qres.body['data']));
     } catch (err) {
       console.log(JSON.stringify(err));
     }
