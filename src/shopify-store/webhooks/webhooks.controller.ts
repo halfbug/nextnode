@@ -1171,4 +1171,22 @@ export class WebhooksController {
       console.log(JSON.stringify(err));
     }
   }
+
+  @Get('inevent')
+  async importEvents(@Query('shopName') shopName: any) {
+    // try {
+    // http://localhost:5000/webhooks/bulkimport?shopName=native-roots-dev.myshopify.com
+    const { shop, accessToken } = await this.storesService.findOne(shopName);
+    // OrdersSavedEvent -- Purchase Count
+    const ordersSavedEvent = new OrdersSavedEvent();
+    ordersSavedEvent.shop = shop;
+    ordersSavedEvent.accessToken = accessToken;
+    this.eventEmitter.emit('orders.saved', ordersSavedEvent);
+    // InventorySavedEvent -- out of stock
+    const inventorySavedEvent = new InventorySavedEvent();
+    inventorySavedEvent.shop = shop;
+    inventorySavedEvent.accessToken = accessToken;
+    inventorySavedEvent.type = 'outofstock';
+    this.eventEmitter.emit('inventory.outofstock', inventorySavedEvent);
+  }
 }
