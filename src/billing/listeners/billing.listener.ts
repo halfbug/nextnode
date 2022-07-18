@@ -91,14 +91,17 @@ export class BillingListener {
     }
     const availedDiscount = groupshop.members[memLength - 1].availedDiscount;
     console.log('groupshop.id', groupshop);
-    const totalPr = groupshop.members[memLength - 1].lineItems?.reduce(
+    let thisPrice = 0;
+    let totalPr = groupshop.members[memLength - 1].lineItems?.reduce(
       (priceSum: number, { price, quantity }) => {
-        const thisPrice = priceSum + quantity * parseFloat(price);
+        thisPrice = priceSum + quantity * parseFloat(price);
         console.log({ thisPrice });
-        return thisPrice - (+thisPrice * availedDiscount) / 100;
+        // return thisPrice - (+thisPrice * availedDiscount) / 100;
+        return thisPrice;
       },
       0,
     );
+    totalPr = totalPr - (+totalPr * availedDiscount) / 100;
     const payload1: CreateBillingInput = {
       type: BillingTypeEnum.ON_REFFERRAL_ADDED,
       groupShopId: event.groupshopId,
