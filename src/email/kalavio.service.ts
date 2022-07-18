@@ -89,7 +89,7 @@ export class KalavioService {
     if (ProfileId !== null) {
       const profileUrlKlaviyo = `${this.configService.get(
         'KLAVIYO_BASE_URL',
-      )}${'/v1/person/'}${ProfileId}${'?sms_marketing_status='}${
+      )}${'/v1/person/'}${ProfileId}${'?sms_marketing_consent='}${
         input.sms_marketing
       }${'&api_key='}${PRIVATE_KEY}`;
       console.log(profileUrlKlaviyo);
