@@ -40,6 +40,7 @@ import { Inventory } from 'src/inventory/entities/inventory.entity';
 import InventoryModal from 'src/inventory/entities/inventory.modal';
 import { InventorySavedEvent } from 'src/inventory/events/inventory-saved.event';
 import { OrdersSavedEvent } from 'src/inventory/events/orders-saved.event';
+import { RequestReturn } from '@shopify/shopify-api';
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -246,6 +247,84 @@ export class WebhooksController {
       // );
 
       return 'yes done';
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
+  }
+
+  // http://localhost:5000/webhooks/storeswh?topic=COLLECTIONS_CREATE&path=collection-listing-update
+  @Get('storeswh')
+  async registerWebHookForAllStores(
+    @Query('topic') topic: any,
+    @Query('path') path: any,
+  ) {
+    try {
+      const stores = await this.storesService.findAll();
+
+      stores.map(async (store) => {
+        const { shop, accessToken } = store;
+        const client = await this.shopifyService.client(shop, accessToken);
+        console.log(
+          '🚀 ~ file: webhooks.controller.ts ~ line 11 ~ WebhooksController ~ register ~ shop',
+          shop,
+        );
+        const rhook = await this.shopifyService.registerHook(
+          shop,
+          accessToken,
+          // '/webhooks/product-update',
+          // 'PRODUCTS_UPDATE',
+          '/webhooks/' + path,
+          topic,
+        );
+        const id =
+          rhook['result']['data']['webhookSubscriptionUpdate'][
+            'webhookSubscription'
+          ]['id'];
+        // console.log('yes register');
+        console.log(
+          'color: #007acc;',
+          '%c rhook ->',
+          JSON.stringify(
+            rhook['result']['data']['webhookSubscriptionUpdate'][
+              'webhookSubscription'
+            ]['id'],
+            null,
+            '\t',
+          ),
+        );
+        console.log(rhook);
+        const qres = await client.query({
+          data: {
+            query: `query webhookSubscription($id: ID!){
+            
+              webhookSubscription(id: $id) {
+                id
+                    topic
+                    endpoint {
+                      __typename
+                      ... on WebhookHttpEndpoint {
+                        callbackUrl
+                      }
+                      ... on WebhookEventBridgeEndpoint {
+                        arn
+                      }
+                    }
+              }
+          
+        }`,
+            variables: {
+              id: id,
+            },
+          },
+        });
+        console.log('🚀 ~ hook detail', JSON.stringify(qres));
+        console.log(
+          '-hook detail',
+          'color: #007acc;',
+          JSON.stringify(qres, null, '\t'),
+        );
+      });
+      return 'done-check console for detail';
     } catch (err) {
       console.log(JSON.stringify(err));
     }
@@ -519,7 +598,7 @@ export class WebhooksController {
       res.status(HttpStatus.OK).send();
     }
   }
-
+  // http://localhost:5000/webhooks/product?shopName=youngandrecklessdev.myshopify.com&id=gid://shopify/Product/3990782902375
   @Get('product')
   async product(@Query('shopName') shopName: any, @Query('id') id: any) {
     try {
@@ -665,8 +744,7 @@ export class WebhooksController {
         await this.inventryService.create(vprod);
       });
 
-      return `${JSON.stringify(Prd)}
-      this product reloaded successfully in groupshop inventory`;
+      return `${JSON.stringify(Prd)}`;
     } catch (err) {
       console.log(JSON.stringify(err));
     }
@@ -738,17 +816,201 @@ export class WebhooksController {
     }
   }
 
-  // for future use
-  // @Post('order-update?')
-  // async orderUpdate(@Req() req, @Res() res) {
+  @Post('collection-create?')
+  async collectionCreate(@Req() req, @Res() res) {
+    try {
+      const { shop } = req.query;
+      const rproduct = req.body;
+      console.log(
+        'WebhooksController ~ collection-create ~ rproduct',
+        JSON.stringify(rproduct),
+        shop,
+      );
+
+      // const { result } = await this.inventryService.remove(
+      //   JSON.stringify(rproduct.id),
+      // );
+      // res.send(result.deletedCount);
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
+
+  @Post('collection-update-fake6?')
+  async collectionUpdate(@Req() req, @Res() res) {
+    try {
+      // 1. receive collection webhook
+      const { shop: shopName } = req.query;
+      const rcollection = req.body;
+      console.log(
+        'WebhooksController ~ collection-update ~ ',
+        JSON.stringify(rcollection),
+        shopName,
+      );
+
+      // 2. get collection detail from shopify
+      if (rcollection.published_at) {
+        const { shop, accessToken } = await this.storesService.findOne(
+          shopName,
+        );
+        const client = await this.shopifyService.client(shopName, accessToken);
+
+        const qres = await client.query({
+          data: {
+            query: `mutation {
+          bulkOperationRunQuery(
+            query:"""
+            {
+              collection(id: "${rcollection.admin_graphql_api_id}") {
+                      title
+                      id
+                      productsCount
+                      products(first:10000, reverse: true, sortKey:CREATED){
+                        edges{
+                          node{
+                            title
+                            id
+                            status
+                            createdAt
+                          }
+                        }
+                      }
+                    }
+                }
+            """
+          ) {
+            bulkOperation {
+              id
+              status
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }`,
+          },
+        });
+        // console.log(event);
+        // console.log(JSON.stringify(qres));
+        // console.log(
+        //   qres.body['data']['bulkOperationRunQuery']['bulkOperation'],
+        // );
+        // const dopoll = true;
+        if (
+          qres.body['data']['bulkOperationRunQuery']['bulkOperation'][
+            'status'
+          ] === 'CREATED'
+        ) {
+          const pollit = setInterval(async () => {
+            const poll = await client.query({
+              data: {
+                query: `query {
+            currentBulkOperation {
+              id
+              status
+              errorCode
+              createdAt
+              completedAt
+              objectCount
+              fileSize
+              url
+              partialDataUrl
+            }
+          }`,
+              },
+            });
+
+            // console.log(poll.body['data']['currentBulkOperation']);
+            if (
+              poll.body['data']['currentBulkOperation']['status'] ===
+              'COMPLETED'
+            ) {
+              clearInterval(pollit);
+
+              // fire inventory received event
+              const url = poll.body['data']['currentBulkOperation'].url;
+              this.httpService.get(url).subscribe(async (res) => {
+                const productsArray = readJsonLines(res.data);
+                // console.log(
+                //   '\x1b[44m%s\x1b[0m',
+                //   'webhooks.controller.ts line:961 inventoryArray',
+                //   JSON.stringify(productsArray, null, '\t'),
+                // );
+                /* 3. loop to the products 
+            1. delete all collection records
+            2. add collection to products 
+      */
+                const collectionObjs = productsArray.map((product) => ({
+                  id: rcollection.admin_graphql_api_id,
+                  title: rcollection.title,
+                  description: rcollection.body_html.replace(
+                    /<\/?[^>]+(>|$)/g,
+                    '',
+                  ),
+                  productsCount: productsArray.length,
+                  sortOrder: rcollection.sort_order.toUpperCase(),
+                  featuredImage: rcollection?.image?.src,
+                  parentId: product.id,
+                  shop,
+                  recordType: 'Collection',
+                }));
+
+                // console.log(
+                //   '\x1b[44m%s\x1b[0m',
+                //   'webhooks.controller.ts line:982 collectionObjs',
+                //   collectionObjs,
+                // );
+                await this.inventryService.remove(
+                  rcollection.admin_graphql_api_id,
+                );
+                await this.inventryService.insertMany(collectionObjs);
+              });
+            }
+          }, 3000);
+        } else console.log(JSON.stringify(qres.body['data']));
+        // console.log(
+        //   '%cwebhooks.controller.ts line:828 scollection',
+        //   'color: #007acc;',
+        //   JSON.stringify(scollection, null, ' '),
+        // );
+        // get collection detail form shopify if scope is web and product count <  db collection product count
+        //  add collection published at
+
+        // await this.inventryService.remove(rcollection.admin_graphql_api_id);
+        // const cproducts =
+        //   scollection.body['data']['collection']['products']['edges'];
+        // console.log(
+        //   '%cwebhooks.controller.ts line:891 cproducts',
+        //   'color: #007acc;',
+        //   JSON.stringify(cproducts, null, '\t'),
+        // );
+        // cproducts.map(({ node: product }) => {});
+      }
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
+
+  // @Post('collection-listing-add?')
+  // async collectionListingAdd(@Req() req, @Res() res) {
   //   try {
   //     const { shop } = req.query;
-  //     const rorders = req.body;
+  //     const rproduct = req.body;
   //     console.log(
-  //       'WebhooksController ~ orderUpdate ~ rorders',
-  //       JSON.stringify(rorders),
+  //       'WebhooksController ~ collection-listing-update ~ rproduct',
+  //       JSON.stringify(rproduct),
+  //       shop,
   //     );
-  //     res.status(HttpStatus.OK).send();
+
+  //     // const { result } = await this.inventryService.remove(
+  //     //   JSON.stringify(rproduct.id),
+  //     // );
+  //     // res.send(result.deletedCount);
   //   } catch (err) {
   //     console.log(JSON.stringify(err));
   //   } finally {
@@ -756,175 +1018,25 @@ export class WebhooksController {
   //   }
   // }
 
-  // @Get('load-inventory')
-  // async loadInventory(@Query('shopName') shopName: any) {
+  // @Post('collection-listing-remove?')
+  // async collectionListingRemove(@Req() req, @Res() res) {
   //   try {
-  //     const { shop, accessToken } = await this.storesService.findOne(shopName);
-  //     this.shopifyService.accessToken = accessToken;
-  //     this.shopifyService.shop = shop;
-  //     const client = await this.shopifyService.client(shop, accessToken);
+  //     const { shop } = req.query;
+  //     const rproduct = req.body;
+  //     console.log(
+  //       'WebhooksController ~ collection-listing-update ~ rproduct',
+  //       JSON.stringify(rproduct),
+  //       shop,
+  //     );
 
-  //     const data = await client.query({
-  //       data: `{
-  //         products(first: 2, reverse: true) {
-  //           edges {
-  //             node {
-  //               title
-  //               id
-  //               status
-  //               description
-  //               createdAt
-  //               publishedAt
-  //               featuredImage {
-  //                 src
-  //               }
-  //               totalVariants
-  //               totalInventory
-  //               images(first:10, reverse: true){
-  //                 edges{
-  //                   node{
-  //                     src
-  //                     id
-  //                   }
-  //                 }
-  //               }
-  //               options{
-  //                 id
-  //                 name
-  //                 values
-  //                 position
-  //               }
-  //               variants(first: 30, reverse: true) {
-  //                 edges {
-  //                   node {
-  //                     title
-  //                     id
-  //                     inventoryQuantity
-  //                     price
-  //                     createdAt
-  //                     selectedOptions {
-  //                       name
-  //                       value
-  //                     }
-  //                     image {
-  //                       src
-  //                     }
-  //                   }
-  //                 }
-  //               }
-
-  //               }
-  //           }
-  //         }
-  //       }`,
-  //     });
-  //     const data1: any = data.body;
-  //     const prods = data1.data.products;
-
-  //     // prods.map(
-  //     //   async ({
-  //     //     edges: {
-  //     //       node: {
-  //     //         selectedOptions,
-  //     //         title,
-  //     //         inventoryQuantity,
-  //     //         price,
-  //     //         id,
-  //     //         createdAt,
-  //     //         image,
-  //     //         publishedAt,
-  //     //         status,
-  //     //         featuredImage,
-  //     //         options,
-  //     //         totalVariants,
-  //     //         totalInventory,
-  //     //         variants,
-  //     //         images,
-  //     //       },
-  //     //     },
-  //     //   }) => {
-  //     //     const variantsReceived = variants.edges;
-  //     //     const imagesReceived = images.edges;
-
-  //     //     const nprod = new UpdateInventoryInput();
-  //     //     // nprod.id = rproduct.id;
-  //     //     nprod.id = id;
-  //     //     nprod.createdAtShopify = createdAt;
-  //     //     nprod.publishedAt = publishedAt;
-  //     //     nprod.title = title;
-  //     //     nprod.status = status?.toUpperCase();
-  //     //     // nprod.price = variants[0].node?.price; //
-  //     //     nprod.featuredImage = featuredImage?.src;
-  //     //     nprod.totalVariants = totalVariants;
-  //     //     nprod.totalInventory = totalInventory;
-  //     //     const isAvailable = variantsReceived.some(
-  //     //       ({ node: { inventoryQuantity } }) => inventoryQuantity > 0,
-  //     //     );
-  //     //     nprod.outofstock = !isAvailable;
-  //     //     nprod.options = options.map(({ id, name, position, values }) => ({
-  //     //       id,
-  //     //       name,
-  //     //       position,
-  //     //       values,
-  //     //     }));
-  //     //     await this.inventryService.update(nprod);
-  //     //     await this.inventryService.removeVariants(id);
-  //     //     variantsReceived.map(
-  //     //       async ({
-  //     //         node: {
-  //     //           selectedOptions,
-  //     //           title: vtitle,
-  //     //           inventoryQuantity: vinventoryQuantity,
-  //     //           price,
-  //     //           id: vid,
-  //     //           createdAt: vcreatedAt,
-  //     //           image,
-  //     //         },
-  //     //       }) => {
-  //     //         const vprod = new CreateInventoryInput();
-  //     //         vprod.id = vid;
-  //     //         vprod.title = vtitle;
-  //     //         vprod.displayName = `${title} Variant ${vtitle}`;
-  //     //         vprod.parentId = id;
-  //     //         vprod.recordType = 'ProductVariant';
-  //     //         vprod.createdAtShopify = vcreatedAt;
-  //     //         // vprod.publishedAt = rproduct?.published_at;
-  //     //         vprod.price = price;
-  //     //         vprod.shop = shopName;
-  //     //         // image
-  //     //         const img = new ProductImage();
-  //     //         img.src = image && image.src ? image.src : null;
-  //     //         vprod.image = img;
-  //     //         vprod.featuredImage = image && image.src ? image.src : null;
-  //     //         vprod.inventoryQuantity = inventoryQuantity;
-  //     //         vprod.selectedOptions = selectedOptions.map((item, index) => {
-  //     //           const sOpt = new SelectedOption();
-  //     //           sOpt.name = item.name;
-  //     //           sOpt.value = item.value;
-  //     //           return sOpt;
-  //     //         });
-  //     //         await this.inventryService.create(vprod);
-  //     //       },
-  //     //     );
-
-  //     //     imagesReceived.map(async ({ node: { id: imid, src } }) => {
-  //     //       const vprod = new CreateInventoryInput();
-  //     //       vprod.id = imid;
-  //     //       vprod.parentId = id;
-  //     //       vprod.recordType = 'ProductImage';
-  //     //       vprod.shop = shopName;
-  //     //       // image
-  //     //       vprod.src = src;
-
-  //     //       await this.inventryService.create(vprod);
-  //     //     });
-  //     //   },
+  //     // const { result } = await this.inventryService.remove(
+  //     //   JSON.stringify(rproduct.id),
   //     // );
-
-  //     return `${JSON.stringify(data)}
-  //     this shop reloaded successfully in groupshop inventory`;
+  //     // res.send(result.deletedCount);
   //   } catch (err) {
   //     console.log(JSON.stringify(err));
+  //   } finally {
+  //     res.status(HttpStatus.OK).send();
   //   }
   // }
 
