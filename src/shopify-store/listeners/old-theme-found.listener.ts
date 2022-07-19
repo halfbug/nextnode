@@ -28,17 +28,16 @@ export class OldThemeFoundListener {
   @OnEvent('old.theme.found')
   async registerScriptTag(event: oldThemeFoundEvent) {
     if (this.configService.get('SCRIPTTAG')) {
-      const { shop, accessToken } = event;
-      console.log(
-        '🚀 ~ file: old-theme-found.listener.ts ~ line 18 ~ InvenotrySavedListener ~ registerScriptTag ~ event',
-      );
-      this.shop = shop;
-
-      this.shopifyapi.accessToken = accessToken;
-      this.shopifyapi.shop = shop;
+      // const { shop, accessToken } = event;
+      // console.log(
+      //   '🚀 ~ file: old-theme-found.listener.ts ~ line 18 ~ InvenotrySavedListener ~ registerScriptTag ~ event',
+      // );
+      // this.shop = shop;
+      // this.shopifyapi.accessToken = accessToken;
+      // this.shopifyapi.shop = shop;
       // this.addResource('gsbootstrap.css');
-      this.addResource('gsbootstrap.js');
-      this.addResource('groupshop-pdp.js');
+      // this.addResource('gsbootstrap.js');
+      // this.addResource('groupshop-pdp.js');
     }
   }
 }
