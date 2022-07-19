@@ -223,28 +223,6 @@ export class WebhooksController {
       );
       console.log('yes register');
       console.log(rhook);
-      // const client = await this.shopifyService.client(shop, accessToken);
-      // const qwbh = await client.query({
-      //   data: `{
-      //   webhookSubscription(id: "gid://shopify/WebhookSubscription/1100885262502") {
-      //     id
-      //     topic
-      //     endpoint {
-      //       __typename
-      //       ... on WebhookHttpEndpoint {
-      //         callbackUrl
-      //       }
-      //       ... on WebhookEventBridgeEndpoint {
-      //         arn
-      //       }
-      //     }
-      //   }
-      // }`,
-      // });
-      // console.log(
-      //   '🚀 ~ file: webhooks.controller.ts ~ line 47 ~ WebhooksController ~ register ~ qwbh',
-      //   JSON.stringify(qwbh),
-      // );
 
       return 'yes done';
     } catch (err) {
@@ -838,7 +816,7 @@ export class WebhooksController {
     }
   }
 
-  @Post('collection-update-fake6?')
+  @Post('collection-update?')
   async collectionUpdate(@Req() req, @Res() res) {
     try {
       // 1. receive collection webhook
@@ -971,23 +949,6 @@ export class WebhooksController {
             }
           }, 3000);
         } else console.log(JSON.stringify(qres.body['data']));
-        // console.log(
-        //   '%cwebhooks.controller.ts line:828 scollection',
-        //   'color: #007acc;',
-        //   JSON.stringify(scollection, null, ' '),
-        // );
-        // get collection detail form shopify if scope is web and product count <  db collection product count
-        //  add collection published at
-
-        // await this.inventryService.remove(rcollection.admin_graphql_api_id);
-        // const cproducts =
-        //   scollection.body['data']['collection']['products']['edges'];
-        // console.log(
-        //   '%cwebhooks.controller.ts line:891 cproducts',
-        //   'color: #007acc;',
-        //   JSON.stringify(cproducts, null, '\t'),
-        // );
-        // cproducts.map(({ node: product }) => {});
       }
     } catch (err) {
       console.log(JSON.stringify(err));
@@ -995,50 +956,6 @@ export class WebhooksController {
       res.status(HttpStatus.OK).send();
     }
   }
-
-  // @Post('collection-listing-add?')
-  // async collectionListingAdd(@Req() req, @Res() res) {
-  //   try {
-  //     const { shop } = req.query;
-  //     const rproduct = req.body;
-  //     console.log(
-  //       'WebhooksController ~ collection-listing-update ~ rproduct',
-  //       JSON.stringify(rproduct),
-  //       shop,
-  //     );
-
-  //     // const { result } = await this.inventryService.remove(
-  //     //   JSON.stringify(rproduct.id),
-  //     // );
-  //     // res.send(result.deletedCount);
-  //   } catch (err) {
-  //     console.log(JSON.stringify(err));
-  //   } finally {
-  //     res.status(HttpStatus.OK).send();
-  //   }
-  // }
-
-  // @Post('collection-listing-remove?')
-  // async collectionListingRemove(@Req() req, @Res() res) {
-  //   try {
-  //     const { shop } = req.query;
-  //     const rproduct = req.body;
-  //     console.log(
-  //       'WebhooksController ~ collection-listing-update ~ rproduct',
-  //       JSON.stringify(rproduct),
-  //       shop,
-  //     );
-
-  //     // const { result } = await this.inventryService.remove(
-  //     //   JSON.stringify(rproduct.id),
-  //     // );
-  //     // res.send(result.deletedCount);
-  //   } catch (err) {
-  //     console.log(JSON.stringify(err));
-  //   } finally {
-  //     res.status(HttpStatus.OK).send();
-  //   }
-  // }
 
   @Get('load-products')
   async loadProducts(@Query('shopName') shopName: any) {
