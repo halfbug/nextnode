@@ -121,6 +121,9 @@ export class InventoryService {
             {
               outofstock: false,
             },
+            {
+              publishedAt: { $ne: null },
+            },
           ],
         },
       },
@@ -187,37 +190,57 @@ export class InventoryService {
               productsCount: {
                 $first: '$productsCount',
               },
+              productslist: {
+                $addToSet: '$parentId',
+              },
             },
           },
           {
             $lookup: {
               from: 'inventory',
-              localField: 'id',
+              localField: 'productslist',
               foreignField: 'id',
-              as: 'products',
+              as: 'productsall',
             },
           },
           {
             $lookup: {
               from: 'inventory',
-              localField: 'products.parentId',
-              foreignField: 'id',
-              as: 'products',
+              let: {
+                pid: '$productslist',
+              },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        {
+                          $in: ['$id', '$$pid'],
+                        },
+                        {
+                          $ne: ['$publishedAt', null],
+                        },
+                        {
+                          $ne: ['$outofstock', true],
+                        },
+                      ],
+                    },
+                  },
+                },
+              ],
+              as: 'presult',
             },
           },
-          // {
-          //   $project: {
-          //     'products.id': 1,
-          //     'products.title': 1,
-          //     'products.totalVariants': 1,
-          //     'productsf.createdAtShopify': 1,
-          //     'products.publishedAt': 1,
-          //     'products.featuredImage': 1,
-          //     id: 1,
-          //     title: 1,
-          //     productsCount: 1,
-          //   },
-          // },
+          {
+            $project: {
+              id: 1,
+              title: 1,
+              products: '$presult',
+              productsCount: {
+                $size: '$presult',
+              },
+            },
+          },
         ]
       : [
           { $match: { $and: [{ shop }, { recordType: 'Collection' }] } },
@@ -255,6 +278,9 @@ export class InventoryService {
             },
             {
               outofstock: false,
+            },
+            {
+              publishedAt: { $ne: null },
             },
           ],
         },
@@ -299,6 +325,12 @@ export class InventoryService {
             },
             {
               status: 'ACTIVE',
+            },
+            {
+              outofstock: false,
+            },
+            {
+              publishedAt: { $ne: null },
             },
           ],
         },

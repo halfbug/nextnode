@@ -828,7 +828,10 @@ export class WebhooksController {
         shopName,
       );
 
-      // 2. get collection detail from shopify
+      // 2. delete all previous products collection
+      await this.inventryService.remove(rcollection.admin_graphql_api_id);
+
+      // 3. get collection detail from shopify IF its a published collection
       if (rcollection.published_at) {
         const { shop, accessToken } = await this.storesService.findOne(
           shopName,
@@ -917,9 +920,8 @@ export class WebhooksController {
                 //   'webhooks.controller.ts line:961 inventoryArray',
                 //   JSON.stringify(productsArray, null, '\t'),
                 // );
-                /* 3. loop to the products 
-            1. delete all collection records
-            2. add collection to products 
+                /* 4. loop to the products 
+                    5. add collection to products 
       */
                 const collectionObjs = productsArray.map((product) => ({
                   id: rcollection.admin_graphql_api_id,
@@ -941,9 +943,7 @@ export class WebhooksController {
                 //   'webhooks.controller.ts line:982 collectionObjs',
                 //   collectionObjs,
                 // );
-                await this.inventryService.remove(
-                  rcollection.admin_graphql_api_id,
-                );
+
                 await this.inventryService.insertMany(collectionObjs);
               });
             }
