@@ -245,6 +245,62 @@ export class InvenotrySavedListener {
           );
         });
 
+      this.shopifyapi
+        .registerHook(
+          shop,
+          accessToken,
+          '/webhooks/billing-failure',
+          'SUBSCRIPTION_BILLING_ATTEMPTS_FAILURE',
+        )
+        .then(() => {
+          console.log(
+            'webhook SUBSCRIPTION_BILLING_ATTEMPTS_FAILURE -> registered for shop',
+            shop,
+          );
+        });
+
+      this.shopifyapi
+        .registerHook(
+          shop,
+          accessToken,
+          '/webhooks/billing-success',
+          'SUBSCRIPTION_BILLING_ATTEMPTS_SUCCESS',
+        )
+        .then(() => {
+          console.log(
+            'webhook SUBSCRIPTION_BILLING_ATTEMPTS_SUCCESS -> registered for shop',
+            shop,
+          );
+        })
+        .catch((rr) => {
+          console.log(
+            'webhook SUBSCRIPTION_BILLING_ATTEMPTS_SUCCESS -> registered for shop',
+            shop,
+            rr,
+          );
+        });
+
+      this.shopifyapi
+        .registerHook(
+          shop,
+          accessToken,
+          '/webhooks/app-subscription',
+          'APP_SUBSCRIPTIONS_UPDATE',
+        )
+        .then(() => {
+          console.log(
+            'webhook APP_SUBSCRIPTIONS_UPDATE -> registered for shop',
+            shop,
+          );
+        })
+        .catch((rr) => {
+          console.log(
+            'webhook APP_SUBSCRIPTIONS_UPDATE -> registered for shop',
+            shop,
+            rr,
+          );
+        });
+
       console.log('webhook registered');
     } catch (err) {
       console.log(JSON.stringify(err));

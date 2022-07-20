@@ -136,7 +136,7 @@ export class BillingsResolver {
     this.storeService.updateField(
       { shop },
       {
-        subscription,
+        subscription: { status: 'Pending', ...subscription },
         appTrialEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
     );

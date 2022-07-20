@@ -957,6 +957,74 @@ export class WebhooksController {
     }
   }
 
+  @Post('billing-failure?')
+  async billingFailure(@Req() req, @Res() res) {
+    try {
+      const { shop } = req.query;
+      const rproduct = req.body;
+      console.log(
+        'WebhooksController ~ billing-failure ~ rproduct',
+        JSON.stringify(rproduct),
+        shop,
+      );
+
+      // const { result } = await this.inventryService.remove(
+      //   JSON.stringify(rproduct.id),
+      // );
+      // res.send(result.deletedCount);
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
+
+  @Post('billing-success?')
+  async billingSuccess(@Req() req, @Res() res) {
+    try {
+      const { shop } = req.query;
+      const rproduct = req.body;
+      console.log(
+        'WebhooksController ~ billing-success ~ rproduct',
+        JSON.stringify(rproduct),
+        shop,
+      );
+
+      // const { result } = await this.inventryService.remove(
+      //   JSON.stringify(rproduct.id),
+      // );
+      // res.send(result.deletedCount);
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
+
+  @Post('app-subscription?')
+  async appSubscription(@Req() req, @Res() res) {
+    try {
+      const { shop } = req.query;
+      const appsub = req.body;
+      console.log(
+        'WebhooksController ~ app-subscription ~ rproduct',
+        JSON.stringify(appsub),
+        shop,
+      );
+
+      if (appsub['app_subscription']['status'] === 'ACTIVE') {
+        this.storesService.updateField(
+          { shop },
+          { 'subscription.status': 'Active' },
+        );
+      }
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
+
   @Get('load-products')
   async loadProducts(@Query('shopName') shopName: any) {
     try {

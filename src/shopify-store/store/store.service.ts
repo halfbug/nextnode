@@ -78,10 +78,12 @@ export class StoreService {
   }
 
   goToAppfront(store) {
-    const { shop, installationStep } = store;
+    const { shop, installationStep, subscription } = store;
     const shopName = shop.split('.')[0];
-    if (installationStep === null)
+    if (installationStep === null && subscription.status === 'Active')
       return `${this.configService.get('FRONT')}/${shopName}/overview`;
+    else if (subscription.status === 'Pending')
+      return subscription.confirmationUrl;
     else
       return `${this.configService.get(
         'FRONT',
