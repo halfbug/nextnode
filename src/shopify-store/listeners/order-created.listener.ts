@@ -85,7 +85,8 @@ export class OrderCreatedListener {
             },
             0,
           );
-          newItem.discountedPrice = +item.price - +newItem.totalDiscounts;
+          newItem.discountedPrice =
+            +item.price - +newItem.totalDiscounts / item.quantity;
           newItem.discountCode = whOrder.discount_codes[0]?.code;
           newItem.discountInfo = item.discount_allocations.map((dinfo) => ({
             amount: dinfo.amount,

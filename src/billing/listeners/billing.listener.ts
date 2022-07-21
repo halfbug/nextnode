@@ -79,8 +79,8 @@ export class BillingListener {
     if (memLength === 2) {
       const owner = groupshop.members[0];
       totalPrice = owner.lineItems?.reduce(
-        (priceSum: number, { price, quantity }) =>
-          priceSum + quantity * parseFloat(price),
+        (priceSum: number, { price, quantity, totalDiscounts }) =>
+          priceSum + (quantity * parseFloat(price) - +totalDiscounts),
         0,
       );
       const payload: any = { revenue: totalPrice };
