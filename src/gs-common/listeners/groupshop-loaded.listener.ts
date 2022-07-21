@@ -58,8 +58,9 @@ export class GSLoadedListener {
       this.gsUpdatePriceRuleEvt.emit();
     } else {
       // 3. find view with ip.
-      const isIPExist = !!(await this.vistorsrv.findOne(ip));
-
+      const isIPExist = !!(await this.vistorsrv.findOne(ip, gs.id));
+      // console.log('ip--', await this.vistorsrv.findOne(ip, gs.id));
+      // console.log({ isIPExist });
       // 4. if no ip found add view record.
       if (!isIPExist) this.vistorsrv.create(gs.id, ip);
     }

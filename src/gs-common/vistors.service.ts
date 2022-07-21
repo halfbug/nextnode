@@ -25,10 +25,11 @@ export class VistorsService {
     });
   }
 
-  findOne(ip: string) {
+  findOne(ip: string, groupshopId) {
     return this.visitorsRepository.findOne({
       where: {
         ip,
+        groupshopId,
       },
     });
   }
