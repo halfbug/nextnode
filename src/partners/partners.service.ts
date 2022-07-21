@@ -64,6 +64,7 @@ export class PartnerService {
             ]
           : null,
     };
+
     partner.dealProducts = [new DealProductsInput()];
     partner.partnerDetails = new PartnerDetailsInput();
     partner.partnerRewards = new PartnerRewardsInput();
@@ -90,7 +91,12 @@ export class PartnerService {
   }
 
   findAll(storeId: string) {
-    return this.partnerRepository.find({ storeId });
+    return this.partnerRepository.find({
+      where: { storeId },
+      order: {
+        createdAt: -1,
+      },
+    });
   }
 
   async update(id: string, updatePartnersInput: UpdatePartnersInput) {
