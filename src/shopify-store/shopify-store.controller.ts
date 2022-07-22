@@ -20,6 +20,7 @@ import { StoreService } from './store/store.service';
 import { UploadImageService } from './ImageUpload/uploadimage.service';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom, map } from 'rxjs';
+import { PartnerService } from 'src/partners/partners.service';
 @Controller()
 export class ShopifyStoreController {
   constructor(
@@ -36,6 +37,7 @@ export class ShopifyStoreController {
     private configService: ConfigService,
     private imageService: UploadImageService,
     private httpService: HttpService,
+    private partnerGSSrv: PartnerService,
   ) {}
 
   // @Get()
@@ -162,5 +164,25 @@ export class ShopifyStoreController {
       this.httpService.get(apiUrl).pipe(map((res) => res.data)),
     );
     return res;
+  }
+  @Get('gsp')
+  async gropshopPartnerTestUrl(
+    @Query('sdate') sdate: string,
+    @Query('edate') edate: string,
+  ) {
+    const gs = await this.partnerGSSrv.findAllByDate(
+      new Date(sdate),
+      new Date(edate),
+    );
+    return (
+      `<h3>total Influencer Groupshops : ${gs.length} </h3> <pre>` +
+      gs.map(
+        (g, idx) =>
+          `${idx + 1}. <a href="${this.configService.get('FRONT')}${g.url}">${
+            g.url
+          } </a> <br/>`,
+      ) +
+      '</pre>'
+    );
   }
 }

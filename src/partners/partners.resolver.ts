@@ -15,7 +15,10 @@ import {
   ExecutionContext,
   Ip,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
+import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
+import { ViewedInterceptor } from 'src/gs-common/viewed.inceptor';
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
     GqlExecutionContext.create(ctx).getContext().req,
@@ -23,7 +26,10 @@ export const ReqDecorator = createParamDecorator(
 
 @Resolver(() => Partners)
 export class PartnersResolver {
-  constructor(private readonly PartnerService: PartnerService) {}
+  constructor(
+    private readonly PartnerService: PartnerService,
+    private readonly crypt: EncryptDecryptService,
+  ) {}
 
   @Mutation(() => Partners)
   createPartner(
@@ -64,5 +70,20 @@ export class PartnersResolver {
   @Query(() => Partners, { name: 'getPartnerDetail' })
   findPartnerDetail(@Args('id') id: string) {
     return this.PartnerService.getpartnerDetail(id);
+  }
+  @UseInterceptors(ViewedInterceptor)
+  @Query(() => Partners, { name: 'partnerGroupshop' })
+  async findOne(@Args('code') code: string) {
+    console.log('🚀 ~ file: Partners.resolver.ts ~ findOne', code);
+    return this.PartnerService.findOne(await this.crypt.decrypt(code));
+  }
+  @Mutation(() => Partners, { name: 'addDealProductPartner' })
+  addDealProductPartner(
+    @Args('updatePartnersInput') updatePartnersInput: UpdatePartnersInput,
+  ) {
+    return this.PartnerService.update(
+      updatePartnersInput.id,
+      updatePartnersInput,
+    );
   }
 }

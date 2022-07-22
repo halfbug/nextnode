@@ -116,4 +116,6 @@ export class Groupshops extends DefaultColumnsService {
 
   @Column(() => Milestone)
   milestones: Milestone[];
+  @Column({ nullable: true })
+  isInfluencer?: boolean;
 }

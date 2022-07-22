@@ -12,6 +12,7 @@ import { UtilsModule } from 'src/utils/utils.module';
 import { RefAddedEvent } from './events/refferal-added.event';
 import { GsCommonModule } from 'src/gs-common/gs-common.module';
 import { GSUpdatePriceRuleEvent } from './events/groupshop-update-price-rule.event';
+import { PartnersModule } from 'src/partners/partners.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { GSUpdatePriceRuleEvent } from './events/groupshop-update-price-rule.eve
     forwardRef(() => ShopifyStoreModule),
     UtilsModule,
     forwardRef(() => GsCommonModule),
+    forwardRef(() => PartnersModule),
   ],
   providers: [
     GroupshopsResolver,

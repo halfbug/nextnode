@@ -24,6 +24,9 @@ export class DealProductsInput {
 
   @Field({ nullable: true })
   gsid?: string;
+
+  @Field({ nullable: true })
+  isInfluencer?: boolean;
 }
 
 @InputType()

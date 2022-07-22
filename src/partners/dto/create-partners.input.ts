@@ -3,6 +3,7 @@ import {
   DealProductsInput,
   DiscountCodeInput,
 } from 'src/groupshops/dto/create-groupshops.input';
+import { Member } from 'src/groupshops/entities/groupshop.entity';
 
 @InputType()
 export class PartnerDetailsInput {

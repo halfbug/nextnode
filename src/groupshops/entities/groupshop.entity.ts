@@ -48,6 +48,8 @@ export class DealProducts {
 
   @Field({ nullable: true })
   customerIP: string;
+  @Field({ nullable: true })
+  isInfluencer?: boolean;
 }
 
 @ObjectType()

@@ -1,5 +1,8 @@
 import { Column, Entity } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
+import { Member } from 'src/groupshops/entities/groupshop.modal';
+import { Customer } from 'src/inventory/entities/orders.modal';
+import { CreateOrderInput as LineItem } from 'src/inventory/dto/create-order.input';
 
 export enum ProductTypeEnum {
   deal,
@@ -87,7 +90,7 @@ export class Partnergroupshop extends DefaultColumnsService {
   discountCode: DiscountCode;
 
   @Column(() => PartnerRewards)
-  partnerRewards: PartnerRewards;
+  partnerRewards?: PartnerRewards;
 
   @Column({ nullable: true })
   partnerCommission: string;
@@ -97,4 +100,31 @@ export class Partnergroupshop extends DefaultColumnsService {
 
   @Column({ nullable: true })
   isActive?: boolean;
+
+  @Column(() => Member)
+  members: Member[];
+  @Column({ default: 0 })
+  totalProducts: number;
+}
+@Entity()
+export class Partnermember extends DefaultColumnsService {
+  @Column()
+  groupshopId: string;
+
+  @Column({ nullable: true })
+  orderId?: string;
+
+  @Column({ nullable: true })
+  orderAmount?: number;
+
+  @Column({ nullable: true })
+  comissionAmount?: number;
+
+  @Column({ nullable: true })
+  isRedeem?: boolean;
+
+  @Column(() => Customer)
+  customerInfo?: Customer;
+  @Column(() => LineItem)
+  lineItems?: LineItem[];
 }

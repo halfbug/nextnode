@@ -28,6 +28,9 @@ import { GroupShopCreated } from '../events/groupshop-created.event';
 import { GroupshopsService } from '../groupshops.service';
 import Store from 'src/stores/entities/store.model';
 import { RefAddedEvent } from '../events/refferal-added.event';
+import { PartnerService } from 'src/partners/partners.service';
+import { Partnergroupshop } from 'src/partners/entities/partner.modal';
+import { PMemberArrivedEvent } from 'src/partners/events/pmember-arrived.event';
 
 @Injectable()
 export class OrderPlacedListener {
@@ -39,6 +42,8 @@ export class OrderPlacedListener {
     private kalavioService: KalavioService,
     private crypt: EncryptDecryptService,
     private addedRef: RefAddedEvent,
+    private partnerSrv: PartnerService,
+    private pmemberArrived: PMemberArrivedEvent,
   ) {}
 
   accessToken: string;
@@ -46,6 +51,7 @@ export class OrderPlacedListener {
   store: Store;
   order: Orders;
   groupshop: Groupshops;
+  partnerGroupshop: Partnergroupshop;
 
   static formatTitle(name: string) {
     return `GS${Math.floor(1000 + Math.random() * 9000)}${name?.substring(
@@ -234,10 +240,10 @@ export class OrderPlacedListener {
   @OnEvent('order.placed')
   async createGroupShop(event: OrderPlacedEvent) {
     try {
-      // console.log(
-      //   '🚀 ~ file: order-placed.listener.ts ~ line 18 ~ OrderPlacedListener ~ createGroupShop ~ event',
-      //   event,
-      // );
+      console.log(
+        '🚀 ~ file: order-placed.listener.ts ~ line 18 ~ OrderPlacedListener ~ createGroupShop ~ event',
+        event,
+      );
       const {
         order: {
           discountCode,
@@ -280,10 +286,16 @@ export class OrderPlacedListener {
       //check order price is greater than $1
       if (+totalProductPrice > 1) {
         let ugroupshop = null;
+        let pgroupshop = null;
         if (discountCode) {
           // const updateGroupshop = await this.gsService.findOne(discountCode);
           ugroupshop = new UpdateGroupshopInput();
           ugroupshop = await this.gsService.findOneWithLineItems(discountCode);
+          pgroupshop = await this.partnerSrv.findOne(discountCode);
+          console.log(
+            '🚀 ~ file: order-placed.listener.ts ~ line 293 ~ OrderPlacedListener ~ createGroupShop ~ pgroupshop',
+            pgroupshop,
+          );
         }
         if (ugroupshop) {
           console.log('🚀 ugroupshop groupshop', ugroupshop);
@@ -347,6 +359,13 @@ export class OrderPlacedListener {
           groupshopSavedEvent.groupdeal = newDiscount;
           groupshopSavedEvent.ugroupshop = ugroupshop;
           this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
+        } else if (pgroupshop) {
+          this.pmemberArrived.pgroupshop = pgroupshop;
+          this.pmemberArrived.order = event.order;
+          this.pmemberArrived.store = event.store;
+          this.pmemberArrived.lineItems = event.lineItems;
+          this.pmemberArrived.emit();
+          // create billing for partner
         } else {
           ownerDiscount = !!discountCode && true;
           const dealProducts = newLineItems

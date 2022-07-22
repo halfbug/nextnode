@@ -26,6 +26,7 @@ import { StoreSavedListener } from './listeners/store-saved.listener';
 import { OrderCreatedEvent } from './events/order-created.event';
 import { OrderCreatedListener } from './listeners/order-created.listener';
 import { GSUpdatePriceRuleListener } from './listeners/groupshop-updatePricerule.listener';
+import { PartnersModule } from 'src/partners/partners.module';
 @Global()
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { GSUpdatePriceRuleListener } from './listeners/groupshop-updatePricerule
     EmailModule,
     CampaignsModule,
     forwardRef(() => GroupshopsModule),
+    forwardRef(() => PartnersModule),
     UploadImageModule,
     BillingModule,
   ],

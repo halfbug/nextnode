@@ -9,12 +9,14 @@ import { UtilsModule } from 'src/utils/utils.module';
 import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 import { GSLoadedEvent } from './events/groupshop-loaded.event';
 import { GSLoadedListener } from './listeners/groupshop-loaded.listener';
+import { PartnersModule } from 'src/partners/partners.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Lifecycle, Visitors]),
     UtilsModule,
     forwardRef(() => GroupshopsModule),
+    forwardRef(() => PartnersModule),
   ],
   providers: [
     VistorsService,

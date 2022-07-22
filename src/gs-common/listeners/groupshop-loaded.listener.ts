@@ -3,6 +3,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { UpdateGroupshopInput } from 'src/groupshops/dto/update-groupshops.input';
 import { GSUpdatePriceRuleEvent } from 'src/groupshops/events/groupshop-update-price-rule.event';
 import { GroupshopsService } from 'src/groupshops/groupshops.service';
+import { PartnerService } from 'src/partners/partners.service';
 import { FIRST_EXPIRE_DAYS } from 'src/utils/constant';
 import { addDays, getDateDifference } from 'src/utils/functions';
 import { EventType } from '../entities/lifecycle.modal';
@@ -17,6 +18,7 @@ export class GSLoadedListener {
     private readonly lifecyclesrv: LifecycleService,
     private readonly groupshopsrv: GroupshopsService,
     private readonly gsUpdatePriceRuleEvt: GSUpdatePriceRuleEvent,
+    private readonly gpsrv: PartnerService,
   ) {}
 
   @OnEvent('groupshop.loaded')
@@ -24,12 +26,14 @@ export class GSLoadedListener {
     const { groupshopCode: code, userIp: ip } = event;
 
     // 0. find groupshop by code.
-    const gs = await this.groupshopsrv.find(code);
+    let gs = await this.groupshopsrv.find(code);
+    if (!gs) {
+      gs = await this.gpsrv.findOne(code);
+    }
     console.log(
       '🚀 ~ file: viewed.inceptor.ts ~ line 51 ~ ViewedInterceptor ~ intercept ~ vgs',
       gs,
     );
-
     // 1. find groupshop all views
     const gsviews = (await this.vistorsrv.findAll(gs.id)) || [];
     console.log(
