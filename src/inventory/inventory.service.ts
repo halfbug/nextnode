@@ -212,10 +212,14 @@ export class InventoryService {
                   cond: {
                     $and: [
                       {
-                        $ne: ['$publishedAt', null],
+                        $ne: ['$$j.publishedAt', null],
                       },
                       {
-                        $ne: ['$outofstock', true],
+                        $ne: ['$$j.outofstock', true],
+                      },
+
+                      {
+                        $eq: ['$$j.status', 'ACTIVE'],
                       },
                     ],
                   },
