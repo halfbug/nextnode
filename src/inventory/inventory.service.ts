@@ -200,44 +200,36 @@ export class InventoryService {
               from: 'inventory',
               localField: 'productslist',
               foreignField: 'id',
-              as: 'productsall',
+              as: 'products',
             },
           },
           {
-            $lookup: {
-              from: 'inventory',
-              let: {
-                pid: '$productslist',
-              },
-              pipeline: [
-                {
-                  $match: {
-                    $expr: {
-                      $and: [
-                        {
-                          $in: ['$id', '$$pid'],
-                        },
-                        {
-                          $ne: ['$publishedAt', null],
-                        },
-                        {
-                          $ne: ['$outofstock', true],
-                        },
-                      ],
-                    },
+            $addFields: {
+              products: {
+                $filter: {
+                  input: '$products',
+                  as: 'j',
+                  cond: {
+                    $and: [
+                      {
+                        $ne: ['$publishedAt', null],
+                      },
+                      {
+                        $ne: ['$outofstock', true],
+                      },
+                    ],
                   },
                 },
-              ],
-              as: 'presult',
+              },
             },
           },
           {
             $project: {
               id: 1,
               title: 1,
-              products: '$presult',
+              products: 1,
               productsCount: {
-                $size: '$presult',
+                $size: '$products',
               },
             },
           },
