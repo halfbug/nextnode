@@ -105,7 +105,7 @@ export class PartnerService {
       {
         $lookup: {
           from: 'inventory',
-          localField: 'members.lineItems.product.id',
+          localField: 'memberDetails.lineItems.product.id',
           foreignField: 'id',
           as: 'popularProducts',
         },
