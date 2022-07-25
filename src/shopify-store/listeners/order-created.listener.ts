@@ -112,6 +112,7 @@ export class OrderCreatedListener {
       );
 
       const newOrderPlaced = new OrderPlacedEvent();
+      newOrderPlaced.klaviyo = newOrder.customer;
       newOrderPlaced.order = newOrderSaved;
       newOrderPlaced.store = await this.storesService.findOneWithActiveCampaing(
         shop,

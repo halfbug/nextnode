@@ -120,9 +120,8 @@ export class GroupshopSavedListener {
       orderData[0].currencyCode || 'USD',
     );
 
-    const sms_marketing_consent =
-      res.data.order?.customer?.sms_marketing || null;
-    const phone_number = res.data.order?.customer?.phone || null;
+    const sms_marketing_consent = res.data.klaviyo?.sms_marketing || null;
+    const phone_number = res.data.klaviyo?.phone || null;
 
     let custName = orderData[0].customer.firstName;
     if (custName === '') {
@@ -258,8 +257,8 @@ export class GroupshopSavedListener {
         customer_properties: {
           $email: customerEmail,
           $phone_number: phone_number,
-          $first_name: orderData[0].customer.firstName,
-          $last_name: orderData[0].customer.lasttName,
+          $first_name: res.data.klaviyo?.firstName,
+          $last_name: res.data.klaviyo?.lastName,
           sms_marketing_consent: sms_marketing_consent,
         },
         properties: mdata,
@@ -303,8 +302,8 @@ export class GroupshopSavedListener {
         customer_properties: {
           $email: customerEmail,
           $phone_number: phone_number,
-          $first_name: orderData[0].customer.firstName,
-          $last_name: orderData[0].customer.lasttName,
+          $first_name: res.data.klaviyo?.firstName,
+          $last_name: res.data.klaviyo?.lastName,
           sms_marketing_consent: sms_marketing_consent,
         },
         properties: rdata,
