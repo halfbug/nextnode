@@ -10,6 +10,7 @@ import { StoresService } from 'src/stores/stores.service';
 import { PMemberArrivedEvent } from '../events/pmember-arrived.event';
 import { PMemberService } from '../pmember.service';
 import { PartnerMember } from '../entities/partner.entity';
+import { CreateOrderInput as LineItem } from 'src/inventory/dto/create-order.input';
 
 @Injectable()
 export class PMemberArrivedListener {
@@ -51,7 +52,13 @@ export class PMemberArrivedListener {
     memobj.comissionAmount = (orderAmount * parseInt(partnerCommission)) / 100;
     memobj.isRedeem = false;
     memobj.customerInfo = order.customer;
-    memobj.lineItems = lineItems;
+    let newLI = [new LineItem()];
+    newLI = lineItems.map((item) => {
+      item.customer = order.customer;
+      return item;
+    });
+    memobj.lineItems = [...newLI];
+    // memobj.lineItems.c = lineItems;
     const res = await this.pMemberSrv.create(memobj);
     console.log(
       '🚀 ~ file: pmember-arrived.listener.ts ~ line 56 ~ PMemberArrivedListener ~ membersaved ~ res',
