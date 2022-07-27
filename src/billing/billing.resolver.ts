@@ -133,11 +133,15 @@ export class BillingsResolver {
     this.shopifyapi.shop = shop;
     this.shopifyapi.accessToken = accessToken;
     const subscription = await this.shopifyapi.AppSubscriptionCreate();
+    const endOfTrialDate = new Date(
+      Date.now() + 30 * 24 * 60 * 60 * 1000,
+    ).setHours(23, 59, 59, 999);
+
     this.storeService.updateField(
       { shop },
       {
         subscription: { status: 'Pending', ...subscription },
-        appTrialEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        appTrialEnd: endOfTrialDate,
       },
     );
     return { redirectUrl: subscription['confirmationUrl'] };

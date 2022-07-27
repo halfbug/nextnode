@@ -50,7 +50,20 @@ export class BillingsService {
     const agg = [
       {
         $match: {
-          storeId: storeId,
+          storeId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'store',
+          localField: 'storeId',
+          foreignField: 'id',
+          as: 'store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$store',
         },
       },
       {
@@ -82,6 +95,7 @@ export class BillingsService {
               else: 0,
             },
           },
+          trialDate: '$store.appTrialEnd',
         },
       },
       {
@@ -104,7 +118,15 @@ export class BillingsService {
             $sum: '$feeTotalCB',
           },
           feeChargesGS: {
-            $sum: '$feeTotalGS',
+            $sum: {
+              $cond: {
+                if: {
+                  $gt: ['$createdAt', '$trialDate'],
+                },
+                then: '$feeTotalGS',
+                else: 0,
+              },
+            },
           },
           count: {
             $count: {},
