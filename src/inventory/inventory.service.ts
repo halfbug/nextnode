@@ -237,6 +237,13 @@ export class InventoryService {
               },
             },
           },
+          {
+            $match: {
+              productsCount: {
+                $gte: 1,
+              },
+            },
+          },
         ]
       : [
           { $match: { $and: [{ shop }, { recordType: 'Collection' }] } },
@@ -247,6 +254,13 @@ export class InventoryService {
               title: { $first: '$title' },
               productsCount: { $first: '$productsCount' },
               // storefrontId: { $first: '$storefrontId' },
+            },
+          },
+          {
+            $match: {
+              productsCount: {
+                $gte: 1,
+              },
             },
           },
         ];
