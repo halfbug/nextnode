@@ -85,6 +85,12 @@ export class Partnergroupshop {
   @Field(() => [Product], { nullable: 'itemsAndList' })
   popularProducts?: Product[];
 
+  @Field(() => [Product], { nullable: 'itemsAndList' })
+  refferalProducts?: Product[];
+
+  @Field(() => [Product], { nullable: 'itemsAndList' })
+  influencerProducts?: Product[];
+
   @Field(() => Campaign, { nullable: true })
   campaign?: Campaign;
 

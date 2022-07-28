@@ -120,6 +120,56 @@ export class PartnerService {
       },
       {
         $addFields: {
+          refferalProducts: {
+            $filter: {
+              input: '$dealProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $eq: ['$$j.isInfluencer', false],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'refferalProducts.productId',
+          foreignField: 'id',
+          as: 'refferalProducts',
+        },
+      },
+      {
+        $addFields: {
+          influencerProducts: {
+            $filter: {
+              input: '$dealProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $eq: ['$$j.isInfluencer', true],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'influencerProducts.productId',
+          foreignField: 'id',
+          as: 'influencerProducts',
+        },
+      },
+      {
+        $addFields: {
           allProducts: {
             $concatArrays: ['$dealsProducts', '$campaignProducts'],
           },
@@ -130,7 +180,7 @@ export class PartnerService {
           popularProducts: {
             $concatArrays: [
               {
-                $ifNull: ['$dealsProducts', []],
+                $ifNull: ['$refferalProducts', []],
               },
               {
                 $ifNull: ['$popularProducts', []],
@@ -226,6 +276,8 @@ export class PartnerService {
           partnerRewards: 1,
           partnerDetails: 1,
           memberDetails: 1,
+          refferalProducts: 1,
+          influencerProducts: 1,
           partnerCommission: 1,
           visitors: {
             $size: '$visitors',
