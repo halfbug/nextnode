@@ -2,12 +2,12 @@
 console.log('v2 Script Local');
 console.log('v2 Script Triggered');
 // Define App Url
-window.BURLL = 'https://173e-39-57-235-166.ngrok.io';
-window.FURLL = 'http://localhost:3000';
-// window.BURLL = 'https://api-stage.groupshop.co';
-// window.FURL = 'http://front-stage.groupshop.co';
+// window.BURL = 'https://173e-39-57-235-166.ngrok.io';
+// window.FURLL = 'http://localhost:3000';
+window.BURL = 'https://api-stage.groupshop.co';
+window.FURL = 'http://front-stage.groupshop.co';
 
-// window.BURLL = 'https://api.groupshop.co';
+// window.BURL = 'https://api.groupshop.co';
 // window.FURL = 'http://app.groupshop.co';
 window.GSURL = window.FURL;
 /* @preserve
@@ -425,7 +425,7 @@ const isGroupshop =
 console.log('🚀  groupshop-thanks isGroupshop', isGroupshop);
 
 async function fetchStore(shop) {
-  let response = await fetch(`${window.BURLL}/ext/store?shop=${shop}`);
+  let response = await fetch(`${window.BURL}/ext/store?shop=${shop}`);
 
   console.log(response.status); // 200
   console.log(response.statusText); // OK
@@ -436,8 +436,8 @@ async function fetchStore(shop) {
   }
 }
 
-async function gsPost1(path, msg) {
-  const rawResponse = await fetch(`${window.BURLL}/ext/${path}`, {
+async function gsPost(path, msg) {
+  const rawResponse = await fetch(`${window.BURL}/ext/${path}`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -455,7 +455,7 @@ function injectStyleSheet(url) {
   var style = document.createElement('link');
   style.rel = 'stylesheet';
   style.crossorigin = 'anonymous';
-  style.href = window.BURLL + '/public/' + url;
+  style.href = window.BURL + '/public/' + url;
 
   document.head.appendChild(style);
 }
@@ -490,7 +490,7 @@ function addLeftBlock() {
 <div class="get-start-thank-wrap">
   <div class="image-placeholder" style="height: 40px !important;">&nbsp</div>
 </div>
-<div class="powerby mont">Powered by <a class="ty-share-this-deal" href="javascript:void(0)"><img src="${window.BURLL}/public/images/GROUPSHOP-logo.svg"></a></div>`;
+<div class="powerby mont">Powered by <a class="ty-share-this-deal" href="javascript:void(0)"><img src="${window.BURL}/public/images/GROUPSHOP-logo.svg"></a></div>`;
 
   var target = document.querySelector('.content-box:first-child');
   target.prepend(leftBlock);
@@ -503,7 +503,7 @@ function addRightBlock(brandName, isLoaded, cashback) {
     ).innerHTML = `<div  class="gs_brandbar">
   <div class="gs_branding"></div>
   </div>
-  <p class="gs_content">Earn up to <strong class="bold"><span id="gscashback">$ ${cashback}</span> cashback </strong> and access <strong class="bold">exclusive discounts</strong> every time you shop with friends! <img src="${window.BURLL}/public/images/3-frnd-icon.svg"></p><p style="font-size: 14px;line-height: 18px;text-align: center;letter-spacing: 0.5px;color: #000000;padding: 0 12px;margin-bottom: 25px;font-family: Mulish;font-weight: 400;">Thanks to your ${brandName} purchase, you unlocked 🔑 access to a personalized shop for you and your friends.</p><div style="margin: auto;width:100%; text-align: center;"><a id="gs_link" style="color:#fff;background: #000;padding: 15px 30px;border-radius: 5px;display: inline-block;font-size: 14px;font-weight: 600;margin-bottom: 10px;font-family: DM Sans, sans-serif;letter-spacing: 1px;" target="_blank">CHECK OUT YOUR GROUPSHOP</a></div>`;
+  <p class="gs_content">Earn up to <strong class="bold"><span id="gscashback">$ ${cashback}</span> cashback </strong> and access <strong class="bold">exclusive discounts</strong> every time you shop with friends! <img src="${window.BURL}/public/images/3-frnd-icon.svg"></p><p style="font-size: 14px;line-height: 18px;text-align: center;letter-spacing: 0.5px;color: #000000;padding: 0 12px;margin-bottom: 25px;font-family: Mulish;font-weight: 400;">Thanks to your ${brandName} purchase, you unlocked 🔑 access to a personalized shop for you and your friends.</p><div style="margin: auto;width:100%; text-align: center;"><a id="gs_link" style="color:#fff;background: #000;padding: 15px 30px;border-radius: 5px;display: inline-block;font-size: 14px;font-weight: 600;margin-bottom: 10px;font-family: DM Sans, sans-serif;letter-spacing: 1px;" target="_blank">CHECK OUT YOUR GROUPSHOP</a></div>`;
   } else {
     const rightBlock = document.createElement('div');
     rightBlock.innerHTML = `<div class="groupshop_right-block">
@@ -667,7 +667,7 @@ async function init() {
     } else {
       const pollit2 = setInterval(async () => {
         indx2++;
-        res = await gsPost1('partner', {
+        res = await gsPost('partner', {
           discountCode,
         });
         console.log(
@@ -709,7 +709,7 @@ async function init() {
           ).innerHTML = `<div class="get-start-wrap"><a target="_blank" href="${window.GSURL}">Get Started</a></div>`;
           document.getElementById('gs_link').setAttribute('href', window.GSURL);
 
-          const products = await gsPost1('products', {
+          const products = await gsPost('products', {
             campaignId: store.campaignId,
           });
 
