@@ -11,6 +11,7 @@ import { CampaignsService } from 'src/campaigns/campaigns.service';
 import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { ConfigService } from '@nestjs/config';
 import { StoresService } from 'src/stores/stores.service';
+import { PartnerService } from 'src/partners/partners.service';
 
 @Controller('ext')
 export class ThemeAppExtensionController {
@@ -19,6 +20,7 @@ export class ThemeAppExtensionController {
     private campaignSrv: CampaignsService,
     private groupshopSrv: GroupshopsService,
     private storesService: StoresService,
+    private partnerSrv: PartnerService,
   ) {}
   @Get('store')
   async getStoreWithActiveCampaign(@Req() req, @Res() res) {
@@ -129,6 +131,30 @@ export class ThemeAppExtensionController {
       res.send(JSON.stringify(products));
     } catch (err) {
       res.send(JSON.stringify({ products: null }));
+    } finally {
+      // res.status(HttpStatus.OK).send();
+    }
+  }
+
+  @Post('partner')
+  async getPartnerDetails(@Req() req, @Res() res) {
+    try {
+      const { discountCode } = req.body;
+      console.log({ discountCode });
+
+      const {
+        url,
+        partnerRewards: { baseline },
+      } = await this.partnerSrv.findOne(discountCode);
+
+      res.send(
+        JSON.stringify({
+          url,
+          baseline,
+        }),
+      );
+    } catch (err) {
+      res.send(JSON.stringify({ activeMember: null, url: null }));
     } finally {
       // res.status(HttpStatus.OK).send();
     }
