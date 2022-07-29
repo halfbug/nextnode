@@ -68,5 +68,27 @@ export class GSPSavedListener {
     );
 
     await this.partnerService.update(id, ugsp);
+
+    // Send Email by Klaviyo
+    const PUBLIC_KEY = this.configSevice.get('KLAVIYO_PUBLIC_KEY');
+    const qrImage = await this.kalavioService.generateQrCode(shortLink);
+    const mdata = {
+      customerEmail: event.email,
+      customerName: `${event.groupshop.partnerDetails.fname} ${event.groupshop.partnerDetails.lname}`,
+      dealUrl: fulllink,
+      shortUrl: shortLink,
+      commission: event.groupshop.partnerCommission,
+      brandName: event.brandName,
+      qrImage: qrImage,
+    };
+    const body = JSON.stringify({
+      token: PUBLIC_KEY,
+      event: 'Groupshop Partner Tools',
+      customer_properties: {
+        $email: event.email,
+      },
+      properties: mdata,
+    });
+    this.kalavioService.sendKlaviyoEmail(body);
   }
 }

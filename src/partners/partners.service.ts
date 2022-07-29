@@ -543,7 +543,7 @@ export class PartnerService {
     // );
     const partner = this.partnerRepository.create(createPartnersInput);
 
-    const { shop, accessToken } = await this.storesService.findById(
+    const { shop, accessToken, brandName } = await this.storesService.findById(
       createPartnersInput.storeId,
     );
     // console.log(shop);
@@ -596,6 +596,7 @@ export class PartnerService {
     this.gspEvent.groupshop = newGSP;
     this.gspEvent.shop = shop;
     this.gspEvent.accessToken = accessToken;
+    this.gspEvent.brandName = brandName;
     this.gspEvent.email = createPartnersInput.partnerDetails['email'];
     this.gspEvent.emit();
     return newGSP;
