@@ -79,6 +79,41 @@ export class Member {
   lineItems?: LineItem[];
 }
 
+export class OBSettings {
+  @Column({ nullable: true })
+  allowEmails: boolean;
+
+  @Column({ nullable: true })
+  allowTexts: boolean;
+
+  @Column({ nullable: true })
+  mobileNumber: string;
+
+  @Column({ nullable: true })
+  email: string;
+
+  @Column({ nullable: true })
+  shopHeader: string;
+
+  @Column({ nullable: true })
+  instagramLink: string;
+
+  @Column({ nullable: true })
+  pinteresrLink: string;
+
+  @Column({ nullable: true })
+  tiktokLink: string;
+
+  @Column({ nullable: true })
+  twitterLink: string;
+
+  @Column({ nullable: true })
+  themeBanner: string;
+
+  @Column({ nullable: true })
+  step: number;
+}
+
 @Entity()
 export class Groupshops extends DefaultColumnsService {
   @Column()
@@ -116,6 +151,10 @@ export class Groupshops extends DefaultColumnsService {
 
   @Column(() => Milestone)
   milestones: Milestone[];
+
+  @Column({ nullable: true })
+  obSettings: OBSettings;
+
   @Column({ nullable: true })
   isInfluencer?: boolean;
 }

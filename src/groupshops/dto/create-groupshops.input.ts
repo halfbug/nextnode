@@ -1,4 +1,4 @@
-import { InputType, Int, Field, ID, Float } from '@nestjs/graphql';
+import { InputType, Int, Field, Float } from '@nestjs/graphql';
 import { CreateOrderInput as LineItem } from 'src/inventory/dto/create-order.input';
 import { Product } from 'src/inventory/entities/product.entity';
 import {
@@ -93,6 +93,42 @@ export class RefundInput {
 }
 
 @InputType()
+export class OBSettingsInput {
+  @Field({ nullable: true })
+  allowEmails: boolean;
+
+  @Field({ nullable: true })
+  allowTexts: boolean;
+
+  @Field({ nullable: true })
+  mobileNumber: string;
+
+  @Field({ nullable: true })
+  email: string;
+
+  @Field({ nullable: true })
+  shopHeader: string;
+
+  @Field({ nullable: true })
+  instagramLink: string;
+
+  @Field({ nullable: true })
+  pinteresrLink: string;
+
+  @Field({ nullable: true })
+  tiktokLink: string;
+
+  @Field({ nullable: true })
+  twitterLink: string;
+
+  @Field({ nullable: true })
+  themeBanner: string;
+
+  @Field({ nullable: true })
+  step: number;
+}
+
+@InputType()
 export class CreateGroupshopInput {
   @Field()
   campaignId: string;
@@ -126,4 +162,7 @@ export class CreateGroupshopInput {
 
   @Field(() => [MilestoneInput])
   milestones: MilestoneInput[];
+
+  @Field(() => OBSettingsInput, { nullable: true })
+  obSettings: OBSettingsInput;
 }

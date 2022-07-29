@@ -589,6 +589,7 @@ export class GroupshopsService {
           popularProducts: 1,
           campaign: 1,
           allProducts: 1,
+          obSettings: 1,
         },
       },
     ];

@@ -125,6 +125,41 @@ export class GsOrders {
   @Field(() => [Member])
   members: Member[];
 }
+@ObjectType()
+export class OBSettings {
+  @Field({ nullable: true })
+  allowEmails: boolean;
+
+  @Field({ nullable: true })
+  allowTexts: boolean;
+
+  @Field({ nullable: true })
+  mobileNumber: string;
+
+  @Field({ nullable: true })
+  email: string;
+
+  @Field({ nullable: true })
+  shopHeader: string;
+
+  @Field({ nullable: true })
+  instagramLink: string;
+
+  @Field({ nullable: true })
+  pinteresrLink: string;
+
+  @Field({ nullable: true })
+  tiktokLink: string;
+
+  @Field({ nullable: true })
+  twitterLink: string;
+
+  @Field({ nullable: true })
+  themeBanner: string;
+
+  @Field({ nullable: true })
+  step: number;
+}
 
 @ObjectType()
 export class GroupShop {
@@ -178,6 +213,9 @@ export class GroupShop {
 
   @Field(() => [Product], { nullable: 'itemsAndList' })
   bestSeller?: Product[];
+
+  @Field(() => OBSettings, { nullable: true })
+  obSettings: OBSettings;
 }
 @ObjectType()
 export class TotalGS {
