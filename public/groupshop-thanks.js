@@ -412,7 +412,9 @@ window.GSURL = window.FURL;
 
 var shop = Shopify.shop;
 var orderId = Shopify.checkout.order_id;
-var discountCode = Shopify.checkout.discount.code;
+var discountCode = Shopify.checkout.discount
+  ? Shopify.checkout.discount.code
+  : null;
 var lineItems = Shopify.checkout.line_items;
 
 console.log('🚀 ~ checkout', Shopify.checkout);
@@ -678,7 +680,7 @@ async function init() {
         // discountCode
         if (res.baseline) {
           clearInterval(pollit2);
-          const { baseline, url } = res;
+          const { baseline, url, fname } = res;
 
           let discountAmt = (totalOrderAmount * parseInt(baseline)) / 100;
 
@@ -690,12 +692,13 @@ async function init() {
             amountCal,
           );
           var leftHeadTxt = '';
+          // Invite you friends to shop X’s Groupshop and give them 20% off
           leftHeadTxt = `
-         Get up to
+          Invite you friends to shop
          <strong>
-           <span>$${amountCal}</span> discount
+           <span>${fname}</span>'s Groupshop
          </strong>
-         when you invite your friends to shop
+         and give them ${baseline} off
        `;
           document.querySelector('.groupshop_left-block h3').innerHTML =
             leftHeadTxt;
