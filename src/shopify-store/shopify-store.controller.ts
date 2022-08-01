@@ -180,7 +180,7 @@ export class ShopifyStoreController {
         (g, idx) =>
           `${idx + 1}. <a href="${this.configService.get('FRONT')}${g.url}">${
             g.url
-          } </a> <br/>`,
+          }</a>&nbsp;&nbsp; ${g.partnerDetails.email} <br/><br/>`,
       ) +
       '</pre>'
     );
