@@ -9,6 +9,7 @@ export class GSPCreatedEvent {
   public email: string;
   public shop: string;
   public brandName: string;
+  public brandLogo: string;
   public accessToken: string;
   constructor(private eventEmitter: EventEmitter2) {}
   emit() {

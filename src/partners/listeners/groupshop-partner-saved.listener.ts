@@ -72,6 +72,9 @@ export class GSPSavedListener {
     // Send Email by Klaviyo
     const PUBLIC_KEY = this.configSevice.get('KLAVIYO_PUBLIC_KEY');
     const qrImage = await this.kalavioService.generateQrCode(shortLink);
+    const imgPath = event.brandLogo.split('/');
+    const brandLogo = `${this.configSevice.get('LOGO_PATH')}/${imgPath[4]}`;
+
     const mdata = {
       customerEmail: event.email,
       customerName: `${event.groupshop.partnerDetails.fname} ${event.groupshop.partnerDetails.lname}`,
@@ -79,6 +82,8 @@ export class GSPSavedListener {
       shortUrl: shortLink,
       commission: event.groupshop.partnerCommission,
       brandName: event.brandName,
+      brandLogo: brandLogo,
+      baselineDiscount: baselineDiscount,
       qrImage: qrImage,
     };
     const body = JSON.stringify({
