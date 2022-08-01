@@ -665,7 +665,7 @@ export class PartnerService {
       where: { storeId: storeId, 'partnerDetails.email': email },
     });
     const res = {
-      isActive: response[0]?.isActive ? true : false,
+      isActive: response[0]?.shortUrl ? true : false,
     };
     return res;
   }
