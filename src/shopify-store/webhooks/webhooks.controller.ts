@@ -772,26 +772,7 @@ export class WebhooksController {
 
   @Post('customer-update?')
   async customerUpdate(@Req() req, @Res() res) {
-    try {
-      const { shop } = req.query;
-      const cust = req.body;
-      console.log(
-        'WebhooksController ~ customerUpdate ~ customer',
-        JSON.stringify(cust),
-      );
-      const email = cust.email;
-      const sms_marketing = cust?.sms_marketing_consent?.state || null;
-      const uorder = new UpdateOrderInput();
-      uorder.shop = shop;
-      uorder.email = email;
-      uorder.sms_marketing = sms_marketing;
-      await this.orderService.smsUpdate(uorder);
-      await this.kalavioService.klaviyoProfileUpdate(uorder);
-    } catch (err) {
-      console.log(JSON.stringify(err));
-    } finally {
-      res.status(HttpStatus.OK).send();
-    }
+    res.status(HttpStatus.OK).send();
   }
 
   @Post('collection-create?')

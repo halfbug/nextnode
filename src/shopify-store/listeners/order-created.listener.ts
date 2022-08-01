@@ -55,6 +55,8 @@ export class OrderCreatedListener {
       // newOrder.discountInfo = whOrder.discount_codes?.map(
       //   (dc: DiscountInfo) => new DiscountInfo(dc),
       // );
+      const phoneNumber =
+        whOrder.shipping_address?.phone ?? whOrder.customer?.phone;
       newOrder.discountInfo = whOrder.discount_codes;
       newOrder.customer = new Customer();
       newOrder.customer.firstName = whOrder.customer?.first_name;
@@ -62,7 +64,9 @@ export class OrderCreatedListener {
       newOrder.customer.email = whOrder.customer?.email;
       newOrder.customer.ip = whOrder?.browser_ip;
       newOrder.customer.phone =
-        whOrder.customer?.phone ?? whOrder.shipping_address?.phone;
+        whOrder.shipping_address?.country === 'United States'
+          ? phoneNumber
+          : null;
       newOrder.customer.sms_marketing =
         whOrder?.customer?.sms_marketing_consent?.state || null;
       const newOrderSaved = await this.orderService.create(newOrder);

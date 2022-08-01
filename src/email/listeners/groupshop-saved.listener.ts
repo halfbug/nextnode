@@ -259,7 +259,7 @@ export class GroupshopSavedListener {
           $phone_number: phone_number,
           $first_name: res.data.klaviyo?.firstName,
           $last_name: res.data.klaviyo?.lastName,
-          sms_marketing_consent: sms_marketing_consent,
+          // sms_marketing_consent: sms_marketing_consent,
         },
         properties: mdata,
       });
@@ -304,7 +304,7 @@ export class GroupshopSavedListener {
           $phone_number: phone_number,
           $first_name: res.data.klaviyo?.firstName,
           $last_name: res.data.klaviyo?.lastName,
-          sms_marketing_consent: sms_marketing_consent,
+          // sms_marketing_consent: sms_marketing_consent,
         },
         properties: rdata,
       });
