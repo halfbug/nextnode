@@ -164,5 +164,5 @@ export class CreateGroupshopInput {
   milestones: MilestoneInput[];
 
   @Field(() => OBSettingsInput, { nullable: true })
-  obSettings: OBSettingsInput;
+  obSettings?: OBSettingsInput;
 }

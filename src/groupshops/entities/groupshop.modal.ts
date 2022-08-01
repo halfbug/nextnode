@@ -153,7 +153,7 @@ export class Groupshops extends DefaultColumnsService {
   milestones: Milestone[];
 
   @Column({ nullable: true })
-  obSettings: OBSettings;
+  obSettings?: OBSettings;
 
   @Column({ nullable: true })
   isInfluencer?: boolean;

@@ -215,7 +215,7 @@ export class GroupShop {
   bestSeller?: Product[];
 
   @Field(() => OBSettings, { nullable: true })
-  obSettings: OBSettings;
+  obSettings?: OBSettings;
 }
 @ObjectType()
 export class TotalGS {
