@@ -32,6 +32,20 @@ export class DiscountInfo {
   type: string;
 }
 
+export class RefundInfo {
+  @Column({ nullable: true })
+  type: string;
+  @Column({ nullable: true })
+  date: Date;
+  @Column({ nullable: true })
+  amount?: string;
+  @Column({ nullable: true })
+  lineItemId?: string;
+  @Column({ nullable: true })
+  quantity?: string;
+  @Column({ nullable: true })
+  note?: string;
+}
 @Entity()
 export default class Orders extends DefaultColumnsService {
   @Column({ nullable: true })
@@ -74,4 +88,8 @@ export default class Orders extends DefaultColumnsService {
   discountInfo?: DiscountInfo[];
   @Column({ nullable: true })
   gateway?: string;
+  @Column({ nullable: true })
+  financialStatus?: string;
+  @Column(() => RefundInfo)
+  refundDetail: RefundInfo[];
 }

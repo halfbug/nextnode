@@ -42,6 +42,22 @@ export class DiscountInfo {
     this.vaule = dc?.vaule;
   }
 }
+@InputType('RefundInfoInput')
+@ObjectType('RefundInfo')
+export class RefundInfo {
+  @Field({ nullable: true })
+  type: string;
+  @Field({ nullable: true })
+  date: Date;
+  @Field({ nullable: true })
+  amount?: string;
+  @Field({ nullable: true })
+  lineItemId?: string;
+  @Field({ nullable: true })
+  quantity?: string;
+  @Field({ nullable: true })
+  note?: string;
+}
 @ObjectType('Order')
 @InputType()
 export class CreateOrderInput {
@@ -82,4 +98,8 @@ export class CreateOrderInput {
   customer?: Customer;
   @Field(() => DiscountInfo)
   discountInfo?: DiscountInfo[];
+  @Field({ nullable: true })
+  financialStatus?: string;
+  @Field(() => [RefundInfo])
+  refundDetail: RefundInfo[];
 }

@@ -202,7 +202,7 @@ export class CampaignsService {
     for (const key in allComapigns) {  
       const priceRuleId = allComapigns[key].discountCode.priceRuleId; 
       // get all deal products
-      const gsDealProduucts = allComapigns[key].dealProducts.map(prd => prd.productId)
+      const gsDealProduucts = allComapigns[key].dealProducts?.map(prd => prd.productId) ?? []
 
       await this.shopifyapi.setDiscountCode(
         shop,

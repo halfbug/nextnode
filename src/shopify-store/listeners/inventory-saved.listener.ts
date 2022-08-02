@@ -34,7 +34,8 @@ export class InvenotrySavedListener {
                               confirmed
                               cancelledAt
                               currencyCode
-                              
+                              paymentGatewayNames
+                              displayFinancialStatus
                               customer{
                                 
                                 firstName
@@ -299,6 +300,17 @@ export class InvenotrySavedListener {
             shop,
             rr,
           );
+        });
+
+      this.shopifyapi
+        .registerHook(
+          shop,
+          accessToken,
+          '/webhooks/order-updated',
+          'ORDERS_UPDATED',
+        )
+        .then(() => {
+          console.log('webhook ORDERS_UPDATED-> registered for shop', shop);
         });
 
       console.log('webhook registered');

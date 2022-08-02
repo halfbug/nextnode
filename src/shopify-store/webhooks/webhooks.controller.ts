@@ -41,6 +41,7 @@ import InventoryModal from 'src/inventory/entities/inventory.modal';
 import { InventorySavedEvent } from 'src/inventory/events/inventory-saved.event';
 import { OrdersSavedEvent } from 'src/inventory/events/orders-saved.event';
 import { RequestReturn } from '@shopify/shopify-api';
+import { UpdateFullOrderInput } from 'src/inventory/dto/update-fullorder.input';
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -1266,5 +1267,49 @@ export class WebhooksController {
     inventorySavedEvent.accessToken = accessToken;
     inventorySavedEvent.type = 'outofstock';
     this.eventEmitter.emit('inventory.outofstock', inventorySavedEvent);
+  }
+
+  @Post('order-updated?')
+  async orderUpdated(@Req() req, @Res() res) {
+    try {
+      const { shop } = req.query;
+      const rorder = req.body;
+      console.log(
+        'WebhooksController ~ orderUpdate ~ webhookData',
+        JSON.stringify(req.body),
+      );
+
+      const order = new UpdateFullOrderInput();
+      order.id = rorder.admin_graphql_api_id;
+      order.financialStatus = rorder.financial_status;
+      if (rorder.financial_status.includes('refund')) {
+        order.refundDetail = rorder.refunds?.map((refund) => {
+          if (refund.order_adjustments.length > 0)
+            return refund.order_adjustments?.map((oj: any) => ({
+              date: refund.created_at,
+              note: refund.note,
+              type: 'amount adjustment',
+              amount: oj.amount,
+            }));
+          else
+            return refund.refund_line_items?.map((rl: any) => ({
+              date: refund.created_at,
+              note: refund.note,
+              type: 'lineitem returned',
+              lineItemId: rl.line_item.admin_graphql_api_id,
+              amount: rl.subtotal,
+              quantity: rl.quantity,
+            }));
+        });
+      }
+      order.refundDetail = order.refundDetail?.map((rd) => rd[0]);
+      this.orderService.update(order);
+
+      // res.send('order created..');
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
   }
 }

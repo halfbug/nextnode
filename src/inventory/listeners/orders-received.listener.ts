@@ -30,8 +30,13 @@ export class OrdersReceivedListener {
       order.totalDiscounts =
         order.totalDiscountSet?.shopMoney.amount ||
         order.currentTotalDiscountsSet?.shopMoney.amount;
+
       // add record type
-      // order.recordType = order.id.split('/')[3];
+      order.recordType = order.id.split('/')[3];
+      if (order.recordType === 'Order') {
+        order.gateway = order.paymentGatewayNames?.[0];
+        order.financialStatus = order.displayFinancialStatus;
+      }
 
       return order;
     });

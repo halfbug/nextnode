@@ -152,7 +152,7 @@ export class OrderPlacedListener {
         variables: {
           input: {
             orderId: orderId,
-            note: `GROUPSHOP V2 ${discount}% cash back for referral`,
+            note: `GROUPSHOP - ${discount}% cash back for referral`,
             notify: true,
             transactions: {
               amount,

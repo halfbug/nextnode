@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getMongoManager, Repository } from 'typeorm';
 import { CreateOrderInput, DiscountInfo } from './dto/create-order.input';
+import { UpdateFullOrderInput } from './dto/update-fullorder.input';
 import { UpdateOrderInput } from './dto/update-order.input';
 import Orders from './entities/orders.modal';
 
@@ -288,5 +289,10 @@ export class OrdersService {
 
   async removeShop(shop: string) {
     return await this.ordersRepository.delete({ shop });
+  }
+
+  async update(updateOrderInput: UpdateFullOrderInput) {
+    const { id } = updateOrderInput;
+    return await this.ordersRepository.update({ id }, updateOrderInput);
   }
 }
