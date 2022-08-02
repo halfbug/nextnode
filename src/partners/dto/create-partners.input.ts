@@ -29,8 +29,9 @@ export class PartnerRewardsInput {
 
 @InputType()
 export class CreatePartnersInput {
-  constructor(createdAt?: Date) {
+  constructor(createdAt?: Date, updatedAt?: Date) {
     this.createdAt = createdAt || new Date();
+    this.updatedAt = updatedAt || new Date();
   }
   @Field({ nullable: true })
   campaignId: string;
@@ -49,6 +50,9 @@ export class CreatePartnersInput {
 
   @Field()
   createdAt: Date;
+
+  @Field()
+  updatedAt?: Date;
 
   @Field(() => DiscountCodeInput)
   discountCode: DiscountCodeInput;

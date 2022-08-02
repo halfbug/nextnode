@@ -591,6 +591,7 @@ export class PartnerService {
     partner.partnerCommission = createPartnersInput.partnerCommission;
     partner.isActive = true;
     partner.createdAt = createPartnersInput.createdAt;
+    partner.updatedAt = createPartnersInput.updatedAt;
     const newGSP = await this.partnerRepository.save(partner);
     this.gspEvent.groupshop = newGSP;
     this.gspEvent.shop = shop;
@@ -606,12 +607,13 @@ export class PartnerService {
     return this.partnerRepository.find({
       where: { storeId },
       order: {
-        createdAt: -1,
+        updatedAt: -1,
       },
     });
   }
 
   async update(id: string, updatePartnersInput: UpdatePartnersInput) {
+    updatePartnersInput.updatedAt = new Date();
     console.log(
       '🚀 ~ file:PartnerService updatePartnersInput',
       updatePartnersInput,
