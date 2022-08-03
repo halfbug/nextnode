@@ -65,4 +65,7 @@ export class CreateInventoryInput {
   image?: ProductImage;
   @Field({ nullable: true })
   src?: string;
+
+  @Field({ nullable: true })
+  description?: string;
 }

@@ -426,6 +426,7 @@ export class WebhooksController {
       nprod.status = rproduct?.status?.toUpperCase();
       nprod.price = rproduct?.variants[0]?.price;
       nprod.featuredImage = rproduct?.image?.src;
+      nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
 
       await this.inventryService.create(nprod);
 
@@ -511,6 +512,7 @@ export class WebhooksController {
       nprod.status = rproduct?.status?.toUpperCase();
       nprod.price = rproduct?.variants[0]?.price; //
       nprod.featuredImage = rproduct?.image?.src;
+      nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
       let qDifference: number;
       const isAvailable = rproduct.variants.some(
         (item) => item.inventory_quantity > 0,
