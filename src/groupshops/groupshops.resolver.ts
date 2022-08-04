@@ -124,12 +124,16 @@ export class GroupshopsResolver {
         // );
 
         // add lifcycle event for revised groupshop
-        this.lifecyclesrv.create(groupshop.id, EventType.revised, new Date());
-        this.lifecyclesrv.create(
-          groupshop.id,
-          EventType.expired,
-          newExpiredate,
-        );
+        this.lifecyclesrv.create({
+          groupshopId: groupshop.id,
+          event: EventType.revised,
+          dateTime: new Date(),
+        });
+        this.lifecyclesrv.create({
+          groupshopId: groupshop.id,
+          event: EventType.expired,
+          dateTime: newExpiredate,
+        });
         // update price rule end date.
         this.gsUpdatePriceRuleEvt.groupshop = updateGS;
         this.gsUpdatePriceRuleEvt.endDate = addDays(new Date(), 7);

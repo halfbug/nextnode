@@ -56,7 +56,7 @@ export class ShopifyService {
       ); // req.query must be cast to unkown and then AuthQuery in order to be accepted
     } catch (error) {
       console.error(JSON.stringify(error)); // in practice these should be handled more gracefully
-      Logger.error(error);
+      Logger.error(error, ShopifyService.name);
     }
   }
 
@@ -325,7 +325,7 @@ export class ShopifyService {
         );
     } catch (err) {
       console.log(err.message);
-      Logger.error(err);
+      Logger.error(err, ShopifyService.name);
     }
   }
 
@@ -353,7 +353,7 @@ export class ShopifyService {
       return scriptTag;
     } catch (err) {
       console.log(err.message);
-      Logger.error(err);
+      Logger.error(err, ShopifyService.name);
     }
   }
 
@@ -400,7 +400,7 @@ export class ShopifyService {
     // }
   }
 
-  async AppSubscriptionCreate() {
+  async AppSubscriptionCreate(trialDays: number) {
     try {
       const client = await this.client(this.shop, this.accessToken);
       const AppSubscriptionCreate = await client.query({
@@ -425,13 +425,13 @@ export class ShopifyService {
             }
           }`,
           variables: {
-            name: 'Explore (free for 30 days) + Cashback charge',
+            name: `Explore (free for ${trialDays} days) + Cashback charge`,
             returnUrl: `${this.configService.get('FRONT')}/${
               this.shop.split('.')[0]
             }/overview`,
             test:
               this.configService.get('BILLING_LIVE') === 'true' ? false : true,
-            trialDays: 30,
+            trialDays,
             lineItems: [
               {
                 plan: {
@@ -526,7 +526,7 @@ export class ShopifyService {
       return sdetail;
     } catch (err) {
       console.log(err.message);
-      Logger.error(err);
+      Logger.error(err, ShopifyService.name);
     }
   }
 
@@ -554,7 +554,7 @@ export class ShopifyService {
       return cdetail;
     } catch (err) {
       console.log(err.message);
-      Logger.error(err);
+      Logger.error(err, ShopifyService.name);
     }
   }
 }

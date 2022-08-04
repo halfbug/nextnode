@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
+import { EventType } from 'src/gs-common/entities/lifecycle.modal';
+import { LifecycleService } from 'src/gs-common/lifecycle.service';
 import { TokenReceivedEvent } from 'src/shopify-store/events/token-received.event';
 import { CreateStoreInput } from '../dto/create-store.input';
+import { UpdateStoreInput } from '../dto/update-store.input';
 import { StoreSavedEvent } from '../events/store-saved.event';
 import { StoresService } from '../stores.service';
 
@@ -10,24 +13,36 @@ export class ShopifyAPIListener {
   constructor(
     private storeService: StoresService,
     private storeSavedEvent: StoreSavedEvent,
+    private readonly lifecyclesrv: LifecycleService,
   ) {}
   @OnEvent('token.received')
-  handleTokenReceivedEvent(event: TokenReceivedEvent) {
-    const store = new CreateStoreInput();
-    store.accessToken = event.token;
-    store.shop = event.session.shop;
-    store.shopifySessionId = event.session.id;
+  async handleTokenReceivedEvent(event: TokenReceivedEvent) {
+    const {
+      token,
+      session: { shop, id },
+    } = event;
+    const store: CreateStoreInput =
+      (await this.storeService.findOne(shop)) ?? new CreateStoreInput();
+    store.accessToken = token;
+    store.shop = shop;
+    store.shopifySessionId = id;
     store.installationStep = 0;
     store.resources = [];
     store.hideProducts = [];
-    this.storeService.create(store).then((sstore) => {
+
+    this.storeService.createORupdate(store).then(() => {
       console.log('store---------------------------saved');
-      console.log(sstore);
-      this.storeSavedEvent.accessToken = sstore.accessToken;
-      this.storeSavedEvent.shop = sstore.shop;
-      this.storeSavedEvent.storeId = sstore.id;
+      // console.log(sstore);
+      this.storeSavedEvent.accessToken = store.accessToken;
+      this.storeSavedEvent.shop = store.shop;
+      this.storeSavedEvent.storeId = store.id;
       this.storeSavedEvent.emit();
       console.log('done');
+      this.lifecyclesrv.create({
+        storeId: store.id,
+        event: EventType.installed,
+        dateTime: new Date(),
+      });
     });
   }
 }

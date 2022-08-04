@@ -30,16 +30,11 @@ export class Resource {
   detail?: string;
 }
 
-// @InputType('SubscriptionInput')
-// @ObjectType('Subscription')
-// export class Subscription {
-//   @Field()
-//   id: string;
-//   @Field({ nullable: true })
-//   lineItems: any[];
-//   @Field({ nullable: true })
-//   detail?: string;
-// }
+@ObjectType('Subscription')
+export class Subscription {
+  @Field({ nullable: true })
+  status?: string;
+}
 
 @ObjectType('Store')
 export class Store {
@@ -110,4 +105,7 @@ export class Store {
 
   @Field({ nullable: true })
   timezone: string;
+
+  @Field({ nullable: true })
+  subscription?: Subscription;
 }

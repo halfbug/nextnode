@@ -1,9 +1,17 @@
-import { Column, CreateDateColumn, Entity, Index, ObjectIdColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ObjectIdColumn,
+} from 'typeorm';
 
 export enum EventType {
   started = 'started',
   expired = 'expired',
   revised = 'revised',
+  installed = 'installed',
+  uninstalled = 'uninstalled',
 }
 
 @Entity()
@@ -15,8 +23,12 @@ export class Lifecycle {
   event: EventType;
 
   @Index({ background: true })
-  @Column()
-  groupshopId: string;
+  @Column({ nullable: true })
+  groupshopId?: string;
+
+  @Index({ background: true })
+  @Column({ nullable: true })
+  storeId?: string;
 
   @Column()
   dataTime: Date;

@@ -32,7 +32,7 @@ export class UploadImageService {
     return new Promise((resolve, reject) => {
       s3.upload(s3Params, (err, data) => {
         if (err) {
-          Logger.error(err);
+          Logger.error(err, UploadImageService.name);
           reject(err);
         }
         resolve(data);

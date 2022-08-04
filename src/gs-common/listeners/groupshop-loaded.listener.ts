@@ -52,8 +52,15 @@ export class GSLoadedListener {
       upgs.expiredAt = gsExpireAt;
       await this.groupshopsrv.update(upgs);
       //    2.2 add started at and expired at event in lifecycle collection.
-      this.lifecyclesrv.create(gs.id, EventType.started);
-      this.lifecyclesrv.create(gs.id, EventType.expired, gsExpireAt);
+      this.lifecyclesrv.create({
+        groupshopId: gs.id,
+        event: EventType.started,
+      });
+      this.lifecyclesrv.create({
+        groupshopId: gs.id,
+        event: EventType.expired,
+        dateTime: gsExpireAt,
+      });
       //    2.3 update visitor service.
       this.vistorsrv.create(gs.id, ip);
       //   2.4 update price-rule on shopify

@@ -50,7 +50,7 @@ export class ThemeAppExtensionController {
         }),
       );
     } catch (err) {
-      Logger.error(err);
+      Logger.error(err, ThemeAppExtensionController.name);
     } finally {
       // res.status(HttpStatus.OK).send();
     }

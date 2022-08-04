@@ -64,7 +64,7 @@ export class KalavioService {
     } catch (err) {
       console.log({ err });
       console.log(JSON.stringify(err));
-      Logger.error(err);
+      Logger.error(err, KalavioService.name);
       return false;
     }
   }

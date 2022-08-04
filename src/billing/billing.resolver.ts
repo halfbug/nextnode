@@ -15,6 +15,8 @@ import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { StoresService } from 'src/stores/stores.service';
 import { DateFormats, Days, monthsArr } from 'src/utils/functions';
 import { Metrics } from 'src/campaigns/entities/campaign.entity';
+import { ConfigService } from '@nestjs/config';
+import { UpdateStoreInput } from 'src/stores/dto/update-store.input';
 
 @Resolver(() => Billing)
 export class BillingsResolver {
@@ -22,6 +24,7 @@ export class BillingsResolver {
     private readonly billingService: BillingsService,
     private shopifyapi: ShopifyService,
     private readonly storeService: StoresService,
+    private configService: ConfigService,
   ) {}
 
   @Mutation(() => Billing)
@@ -132,9 +135,19 @@ export class BillingsResolver {
   ) {
     this.shopifyapi.shop = shop;
     this.shopifyapi.accessToken = accessToken;
-    const subscription = await this.shopifyapi.AppSubscriptionCreate();
+    const store: UpdateStoreInput = await this.storeService.findOne(shop);
+    const trialDays =
+      store && store?.subscription?.status === 'Zero Trial'
+        ? 0
+        : parseInt(this.configService.get('TRIAL_PERIOD'));
+    const subscription = await this.shopifyapi.AppSubscriptionCreate(trialDays);
     const endOfTrialDate = new Date(
-      new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).setHours(23, 59, 59, 999),
+      new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000).setHours(
+        23,
+        59,
+        59,
+        999,
+      ),
     );
 
     this.storeService.updateField(
@@ -144,6 +157,7 @@ export class BillingsResolver {
         appTrialEnd: endOfTrialDate,
       },
     );
+
     return { redirectUrl: subscription['confirmationUrl'] };
   }
 }

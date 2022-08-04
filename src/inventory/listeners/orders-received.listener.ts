@@ -67,7 +67,7 @@ export class OrdersReceivedListener {
           });
       }
     } catch (err) {
-      Logger.error(err);
+      Logger.error(err, OrdersReceivedListener.name);
     } finally {
       console.log('out');
     }

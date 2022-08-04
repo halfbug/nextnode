@@ -53,7 +53,8 @@ export class ShopifyStoreController {
     const { query } = req;
     const shop = query.shop as string;
     const store = await this.storesService.findOne(shop);
-    if (store) res.redirect(this.storeService.goToAppfront(store));
+    if (store && store.status === 'Active')
+      res.redirect(this.storeService.goToAppfront(store));
     else if (shop) return this.storeService.login(req, res, shop);
     else console.log('referer : ', req.headers.referer);
   }

@@ -13,6 +13,11 @@ export class Resource {
   detail?: string;
 }
 
+export class Subscription {
+  @Column({ nullable: true })
+  status?: string;
+}
+
 @Entity()
 export default class Store extends DefaultColumnsService {
   @Column()
@@ -55,7 +60,7 @@ export default class Store extends DefaultColumnsService {
   resources?: Resource[];
 
   @Column({ nullable: true })
-  subscription?: any[];
+  subscription?: Subscription;
 
   @Column({ nullable: true })
   hideProducts?: string[];

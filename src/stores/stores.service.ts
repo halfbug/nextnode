@@ -18,6 +18,25 @@ export class StoresService {
     return this.storeRepository.save(store);
   }
 
+  async createORupdate(createStoreInput: CreateStoreInput) {
+    const { id } = createStoreInput;
+    // return await this.inventoryRepository.update({ id }, updateInvenotryInput);
+    // return await this.inventoryRepository.save(updateInvenotryInput);
+    const manager = getMongoManager();
+    try {
+      return await manager.updateOne(
+        Store,
+        { id },
+        { $set: { ...createStoreInput } },
+        {
+          upsert: true,
+        },
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   findAll() {
     return this.storeRepository.find();
   }

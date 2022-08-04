@@ -45,6 +45,11 @@ export class SettingsInput {
   bannerSummaryPage?: BannerSummaryEnum;
 }
 
+@InputType('SubscriptionInput')
+export class Subscription {
+  @Field({ nullable: true })
+  status?: string;
+}
 @InputType()
 export class CreateStoreInput {
   @Field()
@@ -75,7 +80,7 @@ export class CreateStoreInput {
   industry?: string;
 
   @Field((type) => SettingsInput)
-  settings: SettingsInput;
+  settings?: SettingsInput;
 
   @Field(() => BillingPlanEnum, { defaultValue: BillingPlanEnum.EXPLORE })
   plan?: BillingPlanEnum;
@@ -94,4 +99,7 @@ export class CreateStoreInput {
 
   @Field({ nullable: true })
   timezone: string;
+
+  @Field({ nullable: true })
+  subscription?: Subscription;
 }
