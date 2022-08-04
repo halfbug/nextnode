@@ -254,7 +254,7 @@ export class PartnerService {
       {
         $project: {
           bestSeller: {
-            $slice: ['$bestSeller', 0, 15],
+            $slice: ['$bestSeller', 0, 20],
           },
           createdAt: 1,
           campaignId: 1,

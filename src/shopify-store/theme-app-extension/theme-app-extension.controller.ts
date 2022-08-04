@@ -147,12 +147,13 @@ export class ThemeAppExtensionController {
         partnerRewards: { baseline },
         partnerDetails: { fname },
       } = await this.partnerSrv.findOne(discountCode);
+      const formatName = `${fname[0].toUpperCase()}${fname.slice(1)}`;
 
       res.send(
         JSON.stringify({
           url,
           baseline,
-          fname,
+          formatName,
         }),
       );
     } catch (err) {
