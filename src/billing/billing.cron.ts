@@ -14,43 +14,48 @@ export class BillingUsageCargeCron {
     private shopifyapi: ShopifyService,
   ) {}
 
-  usageDescripton(plan: BillingPlanEnum, cashback, gscharge, totalCharge) {
+  usageDescripton(
+    plan: BillingPlanEnum,
+    cashback,
+    gscharge,
+    totalCharge,
+    isfreeTrial,
+  ) {
     switch (plan) {
       case BillingPlanEnum.EXPLORE:
-        return `Explore (free for 30 days) + Cashback charge - $${cashback}`;
+        return `Groupshop Explore ${
+          isfreeTrial && '(free for 30 days)'
+        } + Cashback charge - $${cashback}`;
 
       case BillingPlanEnum.LAUNCH:
         // return `Launch (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
-        return `Groupshop Launch Plan >> ${new Date().toLocaleDateString(
-          'en-US',
-          {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          },
-        )} - ${totalCharge}(GS Charge - $${gscharge}  + CB Charge - $${cashback})`;
+        return `Groupshop Launch Plan ${
+          isfreeTrial && '(free for 30 days)'
+        }>> ${new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })} - ${totalCharge}(GS Charge - $${gscharge}  + CB Charge - $${cashback})`;
 
       case BillingPlanEnum.GROWTH:
         // return `Growth (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
-        return `Groupshop Growth Plan >> ${new Date().toLocaleDateString(
-          'en-US',
-          {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          },
-        )} - ${totalCharge}(GS Charge - $${gscharge}  + CB Charge - $${cashback})`;
+        return `Groupshop Growth Plan ${
+          isfreeTrial && '(free for 30 days)'
+        }>> ${new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })} - ${totalCharge}(GS Charge - $${gscharge}  + CB Charge - $${cashback})`;
 
       case BillingPlanEnum.ENTERPRISE:
         // return `Enterprise  (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
-        return `Groupshop Enterprise Plan >> ${new Date().toLocaleDateString(
-          'en-US',
-          {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          },
-        )} - ${totalCharge}(GS Charge - $${gscharge}  + CB Charge - $${cashback})`;
+        return `Groupshop Enterprise Plan ${
+          isfreeTrial && '(free for 30 days)'
+        }>> ${new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })} - ${totalCharge}(GS Charge - $${gscharge}  + CB Charge - $${cashback})`;
     }
   }
 
@@ -123,6 +128,7 @@ export class BillingUsageCargeCron {
                   cashbackUsage.toFixed(2),
                   useageQuery['totalfeeByGS'],
                   totalCharge.toFixed(2),
+                  Date.now() < store.appTrialEnd.getTime(),
                 ),
               );
               console.log(
