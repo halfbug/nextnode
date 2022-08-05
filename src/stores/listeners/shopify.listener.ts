@@ -30,12 +30,12 @@ export class ShopifyAPIListener {
     store.resources = [];
     store.hideProducts = [];
 
-    this.storeService.createORupdate(store).then(() => {
+    this.storeService.createORupdate(store).then((sstore) => {
       console.log('store---------------------------saved');
       // console.log(sstore);
-      this.storeSavedEvent.accessToken = store.accessToken;
-      this.storeSavedEvent.shop = store.shop;
-      this.storeSavedEvent.storeId = store.id;
+      this.storeSavedEvent.accessToken = sstore.accessToken;
+      this.storeSavedEvent.shop = sstore.shop;
+      this.storeSavedEvent.storeId = sstore.id;
       this.storeSavedEvent.emit();
       console.log('done');
       this.lifecyclesrv.create({

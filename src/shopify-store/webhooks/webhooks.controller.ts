@@ -441,6 +441,12 @@ export class WebhooksController {
         vprod.publishedAt = rproduct?.published_at;
         vprod.price = variant.price;
         vprod.inventoryQuantity = variant?.inventory_quantity;
+        const img = new ProductImage();
+        img.src = variant.image_id
+          ? rproduct.images.filter((img) => img.id === variant.image_id)?.[0]
+              .src
+          : rproduct?.image.src;
+        vprod.image = img;
         vprod.selectedOptions = rproduct.options.map((item, index) => {
           const sOpt = new SelectedOption();
           sOpt.name = item.name;
@@ -539,8 +545,11 @@ export class WebhooksController {
         vprod.featuredImage = rproduct?.image?.src;
         vprod.shop = shop;
         const img = new ProductImage();
-        img.src =
-          rproduct?.image && rproduct?.image.src ? rproduct?.image.src : null;
+        img.src = variant.image_id
+          ? rproduct.images.filter((img) => img.id === variant.image_id)?.[0]
+              .src
+          : rproduct?.image.src;
+        // rproduct?.image && rproduct?.image.src ? rproduct?.image.src : null;
 
         vprod.image = img;
         vprod.price = variant?.price;
@@ -1256,7 +1265,7 @@ export class WebhooksController {
   @Get('inevent')
   async importEvents(@Query('shopName') shopName: any) {
     // try {
-    // http://localhost:5000/webhooks/bulkimport?shopName=native-roots-dev.myshopify.com
+    // http://localhost:5000/webhooks/inevent?shopName=native-roots-dev.myshopify.com
     const { shop, accessToken } = await this.storesService.findOne(shopName);
     // OrdersSavedEvent -- Purchase Count
     const ordersSavedEvent = new OrdersSavedEvent();

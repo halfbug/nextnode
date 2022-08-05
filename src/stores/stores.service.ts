@@ -18,20 +18,31 @@ export class StoresService {
     return this.storeRepository.save(store);
   }
 
-  async createORupdate(createStoreInput: CreateStoreInput) {
+  async createORupdate(createStoreInput: UpdateStoreInput): Promise<Store> {
     const { id } = createStoreInput;
+    console.log(
+      '🚀 ~ file: stores.service.ts ~ line 23 ~ StoresService ~ createORupdate ~ id',
+      id,
+    );
     // return await this.inventoryRepository.update({ id }, updateInvenotryInput);
     // return await this.inventoryRepository.save(updateInvenotryInput);
+
+    const sid = id ?? uuid();
+    console.log(
+      '🚀 ~ file: stores.service.ts ~ line 31 ~ StoresService ~ createORupdate ~ sid',
+      sid,
+    );
     const manager = getMongoManager();
     try {
-      return await manager.updateOne(
+      await manager.updateOne(
         Store,
         { id },
-        { $set: { ...createStoreInput } },
+        { $set: { id: sid, ...createStoreInput } },
         {
           upsert: true,
         },
       );
+      return this.findById(sid);
     } catch (err) {
       console.log(err);
     }
