@@ -81,37 +81,40 @@ export class Member {
 
 export class OBSettings {
   @Column({ nullable: true })
-  allowEmails: boolean;
+  ownerUrl?: string;
 
   @Column({ nullable: true })
-  allowTexts: boolean;
+  allowEmails?: boolean;
 
   @Column({ nullable: true })
-  mobileNumber: string;
+  allowTexts?: boolean;
 
   @Column({ nullable: true })
-  email: string;
+  mobileNumber?: string;
 
   @Column({ nullable: true })
-  shopHeader: string;
+  email?: string;
 
   @Column({ nullable: true })
-  instagramLink: string;
+  shopHeader?: string;
 
   @Column({ nullable: true })
-  pinteresrLink: string;
+  instagramLink?: string;
 
   @Column({ nullable: true })
-  tiktokLink: string;
+  pinteresrLink?: string;
 
   @Column({ nullable: true })
-  twitterLink: string;
+  tiktokLink?: string;
 
   @Column({ nullable: true })
-  themeBanner: string;
+  twitterLink?: string;
 
   @Column({ nullable: true })
-  step: number;
+  themeBanner?: string;
+
+  @Column({ nullable: true })
+  step?: number;
 }
 
 @Entity()

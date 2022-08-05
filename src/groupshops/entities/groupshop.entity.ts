@@ -128,40 +128,40 @@ export class GsOrders {
 @ObjectType()
 export class OBSettings {
   @Field({ nullable: true })
-  ownerUrl: string;
+  ownerUrl?: string;
 
   @Field({ nullable: true })
-  allowEmails: boolean;
+  allowEmails?: boolean;
 
   @Field({ nullable: true })
-  allowTexts: boolean;
+  allowTexts?: boolean;
 
   @Field({ nullable: true })
-  mobileNumber: string;
+  mobileNumber?: string;
 
   @Field({ nullable: true })
-  email: string;
+  email?: string;
 
   @Field({ nullable: true })
-  shopHeader: string;
+  shopHeader?: string;
 
   @Field({ nullable: true })
-  instagramLink: string;
+  instagramLink?: string;
 
   @Field({ nullable: true })
-  pinteresrLink: string;
+  pinteresrLink?: string;
 
   @Field({ nullable: true })
-  tiktokLink: string;
+  tiktokLink?: string;
 
   @Field({ nullable: true })
-  twitterLink: string;
+  twitterLink?: string;
 
   @Field({ nullable: true })
-  themeBanner: string;
+  themeBanner?: string;
 
   @Field({ nullable: true })
-  step: number;
+  step?: number;
 }
 
 @ObjectType()
