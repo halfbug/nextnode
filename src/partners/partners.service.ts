@@ -618,17 +618,6 @@ export class PartnerService {
       '🚀 ~ file:PartnerService updatePartnersInput',
       updatePartnersInput,
     );
-    const gsp = await this.findById(id);
-    // console.log(
-    //   '🚀 ~ file: partners.service.ts ~ line 606 ~ PartnerService ~ update ~ gsp',
-    //   gsp,
-    // );
-    const {
-      discountCode: { priceRuleId, percentage, title },
-      store: { shop, accessToken },
-      allProducts,
-    } = gsp;
-
     const { storeId, partnerCommission, isActive } = updatePartnersInput;
     const res = await this.partnerRepository.update(
       { id },
@@ -638,15 +627,13 @@ export class PartnerService {
       updatePartnersInput?.dealProducts &&
       updatePartnersInput?.dealProducts?.length > 0
     ) {
-      // console.log(
-      //   '🚀 ~ file: partners.service.ts ~ line 616 ~ PartnerService ~ update ~ allProducts',
-      //   allProducts,
-      // );
+      const gsp = await this.findById(id);
+      const {
+        discountCode: { priceRuleId },
+        store: { shop, accessToken },
+        allProducts,
+      } = gsp;
       const allNewProducts = allProducts.map((item) => item.id);
-      // console.log(
-      //   '🚀 ~ file: partners.service.ts ~ line 621 ~ PartnerService ~ update ~ allNewProducts',
-      //   allNewProducts,
-      // );
       await this.shopifyapi.setDiscountCode(
         shop,
         'Update',
@@ -660,25 +647,29 @@ export class PartnerService {
       );
     }
     if (
-      updatePartnersInput?.discountCode?.percentage &&
-      updatePartnersInput?.discountCode?.percentage != percentage
+      updatePartnersInput?.discountCode &&
+      updatePartnersInput?.discountCode?.percentage
     ) {
+      const gsp = await this.findById(id);
+      const {
+        discountCode: { priceRuleId, percentage, title },
+        store: { shop, accessToken },
+        allProducts,
+      } = gsp;
       const allNewProducts = allProducts.map((item) => item.id);
-      // console.log(
-      //   '🚀 ~ file: partners.service.ts ~ line 621 ~ PartnerService ~ update ~ allNewProducts',
-      //   allNewProducts,
-      // );
-      await this.shopifyapi.setDiscountCode(
-        shop,
-        'Update',
-        accessToken,
-        null,
-        +updatePartnersInput?.discountCode?.percentage,
-        allNewProducts,
-        null,
-        null,
-        priceRuleId,
-      );
+      if (updatePartnersInput?.discountCode?.percentage !== percentage) {
+        await this.shopifyapi.setDiscountCode(
+          shop,
+          'Update',
+          accessToken,
+          null,
+          +updatePartnersInput?.discountCode?.percentage,
+          allNewProducts,
+          null,
+          null,
+          priceRuleId,
+        );
+      }
     }
 
     return updatePartnersInput;

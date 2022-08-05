@@ -46,8 +46,8 @@ export class Partnergroupshop {
   @Field(() => ID)
   id: string;
 
-  @Field()
-  campaignId: string;
+  @Field({ nullable: true })
+  campaignId?: string;
 
   @Field()
   storeId: string;

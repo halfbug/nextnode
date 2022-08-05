@@ -45,13 +45,14 @@ export class GSPSavedListener {
     ugsp = new UpdatePartnersInput();
     ugsp.url = cryptURL;
     ugsp.shortUrl = shortLink;
-    ugsp.shortUrl = shortLink;
     // bought product + campaign products will go to setDiscount below
     // also add in db
     const campaign = await this.storesService.findOneWithActiveCampaing(shop);
     const {
-      activeCampaign: { products },
+      activeCampaign: { products, id: activeCampId },
     } = campaign;
+    ugsp.campaignId = activeCampId;
+
     console.log(
       '🚀 ~ file: groupshop-partner-saved.listener.ts ~ products',
       products,
@@ -65,6 +66,10 @@ export class GSPSavedListener {
       products,
       new Date(),
       null,
+    );
+    console.log(
+      '🚀 ~ file: groupshop-partner-saved.listener.ts ~ line 70 ~ GSPSavedListener ~ setPriceRule ~ ugsp.discountCode',
+      ugsp.discountCode,
     );
 
     await this.partnerService.update(id, ugsp);
