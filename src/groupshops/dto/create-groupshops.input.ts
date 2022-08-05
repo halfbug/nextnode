@@ -95,37 +95,40 @@ export class RefundInput {
 @InputType()
 export class OBSettingsInput {
   @Field({ nullable: true })
-  allowEmails: boolean;
+  ownerUrl?: string;
 
   @Field({ nullable: true })
-  allowTexts: boolean;
+  allowEmails?: boolean;
 
   @Field({ nullable: true })
-  mobileNumber: string;
+  allowTexts?: boolean;
 
   @Field({ nullable: true })
-  email: string;
+  mobileNumber?: string;
 
   @Field({ nullable: true })
-  shopHeader: string;
+  email?: string;
 
   @Field({ nullable: true })
-  instagramLink: string;
+  shopHeader?: string;
 
   @Field({ nullable: true })
-  pinteresrLink: string;
+  instagramLink?: string;
 
   @Field({ nullable: true })
-  tiktokLink: string;
+  pinteresrLink?: string;
 
   @Field({ nullable: true })
-  twitterLink: string;
+  tiktokLink?: string;
 
   @Field({ nullable: true })
-  themeBanner: string;
+  twitterLink?: string;
 
   @Field({ nullable: true })
-  step: number;
+  themeBanner?: string;
+
+  @Field({ nullable: true })
+  step?: number;
 }
 
 @InputType()

@@ -128,6 +128,9 @@ export class GsOrders {
 @ObjectType()
 export class OBSettings {
   @Field({ nullable: true })
+  ownerUrl: string;
+
+  @Field({ nullable: true })
   allowEmails: boolean;
 
   @Field({ nullable: true })

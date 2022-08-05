@@ -383,6 +383,11 @@ export class OrderPlacedListener {
             title,
           )}`;
 
+          const ownerCryptURL = `/${
+            shop.split('.')[0]
+          }/deal/${this.crypt.encrypt(title)}/owner&${this.crypt.encrypt(
+            event?.order?.name,
+          )}`;
           const fulllink = `${this.configSevice.get('FRONT')}${cryptURL}`;
           const shortLink = await this.kalavioService.generateShortLink(
             fulllink,
@@ -406,6 +411,7 @@ export class OrderPlacedListener {
           newGroupshop.dealProducts = dealProducts;
           newGroupshop.totalProducts = totalCampaignProducts.length;
           newGroupshop.url = cryptURL;
+          newGroupshop.obSettings = { ownerUrl: ownerCryptURL, step: 0 };
           newGroupshop.shortUrl = shortLink;
           newGroupshop.createdAt = new Date();
           newGroupshop.expiredAt = expires;
