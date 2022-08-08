@@ -56,6 +56,10 @@ export class GroupshopSavedListener {
     const discount_2_price = Math.floor((discount_2 / 100) * order_price);
     const discount_3_price = Math.floor((discount_3 / 100) * order_price);
     const memberLength = res?.ugroupshop?.members.length || 0;
+    const ownerUrl =
+      `${this.configService.get('FRONT')}${
+        res?.groupdeal?.obSettings.ownerUrl
+      }` || null;
     const shopName = res.data.order.shop;
     const orderData = await this.ordersService.getOrderDetailsByOrderId(
       res.data.order.id,
@@ -232,6 +236,7 @@ export class GroupshopSavedListener {
         customerEmail: customerEmail,
         dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
         shortUrl: shortLink,
+        ownerUrl: ownerUrl,
         sms_marketing_consent: sms_marketing_consent,
         phone_number: phone_number,
         qrImage: qrImage,
@@ -281,6 +286,7 @@ export class GroupshopSavedListener {
         customerEmail: customerEmail,
         dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
         shortUrl: shortLink,
+        ownerUrl: ownerUrl,
         sms_marketing_consent: sms_marketing_consent,
         phone_number: phone_number,
         qrImage: qrImage,
