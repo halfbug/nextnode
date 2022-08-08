@@ -182,6 +182,7 @@ export class GroupshopCashbackListener {
       customerName: custName,
       orderLineItems: orderline_items,
       currencyCode: currencySymbol,
+      percentage: `${netDiscountCal}%`,
       availableCashback: availableCashbackCal,
       getUptoDiscount: getUptoDiscount,
       total_price: totalPrice,
