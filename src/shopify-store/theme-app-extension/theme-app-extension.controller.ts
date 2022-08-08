@@ -156,7 +156,7 @@ export class ThemeAppExtensionController {
         JSON.stringify({
           url,
           baseline,
-          formatName,
+          fname: formatName,
         }),
       );
     } catch (err) {
