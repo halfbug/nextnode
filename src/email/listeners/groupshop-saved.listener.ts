@@ -262,8 +262,10 @@ export class GroupshopSavedListener {
         customer_properties: {
           $email: customerEmail,
           $phone_number: phone_number,
+          sms_consent: true,
           $first_name: res.data.klaviyo?.firstName,
           $last_name: res.data.klaviyo?.lastName,
+          $consent: ['sms', 'email'],
           // sms_marketing_consent: sms_marketing_consent,
         },
         properties: mdata,
@@ -308,8 +310,10 @@ export class GroupshopSavedListener {
         customer_properties: {
           $email: customerEmail,
           $phone_number: phone_number,
+          sms_consent: true,
           $first_name: res.data.klaviyo?.firstName,
           $last_name: res.data.klaviyo?.lastName,
+          $consent: ['sms', 'email'],
           // sms_marketing_consent: sms_marketing_consent,
         },
         properties: rdata,
