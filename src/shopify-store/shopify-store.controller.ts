@@ -127,10 +127,17 @@ export class ShopifyStoreController {
   async gropshopTestUrl(
     @Query('sdate') sdate: string,
     @Query('edate') edate: string,
+    @Query('shop') shop: string,
   ) {
     const gs = await this.groupshopSrv.findAllByDate(
       new Date(sdate),
       new Date(edate),
+      shop,
+    );
+    console.log(
+      '%cshopify-store.controller.ts line:137 gs',
+      'color: #007acc;',
+      JSON.stringify(gs, null, '\t'),
     );
     return (
       `<h3>total Groupshops : ${gs.length} </h3> <pre>` +
@@ -138,7 +145,9 @@ export class ShopifyStoreController {
         (g, idx) =>
           `${idx + 1}. <a href="${this.configService.get('FRONT')}${g.url}">${
             g.url
-          } </a> <br/>`,
+          } </a> &nbsp;&nbsp; ${
+            g.members[0].orderDetail.customer.email
+          } <br/><br/>`,
       ) +
       '</pre>'
     );

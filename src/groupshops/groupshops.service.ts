@@ -60,15 +60,100 @@ export class GroupshopsService {
     });
   }
 
-  findAllByDate(sdate: Date, edate: Date) {
-    return this.groupshopRepository.find({
-      where: {
-        createdAt: {
-          $gte: new Date(sdate),
-          $lt: new Date(edate),
+  async findAllByDate(sdate: Date, edate: Date, shop: string) {
+    // return this.groupshopRepository.find({
+    //   where: {
+    //     createdAt: {
+    //       $gte: new Date(sdate),
+    //       $lt: new Date(edate),
+    //     },
+    //   },
+    // });
+    const agg = [
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(sdate),
+            $lt: new Date(edate),
+          },
         },
       },
-    });
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'id',
+          as: 'orderDetails',
+        },
+      },
+      {
+        $lookup: {
+          from: 'store',
+          localField: 'storeId',
+          foreignField: 'id',
+          as: 'store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$store',
+        },
+      },
+      {
+        $match: {
+          $or: [
+            {
+              'store.shop': {
+                $regex: `^${shop}*`,
+              },
+            },
+            {
+              'store.brandname': {
+                $regex: `^${shop}*`,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    orderDetail: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$orderDetails',
+                            as: 'j',
+                            cond: {
+                              $and: [
+                                {
+                                  $eq: ['$$this.orderId', '$$j.id'],
+                                },
+                              ],
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    // console.log({ gs });
+    return gs;
   }
 
   async getRunningGroupshop(campaignId, productId) {
