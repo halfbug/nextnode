@@ -134,11 +134,7 @@ export class ShopifyStoreController {
       new Date(edate),
       shop,
     );
-    console.log(
-      '%cshopify-store.controller.ts line:137 gs',
-      'color: #007acc;',
-      JSON.stringify(gs, null, '\t'),
-    );
+
     return (
       `<h3>total Groupshops : ${gs.length} </h3> <pre>` +
       gs.map(

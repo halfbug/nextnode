@@ -61,15 +61,7 @@ export class GroupshopsService {
   }
 
   async findAllByDate(sdate: Date, edate: Date, shop: string) {
-    // return this.groupshopRepository.find({
-    //   where: {
-    //     createdAt: {
-    //       $gte: new Date(sdate),
-    //       $lt: new Date(edate),
-    //     },
-    //   },
-    // });
-    const agg = [
+    const agg: any = [
       {
         $match: {
           createdAt: {
@@ -97,22 +89,6 @@ export class GroupshopsService {
       {
         $unwind: {
           path: '$store',
-        },
-      },
-      {
-        $match: {
-          $or: [
-            {
-              'store.shop': {
-                $regex: `^${shop}*`,
-              },
-            },
-            {
-              'store.brandname': {
-                $regex: `^${shop}*`,
-              },
-            },
-          ],
         },
       },
       {
@@ -150,6 +126,24 @@ export class GroupshopsService {
         },
       },
     ];
+
+    if (shop)
+      agg?.push({
+        $match: {
+          $or: [
+            {
+              'store.shop': {
+                $regex: `^${shop}*`,
+              },
+            },
+            {
+              'store.brandname': {
+                $regex: `^${shop}*`,
+              },
+            },
+          ],
+        },
+      });
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
     // console.log({ gs });
