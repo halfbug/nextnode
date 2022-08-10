@@ -603,6 +603,10 @@ export class PartnerService {
     return newGSP;
   }
 
+  findWithId(id: string) {
+    return this.partnerRepository.findOne({ id });
+  }
+
   findAll(storeId: string) {
     return this.partnerRepository.find({
       where: { storeId },
@@ -623,6 +627,12 @@ export class PartnerService {
       { id },
       updatePartnersInput,
     );
+    if (
+      updatePartnersInput.isActive === true ||
+      updatePartnersInput.isActive === false
+    ) {
+      return this.findWithId(id);
+    }
     if (
       updatePartnersInput?.dealProducts &&
       updatePartnersInput?.dealProducts?.length > 0
