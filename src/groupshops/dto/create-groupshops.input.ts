@@ -152,6 +152,9 @@ export class CreateGroupshopInput {
   shortUrl?: string;
 
   @Field()
+  exipredShortLink?: string;
+
+  @Field()
   createdAt: Date;
 
   @Field()

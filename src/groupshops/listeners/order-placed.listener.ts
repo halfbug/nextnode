@@ -389,8 +389,14 @@ export class OrderPlacedListener {
             event?.order?.name,
           )}`;
           const fulllink = `${this.configSevice.get('FRONT')}${cryptURL}`;
+          const exipredFulllink = `${this.configSevice.get(
+            'FRONT',
+          )}${cryptURL}/status&activated`;
           const shortLink = await this.kalavioService.generateShortLink(
             fulllink,
+          );
+          const exipredShortLink = await this.kalavioService.generateShortLink(
+            exipredFulllink,
           );
           console.log('myshort wwww: ' + shortLink);
 
@@ -413,6 +419,7 @@ export class OrderPlacedListener {
           newGroupshop.url = cryptURL;
           newGroupshop.obSettings = { ownerUrl: ownerCryptURL, step: 0 };
           newGroupshop.shortUrl = shortLink;
+          newGroupshop.exipredShortLink = exipredShortLink;
           newGroupshop.createdAt = new Date();
           newGroupshop.expiredAt = expires;
           // newGroupshop.

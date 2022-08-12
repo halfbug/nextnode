@@ -187,6 +187,9 @@ export class GroupShop {
   @Field({ nullable: true })
   shortUrl?: string;
 
+  @Field({ nullable: true })
+  exipredShortLink?: string;
+
   @Field()
   createdAt: Date;
 
