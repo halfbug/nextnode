@@ -58,7 +58,7 @@ export class GroupshopSavedListener {
     const memberLength = res?.ugroupshop?.members.length || 0;
     const ownerUrl =
       `${this.configService.get('FRONT')}${
-        res?.groupdeal?.obSettings.ownerUrl
+        res?.groupdeal?.obSettings?.ownerUrl
       }` || null;
     const shopName = res.data.order.shop;
     const orderData = await this.ordersService.getOrderDetailsByOrderId(

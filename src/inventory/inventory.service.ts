@@ -5,7 +5,7 @@ import { CreateInventoryInput } from './dto/create-inventory.input';
 import { ProductQueryInput } from './dto/product-query.input';
 import { UpdateInventoryInput } from './dto/update-inventory.input';
 import Inventory from './entities/inventory.modal';
-
+import { Product } from './entities/product.entity';
 @Injectable()
 export class InventoryService {
   private inventoryManager: any;
@@ -55,17 +55,18 @@ export class InventoryService {
     }
   }
 
-  async updateInventory(id: string, dif: number) {
+  async updateInventory(id: string, dif: number, field: string) {
     const manager = getMongoManager();
+    console.log('updateInventory', id, dif, field, 'updateInventory');
 
     try {
       return await manager.findOneAndUpdate(
         Inventory,
         { id },
-        { $inc: { totalInventory: dif } },
+        { $inc: { [field]: dif } },
       );
     } catch (err) {
-      console.log(err);
+      console.log(err, 'updateInventory err');
     }
   }
 

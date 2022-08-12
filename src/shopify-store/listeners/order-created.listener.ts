@@ -13,6 +13,8 @@ import {
 } from 'src/inventory/dto/create-order.input';
 import { OrderPlacedEvent } from '../events/order-placed.envent';
 import { StoresService } from 'src/stores/stores.service';
+import { UpdateInventoryInput } from 'src/inventory/dto/update-inventory.input';
+import { InventoryService } from 'src/inventory/inventory.service';
 
 @Injectable()
 export class OrderCreatedListener {
@@ -22,6 +24,7 @@ export class OrderCreatedListener {
     private eventEmitter: EventEmitter2,
     private configSevice: ConfigService,
     private storesService: StoresService,
+    private inventryService: InventoryService,
   ) {}
 
   private shop: string;
@@ -89,6 +92,16 @@ export class OrderCreatedListener {
             },
             0,
           );
+          const resInv = await this.inventryService.updateInventory(
+            `gid://shopify/Product/${item.product_id}`,
+            item.quantity,
+            'purchaseCount',
+          );
+          console.log(
+            '🚀 ~ file: order-created.listener.ts ~ line 100 ~ OrderCreatedListener ~ whOrder?.line_items?.map ~ resInv',
+            JSON.stringify(resInv),
+          );
+
           newItem.discountedPrice =
             +item.price - +newItem.totalDiscounts / item.quantity;
           newItem.discountCode = whOrder.discount_codes[0]?.code;
@@ -123,6 +136,7 @@ export class OrderCreatedListener {
       );
       newOrderPlaced.lineItems = lineItems;
       this.eventEmitter.emit('order.placed', newOrderPlaced);
+      const inv = new UpdateInventoryInput();
     } catch (err) {
       Logger.error({ err }, OrderCreatedListener.name);
     }
