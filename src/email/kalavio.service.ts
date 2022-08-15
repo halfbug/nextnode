@@ -28,6 +28,22 @@ export class KalavioService {
     });
   }
 
+  createKlaviyoSubscribes(body: any) {
+    const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
+    const urlKlaviyo = `${this.configService.get(
+      'KLAVIYO_BASE_URL',
+    )}${'/v2/list/'}${'UHgKGu'}${'/subscribe?api_key='}${PRIVATE_KEY}`;
+    const options = {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    };
+    this.httpService.post(urlKlaviyo, body, options).subscribe(async (res) => {
+      // console.log(res);
+    });
+  }
+
   async klaviyoSignUp(createSignUpInput) {
     const listId = this.configService.get('KLAVIYO_LIST_ID');
     const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');

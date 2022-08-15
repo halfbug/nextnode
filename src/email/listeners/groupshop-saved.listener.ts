@@ -179,6 +179,27 @@ export class GroupshopSavedListener {
 
     // console.log(brandLogo);
 
+    let validateNumber = '';
+    if (phone_number !== '') {
+      validateNumber = phoneNumberValidate(phone_number);
+      if (validateNumber !== '') {
+        const subscriberbody = JSON.stringify({
+          api_key: PRIVATE_KEY,
+          profiles: [
+            {
+              first_name: res.data.klaviyo?.firstName,
+              last_name: res.data.klaviyo?.lastName,
+              $consent: ['sms'],
+              email: customerEmail,
+              phone_number: validateNumber,
+              sms_consent: true,
+            },
+          ],
+        });
+        this.kalavioService.createKlaviyoSubscribes(subscriberbody);
+      }
+    }
+
     if (res.post == 'yes') {
       // console.log('groupshop saved listener received');
       const campaigns_products = res.data.store.activeCampaign.products;
@@ -226,7 +247,6 @@ export class GroupshopSavedListener {
           ];
         }),
       );
-      console.log(qrImage);
       const mdata = {
         logoImage: brandLogo,
         shopUrl: `https://${res.data.store.shop}`,
@@ -237,8 +257,6 @@ export class GroupshopSavedListener {
         dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
         shortUrl: shortLink,
         ownerUrl: ownerUrl,
-        sms_marketing_consent: sms_marketing_consent,
-        phone_number: phone_number,
         qrImage: qrImage,
         created_at: orderDate,
         order_number: res.data.order.name,
@@ -260,17 +278,13 @@ export class GroupshopSavedListener {
         token: PUBLIC_KEY,
         event: 'Groupshop Order Trigger',
         customer_properties: {
-          $email: customerEmail,
-          $phone_number: phone_number,
-          sms_consent: true,
-          $first_name: res.data.klaviyo?.firstName,
-          $last_name: res.data.klaviyo?.lastName,
-          $consent: ['sms', 'email'],
-          // sms_marketing_consent: sms_marketing_consent,
+          first_name: res.data.klaviyo?.firstName,
+          last_name: res.data.klaviyo?.lastName,
+          email: customerEmail,
+          phone_number: validateNumber,
         },
         properties: mdata,
       });
-      console.log(JSON.stringify(body));
 
       this.kalavioService.sendKlaviyoEmail(body);
     } else {
@@ -289,8 +303,6 @@ export class GroupshopSavedListener {
         dealUrl: `${this.configService.get('FRONT')}${dealUrl}`,
         shortUrl: shortLink,
         ownerUrl: ownerUrl,
-        sms_marketing_consent: sms_marketing_consent,
-        phone_number: phone_number,
         qrImage: qrImage,
         created_at: orderDate,
         order_number: res.data.order.name,
@@ -303,17 +315,14 @@ export class GroupshopSavedListener {
         getUptoDiscount: leftDiscount,
         orderLineItems: order_line_items,
       };
-
       const body = JSON.stringify({
         token: PUBLIC_KEY,
         event: 'Groupshop Referrer Order Trigger',
         customer_properties: {
           $email: customerEmail,
-          $phone_number: phone_number,
-          sms_consent: true,
+          $phone_number: validateNumber,
           $first_name: res.data.klaviyo?.firstName,
           $last_name: res.data.klaviyo?.lastName,
-          $consent: ['sms', 'email'],
           // sms_marketing_consent: sms_marketing_consent,
         },
         properties: rdata,
@@ -321,5 +330,19 @@ export class GroupshopSavedListener {
 
       this.kalavioService.sendKlaviyoEmail(body);
     }
+  }
+}
+
+function phoneNumberValidate(phone_number) {
+  const phoneNumber = phone_number.replace(/[^0-9]/g, '');
+  if (phoneNumber.length === 10) {
+    return `${'+1'}${phoneNumber}`;
+  } else if (phoneNumber.length === 11) {
+    return `${'+'}${phoneNumber}`;
+  } else if (phoneNumber.length === 12) {
+    const substrPhoneNumber = phoneNumber.substr(2, 10);
+    return `${'+1'}${substrPhoneNumber}`;
+  } else {
+    return '';
   }
 }
