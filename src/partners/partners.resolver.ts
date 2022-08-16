@@ -10,10 +10,12 @@ import { PartnerService } from './partners.service';
 import { Partnergroupshop as Partners } from './entities/partner.entity';
 import { CreatePartnersInput } from './dto/create-partners.input';
 import { UpdatePartnersInput } from './dto/update-partners.input';
+import { StoresService } from 'src/stores/stores.service';
 import {
   createParamDecorator,
   ExecutionContext,
   Ip,
+  NotFoundException,
   Req,
   UseInterceptors,
 } from '@nestjs/common';
@@ -29,18 +31,29 @@ export class PartnersResolver {
   constructor(
     private readonly PartnerService: PartnerService,
     private readonly crypt: EncryptDecryptService,
+    private storesService: StoresService,
   ) {}
 
-  @Mutation(() => Partners)
-  createPartner(
+  @Mutation(() => Partners || undefined)
+  async createPartner(
     @Args('createPartnersInput') createPartnersInput: CreatePartnersInput,
   ) {
     // console.log(
     //   '🚀 ~ file: Partners.resolver.ts ~ line 38 ~ PartnersResolver ~ createPartnersInput',
     //   createPartnersInput,
     // );
-
-    return this.PartnerService.create(createPartnersInput);
+    const { shop } = await this.storesService.findById(
+      createPartnersInput.storeId,
+    );
+    const campaign = await this.storesService.findOneWithActiveCampaing(shop);
+    const {
+      activeCampaign: { products },
+    } = campaign;
+    if (products.length > 0) {
+      return this.PartnerService.create(createPartnersInput);
+    } else {
+      throw new NotFoundException('Products not found in active campaign');
+    }
   }
 
   @Query(() => [Partners], { name: 'partnerGroupshops' })
