@@ -39,7 +39,7 @@ export default class Store extends DefaultColumnsService {
   logoImage: string;
 
   @Column({ nullable: true })
-  industry: string;
+  industry: string[];
 
   @Column((type) => Settings)
   settings?: Settings;

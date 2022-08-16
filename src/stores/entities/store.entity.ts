@@ -68,8 +68,8 @@ export class Store {
   @Field({ nullable: true })
   status: string;
 
-  @Field({ nullable: true })
-  industry: string;
+  @Field(() => [String], { nullable: 'itemsAndList' })
+  industry: string[];
 
   @Field((type) => Settings, { nullable: true })
   settings: Settings;

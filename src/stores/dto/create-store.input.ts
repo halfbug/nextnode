@@ -76,8 +76,8 @@ export class CreateStoreInput {
   @Field({ nullable: true })
   logoImage?: string;
 
-  @Field({ nullable: true })
-  industry?: string;
+  @Field(() => [String], { nullable: true })
+  industry?: string[];
 
   @Field((type) => SettingsInput)
   settings?: SettingsInput;
