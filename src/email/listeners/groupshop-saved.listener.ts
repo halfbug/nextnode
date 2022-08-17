@@ -180,7 +180,7 @@ export class GroupshopSavedListener {
     // console.log(brandLogo);
 
     let validateNumber = '';
-    if (phone_number !== '') {
+    if (phone_number !== '' && phone_number !== null) {
       validateNumber = phoneNumberValidate(phone_number);
       if (validateNumber !== '') {
         const subscriberbody = JSON.stringify({
