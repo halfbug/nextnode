@@ -669,6 +669,7 @@ export class GroupshopsService {
           campaign: 1,
           allProducts: 1,
           obSettings: 1,
+          exipredShortLink: 1,
         },
       },
     ];
