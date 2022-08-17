@@ -98,6 +98,10 @@ export class ThemeAppExtensionController {
         members,
       );
       const newURL = owner.orderId === orderId ? ownerUrl : url;
+      console.log(
+        '🚀 ~ file: theme-app-extension.controller.ts ~ line 101 ~ ThemeAppExtensionController ~ getMemberDetails ~ newURL',
+        newURL,
+      );
       // console.log(await /this.groupshopSrv.findByOrderId(orderId));
       const activeMember = members.find((member) =>
         member.orderId.includes(orderId),
@@ -109,7 +113,7 @@ export class ThemeAppExtensionController {
       res.send(
         JSON.stringify({
           activeMember,
-          url,
+          url: newURL,
           percentage,
           members: members.length,
         }),
