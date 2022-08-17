@@ -97,7 +97,8 @@ export class ThemeAppExtensionController {
         '🚀 ~ file: theme-app-extension.controller.ts ~ line 65 ~ ThemeAppExtensionController ~ getMemberDetails ~ members',
         members,
       );
-      const newURL = owner.orderId === orderId ? ownerUrl : url;
+      const newURL =
+        owner.orderId === `gid://shopify/Order/${orderId}` ? ownerUrl : url;
       console.log(
         '🚀 ~ file: theme-app-extension.controller.ts ~ line 101 ~ ThemeAppExtensionController ~ getMemberDetails ~ newURL',
         newURL,

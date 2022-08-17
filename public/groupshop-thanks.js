@@ -2,8 +2,8 @@
 console.log('v2 Script Local');
 console.log('v2 Script Triggered');
 // Define App Url
-// window.BURL = 'https://173e-39-57-235-166.ngrok.io';
-// window.FURLL = 'http://localhost:3000';
+// window.BURL = 'https://d83a-39-57-201-45.ngrok.io';
+// window.FURL = 'http://localhost:3000';
 window.BURL = 'https://api-stage.groupshop.co';
 window.FURL = 'http://front-stage.groupshop.co';
 
@@ -615,6 +615,10 @@ async function init() {
           //   }
           // });
           window.GSURL = window.FURL + url;
+          console.log(
+            '🚀 ~ file: groupshop-thanks.js ~ line 618 ~ pollit ~ window.GSURL',
+            window.GSURL,
+          );
           document.querySelector(
             '.get-start-thank-wrap',
           ).innerHTML = `<div class="get-start-wrap"><a target="_blank" href="${window.GSURL}">Get Started</a></div>`;
