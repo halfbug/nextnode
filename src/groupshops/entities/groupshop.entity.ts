@@ -121,6 +121,15 @@ export class uniqueClicks {
 }
 
 @ObjectType()
+export class activeGroupshop {
+  @Field({ nullable: true })
+  shortUrl?: string;
+
+  @Field({ nullable: true })
+  url?: string;
+}
+
+@ObjectType()
 export class GsOrders {
   @Field(() => [Member])
   members: Member[];

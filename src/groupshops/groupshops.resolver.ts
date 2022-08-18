@@ -11,6 +11,7 @@ import {
   GroupShop as Groupshop,
   Member,
   uniqueClicks,
+  activeGroupshop,
 } from './entities/groupshop.entity';
 import { CreateGroupshopInput } from './dto/create-groupshops.input';
 import { UpdateGroupshopInput } from './dto/update-groupshops.input';
@@ -96,6 +97,12 @@ export class GroupshopsResolver {
       startFrom,
       toDate,
     );
+    return result;
+  }
+
+  @Query(() => activeGroupshop, { name: 'getActiveGroupshop' })
+  async getActiveGroupshop(@Args('storeId') storeId: string) {
+    const result = await this.GroupshopsService.getActiveGroupshop(storeId);
     return result;
   }
 

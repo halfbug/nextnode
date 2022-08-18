@@ -278,6 +278,7 @@ export class PartnerService {
           memberDetails: 1,
           refferalProducts: 1,
           influencerProducts: 1,
+          isActive: 1,
           partnerCommission: 1,
           visitors: {
             $size: '$visitors',

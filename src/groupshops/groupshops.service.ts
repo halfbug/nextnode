@@ -218,6 +218,46 @@ export class GroupshopsService {
     // console.log({ gs });
     return gs[0];
   }
+
+  async getActiveGroupshop(storeId) {
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              storeId: storeId,
+            },
+            {
+              expiredAt: {
+                $gte: new Date(),
+              },
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          memberLength: {
+            $size: '$members',
+          },
+          url: 1,
+          shortUrl: 1,
+        },
+      },
+      {
+        $sort: {
+          memberLength: -1,
+        },
+      },
+      {
+        $limit: 1,
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    return gs[0];
+  }
+
   async totalGs(storeId: string) {
     const agg = [
       {
