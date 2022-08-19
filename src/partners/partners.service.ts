@@ -608,13 +608,96 @@ export class PartnerService {
     return this.partnerRepository.findOne({ id });
   }
 
-  findAll(storeId: string) {
-    return this.partnerRepository.find({
-      where: { storeId },
-      order: {
-        updatedAt: -1,
+  async findAll(storeId: string) {
+    const agg = [
+      {
+        $match: {
+          storeId: storeId,
+        },
       },
-    });
+      {
+        $lookup: {
+          from: 'partnermember',
+          localField: 'id',
+          foreignField: 'groupshopId',
+          as: 'members',
+        },
+      },
+      {
+        $project: {
+          purchases: {
+            $size: '$members',
+          },
+          id: 1,
+          members: 1,
+          campaignId: 1,
+          discountCode: 1,
+          partnerRewards: 1,
+          partnerDetails: 1,
+          isActive: 1,
+          partnerCommission: 1,
+          shortUrl: 1,
+          url: 1,
+          updatedAt: 1,
+        },
+      },
+      {
+        $unwind: {
+          path: '$members',
+          includeArrayIndex: 'typeIndex',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: '$id',
+          revenue: {
+            $sum: '$members.orderAmount',
+          },
+          partnerRewards: {
+            $first: '$partnerRewards',
+          },
+          partnerDetails: {
+            $first: '$partnerDetails',
+          },
+          discountCode: {
+            $first: '$discountCode',
+          },
+          purchases: {
+            $first: '$purchases',
+          },
+          shortUrl: {
+            $first: '$shortUrl',
+          },
+          url: {
+            $first: '$url',
+          },
+          partnerCommission: {
+            $first: '$partnerCommission',
+          },
+          campaignId: {
+            $first: '$campaignId',
+          },
+          isActive: {
+            $first: '$isActive',
+          },
+          id: {
+            $first: '$id',
+          },
+          updatedAt: {
+            $first: '$updatedAt',
+          },
+        },
+      },
+      {
+        $sort: {
+          updatedAt: -1,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Partnergroupshop, agg).toArray();
+    return gs;
   }
 
   async update(id: string, updatePartnersInput: UpdatePartnersInput) {

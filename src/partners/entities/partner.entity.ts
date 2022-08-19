@@ -73,6 +73,12 @@ export class Partnergroupshop {
   @Field({ nullable: true })
   partnerCommission: string;
 
+  @Field({ nullable: true })
+  revenue?: string;
+
+  @Field({ nullable: true })
+  purchases?: string;
+
   @Field(() => partnerDetails)
   partnerDetails: partnerDetails;
 

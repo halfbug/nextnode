@@ -58,8 +58,8 @@ export class PartnersResolver {
 
   @Query(() => [Partners], { name: 'partnerGroupshops' })
   async findAll(@Args('storeId') storeId: string) {
-    console.log('🚀 ~ file: Partners.resolver.ts ~ findAll');
-    return this.PartnerService.findAll(storeId);
+    console.log('🚀 ~ file: Partners.resolver.ts ~ findAll ');
+    return await this.PartnerService.findAll(storeId);
   }
 
   @Mutation(() => Partners)
