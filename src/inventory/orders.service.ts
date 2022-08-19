@@ -60,6 +60,68 @@ export class OrdersService {
 
     return await manager.aggregate(Orders, agg).toArray();
   }
+  async getPurchasedProductsLastSixMonth(shop: string, nowdate: Date) {
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              id: {
+                $regex: 'Order',
+              },
+            },
+            {
+              shop,
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          createDate: {
+            $dateFromString: {
+              dateString: '$shopifyCreateAt',
+            },
+          },
+          id: 1,
+        },
+      },
+      {
+        $match: {
+          createDate: {
+            $gte: new Date(Date.now() - 15770000000),
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'id',
+          foreignField: 'parentId',
+          as: 'LI',
+        },
+      },
+      {
+        $unwind: {
+          path: '$LI',
+        },
+      },
+      {
+        $group: {
+          _id: '$LI.product.id',
+          purchaseCount: {
+            $sum: {
+              $multiply: [1, '$LI.quantity'],
+            },
+          },
+        },
+      },
+    ];
+
+    const manager = getMongoManager();
+
+    return await manager.aggregate(Orders, agg).toArray();
+  }
 
   async getDataByOrderId(orderId: string) {
     const agg = [

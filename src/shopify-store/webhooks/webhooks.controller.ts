@@ -1323,4 +1323,42 @@ export class WebhooksController {
       res.status(HttpStatus.OK).send();
     }
   }
+
+  @Get('sync-pc?')
+  async updatePurchaseCount(@Query('shop') shop: any, @Res() res) {
+    try {
+      // const allShopPrd = await this.inventryService.findAllProductsOnly(shop);
+      // console.log(
+      //   '🚀 ~ file: webhooks.controller.ts ~ line 1331 ~ WebhooksController ~ updatePurchaseCount ~ allShopPrd',
+      //   allShopPrd.length,
+      // );
+      const nowdate = new Date(Date.now() - 15770000000);
+      const PurchasedProducts =
+        await this.orderService.getPurchasedProductsLastSixMonth(shop, nowdate);
+
+      console.log(
+        '🚀 ~ file: webhooks.controller.ts ~ line 1337 ~ WebhooksController ~ updatePurchaseCount ~ PurchasedProducts',
+        PurchasedProducts.slice(0, 2),
+      );
+      const blukWrite = PurchasedProducts.map((item) => {
+        return {
+          updateOne: {
+            filter: { id: item._id },
+            update: { $set: { purchaseCount: item.purchaseCount } },
+          },
+        };
+      });
+      await this.inventryService.setPurchaseCount(blukWrite);
+      // console.log('Product purchase count updated...');
+
+      res.send({
+        shop: PurchasedProducts,
+        message: 'purchaseCount updated',
+      });
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
 }
