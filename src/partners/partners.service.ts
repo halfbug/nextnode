@@ -729,14 +729,28 @@ export class PartnerService {
         store: { shop, accessToken },
         allProducts,
       } = gsp;
-      const allNewProducts = allProducts.map((item) => item.id);
+      const allNewProducts = [
+        ...allProducts,
+        ...updatePartnersInput.dealProducts.map((item) => ({
+          id: item.productId,
+        })),
+      ].map((item) => item.id);
+      console.log(
+        '🚀 ~ file: partners.service.ts ~ line 738 ~ PartnerService ~ update ~ allNewProducts',
+        allNewProducts,
+      );
+      console.log(
+        '🚀 ~ file: partners.service.ts ~ line 738 ~ PartnerService ~ update ~ updatePartnersInput.dealProducts',
+        updatePartnersInput.dealProducts,
+      );
+
       await this.shopifyapi.setDiscountCode(
         shop,
         'Update',
         accessToken,
         null,
         null,
-        allNewProducts,
+        [...new Set(allNewProducts)],
         null,
         null,
         priceRuleId,
