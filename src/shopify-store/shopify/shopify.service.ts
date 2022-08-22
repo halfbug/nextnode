@@ -111,7 +111,7 @@ export class ShopifyService {
     id?: string,
   ) {
     // if (percentage) {
-    // console.log({ action });
+    console.log({ title });
     // console.log({ percentage });
     const client = await this.client(shop, accessToken);
     let priceRule: any;
@@ -199,7 +199,7 @@ export class ShopifyService {
           },
         };
 
-      console.log({ variables });
+      // console.log({ variables });
       console.log(JSON.stringify(variables));
       priceRule = await client.query({
         data: {
@@ -237,11 +237,11 @@ export class ShopifyService {
     );
     const {
       [`priceRule${action}`]: {
-        priceRule: { id: priceRuleId },
+        priceRule: { id: priceRuleId, title: title1 },
       },
     } = priceRule.body['data'];
     return {
-      title,
+      title: title ?? title1,
       percentage: percentage?.toString(),
       priceRuleId: priceRuleId,
     };

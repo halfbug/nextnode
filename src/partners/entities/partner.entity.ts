@@ -67,7 +67,7 @@ export class Partnergroupshop {
   @Field(() => DiscountCode)
   discountCode: DiscountCode;
 
-  @Field(() => PartnerRewards)
+  @Field(() => PartnerRewards, { nullable: true })
   partnerRewards?: PartnerRewards;
 
   @Field({ nullable: true })

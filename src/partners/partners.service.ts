@@ -24,7 +24,7 @@ export class PartnerService {
     private partnerRepository: Repository<Partnergroupshop>,
     private shopifyapi: ShopifyService,
     private storesService: StoresService,
-    private gspEvent: GSPCreatedEvent,
+    private gspEvent: GSPCreatedEvent, // private gspListener: GSPSavedListener,
   ) {}
 
   async findOne(discountCode: string) {
@@ -702,19 +702,21 @@ export class PartnerService {
 
   async update(id: string, updatePartnersInput: UpdatePartnersInput) {
     updatePartnersInput.updatedAt = new Date();
+
     console.log(
       '🚀 ~ file:PartnerService updatePartnersInput',
       updatePartnersInput,
     );
-    const { storeId, partnerCommission, isActive } = updatePartnersInput;
-    const res = await this.partnerRepository.update(
-      { id },
-      updatePartnersInput,
-    );
-    if (
-      updatePartnersInput.isActive === true ||
-      updatePartnersInput.isActive === false
-    ) {
+    const {
+      storeId,
+      partnerCommission,
+      // partnerRewards: { baseline },
+    } = updatePartnersInput;
+    if (updatePartnersInput.isActive) {
+      const res = await this.partnerRepository.update(
+        { id },
+        updatePartnersInput,
+      );
       return this.findWithId(id);
     }
     if (
@@ -741,30 +743,45 @@ export class PartnerService {
       );
     }
     if (
-      updatePartnersInput?.discountCode &&
-      updatePartnersInput?.discountCode?.percentage
+      updatePartnersInput?.partnerRewards &&
+      updatePartnersInput?.partnerRewards?.baseline
     ) {
       const gsp = await this.findById(id);
       const {
         discountCode: { priceRuleId, percentage, title },
         store: { shop, accessToken },
+        partnerRewards: { baseline },
         allProducts,
       } = gsp;
-      const allNewProducts = allProducts.map((item) => item.id);
-      if (updatePartnersInput?.discountCode?.percentage !== percentage) {
-        await this.shopifyapi.setDiscountCode(
-          shop,
-          'Update',
-          accessToken,
-          null,
-          +updatePartnersInput?.discountCode?.percentage,
-          allNewProducts,
-          null,
-          null,
-          priceRuleId,
-        );
-      }
+      // console.log(
+      //   '🚀 ~ file: partners.service.ts ~ line 751 ~ PartnerService ~ update ~ gsp',
+      //   gsp,
+      // );
+      // const allNewProducts = allProducts.map((item) => item.id);
+      // const { shop, accessToken } = await this.storesService.findById(
+      //   updatePartnersInput.storeId,
+      // );
+      updatePartnersInput.discountCode = new DiscountCodeInput();
+      updatePartnersInput.discountCode = await this.shopifyapi.setDiscountCode(
+        shop,
+        'Update',
+        accessToken,
+        null,
+        parseInt(updatePartnersInput?.partnerRewards?.baseline ?? baseline),
+        null,
+        null,
+        null,
+        priceRuleId,
+      );
+      console.log(
+        '🚀 ~ file: partners.service.ts ~ line 759 ~ PartnerService ~ update ~ updatePartnersInput.discountCode',
+        updatePartnersInput.discountCode,
+      );
     }
+    const res = await this.partnerRepository.update(
+      { id },
+      updatePartnersInput,
+    );
 
     return updatePartnersInput;
   }
