@@ -654,6 +654,9 @@ export class PartnerService {
           revenue: {
             $sum: '$members.orderAmount',
           },
+          comissionAmount: {
+            $sum: '$members.comissionAmount',
+          },
           partnerRewards: {
             $first: '$partnerRewards',
           },

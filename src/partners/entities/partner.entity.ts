@@ -77,6 +77,9 @@ export class Partnergroupshop {
   revenue?: string;
 
   @Field({ nullable: true })
+  comissionAmount?: string;
+
+  @Field({ nullable: true })
   purchases?: string;
 
   @Field(() => partnerDetails)
