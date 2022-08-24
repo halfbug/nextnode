@@ -86,17 +86,27 @@ export class StoresService {
     const res = await manager.aggregate(Store, agg).toArray();
     // console.log(
     //   '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
-    //   res[0].campaigns,
+    //   res[0],
     // );
-    return { ...res[0] };
+    if (typeof res[0].industry === 'string') {
+      return { ...res[0], industry: [res[0].industry] };
+    } else {
+      return { ...res[0] };
+    }
   }
 
   async findOneByName(shop: string) {
-    return await this.storeRepository.findOne({
+    const result = await this.storeRepository.findOne({
       where: {
         shop: { $regex: `^${shop}*` },
       },
     });
+    console.log(JSON.stringify(result));
+    if (typeof result.industry === 'string') {
+      return { ...result, industry: [result.industry] };
+    } else {
+      return result;
+    }
   }
 
   async findOneById(id: string) {
