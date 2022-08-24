@@ -1,4 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotAcceptableException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { BillingPlanEnum } from 'src/stores/entities/store.entity';
@@ -12,6 +13,7 @@ export class BillingUsageCargeCron {
     private readonly billingService: BillingsService,
     private readonly storesService: StoresService,
     private shopifyapi: ShopifyService,
+    private configService: ConfigService,
   ) {}
 
   usageDescripton(
@@ -59,9 +61,14 @@ export class BillingUsageCargeCron {
     }
   }
 
-  @Cron('0 00 12 * * *') // CronExpression.EVERY_DAY_AT_5PM) ///EVERY_DAY_AT_6AM) // EVERY_10_SECONDS)
+  @Cron('0 59 23 * * *') // CronExpression.EVERY_DAY_AT_5PM) ///EVERY_DAY_AT_6AM) // EVERY_10_SECONDS)
   async handleBillingCron() {
     try {
+      if (this.configService.get('BILLING_LIVE') === 'false')
+        throw new NotAcceptableException(
+          BillingUsageCargeCron.name,
+          'Billing live is false',
+        );
       // this.logger.error('Called every 30 seconds');
       this.logger.debug(`Started At : ${new Date()}`);
       const stores = await this.storesService.findActiveAll();
