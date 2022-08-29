@@ -494,7 +494,7 @@ function addLeftBlock() {
 </div>
 <div class="powerby mont">Powered by <a class="ty-share-this-deal" href="javascript:void(0)"><img src="${window.BURL}/public/images/GROUPSHOP-logo.svg"></a></div>`;
 
-  var target = document.querySelector('.content-box:first-child');
+  var target = document.querySelector('.content-box:not([hidden])');
   target.prepend(leftBlock);
 }
 
