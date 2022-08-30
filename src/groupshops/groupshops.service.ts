@@ -414,7 +414,7 @@ export class GroupshopsService {
                   },
                   {
                     $not: {
-                      $in: ['$$j.id', '$store.hideProducts'],
+                      $in: ['$$j.product.id', '$store.hideProducts'],
                     },
                   },
                 ],
