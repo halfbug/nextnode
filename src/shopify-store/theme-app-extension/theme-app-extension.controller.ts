@@ -114,8 +114,8 @@ export class ThemeAppExtensionController {
       res.send(
         JSON.stringify({
           activeMember,
-          // url: newURL,
-          url,
+          url: newURL,
+          // url,
           percentage,
           members: members.length,
         }),
