@@ -26,13 +26,13 @@ export class BillingUsageCargeCron {
     switch (plan) {
       case BillingPlanEnum.EXPLORE:
         return `Groupshop Explore ${
-          isfreeTrial && '(free for 30 days)'
+          isfreeTrial ? '(free for 30 days)' : ''
         } + Cashback charge - $${cashback}`;
 
       case BillingPlanEnum.LAUNCH:
         // return `Launch (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
         return `Groupshop Launch Plan ${
-          isfreeTrial && '(free for 30 days)'
+          isfreeTrial ? '(free for 30 days)' : ''
         }>> ${new Date().toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
@@ -42,7 +42,7 @@ export class BillingUsageCargeCron {
       case BillingPlanEnum.GROWTH:
         // return `Growth (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
         return `Groupshop Growth Plan ${
-          isfreeTrial && '(free for 30 days)'
+          isfreeTrial ? '(free for 30 days)' : ''
         }>> ${new Date().toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
@@ -52,7 +52,7 @@ export class BillingUsageCargeCron {
       case BillingPlanEnum.ENTERPRISE:
         // return `Enterprise  (${totalCharge}) >> Groupshop charge - ${gscharge} + Cashback charge - $${cashback}`;
         return `Groupshop Enterprise Plan ${
-          isfreeTrial && '(free for 30 days)'
+          isfreeTrial ? '(free for 30 days)' : ''
         }>> ${new Date().toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
