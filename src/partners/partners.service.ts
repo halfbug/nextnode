@@ -830,4 +830,16 @@ export class PartnerService {
       },
     });
   }
+
+  async getCampaignGS(campaignId) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          campaignId: campaignId.id,
+        },
+      },
+    ];
+    return await manager.aggregate(Partnergroupshop, agg).toArray();
+  }
 }

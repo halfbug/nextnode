@@ -16,6 +16,7 @@ import {
 } from 'src/appsettings/entities/sales-target.model';
 import { CampaignInactiveEvent } from 'src/billing/events/campaign-inactive.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PartnerService } from 'src/partners/partners.service';
 
 @Injectable()
 export class CampaignsService {
@@ -28,6 +29,7 @@ export class CampaignsService {
 
     private shopifyapi: ShopifyService,
     private groupshopsService: GroupshopsService,
+    private partnerGsService: PartnerService,
   ) {}
 
   async setProducts(shop, criteria, prevProducts) {
@@ -198,11 +200,12 @@ export class CampaignsService {
 
   async updateDiscountCode(campaignId, products, shop, accessToken) {   
     console.log("🚀 ~ campaignId", campaignId);    
-    const allComapigns = await this.groupshopsService.getCampaignGS(campaignId);
-    for (const key in allComapigns) {  
-      const priceRuleId = allComapigns[key].discountCode.priceRuleId; 
+    const allGS = await this.groupshopsService.getCampaignGS(campaignId);
+    const allPartnerGS = await this.partnerGsService.getCampaignGS(campaignId);
+    for (const key in allGS) {  
+      const priceRuleId = allGS[key].discountCode.priceRuleId; 
       // get all deal products
-      const gsDealProduucts = allComapigns[key].dealProducts?.map(prd => prd.productId) ?? []
+      const gsDealProduucts = allGS[key].dealProducts?.map(prd => prd.productId) ?? []
 
       await this.shopifyapi.setDiscountCode(
         shop,
@@ -216,8 +219,26 @@ export class CampaignsService {
         priceRuleId,
       );
     }
-
+    if (allPartnerGS && allPartnerGS.length) {
+      for (const key in allPartnerGS) {  
+      const priceRuleId = allPartnerGS[key].discountCode.priceRuleId; 
+      // get all deal products
+      const gsDealProduucts = allPartnerGS[key].dealProducts?.map(prd => prd.productId) ?? []
+      await this.shopifyapi.setDiscountCode(
+        shop,
+        'Update',
+        accessToken,
+        null,
+        null,
+        [...new Set([...products, ...gsDealProduucts])],
+        null,
+        null,
+        priceRuleId,
+      );
+    }
   }
+
+  } // end update 
  
   // this funtion will return best seller product of running active campaign
   async getBestSellerProducts(shop: string) {

@@ -8,6 +8,7 @@ import { InventoryService } from 'src/inventory/inventory.service';
 import { InventoryModule } from 'src/inventory/inventory.module';
 import { StoresModule } from 'src/stores/stores.module';
 import { GroupshopsModule } from 'src/groupshops/groupshops.module';
+import { PartnersModule } from 'src/partners/partners.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { GroupshopsModule } from 'src/groupshops/groupshops.module';
     InventoryModule,
     forwardRef(() => StoresModule),
     GroupshopsModule,
+    PartnersModule,
   ],
   providers: [CampaignsResolver, CampaignsService],
   exports: [CampaignsService],
