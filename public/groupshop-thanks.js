@@ -2,7 +2,7 @@
 console.log('v2 Script Local');
 console.log('v2 Script Triggered');
 // Define App Url
-// window.BURL = 'https://d83a-39-57-201-45.ngrok.io';
+// window.BURL = 'https://4a99-39-57-239-253.ngrok.io';
 // window.FURL = 'http://localhost:3000';
 window.BURL = 'https://api-stage.groupshop.co';
 window.FURL = 'http://front-stage.groupshop.co';
@@ -567,6 +567,7 @@ async function init() {
           }
 
           var amountCal = `${Math.floor(cashback)
+            .toFixed(2)
             .toString()
             .replace('.00', '')}`;
           var leftHeadTxt = '';
@@ -593,10 +594,12 @@ async function init() {
           // document.querySelectorAll('#gscashback').forEach((elem) => {
           //   console.log(elem);
           //   var amountCal = `${Math.floor(cashback)
+          //     .toFixed(2)
           //     .toString()
           //     .replace('.00', '')}`;
           //   if (amountCal > 0) {
           //     elem.innerHTML = `$${Math.floor(cashback)
+          //     .toFixed(2)
           //       .toString()
           //       .replace('.00', '')}`;
           //   } else {
@@ -646,6 +649,12 @@ async function init() {
             slide.href = window.GSURL;
             slide.target = '_blank';
             slide.className = 'gscard';
+            const pp = +prod?.price;
+            const productPrice = +pp.toFixed(2).toString().replace('.00', '');
+            console.log(
+              '🚀 ~ file: groupshop-thanks.js ~ line 654 ~ displayProd.map ~ productPrice',
+              productPrice,
+            );
             slide.innerHTML = `<img src="${
               prod.featuredImage
             }"alt="img"><span class="discount">${percentage}% OFF</span><h4>${prod.title.slice(
@@ -657,7 +666,7 @@ async function init() {
             )
               .toFixed(2)
               .toString()
-              .replace('.00', '')}</span> <del>$${prod.price}</del>`;
+              .replace('.00', '')}</span> <del>$${productPrice}</del>`;
             glider.addItem(slide);
             glider.refresh(true);
             return prod;
@@ -689,6 +698,7 @@ async function init() {
           let discountAmt = (totalOrderAmount * parseInt(baseline)) / 100;
 
           var amountCal = `${Math.floor(discountAmt)
+            .toFixed(2)
             .toString()
             .replace('.00', '')}`;
           console.log(
