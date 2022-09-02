@@ -322,6 +322,121 @@ export class OrdersService {
     return response;
   }
 
+  async findpendinggroupshop(
+    shop: string,
+    startDate: string,
+    endDate: string,
+    minOrderValue: string,
+  ) {
+    const agg: any = [
+      {
+        $match: {
+          $and: [
+            {
+              shop: shop,
+            },
+            {
+              confirmed: true,
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          createDate: {
+            $dateFromString: {
+              dateString: '$shopifyCreateAt',
+            },
+          },
+          id: 1,
+          price: 1,
+          shop: 1,
+          confirmed: 1,
+          currencyCode: 1,
+          totalDiscounts: 1,
+          discountCode: 1,
+          discountInfo: 1,
+          customer: 1,
+          shopifyCreateAt: 1,
+          name: 1,
+        },
+      },
+      {
+        $match: {
+          $and: [
+            {
+              createDate: {
+                $gte: new Date(startDate),
+              },
+            },
+            {
+              createDate: {
+                $lt: new Date(endDate),
+              },
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'groupshops',
+          localField: 'id',
+          foreignField: 'members.orderId',
+          as: 'groupshops',
+        },
+      },
+      {
+        $addFields: {
+          haveGroupshop: {
+            $cond: {
+              if: {
+                $gt: [
+                  {
+                    $size: '$groupshops',
+                  },
+                  0,
+                ],
+              },
+              then: true,
+              else: false,
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          haveGroupshop: false,
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'id',
+          foreignField: 'parentId',
+          as: 'lineItems',
+        },
+      },
+    ];
+
+    if (minOrderValue !== '')
+      agg?.push({
+        $match: {
+          $expr: {
+            $gte: [
+              {
+                $toDecimal: '$price',
+              },
+              +minOrderValue,
+            ],
+          },
+        },
+      });
+
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Orders, agg).toArray();
+    return gs;
+  }
+
   async create(createOrderInput: CreateOrderInput) {
     try {
       const order = this.ordersRepository.create(createOrderInput);
@@ -332,6 +447,11 @@ export class OrdersService {
     } catch (err) {
       console.log(JSON.stringify(err));
     }
+  }
+
+  async updateBulkOrders(orderData: any) {
+    const manager = getMongoManager();
+    return await manager.bulkWrite(Orders, orderData);
   }
 
   async smsUpdate(updateOrderInput: UpdateOrderInput) {

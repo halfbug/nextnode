@@ -28,3 +28,25 @@ export class CustomerType {
   @Field({ nullable: true })
   sms_marketing?: string;
 }
+
+@ObjectType('PendingGroupshop')
+export class PendingGroupshop {
+  @Field({ nullable: true })
+  _id?: string;
+  @Field({ nullable: true })
+  name?: string;
+  @Field({ nullable: true })
+  id?: string;
+  @Field(() => CustomerType, { nullable: true })
+  customer?: CustomerType;
+  @Field({ nullable: true })
+  createDate?: string;
+  @Field({ nullable: true })
+  shopifyCreateAt?: string;
+  @Field({ nullable: true })
+  price?: number;
+  @Field({ nullable: true })
+  haveGroupshop?: boolean;
+  @Field(() => [String], { nullable: 'itemsAndList' })
+  groupshops?: string[];
+}

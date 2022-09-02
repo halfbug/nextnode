@@ -50,6 +50,14 @@ export class Subscription {
   @Field({ nullable: true })
   status?: string;
 }
+@InputType('RetentiontoolsInput')
+export class Retentiontools {
+  @Field({ nullable: true })
+  status?: string;
+
+  @Field({ nullable: true })
+  updatedAt?: Date;
+}
 @InputType()
 export class CreateStoreInput {
   @Field()
@@ -104,6 +112,8 @@ export class CreateStoreInput {
   subscription?: Subscription;
 
   @Field({ nullable: true })
+  retentiontool?: Retentiontools;
+
   createdAt?: Date;
 
   @Field({ defaultValue: new Date() })

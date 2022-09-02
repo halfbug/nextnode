@@ -133,6 +133,15 @@ export class CampaignsService {
     });
   }
 
+  async findActiveOneById(storeId: string) {
+    return await this.campaignRepository.findOne({
+      where: {
+        storeId: storeId,
+        isActive: true,
+      },
+    });
+  }
+
   async update(id: string, updateCampaignInput: UpdateCampaignInput) {
     console.log(
       '🚀 ~ file:CampaignsService updateCampaignInput',

@@ -37,6 +37,11 @@ export class CampaignsResolver {
     return this.campaignsService.findOne(id);
   }
 
+  @Query(() => Campaign, { name: 'getActiveCampaign' })
+  findActiveOne(@Args('storeId') storeId: string) {
+    return this.campaignsService.findActiveOneById(storeId);
+  }
+
   @Query(() => [Metrics], { name: 'overviewCampaignMetric' })
   async overviewCampaignMetric(
     @Args('storeId') storeId: string,

@@ -14,6 +14,7 @@ import { BillingModule } from './billing/billing.module';
 import Inventory from './inventory/entities/inventory.modal';
 import Campaign from './campaigns/entities/campaign.model';
 import Orders from './inventory/entities/orders.modal';
+import { Retentiontool } from './retentiontools/entities/retention.modal';
 import { Appsetting } from './appsettings/entities/appsetting.model';
 import { GroupshopsModule } from './groupshops/groupshops.module';
 import { Groupshops } from './groupshops/entities/groupshop.modal';
@@ -30,6 +31,7 @@ import {
 import { GsCommonModule } from './gs-common/gs-common.module';
 import { Lifecycle } from './gs-common/entities/lifecycle.modal';
 import { Visitors } from './gs-common/entities/visitors.modal';
+import { RetentiontoolsModule } from './retentiontools/retentiontools.module';
 
 @Module({
   imports: [
@@ -63,6 +65,7 @@ import { Visitors } from './gs-common/entities/visitors.modal';
             Inventory,
             Campaign,
             Orders,
+            Retentiontool,
             Partnergroupshop,
             Appsetting,
             Groupshops,
@@ -93,6 +96,7 @@ import { Visitors } from './gs-common/entities/visitors.modal';
     EmailModule,
     PartnersModule,
     GsCommonModule,
+    RetentiontoolsModule,
   ],
 })
 export class AppModule {}

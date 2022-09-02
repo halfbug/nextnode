@@ -18,6 +18,14 @@ export class Subscription {
   status?: string;
 }
 
+export class Retentiontools {
+  @Column({ nullable: true })
+  status?: string;
+
+  @Column({ nullable: true })
+  updatedAt?: Date;
+}
+
 @Entity()
 export default class Store extends DefaultColumnsService {
   @Column()
@@ -61,6 +69,9 @@ export default class Store extends DefaultColumnsService {
 
   @Column({ nullable: true })
   subscription?: Subscription;
+
+  @Column({ nullable: true })
+  retentiontool?: Retentiontools;
 
   @Column({ nullable: true })
   hideProducts?: string[];

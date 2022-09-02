@@ -55,10 +55,18 @@ export class OrdersReceivedListener {
               readJsonLines(res.data),
               event.shop,
             );
-            // console.log(ordersObj);
-            // const savedorder =
-            await this.orderService.insertMany(ordersObj);
-            console.log('saved orders for ', event.shop);
+            // console.log(JSON.stringify(ordersObj));
+
+            const blukWrite = ordersObj.map((item) => {
+              return {
+                updateOne: {
+                  filter: { id: item.id },
+                  update: { $set: { ...item } },
+                  upsert: true,
+                },
+              };
+            });
+            await this.orderService.updateBulkOrders(blukWrite);
 
             const ordersSavedEvent = new OrdersSavedEvent();
             ordersSavedEvent.shop = event.shop;

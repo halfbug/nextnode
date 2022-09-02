@@ -6,7 +6,10 @@ import {
   Int,
   GqlExecutionContext,
 } from '@nestjs/graphql';
-import { TotalOrders } from 'src/inventory/entities/orders.entity';
+import {
+  PendingGroupshop,
+  TotalOrders,
+} from 'src/inventory/entities/orders.entity';
 import { OrdersService } from './orders.service';
 
 @Resolver()
@@ -17,5 +20,34 @@ export class OrdersResolver {
   getOrderCount(@Args('shop') shop: string) {
     const data = this.OrderService.getOrderCount(shop);
     return data;
+  }
+
+  @Query(() => [PendingGroupshop], { name: 'findpendinggroupshop' })
+  async findpendinggroupshop(
+    @Args('shop') shop: string,
+    @Args('startDate') startDate: string,
+    @Args('endDate') endDate: string,
+    @Args('minOrderValue') minOrderValue: string,
+  ) {
+    let startDateFormat = '';
+    const d = new Date(startDate);
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    startDateFormat = `${year}${'-'}${month}${'-'}${day}`;
+
+    let endDateFormat = '';
+    const endd = new Date(endDate);
+    const endyear = endd.getFullYear();
+    const endmonth = ('0' + (endd.getMonth() + 1)).slice(-2);
+    const endday = ('0' + endd.getDate()).slice(-2);
+    endDateFormat = `${endyear}${'-'}${endmonth}${'-'}${endday}`;
+
+    return await this.OrderService.findpendinggroupshop(
+      shop,
+      startDateFormat,
+      endDateFormat,
+      minOrderValue,
+    );
   }
 }

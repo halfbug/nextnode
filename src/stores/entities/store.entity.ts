@@ -36,6 +36,15 @@ export class Subscription {
   status?: string;
 }
 
+@ObjectType('Retentiontools')
+export class Retentiontools {
+  @Field({ nullable: true })
+  status?: string;
+
+  @Field({ nullable: true })
+  updatedAt?: Date;
+}
+
 @ObjectType('Store')
 export class Store {
   // @Field({ description: 'mongo entity id' })
@@ -108,4 +117,7 @@ export class Store {
 
   @Field({ nullable: true })
   subscription?: Subscription;
+
+  @Field({ nullable: true })
+  retentiontool?: Retentiontools;
 }

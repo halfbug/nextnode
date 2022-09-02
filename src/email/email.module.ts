@@ -1,5 +1,5 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { InventoryModule } from 'src/inventory/inventory.module';
 import { CatController } from './connect/connect.controller';
 import { GroupshopCashbackListener } from './listeners/groupshop-cashback.listener';
@@ -9,9 +9,15 @@ import { UploadImageService } from 'src/shopify-store/ImageUpload/uploadimage.se
 
 import { UploadImageModule } from 'src/shopify-store/ImageUpload/uploadimage.module';
 import { KalavioResolver } from './kalavio.resolver';
+import { StoresModule } from 'src/stores/stores.module';
 
 @Module({
-  imports: [HttpModule, InventoryModule, UploadImageModule],
+  imports: [
+    HttpModule,
+    InventoryModule,
+    UploadImageModule,
+    forwardRef(() => StoresModule),
+  ],
   providers: [
     GroupshopSavedListener,
     GroupshopCashbackListener,

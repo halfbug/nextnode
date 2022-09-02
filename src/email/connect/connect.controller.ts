@@ -19,6 +19,8 @@ import { GroupshopSavedEvent } from 'src/groupshops/events/groupshop-saved.event
 import { KalavioService } from '../kalavio.service';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { StoreService } from 'src/shopify-store/store/store.service';
+import { OrdersReceivedEvent } from 'src/shopify-store/events/orders-received.event';
+import { StoresService } from 'src/stores/stores.service';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import * as getSymbolFromCurrency from 'currency-symbol-map';
@@ -35,6 +37,7 @@ export class CatController {
     private inventoryService: InventoryService,
     private shopifyService: ShopifyService,
     private storeService: StoreService,
+    private readonly storesService: StoresService,
     private ordersService: OrdersService,
     private kalavioService: KalavioService,
     private uploadImageService: UploadImageService,
@@ -45,6 +48,142 @@ export class CatController {
     groupshopSavedEvent.data = 'newGroupshop';
     this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
     return 'running server on port 5000';
+  }
+
+  @Get('pull-orders')
+  async pullOrders() {
+    try {
+      const { shop, accessToken } = await this.storesService.findOneById(
+        '0ef135cd-c239-420e-a61f-5177e99c91ab',
+      );
+      const client = await this.shopifyService.client(shop, accessToken);
+      const qres = await client.query({
+        data: {
+          query: `mutation {
+            bulkOperationRunQuery(
+             query:"""
+              {
+                 orders(first:5, , query: "created_at:>=2022-07-08"){
+                          edges{
+                            node{
+                              name
+                              id
+                              shopifyCreateAt:createdAt
+                              confirmed
+                              cancelledAt
+                              currencyCode
+                              
+                              customer{
+                                
+                                firstName
+                                lastName
+                                email
+                                  
+                              }
+                              discountCode
+                              totalPriceSet{
+                                shopMoney{
+                                  amount
+                                  currencyCode
+                                }
+                              }
+                              lineItems(first:100){
+                                edges{
+                                  node{
+                                    id
+                                    originalUnitPriceSet{
+                                      shopMoney{
+                                        amount
+                                        currencyCode
+                                      }
+                                    }
+                                    totalDiscountSet{
+                                      shopMoney{
+                                        amount
+                                        currencyCode
+                                      }}
+                                    quantity
+                                    product{
+                                      id
+                                      priceRangeV2{
+                                        maxVariantPrice{
+                                          amount
+                                          currencyCode
+                                        }
+                                      }
+                                    }
+                                    variant{
+                                      id,
+                                      price
+                                      }
+                                  }
+                                }
+                              }
+                              
+                            }
+                          }
+                        }
+              }
+              """
+            ) {
+              bulkOperation {
+                id
+                status
+              }
+              userErrors {
+                field
+                message
+              }
+            }
+          }`,
+        },
+      });
+
+      // console.log(event);
+      // console.log(JSON.stringify(qres));
+      console.log(qres.body['data']['bulkOperationRunQuery']['bulkOperation']);
+      if (
+        qres.body['data']['bulkOperationRunQuery']['bulkOperation'][
+          'status'
+        ] === 'CREATED'
+      ) {
+        const pollit = setInterval(async () => {
+          const poll = await client.query({
+            data: {
+              query: `query {
+            currentBulkOperation {
+              id
+              status
+              errorCode
+              createdAt
+              completedAt
+              objectCount
+              fileSize
+              url
+              partialDataUrl
+            }
+          }`,
+            },
+          });
+
+          console.log(poll.body['data']['currentBulkOperation']);
+          if (
+            poll.body['data']['currentBulkOperation']['status'] === 'COMPLETED'
+          ) {
+            clearInterval(pollit);
+            // fire inventory received event
+            const ordersReceivedEvent = new OrdersReceivedEvent();
+            ordersReceivedEvent.bulkOperationResponse =
+              poll.body['data']['currentBulkOperation'];
+            ordersReceivedEvent.shop = shop;
+            ordersReceivedEvent.accessToken = accessToken;
+            this.eventEmitter.emit('orders.received', ordersReceivedEvent);
+          }
+        }, 3000);
+      } else console.log(JSON.stringify(qres.body['data']));
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    }
   }
 
   @Get('klaviyo-email')
