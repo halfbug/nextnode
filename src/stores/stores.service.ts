@@ -32,12 +32,16 @@ export class StoresService {
       '🚀 ~ file: stores.service.ts ~ line 31 ~ StoresService ~ createORupdate ~ sid',
       sid,
     );
+
+    const dates = sid
+      ? { createdAt: new Date(), updatedAt: new Date() }
+      : { updatedAt: new Date() };
     const manager = getMongoManager();
     try {
       await manager.updateOne(
         Store,
         { id },
-        { $set: { id: sid, ...createStoreInput } },
+        { $set: { id: sid, ...createStoreInput, ...dates } },
         {
           upsert: true,
         },
@@ -124,7 +128,9 @@ export class StoresService {
 
   async updateField(criteria: any, updateLiteral: any) {
     const manager = getMongoManager();
-    manager.updateOne(Store, criteria, { $set: updateLiteral });
+    manager.updateOne(Store, criteria, {
+      $set: { ...updateLiteral, updatedAt: new Date() },
+    });
   }
 
   async updateResource(shop: string, resource: Resource) {

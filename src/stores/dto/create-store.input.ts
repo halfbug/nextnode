@@ -102,4 +102,10 @@ export class CreateStoreInput {
 
   @Field({ nullable: true })
   subscription?: Subscription;
+
+  @Field({ nullable: true })
+  createdAt?: Date;
+
+  @Field({ defaultValue: new Date() })
+  updatedAt: Date;
 }
