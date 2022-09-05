@@ -1,13 +1,11 @@
 import { Column, Entity } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
-import { Member } from 'src/groupshops/entities/groupshop.modal';
+import {
+  Member,
+  ProductTypeEnum,
+} from 'src/groupshops/entities/groupshop.modal';
 import { Customer } from 'src/inventory/entities/orders.modal';
 import { CreateOrderInput as LineItem } from 'src/inventory/dto/create-order.input';
-
-export enum ProductTypeEnum {
-  deal,
-  abandoned,
-}
 
 export enum RefundStatusEnum {
   done,

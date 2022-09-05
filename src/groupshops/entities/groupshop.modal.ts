@@ -4,6 +4,7 @@ import { CreateOrderInput as LineItem } from 'src/inventory/dto/create-order.inp
 
 export enum ProductTypeEnum {
   deal,
+  owner,
   abandoned,
 }
 

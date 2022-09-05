@@ -13,6 +13,7 @@ import { Store } from 'src/stores/entities/store.entity';
 
 export enum ProductTypeEnum {
   deal,
+  owner,
   abandoned,
 }
 registerEnumType(ProductTypeEnum, {
