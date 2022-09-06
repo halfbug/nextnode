@@ -20,6 +20,7 @@ import { CampaignsModule } from 'src/campaigns/campaigns.module';
 import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
 import { CampaignInActiveListener } from './listeners/campaign-inactive.listener';
 import { GsCommonModule } from 'src/gs-common/gs-common.module';
+import { PartnersModule } from 'src/partners/partners.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { GsCommonModule } from 'src/gs-common/gs-common.module';
     InventoryModule,
     forwardRef(() => CampaignsModule),
     GroupshopsModule,
+    PartnersModule,
     forwardRef(() => BillingModule),
     GsCommonModule,
   ],
