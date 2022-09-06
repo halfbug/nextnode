@@ -5,8 +5,10 @@ import { CampaignsService } from 'src/campaigns/campaigns.service';
 import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { LifecycleService } from 'src/gs-common/lifecycle.service';
+import { VistorsService } from 'src/gs-common/vistors.service';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { OrdersService } from 'src/inventory/orders.service';
+import { PartnerService } from 'src/partners/partners.service';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { UpdateStoreInput } from './dto/update-store.input';
 import { BillingPlanEnum } from './entities/store.entity';
@@ -24,6 +26,8 @@ export class UninstallService {
     private shopifyService: ShopifyService,
     private configService: ConfigService,
     private readonly lifecyclesrv: LifecycleService,
+    private partnerGSSrv: PartnerService,
+    private visitorSrv: VistorsService,
   ) {}
 
   async deleteStoreByName(shop: string) {
@@ -44,6 +48,7 @@ export class UninstallService {
       await this.groupshopSrv.removeShop(store.id);
       // await this.storesService.removeShop(shop);
       await this.billingService.removeByShop(store.id);
+      await this.partnerGSSrv.removeShop(store.id);
       store.status = 'Uninstalled';
       store.installationStep = 0;
       store.totalGroupShop = 0;

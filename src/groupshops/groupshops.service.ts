@@ -23,9 +23,9 @@ export class GroupshopsService {
     private shopifyapi: ShopifyService,
   ) {}
   async create(createGroupshopInput: CreateGroupshopInput) {
-    console.log(
-      'createGroupshopInput : ' + JSON.stringify(createGroupshopInput),
-    );
+    // console.log(
+    //   'createGroupshopInput : ' + JSON.stringify(createGroupshopInput),
+    // );
     const groupshop = this.groupshopRepository.create(createGroupshopInput);
     groupshop.dealProducts = [new DealProductsInput()];
     groupshop.id = uuid();
@@ -364,7 +364,7 @@ export class GroupshopsService {
       url: gs[0]?.groupshops[0].url,
       brandname: gs[0]?.shops[0].logoImage,
     };
-    console.log(JSON.stringify(response));
+    // console.log(JSON.stringify(response));
     return response;
   }
 
@@ -921,7 +921,7 @@ export class GroupshopsService {
   }
 
   async getCampaignGS(campaignId) {
-    console.log('🚀 ~ getAllCampaignById', campaignId.id);
+    // console.log('🚀 ~ getAllCampaignById', campaignId.id);
     const manager = getMongoManager();
     const agg = [
       {
@@ -939,7 +939,7 @@ export class GroupshopsService {
         url: groupshopUrl,
       },
     });
-    console.log(JSON.stringify(response));
+    // console.log(JSON.stringify(response));
     return response.members;
   }
 
@@ -1152,9 +1152,6 @@ export class GroupshopsService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
-    console.log('🚀 total GSs in updateStore ~ gs', gs);
-    console.log('🚀 total GSs in updateStore ~ date', sdate, edate);
-    console.log('🚀 total GSs in updateStore ~ month', month, year);
     return gs[0];
   }
 }

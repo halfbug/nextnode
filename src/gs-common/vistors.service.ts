@@ -33,4 +33,8 @@ export class VistorsService {
       },
     });
   }
+  // todo: add storeId field in visitors so we can remove records when app is uninstalled
+  // async removeShop(storeId: string) {
+  //   return await this.visitorsRepository.delete({ storeId });
+  // }
 }

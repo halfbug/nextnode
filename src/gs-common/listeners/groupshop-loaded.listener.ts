@@ -30,10 +30,6 @@ export class GSLoadedListener {
     if (!gs) {
       gs = await this.gpsrv.findOne(code);
     }
-    console.log(
-      '🚀 ~ file: viewed.inceptor.ts ~ line 51 ~ ViewedInterceptor ~ intercept ~ vgs',
-      gs,
-    );
     // 1. find groupshop all views
     const gsviews = (await this.vistorsrv.findAll(gs.id)) || [];
     console.log(

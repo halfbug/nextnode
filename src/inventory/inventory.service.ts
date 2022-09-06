@@ -57,7 +57,7 @@ export class InventoryService {
 
   async updateInventory(id: string, dif: number, field: string) {
     const manager = getMongoManager();
-    console.log('updateInventory', id, dif, field, 'updateInventory');
+    // console.log('updateInventory', id, dif, field, 'updateInventory');
 
     try {
       return await manager.findOneAndUpdate(
