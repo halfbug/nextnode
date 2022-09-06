@@ -75,7 +75,6 @@ export class GSPSavedListener {
     await this.partnerService.update(id, ugsp);
 
     // Send Email by Klaviyo
-    const PUBLIC_KEY = this.configSevice.get('KLAVIYO_PUBLIC_KEY');
     const qrImage = await this.kalavioService.generateQrCode(shortLink);
     const imgPath = event.brandLogo.split('/');
     const brandLogo = `${this.configSevice.get('LOGO_PATH')}/${imgPath[4]}`;
@@ -91,14 +90,13 @@ export class GSPSavedListener {
       baselineDiscount: baselineDiscount,
       qrImage: qrImage,
     };
-    const body = JSON.stringify({
-      token: PUBLIC_KEY,
+    const body = {
       event: 'Groupshop Partner Tools',
       customer_properties: {
         $email: event.email,
       },
       properties: mdata,
-    });
+    };
     this.kalavioService.sendKlaviyoEmail(body);
   }
 }

@@ -17,15 +17,19 @@ export class KalavioService {
 
   sendKlaviyoEmail(body) {
     const urlKlaviyo = this.configService.get('KLAVIYO_TRACK_URL');
+    const token = this.configService.get('KLAVIYO_PUBLIC_KEY');
+    const newbody = JSON.stringify({ token, ...body });
     const options = {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
     };
-    this.httpService.post(urlKlaviyo, body, options).subscribe(async (res) => {
-      //console.log(res);
-    });
+    this.httpService
+      .post(urlKlaviyo, newbody, options)
+      .subscribe(async (res) => {
+        //console.log(res);
+      });
   }
 
   createKlaviyoSubscribes(body: any) {

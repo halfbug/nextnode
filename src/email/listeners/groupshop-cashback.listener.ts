@@ -26,7 +26,6 @@ export class GroupshopCashbackListener {
 
   @OnEvent('cashbackEmail.generated')
   async handleCashbackEvent(res: GroupshopCashbackEvent) {
-    const PUBLIC_KEY = this.configService.get('KLAVIYO_PUBLIC_KEY');
     let orderline_items = [];
     //console.log('resData1111 : ' + JSON.stringify(res));
     const dealUrl = res.groupshop.url;
@@ -191,8 +190,7 @@ export class GroupshopCashbackListener {
       shortUrl: shortLink,
     };
 
-    const body = JSON.stringify({
-      token: PUBLIC_KEY,
+    const body = {
       event: 'Groupshop Cashback Notification',
       customer_properties: {
         $email: customerEmail,
@@ -202,7 +200,7 @@ export class GroupshopCashbackListener {
         sms_marketing_consent: sms_marketing_consent,
       },
       properties: mdata,
-    });
+    };
 
     console.log('cashback : ' + JSON.stringify(mdata));
 

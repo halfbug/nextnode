@@ -27,9 +27,7 @@ export class GroupshopSavedListener {
 
   @OnEvent('groupshop.saved')
   async handleTokenReceivedEvent(res: GroupshopSavedEvent) {
-    const PUBLIC_KEY = this.configService.get('KLAVIYO_PUBLIC_KEY');
     const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
-
     //console.log('resData : ' + JSON.stringify(res));
     const discount_1 =
       res.data.store.activeCampaign.salesTarget.rewards[0].discount.replace(
@@ -273,9 +271,7 @@ export class GroupshopSavedListener {
         campaignsLineItems: campaigns_line_items,
         orderLineItems: order_line_items,
       };
-
-      const body = JSON.stringify({
-        token: PUBLIC_KEY,
+      const body = {
         event: 'Groupshop Order Trigger',
         customer_properties: {
           first_name: res.data.klaviyo?.firstName,
@@ -284,7 +280,7 @@ export class GroupshopSavedListener {
           phone_number: validateNumber,
         },
         properties: mdata,
-      });
+      };
 
       this.kalavioService.sendKlaviyoEmail(body);
     } else {
@@ -315,8 +311,7 @@ export class GroupshopSavedListener {
         getUptoDiscount: leftDiscount,
         orderLineItems: order_line_items,
       };
-      const body = JSON.stringify({
-        token: PUBLIC_KEY,
+      const body = {
         event: 'Groupshop Referrer Order Trigger',
         customer_properties: {
           $email: customerEmail,
@@ -326,7 +321,7 @@ export class GroupshopSavedListener {
           // sms_marketing_consent: sms_marketing_consent,
         },
         properties: rdata,
-      });
+      };
 
       this.kalavioService.sendKlaviyoEmail(body);
     }

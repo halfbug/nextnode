@@ -188,11 +188,6 @@ export class CatController {
 
   @Get('klaviyo-email')
   async klaviyoemailURL() {
-    const PUBLIC_KEY = this.configService.get('KLAVIYO_PUBLIC_KEY');
-    const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
-    const url = `https://a.klaviyo.com/api/track`;
-
-    const currencySymbol = getSymbolFromCurrency('USD');
     const today = new Date();
     const dd = String(today.getDate() - 1).padStart(2, '0');
     const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -340,14 +335,13 @@ export class CatController {
           orderLineItems: order_line_items,
         };
         //console.log(JSON.stringify('mdata : ' + JSON.stringify(mdata)));
-        const body = JSON.stringify({
-          token: PUBLIC_KEY,
+        const body = {
           event: 'Groupshop Reminders Trigger',
           customer_properties: {
             $email: customerEmail,
           },
           properties: mdata,
-        });
+        };
         this.kalavioService.sendKlaviyoEmail(body);
       }
     });

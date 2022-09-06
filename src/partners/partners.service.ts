@@ -7,6 +7,7 @@ import {
   PartnerRewardsInput,
 } from './dto/create-partners.input';
 import { UpdatePartnersInput } from './dto/update-partners.input';
+import { ConfigService } from '@nestjs/config';
 import { partnerDetails, Partnergroupshop } from './entities/partner.modal';
 import { v4 as uuid } from 'uuid';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
@@ -16,6 +17,7 @@ import {
 } from 'src/groupshops/dto/create-groupshops.input';
 import { StoresService } from 'src/stores/stores.service';
 import { GSPCreatedEvent } from './events/create-partner-groupshop.event';
+import { KalavioService } from 'src/email/kalavio.service';
 
 @Injectable()
 export class PartnerService {
@@ -23,6 +25,8 @@ export class PartnerService {
     @InjectRepository(Partnergroupshop)
     private partnerRepository: Repository<Partnergroupshop>,
     private shopifyapi: ShopifyService,
+    private kalavioService: KalavioService,
+    private configService: ConfigService,
     private storesService: StoresService,
     private gspEvent: GSPCreatedEvent, // private gspListener: GSPSavedListener,
   ) {}
@@ -705,7 +709,8 @@ export class PartnerService {
 
   async update(id: string, updatePartnersInput: UpdatePartnersInput) {
     updatePartnersInput.updatedAt = new Date();
-
+    const getData = await this.findWithId(id);
+    const prevPartnerCommission = getData.partnerCommission;
     console.log(
       '🚀 ~ file:PartnerService updatePartnersInput',
       updatePartnersInput,
@@ -799,6 +804,33 @@ export class PartnerService {
       { id },
       updatePartnersInput,
     );
+
+    // Send email when the commission is updated
+    if (prevPartnerCommission !== updatePartnersInput.partnerCommission) {
+      const { shop, brandName, logoImage } = await this.storesService.findById(
+        storeId,
+      );
+      const imgPath = logoImage.split('/');
+      const brandLogo = `${this.configService.get('LOGO_PATH')}/${imgPath[4]}`;
+      const mdata = {
+        customerEmail: getData.partnerDetails.email,
+        commission: updatePartnersInput.partnerCommission,
+        brandName: brandName,
+        brandLogo: brandLogo,
+        storeUrl: shop,
+      };
+      const body = {
+        event: 'Groupshop Influencer Commission Update',
+        customer_properties: {
+          first_name: getData.partnerDetails?.fname,
+          last_name: getData.partnerDetails?.lname,
+          email: getData.partnerDetails?.email,
+        },
+        properties: mdata,
+      };
+
+      this.kalavioService.sendKlaviyoEmail(body);
+    }
 
     return updatePartnersInput;
   }
