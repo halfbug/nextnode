@@ -1,11 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
-import Shopify, {
-  ApiVersion,
-  AuthQuery,
-  RegisterReturn,
-} from '@shopify/shopify-api';
+import Shopify, { AuthQuery, ApiVersion } from '@shopify/shopify-api';
 import { HttpService } from '@nestjs/axios';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { TokenReceivedEvent } from '../events/token-received.event';
@@ -25,7 +21,7 @@ export class ShopifyService {
       API_SECRET_KEY: configService.get('SHOPIFY_API_SECRET'),
       SCOPES: configService.get('SCOPES').split(','),
       HOST_NAME: configService.get('HOST').replace(/https:\/\//, ''),
-      API_VERSION: ApiVersion.October20,
+      API_VERSION: ApiVersion.July22,
       IS_EMBEDDED_APP: false,
       // This should be replaced with your preferred storage strategy
       SESSION_STORAGE: new Shopify.Session.MemorySessionStorage(),
@@ -75,19 +71,24 @@ export class ShopifyService {
 
   async registerHook(shop, accessToken, path, topic) {
     try {
-      // const host = this.configService.get('HOST') + path;
-
+      const host = this.configService.get('HOST') + path;
       const response = await Shopify.Webhooks.Registry.register({
         shop,
         accessToken,
         path: path + '?shop=' + shop,
         topic,
-        webhookHandler: async (topic, shop, body) => {
-          console.log('inside');
-        },
       });
-      console.log(JSON.stringify(response));
-      return response;
+      // const response = await Shopify.Webhooks.Registry.register({
+      //   shop,
+      //   accessToken,
+      //   path: path + '?shop=' + shop,
+      //   topic,
+      //   webhookHandler: function (topic: string, shop_domain: string, body: string): Promise<void> {
+      //     throw new Error('Function not implemented.');
+      //   }
+      // });
+      // console.log(JSON.stringify(response));
+      // return response;
     } catch (error) {
       console.log('error : ', error);
     }
