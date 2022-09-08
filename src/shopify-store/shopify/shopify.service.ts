@@ -29,6 +29,7 @@ export class ShopifyService {
   }
 
   async currentSession(req: Request, res: Response) {
+    console.log('test stage');
     return await Shopify.Utils.loadCurrentSession(req, res, false);
   }
 
