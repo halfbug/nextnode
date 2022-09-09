@@ -299,7 +299,7 @@ export class PartnerService {
     const RP = [];
     const PP = [];
     // removing duplicate roducts from inf prdoucts n ref prds
-    influencerProducts.map((item, ind) => {
+    influencerProducts?.map((item, ind) => {
       if (ind === 0) {
         IP.push(item);
       } else {
@@ -309,7 +309,7 @@ export class PartnerService {
       }
     });
     gs[0].influencerProducts = IP;
-    refferalProducts.map((item, ind) => {
+    refferalProducts?.map((item, ind) => {
       if (ind === 0) {
         RP.push(item);
       } else {
@@ -319,7 +319,7 @@ export class PartnerService {
       }
     });
     gs[0].refferalProducts = RP;
-    popularProducts.map((item, ind) => {
+    popularProducts?.map((item, ind) => {
       if (ind === 0) {
         PP.push(item);
       } else {

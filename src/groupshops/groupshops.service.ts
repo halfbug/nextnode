@@ -805,7 +805,7 @@ export class GroupshopsService {
     const popular = gs[0].popularProducts;
     const dPopular = [];
 
-    popular.map((item, ind) => {
+    popular?.map((item, ind) => {
       if (ind === 0) {
         dPopular.push(item);
       } else {
