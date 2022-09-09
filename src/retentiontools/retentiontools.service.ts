@@ -10,6 +10,7 @@ import { UpdateStoreInput } from 'src/stores/dto/update-store.input';
 import { getMongoManager, Like, Repository } from 'typeorm';
 import { RTPCreatedEvent } from './events/create-retention-tools.event';
 import { v4 as uuid } from 'uuid';
+import { OrdersService } from 'src/inventory/orders.service';
 @Injectable()
 export class RetentiontoolsService {
   constructor(
@@ -20,6 +21,7 @@ export class RetentiontoolsService {
     private eventEmitter: EventEmitter2,
     private storeService: StoresService,
     private rtcEvent: RTPCreatedEvent,
+    private ordersService: OrdersService,
   ) {}
 
   async create(createRetentiontoolInput: CreateRetentiontoolInput) {
@@ -36,6 +38,18 @@ export class RetentiontoolsService {
     const endmonth = ('0' + (endd.getMonth() + 1)).slice(-2);
     const endday = ('0' + endd.getDate()).slice(-2);
     retention.endDate = `${endyear}${'-'}${endmonth}${'-'}${endday}`;
+
+    const pendingGroupshop = await this.ordersService.findpendinggroupshop(
+      createRetentiontoolInput.shop,
+      retention.startDate,
+      retention.endDate,
+      createRetentiontoolInput.minOrderValue,
+    );
+    const orderIds = [];
+    pendingGroupshop.map((items) => {
+      orderIds.push(items.id);
+    });
+    retention.orderIds = orderIds;
     const savedRetention = await this.retentionRepository.save(retention);
 
     this.rtcEvent.storeId = createRetentiontoolInput.storeId;
@@ -215,5 +229,31 @@ export class RetentiontoolsService {
       return res;
       console.log(JSON.stringify(err));
     }
+  }
+
+  async retentionanalytics(id: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          id: id,
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'orderIds',
+          foreignField: 'id',
+          as: 'orders',
+        },
+      },
+      {
+        $project: {
+          orders: -1,
+        },
+      },
+    ];
+    const result = await manager.aggregate(Retentiontool, agg).toArray();
+    return result[0]?.orders;
   }
 }

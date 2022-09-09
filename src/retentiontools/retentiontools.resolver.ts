@@ -1,6 +1,10 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { RetentiontoolsService } from './retentiontools.service';
-import { Retentiontool, SyncStatus } from './entities/retentiontool.entity';
+import {
+  Retentiontool,
+  SyncStatus,
+  RetentionAnalytics,
+} from './entities/retentiontool.entity';
 import { CreateRetentiontoolInput } from './dto/create-retentiontool.input';
 import { StoresService } from 'src/stores/stores.service';
 import { NotFoundException } from '@nestjs/common';
@@ -24,6 +28,12 @@ export class RetentiontoolsResolver {
   async findAll(@Args('storeId') storeId: string) {
     // console.log('🚀 ~ file: Partners.resolver.ts ~ findAll ');
     return await this.retentiontoolsService.findAll(storeId);
+  }
+
+  @Query(() => [RetentionAnalytics], { name: 'retentionanalytics' })
+  async retentionanalytics(@Args('id') id: string) {
+    const data = await this.retentiontoolsService.retentionanalytics(id);
+    return data;
   }
 
   @Query(() => SyncStatus, { name: 'syncStoreCustomers' })

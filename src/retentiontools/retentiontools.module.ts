@@ -12,6 +12,7 @@ import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
 import { RTPCreatedEvent } from './events/create-retention-tools.event';
 import { RTSSavedListener } from './listeners/retentiontools-groupshop-saved.listener';
 import { InventoryModule } from 'src/inventory/inventory.module';
+import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { InventoryModule } from 'src/inventory/inventory.module';
     forwardRef(() => InventoryModule),
     ConfigModule,
     HttpModule,
+    GroupshopsModule,
   ],
   providers: [
     RetentiontoolsResolver,

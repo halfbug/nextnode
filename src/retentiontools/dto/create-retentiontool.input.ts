@@ -25,6 +25,9 @@ export class CreateRetentiontoolInput {
   @Field({ nullable: true })
   minOrderValue?: string;
 
+  @Field(() => [String], { nullable: true })
+  orderIds?: string[];
+
   @Field()
   createdAt: Date;
 

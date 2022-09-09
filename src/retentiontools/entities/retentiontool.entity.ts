@@ -23,11 +23,44 @@ export class Retentiontool {
   @Field({ nullable: true })
   minOrderValue?: string;
 
+  @Field(() => [String], { nullable: true })
+  orderIds?: string[];
+
   @Field()
   createdAt: Date;
 
   @Field()
   updatedAt?: Date;
+}
+
+@ObjectType('CustomersType')
+export class CustomersType {
+  @Field({ nullable: true })
+  firstName: string;
+  @Field({ nullable: true })
+  lastName: string;
+  @Field({ nullable: true })
+  email: string;
+}
+
+@ObjectType('RetentionAnalytics')
+export class RetentionAnalytics {
+  @Field({ nullable: true })
+  id?: string;
+  @Field({ nullable: true })
+  cancelledAt?: string;
+  @Field({ nullable: true })
+  confirmed?: string;
+  @Field(() => CustomersType, { nullable: true })
+  customer?: CustomersType;
+  @Field({ nullable: true })
+  price?: string;
+  @Field({ nullable: true })
+  displayFinancialStatus?: string;
+  @Field({ nullable: true })
+  shopifyCreateAt?: string;
+  @Field({ nullable: true })
+  name?: string;
 }
 
 @ObjectType()

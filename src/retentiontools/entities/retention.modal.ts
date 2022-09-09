@@ -22,6 +22,9 @@ export class Retentiontool extends DefaultColumnsService {
   minOrderValue?: string;
 
   @Column({ nullable: true })
+  orderIds?: string[];
+
+  @Column({ nullable: true })
   createdAt: Date;
 
   @Column({ nullable: true })

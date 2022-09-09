@@ -31,6 +31,11 @@ import { PartnersModule } from 'src/partners/partners.module';
     RefAddedEvent,
     GSUpdatePriceRuleEvent,
   ],
-  exports: [GroupshopsService, RefAddedEvent, GSUpdatePriceRuleEvent],
+  exports: [
+    GroupshopsService,
+    RefAddedEvent,
+    GSUpdatePriceRuleEvent,
+    OrderPlacedListener,
+  ],
 })
 export class GroupshopsModule {}
