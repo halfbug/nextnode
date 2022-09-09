@@ -292,6 +292,44 @@ export class PartnerService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Partnergroupshop, agg).toArray();
+    const influencerProducts = gs[0].influencerProducts;
+    const refferalProducts = gs[0].refferalProducts;
+    const popularProducts = gs[0].popularProducts;
+    const IP = [];
+    const RP = [];
+    const PP = [];
+    // removing duplicate roducts from inf prdoucts n ref prds
+    influencerProducts.map((item, ind) => {
+      if (ind === 0) {
+        IP.push(item);
+      } else {
+        if (!IP.find((prd) => prd.id === item.id)) {
+          IP.push(item);
+        }
+      }
+    });
+    gs[0].influencerProducts = IP;
+    refferalProducts.map((item, ind) => {
+      if (ind === 0) {
+        RP.push(item);
+      } else {
+        if (!RP.find((prd) => prd.id === item.id)) {
+          RP.push(item);
+        }
+      }
+    });
+    gs[0].refferalProducts = RP;
+    popularProducts.map((item, ind) => {
+      if (ind === 0) {
+        PP.push(item);
+      } else {
+        if (!PP.find((prd) => prd.id === item.id)) {
+          PP.push(item);
+        }
+      }
+    });
+    gs[0].popularProducts = PP;
+
     return gs[0];
   }
 
@@ -743,14 +781,6 @@ export class PartnerService {
           id: item.productId,
         })),
       ].map((item) => item.id);
-      console.log(
-        '🚀 ~ file: partners.service.ts ~ line 738 ~ PartnerService ~ update ~ allNewProducts',
-        allNewProducts,
-      );
-      console.log(
-        '🚀 ~ file: partners.service.ts ~ line 738 ~ PartnerService ~ update ~ updatePartnersInput.dealProducts',
-        updatePartnersInput.dealProducts,
-      );
 
       await this.shopifyapi.setDiscountCode(
         shop,
@@ -806,7 +836,10 @@ export class PartnerService {
     );
 
     // Send email when the commission is updated
-    if (prevPartnerCommission !== updatePartnersInput.partnerCommission) {
+    if (
+      updatePartnersInput.partnerCommission &&
+      prevPartnerCommission !== updatePartnersInput.partnerCommission
+    ) {
       const { shop, brandName, logoImage } = await this.storesService.findById(
         storeId,
       );

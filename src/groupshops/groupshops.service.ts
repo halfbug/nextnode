@@ -653,6 +653,86 @@ export class GroupshopsService {
       },
       {
         $addFields: {
+          ownerDealsProducts: {
+            $filter: {
+              input: '$dealProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $eq: ['$$j.type', 1],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          ownerDeals: {
+            $map: {
+              input: '$ownerDealsProducts',
+              in: {
+                $arrayElemAt: [
+                  {
+                    $filter: {
+                      input: '$dealsProducts',
+                      as: 'j',
+                      cond: {
+                        $eq: ['$$this.productId', '$$j.id'],
+                      },
+                    },
+                  },
+                  0,
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          refferalDealsProducts: {
+            $filter: {
+              input: '$dealProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $eq: ['$$j.type', 0],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          reffDeals: {
+            $map: {
+              input: '$refferalDealsProducts',
+              in: {
+                $arrayElemAt: [
+                  {
+                    $filter: {
+                      input: '$dealsProducts',
+                      as: 'j',
+                      cond: {
+                        $eq: ['$$this.productId', '$$j.id'],
+                      },
+                    },
+                  },
+                  0,
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
           allProducts: {
             $concatArrays: ['$dealsProducts', '$campaignProducts'],
           },
@@ -661,7 +741,7 @@ export class GroupshopsService {
       {
         $addFields: {
           popularProducts: {
-            $concatArrays: ['$dealsProducts', '$popularProducts'],
+            $concatArrays: ['$reffDeals', '$popularProducts'],
           },
         },
       },
@@ -684,6 +764,8 @@ export class GroupshopsService {
           orderDetails: 0,
           dealsProducts: 0,
           campaignProducts: 0,
+          // ownerDealsProducts: 0,
+          // refferalDealsProducts: 0,
         },
       },
       {
@@ -710,6 +792,10 @@ export class GroupshopsService {
           allProducts: 1,
           obSettings: 1,
           exipredShortLink: 1,
+          ownerDeals: 1,
+          reffDeals: 1,
+          ownerDealsProducts: 1,
+          refferalDealsProducts: 1,
         },
       },
     ];

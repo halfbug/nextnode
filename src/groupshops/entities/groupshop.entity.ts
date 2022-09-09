@@ -232,6 +232,18 @@ export class GroupShop {
 
   @Field(() => OBSettings, { nullable: true })
   obSettings?: OBSettings;
+
+  @Field(() => [Product], { nullable: 'itemsAndList' })
+  ownerDeals?: Product[];
+
+  @Field(() => [Product], { nullable: 'itemsAndList' })
+  reffDeals?: Product[];
+
+  @Field(() => [DealProducts], { nullable: 'itemsAndList' })
+  ownerDealsProducts?: DealProducts[];
+
+  @Field(() => [DealProducts], { nullable: 'itemsAndList' })
+  refferalDealsProducts?: DealProducts[];
 }
 @ObjectType()
 export class TotalGS {
