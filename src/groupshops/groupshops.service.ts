@@ -198,7 +198,14 @@ export class GroupshopsService {
       {
         $addFields: {
           allProducts: {
-            $concatArrays: ['$campaignProducts', '$dealsProducts'],
+            $concatArrays: [
+              {
+                $ifNull: ['$campaignProducts', []],
+              },
+              {
+                $ifNull: ['$dealsProducts', []],
+              },
+            ],
           },
         },
       },
@@ -259,39 +266,39 @@ export class GroupshopsService {
   }
 
   async getActiveGroupshops(email: string) {
-    const agg = [{
-      $match: {
-        'customer.email': email,
+    const agg = [
+      {
+        $match: {
+          'customer.email': email,
+        },
       },
-    },
-    {
-      $lookup: {
-        from: 'groupshops',
-        let: { expiredAt: '$expiredAt' }, 
-        localField: 'id',
-        foreignField: 'members.orderId',
-        pipeline: [
-          { $match: {
-              $expr: { 
-                $and: [
-                  { $gt: ['$expiredAt', new Date() ] }
-                ]
-              }
-            } 
-          }
-        ],
-        as: 'groupshops',
+      {
+        $lookup: {
+          from: 'groupshops',
+          let: { expiredAt: '$expiredAt' },
+          localField: 'id',
+          foreignField: 'members.orderId',
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [{ $gt: ['$expiredAt', new Date()] }],
+                },
+              },
+            },
+          ],
+          as: 'groupshops',
+        },
       },
-    },
-    {
-      $lookup: {
-        from: 'store',
-        localField: 'shop',
-        foreignField: 'shop',
-        as: 'shop',
+      {
+        $lookup: {
+          from: 'store',
+          localField: 'shop',
+          foreignField: 'shop',
+          as: 'shop',
+        },
       },
-    },
-    { '$unwind': '$shop' },
+      { $unwind: '$shop' },
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Orders, agg).toArray();
@@ -804,14 +811,28 @@ export class GroupshopsService {
       {
         $addFields: {
           allProducts: {
-            $concatArrays: ['$dealsProducts', '$campaignProducts'],
+            $concatArrays: [
+              {
+                $ifNull: ['$dealsProducts', []],
+              },
+              {
+                $ifNull: ['$campaignProducts', []],
+              },
+            ],
           },
         },
       },
       {
         $addFields: {
           popularProducts: {
-            $concatArrays: ['$reffDeals', '$popularProducts'],
+            $concatArrays: [
+              {
+                $ifNull: ['$reffDeals', []],
+              },
+              {
+                $ifNull: ['$popularProducts', []],
+              },
+            ],
           },
         },
       },
@@ -999,7 +1020,14 @@ export class GroupshopsService {
       {
         $addFields: {
           gsproducts: {
-            $concatArrays: ['$cproducts', '$dproducts'],
+            $concatArrays: [
+              {
+                $ifNull: ['$cproducts', []],
+              },
+              {
+                $ifNull: ['$dproducts', []],
+              },
+            ],
           },
         },
       },
