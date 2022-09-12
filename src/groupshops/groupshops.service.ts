@@ -258,6 +258,47 @@ export class GroupshopsService {
     return gs[0];
   }
 
+  async getActiveGroupshops(email: string) {
+    const agg = [{
+      $match: {
+        'customer.email': email,
+      },
+    },
+    {
+      $lookup: {
+        from: 'groupshops',
+        let: { expiredAt: '$expiredAt' }, 
+        localField: 'id',
+        foreignField: 'members.orderId',
+        pipeline: [
+          { $match: {
+              $expr: { 
+                $and: [
+                  { $gt: ['$expiredAt', new Date() ] }
+                ]
+              }
+            } 
+          }
+        ],
+        as: 'groupshops',
+      },
+    },
+    {
+      $lookup: {
+        from: 'store',
+        localField: 'shop',
+        foreignField: 'shop',
+        as: 'shop',
+      },
+    },
+    { '$unwind': '$shop' },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Orders, agg).toArray();
+    console.log(gs);
+    return gs;
+  }
+
   async totalGs(storeId: string) {
     const agg = [
       {
@@ -331,11 +372,10 @@ export class GroupshopsService {
     return response;
   }
 
-  async findfindQrDealLinkAll(email: string, ordernumber: string) {
+  async findfindQrDealLinkAll(email: string) {
     const agg = [
       {
         $match: {
-          name: '#' + ordernumber,
           'customer.email': email,
         },
       },
@@ -356,15 +396,45 @@ export class GroupshopsService {
         },
       },
     ];
-    // console.log(agg);
     const manager = getMongoManager();
     const gs = await manager.aggregate(Orders, agg).toArray();
-    // console.log('🚀 ~ find qr deal link', gs);
     const response = {
       url: gs[0]?.groupshops[0].url,
       brandname: gs[0]?.shops[0].logoImage,
     };
-    // console.log(JSON.stringify(response));
+    return response;
+  }
+
+  async findActiveGroupshops(email: string) {
+    const agg = [
+      {
+        $match: {
+          'customer.email': email,
+        },
+      },
+      {
+        $lookup: {
+          from: 'groupshops',
+          localField: 'id',
+          foreignField: 'members.orderId',
+          as: 'groupshops',
+        },
+      },
+      // {
+      //   $lookup: {
+      //     from: 'store',
+      //     localField: 'shop',
+      //     foreignField: 'shop',
+      //     as: 'shops',
+      //   },
+      // },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Orders, agg).toArray();
+    const response = {
+      url: gs[0]?.groupshops[0].url,
+      brandname: gs[0]?.shops[0].logoImage,
+    };
     return response;
   }
 

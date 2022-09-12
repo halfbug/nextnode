@@ -10,6 +10,7 @@ import { Campaign } from 'src/campaigns/entities/campaign.entity';
 import { CreateOrderInput as Order } from 'src/inventory/dto/create-order.input';
 import { Product } from 'src/inventory/entities/product.entity';
 import { Store } from 'src/stores/entities/store.entity';
+import { Groupshops } from './groupshop.modal';
 
 export enum ProductTypeEnum {
   deal,
@@ -125,6 +126,15 @@ export class uniqueClicks {
 export class activeGroupshop {
   @Field({ nullable: true })
   shortUrl?: string;
+
+  @Field({ nullable: true })
+  name?: string;
+
+  @Field(() => [GroupShop], { nullable: 'itemsAndList' })
+  groupshops?: GroupShop[];
+
+  @Field({ nullable: true })
+  shop?: Store;
 
   @Field({ nullable: true })
   url?: string;
