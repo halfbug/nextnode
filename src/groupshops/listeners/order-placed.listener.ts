@@ -449,6 +449,10 @@ export class OrderPlacedListener {
         }
       }
     } catch (err) {
+      console.log(
+        '🚀 ~ file: order-placed.listener.ts ~ line 452 ~ OrderPlacedListener ~ createGroupShop ~ err',
+        err,
+      );
       Logger.error(err, OrderPlacedListener.name);
     }
   }

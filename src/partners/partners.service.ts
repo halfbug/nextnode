@@ -292,9 +292,10 @@ export class PartnerService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Partnergroupshop, agg).toArray();
-    const influencerProducts = gs[0].influencerProducts;
-    const refferalProducts = gs[0].refferalProducts;
-    const popularProducts = gs[0].popularProducts;
+    if (!gs.length) return null;
+    const influencerProducts = gs[0]?.influencerProducts;
+    const refferalProducts = gs[0]?.refferalProducts;
+    const popularProducts = gs[0]?.popularProducts;
     const IP = [];
     const RP = [];
     const PP = [];
