@@ -162,7 +162,7 @@ export class StoresService {
     return this.storeRepository.findOne({ shop });
   }
 
-  async findOneWithActiveCampaing(shop: string) {
+  async findOneWithActiveCampaing(shop: string): Promise<Store> {
     const manager = getMongoManager();
     const agg = [
       {

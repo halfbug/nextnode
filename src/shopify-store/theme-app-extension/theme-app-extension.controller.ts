@@ -28,6 +28,7 @@ export class ThemeAppExtensionController {
       const { shop } = req.query;
       const {
         id,
+        currencyCode,
         activeCampaign: {
           id: campaignId,
           salesTarget: {
@@ -42,10 +43,13 @@ export class ThemeAppExtensionController {
       res.send(
         JSON.stringify({
           id,
+          currencyCode,
           campaignId,
           status,
           discount,
-          logoImage,
+          logoImage: `${this.configService.get('IMAGE_PATH')}${
+            logoImage?.split('/')[4]
+          }`,
           brandName,
         }),
       );

@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-this-alias */
+// @ts-ignore
+// @ts-nocheck
 console.log('v2 Script Local');
 console.log('v2 Script Triggered');
 // Define App Url
-// window.BURL = 'https://4a99-39-57-239-253.ngrok.io';
-// window.FURL = 'http://localhost:3000';
-window.BURL = 'https://api-stage.groupshop.co';
-window.FURL = 'http://front-stage.groupshop.co';
+window.BURL = 'https://a559-39-51-79-135.eu.ngrok.io';
+window.FURL = 'http://localhost:3000';
+// window.BURL = 'https://api-stage.groupshop.co';
+// window.FURL = 'http://front-stage.groupshop.co';
 
 // window.BURL = 'https://api.groupshop.co';
 // window.FURL = 'http://app.groupshop.co';
@@ -25,7 +28,9 @@ window.GSURL = window.FURL;
   Release Date: October 25th, 2018
 
 */
+
 // eslint-disable-next-line @typescript-eslint/no-this-alias
+// @ts-ignore
 !(function (e) {
   'function' == typeof define && define.amd
     ? define(e)
@@ -461,38 +466,57 @@ function injectStyleSheet(url) {
 
   document.head.appendChild(style);
 }
-function addLeftBlock() {
+function addLeftBlock(logo) {
   leftBlock = document.createElement('div');
   leftBlock.className = 'groupshop_left-block';
-  leftBlock.innerHTML = `
-  <h3>
-  <span class="image-placeholder" style="height: 45px !important;width: 100% !important;">&nbsp;</span>
-  </h3>
-  
-  <div class="glider-contain">
-  <div class="glider">
-    <div class="image-placeholder">
-        <h4>...</h4>
+  leftBlock.innerHTML = `<div class="thankyouContainer">
+          <div class="top">
+            <div class="logoBox">
+              <img class="logo" height="63px" src="${logo}"></img>
+                <img class="gslogo" src="${window.BURL}/public/images/gslogo.svg">
+            </div>
+            <div class="cashback groupshop_left-block">
+                <h3><div class="image-placeholder" style="height: 50px !important;align-self: left;width: 120px !important;">&nbsp;</div>
+                </h3>
+            </div>
+            <div class="cashbackBtn">
+            <div class="image-placeholder" style="height: 50px !important;align-self: left;width: 120px !important;">&nbsp;</div>
+            </div>
+        </div>
+        <div class="cashback_mobile">
+            <span>Get up to <strong>$64 cashback</strong> 
+            on your order & unlock exclusive rewards.</span>
+        </div>
+        <div class="slider">
+        <div class="glider-contain">
+              <div class="glider">
+                    <div class="image-placeholder">
+                      <h4>...</h4>
+                  </div>
+                  <div class="image-placeholder">
+                      <h4>...</h4>
+                  </div>
+                  <div class="image-placeholder">
+                      <h4>...</h4>
+                  </div>                          
+              </div>					
+              <button aria-label="Previous" class="glider-prev">«</button>
+              <button aria-label="Next" class="glider-next">»</button>
+   				</div>				 
+        </div>
+        <div class="cashbackBtn_mobile">
+            <div class="buttonThnx"><a id="gs_link" href="#">Get Cashback</a></div>
+        </div>
+        <div class="bottom">
+            <div class="left">
+                <span><a id="gs_link" href="#">Get Cashback</a></span> <img src="${window.BURL}/public/images/arrow.svg">
+            </div>
+            <div class="right">
+                <span>Powered by</span> <img src="${window.BURL}/public/images/groupshop.svg">
+            </div>
+        
     </div>
-    <div class="image-placeholder">
-        <h4>...</h4>
-    </div>
-    <div class="image-placeholder">
-        <h4>...</h4>
-    </div>
-    <div class="image-placeholder">
-        <h4>...</h4>
-    </div>
-  </div>
-
-  <button aria-label="Previous" class="glider-prev">«</button>
-  <button aria-label="Next" class="glider-next">»</button>
-  
-</div>
-<div class="get-start-thank-wrap">
-  <div class="image-placeholder" style="height: 40px !important;">&nbsp</div>
-</div>
-<div class="powerby mont">Powered by <a class="ty-share-this-deal" href="javascript:void(0)"><img src="${window.BURL}/public/images/GROUPSHOP-logo.svg"></a></div>`;
+</div>`;
 
   var target = document.querySelector('.content-box:not([hidden])');
   target.prepend(leftBlock);
@@ -502,18 +526,30 @@ function addRightBlock(brandName, isLoaded, cashback) {
   if (isLoaded) {
     document.querySelector(
       '.groupshop_right-block',
-    ).innerHTML = `<div  class="gs_brandbar">
-  <div class="gs_branding"></div>
-  </div>
-  <p class="gs_content">Earn up to <strong class="bold"><span id="gscashback">$ ${cashback}</span> cashback </strong> and access <strong class="bold">exclusive discounts</strong> every time you shop with friends! <img src="${window.BURL}/public/images/3-frnd-icon.svg"></p><p style="font-size: 14px;line-height: 18px;text-align: center;letter-spacing: 0.5px;color: #000000;padding: 0 12px;margin-bottom: 25px;font-family: Mulish;font-weight: 400;">Thanks to your ${brandName} purchase, you unlocked 🔑 access to a personalized shop for you and your friends.</p><div style="margin: auto;width:100%; text-align: center;"><a id="gs_link" style="color:#fff;background: #000;padding: 15px 30px;border-radius: 5px;display: inline-block;font-size: 14px;font-weight: 600;margin-bottom: 10px;font-family: DM Sans, sans-serif;letter-spacing: 1px;" target="_blank">CHECK OUT YOUR GROUPSHOP</a></div>`;
+    ).innerHTML = `<div class="cashback gs_content">Get up to $ ${cashback} cashback on your order! 🎉</div> <div class="cashbackTxt"> Get cashback on this order and unlock exclusive discounts with Groupshop. </div> <div class="cashbackBtn"> <div class="buttonSmry"> <a id="gs_link" >Get Your Cashback</a></div></div>`;
   } else {
     const rightBlock = document.createElement('div');
-    rightBlock.innerHTML = `<div class="groupshop_right-block">
-    <div style="display: flex;flex-direction: column;">
-    <div class="image-placeholder" style="height: 40px !important;align-self: center;">&nbsp;</div>
-    <div class="image-placeholder" style="height: 100px !important;align-self: center;width: 100% !important;">&nbsp;</div>
-    <div class="image-placeholder" style="height: 40px !important;/* width: 100% !important; */align-self: center;">&nbsp;</div>
-    </div></div>`;
+    rightBlock.style = 'display: flex; justify-content: center;';
+
+    rightBlock.innerHTML = `<div class="summaryContainer">
+        <div class="image">
+            <img src="${window.BURL}/public/images/purple-head-mobile.png" alt="headtag" />
+        </div>
+        <div class="groupshop_right-block">
+        <div class="cashback gs_content">
+        <div class="image-placeholder" style="height: 30px !important;align-self: center; width: 205px !important;">&nbsp;</div>
+        </div>
+        <div class="cashbackTxt">
+        <div class="image-placeholder" style="height: 30px !important;align-self: center; width: 205px !important;">&nbsp;</div>
+        </div>
+        
+        <div class="cashbackBtn">
+        <div class="buttonSmry">
+            <a id="gs_link" ><span class="image-placeholder" style="height: 20px !important; width: 70px !important;">&nbsp;</span></a>
+            </div>
+        </div>
+        </div>
+</div>`;
 
     var target = document.querySelector('.order-summary__sections');
     target.append(rightBlock);
@@ -530,7 +566,7 @@ async function init() {
     injectStyleSheet('gsthanks.css');
     injectStyleSheet('glider.min.css');
 
-    addLeftBlock();
+    addLeftBlock(store.logoImage);
     addRightBlock(store.brandName, false, '');
 
     var glider = new Glider(document.querySelector('.glider'), {
@@ -573,17 +609,15 @@ async function init() {
           var leftHeadTxt = '';
           if (+amountCal > 0 && members < 6) {
             leftHeadTxt = `
-         Get up to
-         <strong>
-           <span>$ ${amountCal}</span> cashback
-         </strong>
-         when you invite your friends to shop
+         Get up to     
+           $ ${amountCal} cashback
+          when you invite your friends to shop
        `;
           } else {
             leftHeadTxt =
-              'Your friends get up to <strong>' +
+              'Your friends get up to' +
               percentage +
-              '% off</strong> when they shop on your link.';
+              '% off when they shop on your link.';
           }
           document.querySelector('.groupshop_left-block h3').innerHTML =
             leftHeadTxt;
@@ -622,10 +656,14 @@ async function init() {
             '🚀 ~ file: groupshop-thanks.js ~ line 618 ~ pollit ~ window.GSURL',
             window.GSURL,
           );
-          document.querySelector(
-            '.get-start-thank-wrap',
-          ).innerHTML = `<div class="get-start-wrap"><a target="_blank" href="${window.GSURL}">Get Started</a></div>`;
-          document.getElementById('gs_link').setAttribute('href', window.GSURL);
+          [...document.querySelectorAll('.cashbackBtn')].map(
+            (btn) =>
+              (btn.innerHTML = `<div class="buttonThnx"><a target="_blank" id="gs_link" href="${window.GSURL}">Get Cashback</a></div>`),
+          );
+          // document.getElementById('gs_link').setAttribute('href', window.GSURL);
+          [...document.querySelectorAll('#gs_link')].map((btn) =>
+            btn.setAttribute('href', window.GSURL),
+          );
 
           const products = await gsPost('products', {
             campaignId: store.campaignId,
