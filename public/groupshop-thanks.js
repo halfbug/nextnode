@@ -415,6 +415,176 @@ window.GSURL = window.FURL;
   );
 });
 
+function getCurrencySymbol(code) {
+  // length 164
+  var currency_list = [
+    { code: 'AFA', symbol: '؋' },
+    { code: 'ALL', symbol: 'Lek' },
+    { code: 'DZD', symbol: 'دج' },
+    { code: 'AOA', symbol: 'Kz' },
+    { code: 'ARS', symbol: '$' },
+    { code: 'AMD', symbol: '֏' },
+    { code: 'AWG', symbol: 'ƒ' },
+    { code: 'AUD', symbol: '$' },
+    { code: 'AZN', symbol: 'm' },
+    { code: 'BSD', symbol: 'B$' },
+    { code: 'BHD', symbol: '.د.ب' },
+    { code: 'BDT', symbol: '৳' },
+    { code: 'BBD', symbol: 'Bds$' },
+    { code: 'BYR', symbol: 'Br' },
+    { code: 'BEF', symbol: 'fr' },
+    { code: 'BZD', symbol: '$' },
+    { code: 'BMD', symbol: '$' },
+    { code: 'BTN', symbol: 'Nu.' },
+    { code: 'BTC', symbol: '฿' },
+    { code: 'BOB', symbol: 'Bs.' },
+    { code: 'BAM', symbol: 'KM' },
+    { code: 'BWP', symbol: 'P' },
+    { code: 'BRL', symbol: 'R$' },
+    { code: 'GBP', symbol: '£' },
+    { code: 'BND', symbol: 'B$' },
+    { code: 'BGN', symbol: 'Лв.' },
+    { code: 'BIF', symbol: 'FBu' },
+    { code: 'KHR', symbol: 'KHR' },
+    { code: 'CAD', symbol: '$' },
+    { code: 'CVE', symbol: '$' },
+    { code: 'KYD', symbol: '$' },
+    { code: 'XOF', symbol: 'CFA' },
+    { code: 'XAF', symbol: 'FCFA' },
+    { code: 'XPF', symbol: '₣' },
+    { code: 'CLP', symbol: '$' },
+    { code: 'CNY', symbol: '¥' },
+    { code: 'COP', symbol: '$' },
+    { code: 'KMF', symbol: 'CF' },
+    { code: 'CDF', symbol: 'FC' },
+    { code: 'CRC', symbol: '₡' },
+    { code: 'HRK', symbol: 'kn' },
+    { code: 'CUC', symbol: '$, CUC' },
+    { code: 'CZK', symbol: 'Kč' },
+    { code: 'DKK', symbol: 'Kr.' },
+    { code: 'DJF', symbol: 'Fdj' },
+    { code: 'DOP', symbol: '$' },
+    { code: 'XCD', symbol: '$' },
+    { code: 'EGP', symbol: 'ج.م' },
+    { code: 'ERN', symbol: 'Nfk' },
+    { code: 'EEK', symbol: 'kr' },
+    { code: 'ETB', symbol: 'Nkf' },
+    { code: 'EUR', symbol: '€' },
+    { code: 'FKP', symbol: '£' },
+    { code: 'FJD', symbol: 'FJ$' },
+    { code: 'GMD', symbol: 'D' },
+    { code: 'GEL', symbol: 'ლ' },
+    { code: 'DEM', symbol: 'DM' },
+    { code: 'GHS', symbol: 'GH₵' },
+    { code: 'GIP', symbol: '£' },
+    { code: 'GRD', symbol: '₯, Δρχ, Δρ' },
+    { code: 'GTQ', symbol: 'Q' },
+    { code: 'GNF', symbol: 'FG' },
+    { code: 'GYD', symbol: '$' },
+    { code: 'HTG', symbol: 'G' },
+    { code: 'HNL', symbol: 'L' },
+    { code: 'HKD', symbol: '$' },
+    { code: 'HUF', symbol: 'Ft' },
+    { code: 'ISK', symbol: 'kr' },
+    { code: 'INR', symbol: '₹' },
+    { code: 'IDR', symbol: 'Rp' },
+    { code: 'IRR', symbol: '﷼' },
+    { code: 'IQD', symbol: 'د.ع' },
+    { code: 'ILS', symbol: '₪' },
+    { code: 'ITL', symbol: 'L,£' },
+    { code: 'JMD', symbol: 'J$' },
+    { code: 'JPY', symbol: '¥' },
+    { code: 'JOD', symbol: 'ا.د' },
+    { code: 'KZT', symbol: 'лв' },
+    { code: 'KES', symbol: 'KSh' },
+    { code: 'KWD', symbol: 'ك.د' },
+    { code: 'KGS', symbol: 'лв' },
+    { code: 'LAK', symbol: '₭' },
+    { code: 'LVL', symbol: 'Ls' },
+    { code: 'LBP', symbol: '£' },
+    { code: 'LSL', symbol: 'L' },
+    { code: 'LRD', symbol: '$' },
+    { code: 'LYD', symbol: 'د.ل' },
+    { code: 'LTL', symbol: 'Lt' },
+    { code: 'MOP', symbol: '$' },
+    { code: 'MKD', symbol: 'ден' },
+    { code: 'MGA', symbol: 'Ar' },
+    { code: 'MWK', symbol: 'MK' },
+    { code: 'MYR', symbol: 'RM' },
+    { code: 'MVR', symbol: 'Rf' },
+    { code: 'MRO', symbol: 'MRU' },
+    { code: 'MUR', symbol: '₨' },
+    { code: 'MXN', symbol: '$' },
+    { code: 'MDL', symbol: 'L' },
+    { code: 'MNT', symbol: '₮' },
+    { code: 'MAD', symbol: 'MAD' },
+    { code: 'MZM', symbol: 'MT' },
+    { code: 'MMK', symbol: 'K' },
+    { code: 'NAD', symbol: '$' },
+    { code: 'NPR', symbol: '₨' },
+    { code: 'ANG', symbol: 'ƒ' },
+    { code: 'TWD', symbol: '$' },
+    { code: 'NZD', symbol: '$' },
+    { code: 'NIO', symbol: 'C$' },
+    { code: 'NGN', symbol: '₦' },
+    { code: 'KPW', symbol: '₩' },
+    { code: 'NOK', symbol: 'kr' },
+    { code: 'OMR', symbol: '.ع.ر' },
+    { code: 'PKR', symbol: '₨' },
+    { code: 'PAB', symbol: 'B/.' },
+    { code: 'PGK', symbol: 'K' },
+    { code: 'PYG', symbol: '₲' },
+    { code: 'PEN', symbol: 'S/.' },
+    { code: 'PHP', symbol: '₱' },
+    { code: 'PLN', symbol: 'zł' },
+    { code: 'QAR', symbol: 'ق.ر' },
+    { code: 'RON', symbol: 'lei' },
+    { code: 'RUB', symbol: '₽' },
+    { code: 'RWF', symbol: 'FRw' },
+    { code: 'SVC', symbol: '₡' },
+    { code: 'WST', symbol: 'SAT' },
+    { code: 'SAR', symbol: '﷼' },
+    { code: 'RSD', symbol: 'din' },
+    { code: 'SCR', symbol: 'SRe' },
+    { code: 'SLL', symbol: 'Le' },
+    { code: 'SGD', symbol: '$' },
+    { code: 'SKK', symbol: 'Sk' },
+    { code: 'SBD', symbol: 'Si$' },
+    { code: 'SOS', symbol: 'Sh.so.' },
+    { code: 'ZAR', symbol: 'R' },
+    { code: 'KRW', symbol: '₩' },
+    { code: 'XDR', symbol: 'SDR' },
+    { code: 'LKR', symbol: 'Rs' },
+    { code: 'SHP', symbol: '£' },
+    { code: 'SDG', symbol: '.س.ج' },
+    { code: 'SRD', symbol: '$' },
+    { code: 'SZL', symbol: 'E' },
+    { code: 'SEK', symbol: 'kr' },
+    { code: 'CHF', symbol: 'CHf' },
+    { code: 'SYP', symbol: 'LS' },
+    { code: 'STD', symbol: 'Db' },
+    { code: 'TJS', symbol: 'SM' },
+    { code: 'TZS', symbol: 'TSh' },
+    { code: 'THB', symbol: '฿' },
+    { code: 'TOP', symbol: '$' },
+    { code: 'TTD', symbol: '$' },
+    { code: 'TND', symbol: 'ت.د' },
+    { code: 'TRY', symbol: '₺' },
+    { code: 'TMT', symbol: 'T' },
+    { code: 'UGX', symbol: 'USh' },
+    { code: 'UAH', symbol: '₴' },
+    { code: 'AED', symbol: 'إ.د' },
+    { code: 'UYU', symbol: '$' },
+    { code: 'USD', symbol: '$' },
+    { code: 'UZS', symbol: 'лв' },
+    { code: 'VUV', symbol: 'VT' },
+    { code: 'VEF', symbol: 'Bs' },
+    { code: 'VND', symbol: '₫' },
+    { code: 'YER', symbol: '﷼' },
+    { code: 'ZMK', symbol: 'ZK' },
+  ];
+  return currency_list.filter((cur) => cur.code === code)?.[0]?.symbol;
+}
 var shop = Shopify.shop;
 var orderId = Shopify.checkout.order_id;
 var discountCode = Shopify.checkout.discount
@@ -526,7 +696,7 @@ function addRightBlock(brandName, isLoaded, cashback) {
   if (isLoaded) {
     document.querySelector(
       '.groupshop_right-block',
-    ).innerHTML = `<div class="cashback gs_content">Get up to $ ${cashback} cashback on your order! 🎉</div> <div class="cashbackTxt"> Get cashback on this order and unlock exclusive discounts with Groupshop. </div> <div class="cashbackBtn"> <div class="buttonSmry"> <a id="gs_link" >Get Your Cashback</a></div></div>`;
+    ).innerHTML = `<div class="cashback gs_content">Get up to ${cashback} cashback on your order! 🎉</div> <div class="cashbackTxt"> Get cashback on this order and unlock exclusive discounts with Groupshop. </div> <div class="cashbackBtn"> <div class="buttonSmry"> <a id="gs_link" >Get Your Cashback</a></div></div>`;
   } else {
     const rightBlock = document.createElement('div');
     rightBlock.style = 'display: flex; justify-content: center;';
@@ -565,7 +735,7 @@ async function init() {
     //create products slider
     injectStyleSheet('gsthanks.css');
     injectStyleSheet('glider.min.css');
-
+    const csymbol = getCurrencySymbol(store.currencyCode);
     addLeftBlock(store.logoImage);
     addRightBlock(store.brandName, false, '');
 
@@ -610,7 +780,7 @@ async function init() {
           if (+amountCal > 0 && members < 6) {
             leftHeadTxt = `
          Get up to     
-           $ ${amountCal} cashback
+         ${csymbol}${amountCal} cashback
           when you invite your friends to shop
        `;
           } else {
@@ -623,7 +793,7 @@ async function init() {
             leftHeadTxt;
           document.querySelector('.groupshop_left-block h3').className =
             'active';
-          addRightBlock(store.brandName, true, amountCal);
+          addRightBlock(store.brandName, true, `${csymbol}${amountCal}`);
           document.querySelector('.gs_content').innerHTML = leftHeadTxt;
           // document.querySelectorAll('#gscashback').forEach((elem) => {
           //   console.log(elem);
@@ -698,13 +868,13 @@ async function init() {
             }"alt="img"><span class="discount">${percentage}% OFF</span><h4>${prod.title.slice(
               0,
               15,
-            )}..</h4><span class="bold">$${(
+            )}..</h4><span class="bold">${csymbol}${(
               prod.price -
               (parseFloat(percentage) / 100) * prod.price
             )
               .toFixed(2)
               .toString()
-              .replace('.00', '')}</span> <del>$${productPrice}</del>`;
+              .replace('.00', '')}</span> <del>${csymbol}${productPrice}</del>`;
             glider.addItem(slide);
             glider.refresh(true);
             return prod;
@@ -756,7 +926,7 @@ async function init() {
             leftHeadTxt;
           document.querySelector('.groupshop_left-block h3').className =
             'active';
-          addRightBlock(store.brandName, true, amountCal);
+          addRightBlock(store.brandName, true, `${csymbol}${amountCal}`);
           document.querySelector('.gs_content').innerHTML = leftHeadTxt;
           window.GSURL = window.FURL + url;
           document.querySelector(
@@ -794,13 +964,13 @@ async function init() {
             }"alt="img"><span class="discount">${baseline} OFF</span><h4>${prod.title.slice(
               0,
               15,
-            )}..</h4><span class="bold">$${(
+            )}..</h4><span class="bold">${csymbol}${(
               prod.price -
               (parseFloat(baseline) / 100) * prod.price
             )
               .toFixed(2)
               .toString()
-              .replace('.00', '')}</span> <del>$${prod.price}</del>`;
+              .replace('.00', '')}</span> <del>${csymbol}${prod.price}</del>`;
             glider.addItem(slide);
             glider.refresh(true);
             return prod;
