@@ -735,7 +735,7 @@ async function init() {
     //create products slider
     injectStyleSheet('gsthanks.css');
     injectStyleSheet('glider.min.css');
-    const csymbol = getCurrencySymbol(store.currencyCode);
+    const csymbol = getCurrencySymbol(Shopify.checkout.currency);
     addLeftBlock(store.logoImage);
     addRightBlock(store.brandName, false, '');
 
