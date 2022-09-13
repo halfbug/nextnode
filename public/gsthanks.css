@@ -55,11 +55,15 @@ a:active {
 .thankyouContainer > .top > .logoBox {
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .thankyouContainer > .top > .logoBox > .logo {
     position: absolute;
     z-index: 99;
+    width: 63px;
+    border-radius: 50px;
+    left: 20px;
 }
 
 .thankyouContainer > .top > .logoBox > .gslogo {
@@ -154,7 +158,7 @@ a:active {
     margin-left: 10px;
 }
 .summaryContainer {
-	width: 352px;
+	width: 100%;
 	background-color: #ffffff;
 	border: 1px solid #DCDCDC;
 	border-radius: 10px;
@@ -162,6 +166,10 @@ a:active {
 
 .summaryContainer > .image {
 	margin-top: 10px;
+}
+
+.summaryContainer > .image img{
+	width: 100%;
 }
 
 .summaryContainer > .groupshop_right-block >.cashback {
