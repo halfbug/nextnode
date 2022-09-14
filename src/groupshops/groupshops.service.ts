@@ -1113,6 +1113,16 @@ export class GroupshopsService {
           campaignId: campaignId.id,
         },
       },
+      {
+        $addFields: {
+          boughtProducts: '$members.lineItems.product.id',
+        },
+      },
+      {
+        $unwind: {
+          path: '$boughtProducts',
+        },
+      },
     ];
     return await manager.aggregate(Groupshops, agg).toArray();
   }

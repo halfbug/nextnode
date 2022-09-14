@@ -905,6 +905,24 @@ export class PartnerService {
           campaignId: campaignId.id,
         },
       },
+      {
+        $lookup: {
+          from: 'partnermember',
+          localField: 'id',
+          foreignField: 'groupshopId',
+          as: 'members',
+        },
+      },
+      {
+        $addFields: {
+          boughtProducts: '$members.lineItems.product.id',
+        },
+      },
+      {
+        $unwind: {
+          path: '$boughtProducts',
+        },
+      },
     ];
     return await manager.aggregate(Partnergroupshop, agg).toArray();
   }

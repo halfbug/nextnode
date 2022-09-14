@@ -160,6 +160,7 @@ export class CampaignsService {
 
     const { shop, accessToken } = await this.sotresService.findOneById(storeId); 
     const prevCampaign = await this.findOneById(id);
+    console.log("🚀 ~ file: campaigns.service.ts ~ line 163 ~ CampaignsService ~ update ~ prevCampaign", prevCampaign)
     const prevProducts = prevCampaign.products;
 
     if (products && criteria === 'custom') {
@@ -193,7 +194,7 @@ export class CampaignsService {
     } else {
       this.eventEmitter.emit('campaign.active', campEvent);
     }
-    if (updateCampaignInput.criteria && (prevCampaign.criteria !== updateCampaignInput.criteria)) await this.updateDiscountCode({ id }, updateCampaignInput.products, shop, accessToken);    
+    if (updateCampaignInput.criteria && (prevCampaign.products?.length !== updateCampaignInput.products?.length)) await this.updateDiscountCode({ id }, updateCampaignInput.products, shop, accessToken);    
     
 
     return await this.findOneById(id);
@@ -208,6 +209,7 @@ export class CampaignsService {
   }
 
   async updateDiscountCode(campaignId, products, shop, accessToken) {   
+    try{
     console.log("🚀 ~ campaignId", campaignId);    
     const allGS = await this.groupshopsService.getCampaignGS(campaignId);
     const allPartnerGS = await this.partnerGsService.getCampaignGS(campaignId);
@@ -222,7 +224,7 @@ export class CampaignsService {
         accessToken,
         null,
         null,
-        [...new Set([...products, ...gsDealProduucts])],
+        [...new Set([...products, ...gsDealProduucts, ...allGS[key]?.boughtProducts])],
         null,
         null,
         priceRuleId,
@@ -239,13 +241,23 @@ export class CampaignsService {
         accessToken,
         null,
         null,
-        [...new Set([...products, ...gsDealProduucts])],
+        [...new Set([...products, ...gsDealProduucts, ...allPartnerGS[key]?.boughtProducts])],
         null,
         null,
         priceRuleId,
       );
     }
+  
   }
+} 
+catch (err) { 
+  console.log(
+    '%ccampaigns.service.ts line:253 err',
+    'color: #007acc;',
+    JSON.stringify(err, null, "\t" )
+  );
+Logger.error(err.message, CampaignsService.name)
+}
 
   } // end update 
  
