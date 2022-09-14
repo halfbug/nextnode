@@ -916,10 +916,10 @@ async function init() {
           var leftHeadTxt = '';
           // Invite you friends to shop X’s Groupshop and give them 20% off
           leftHeadTxt = `
-          Invite you friends to shop
-         <strong>
-           <span>${fname}</span>'s Groupshop
-         </strong>
+          Invite your friends to shop
+         
+           ${fname}'s Groupshop
+         
          and give them ${baseline} off
        `;
           document.querySelector('.groupshop_left-block h3').innerHTML =
@@ -929,10 +929,14 @@ async function init() {
           addRightBlock(store.brandName, true, `${csymbol}${amountCal}`);
           document.querySelector('.gs_content').innerHTML = leftHeadTxt;
           window.GSURL = window.FURL + url;
-          document.querySelector(
-            '.get-start-thank-wrap',
-          ).innerHTML = `<div class="get-start-wrap"><a target="_blank" href="${window.GSURL}">Get Started</a></div>`;
-          document.getElementById('gs_link').setAttribute('href', window.GSURL);
+          [...document.querySelectorAll('.cashbackBtn')].map(
+            (btn) =>
+              (btn.innerHTML = `<div class="buttonThnx"><a target="_blank" id="gs_link" href="${window.GSURL}">Get Cashback</a></div>`),
+          );
+          // document.getElementById('gs_link').setAttribute('href', window.GSURL);
+          [...document.querySelectorAll('#gs_link')].map((btn) =>
+            btn.setAttribute('href', window.GSURL),
+          );
 
           const products = await gsPost('products', {
             campaignId: store.campaignId,
