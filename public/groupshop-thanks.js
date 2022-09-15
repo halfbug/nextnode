@@ -828,8 +828,10 @@ async function init() {
             window.GSURL,
           );
           [...document.querySelectorAll('.cashbackBtn')].map(
-            (btn) =>
-              (btn.innerHTML = `<div class="buttonThnx"><a target="_blank" id="gs_link" href="${window.GSURL}">Get Your Cashback</a></div>`),
+            (btn, idx) =>
+              (btn.innerHTML = `<div class="buttonThnx"><a target="_blank" id="gs_link" href="${
+                window.GSURL
+              }">Get ${idx ? 'Your ' : ''}Cashback</a></div>`),
           );
           // document.getElementById('gs_link').setAttribute('href', window.GSURL);
           [...document.querySelectorAll('#gs_link')].map((btn) =>
@@ -931,8 +933,10 @@ async function init() {
           document.querySelector('.gs_content_right').innerHTML = leftHeadTxt;
           window.GSURL = window.FURL + url;
           [...document.querySelectorAll('.cashbackBtn')].map(
-            (btn) =>
-              (btn.innerHTML = `<div class="buttonThnx"><a target="_blank" id="gs_link" href="${window.GSURL}">Get Your Cashback</a></div>`),
+            (btn, idx) =>
+              (btn.innerHTML = `<div class="buttonThnx"><a target="_blank" id="gs_link" href="${
+                window.GSURL
+              }">Get ${idx ? 'Your ' : ''}Cashback</a></div>`),
           );
           // document.getElementById('gs_link').setAttribute('href', window.GSURL);
           [...document.querySelectorAll('#gs_link')].map((btn) =>
