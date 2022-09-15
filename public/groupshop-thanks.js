@@ -5,10 +5,10 @@
 console.log('v2 Script Local');
 console.log('v2 Script Triggered');
 // Define App Url
-window.BURL = 'https://a559-39-51-79-135.eu.ngrok.io';
-window.FURL = 'http://localhost:3000';
-// window.BURL = 'https://api-stage.groupshop.co';
-// window.FURL = 'http://front-stage.groupshop.co';
+// window.BURL = 'https://a559-39-51-79-135.eu.ngrok.io';
+// window.FURL = 'http://localhost:3000';
+window.BURL = 'https://api-stage.groupshop.co';
+window.FURL = 'http://front-stage.groupshop.co';
 
 // window.BURL = 'https://api.groupshop.co';
 // window.FURL = 'http://app.groupshop.co';
