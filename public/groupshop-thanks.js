@@ -5,10 +5,10 @@
 console.log('v2 Script Local');
 console.log('v2 Script Triggered');
 // Define App Url
-// window.BURL = 'https://a559-39-51-79-135.eu.ngrok.io';
-// window.FURL = 'http://localhost:3000';
-window.BURL = 'https://api-stage.groupshop.co';
-window.FURL = 'http://front-stage.groupshop.co';
+window.BURL = 'https://a559-39-51-79-135.eu.ngrok.io';
+window.FURL = 'http://localhost:3000';
+// window.BURL = 'https://api-stage.groupshop.co';
+// window.FURL = 'http://front-stage.groupshop.co';
 
 // window.BURL = 'https://api.groupshop.co';
 // window.FURL = 'http://app.groupshop.co';
@@ -696,7 +696,7 @@ function addRightBlock(brandName, isLoaded, cashback) {
   if (isLoaded) {
     document.querySelector(
       '.groupshop_right-block',
-    ).innerHTML = `<div class="cashback gs_content">Get up to ${cashback} cashback on your order! 🎉</div> <div class="cashbackTxt"> Get cashback on this order and unlock exclusive discounts with Groupshop. </div> <div class="cashbackBtn"> <div class="buttonSmry"> <a id="gs_link" >Get Your Cashback</a></div></div>`;
+    ).innerHTML = `<div class="cashback gs_content_right">Get up to ${cashback} cashback on your order! 🎉</div>  <div class="cashbackTxt"> Get cashback on this order and unlock exclusive discounts with Groupshop. </div> <div class="cashbackBtn"> <div class="buttonSmry"> <a id="gs_link" >Get Your Cashback</a></div></div>`;
   } else {
     const rightBlock = document.createElement('div');
     rightBlock.style = 'display: flex; justify-content: center;';
@@ -706,7 +706,7 @@ function addRightBlock(brandName, isLoaded, cashback) {
             <img src="${window.BURL}/public/images/purple-head-mobile.png" alt="headtag" />
         </div>
         <div class="groupshop_right-block">
-        <div class="cashback gs_content">
+        <div class="cashback gs_content_right">
         <div class="image-placeholder" style="height: 30px !important;align-self: center; width: 205px !important;">&nbsp;</div>
         </div>
         <div class="cashbackTxt">
@@ -777,24 +777,25 @@ async function init() {
             .toString()
             .replace('.00', '')}`;
           var leftHeadTxt = '';
+          var rightHeadTxt = '';
           if (+amountCal > 0 && members < 6) {
             leftHeadTxt = `
          Get up to     
          ${csymbol}${amountCal} cashback
-          when you invite your friends to shop
+          on your order & unlock exclusive rewards
        `;
+            rightHeadTxt = `Get up to ${csymbol}${cashback} cashback on your order! 🎉`;
           } else {
-            leftHeadTxt =
-              'Your friends get up to' +
-              percentage +
-              '% off when they shop on your link.';
+            leftHeadTxt = 'Get up to' + percentage + '% off on your order.';
+            rightHeadTxt = leftHeadTxt;
           }
           document.querySelector('.groupshop_left-block h3').innerHTML =
             leftHeadTxt;
           document.querySelector('.groupshop_left-block h3').className =
             'active';
           addRightBlock(store.brandName, true, `${csymbol}${amountCal}`);
-          document.querySelector('.gs_content').innerHTML = leftHeadTxt;
+          // document.querySelector('.gs_content').innerHTML = leftHeadTxt;
+          document.querySelector('.gs_content_right').innerHTML = rightHeadTxt;
           // document.querySelectorAll('#gscashback').forEach((elem) => {
           //   console.log(elem);
           //   var amountCal = `${Math.floor(cashback)
@@ -828,7 +829,7 @@ async function init() {
           );
           [...document.querySelectorAll('.cashbackBtn')].map(
             (btn) =>
-              (btn.innerHTML = `<div class="buttonThnx"><a target="_blank" id="gs_link" href="${window.GSURL}">Get Cashback</a></div>`),
+              (btn.innerHTML = `<div class="buttonThnx"><a target="_blank" id="gs_link" href="${window.GSURL}">Get Your Cashback</a></div>`),
           );
           // document.getElementById('gs_link').setAttribute('href', window.GSURL);
           [...document.querySelectorAll('#gs_link')].map((btn) =>
@@ -927,11 +928,11 @@ async function init() {
           document.querySelector('.groupshop_left-block h3').className =
             'active';
           addRightBlock(store.brandName, true, `${csymbol}${amountCal}`);
-          document.querySelector('.gs_content').innerHTML = leftHeadTxt;
+          document.querySelector('.gs_content_right').innerHTML = leftHeadTxt;
           window.GSURL = window.FURL + url;
           [...document.querySelectorAll('.cashbackBtn')].map(
             (btn) =>
-              (btn.innerHTML = `<div class="buttonThnx"><a target="_blank" id="gs_link" href="${window.GSURL}">Get Cashback</a></div>`),
+              (btn.innerHTML = `<div class="buttonThnx"><a target="_blank" id="gs_link" href="${window.GSURL}">Get Your Cashback</a></div>`),
           );
           // document.getElementById('gs_link').setAttribute('href', window.GSURL);
           [...document.querySelectorAll('#gs_link')].map((btn) =>
