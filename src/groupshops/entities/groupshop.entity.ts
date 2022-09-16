@@ -8,9 +8,9 @@ import {
 } from '@nestjs/graphql';
 import { Campaign } from 'src/campaigns/entities/campaign.entity';
 import { CreateOrderInput as Order } from 'src/inventory/dto/create-order.input';
+import { CustomerType } from 'src/inventory/entities/orders.entity';
 import { Product } from 'src/inventory/entities/product.entity';
 import { Store } from 'src/stores/entities/store.entity';
-import { Groupshops } from './groupshop.modal';
 
 export enum ProductTypeEnum {
   deal,
@@ -132,6 +132,12 @@ export class activeGroupshop {
 
   @Field(() => [GroupShop], { nullable: 'itemsAndList' })
   groupshops?: GroupShop[];
+
+  @Field({ nullable: true })
+  cashback?: number;
+
+  @Field(() => CustomerType)
+  customer?: CustomerType;
 
   @Field({ nullable: true })
   shop?: Store;

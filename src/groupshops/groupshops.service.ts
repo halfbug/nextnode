@@ -269,25 +269,45 @@ export class GroupshopsService {
     const agg = [
       {
         $match: {
-          'customer.email': email,
+          $and: [
+            {
+              'customer.email': email,
+            },
+            {
+              confirmed: true,
+            },
+          ],
         },
       },
       {
         $lookup: {
           from: 'groupshops',
-          let: { expiredAt: '$expiredAt' },
+          let: {
+            expiredAt: '$expiredAt',
+          },
           localField: 'id',
           foreignField: 'members.orderId',
           pipeline: [
             {
               $match: {
                 $expr: {
-                  $and: [{ $gt: ['$expiredAt', new Date()] }],
+                  $and: [
+                    {
+                      $gt: ['$expiredAt', new Date()],
+                    },
+                  ],
                 },
               },
             },
           ],
           as: 'groupshops',
+        },
+      },
+      {
+        $match: {
+          'groupshops.0': {
+            $exists: true,
+          },
         },
       },
       {
@@ -298,11 +318,50 @@ export class GroupshopsService {
           as: 'shop',
         },
       },
-      { $unwind: '$shop' },
+      {
+        $unwind: '$shop',
+      },
+      {
+        $lookup: {
+          from: 'billing',
+          localField: 'groupshops.id',
+          foreignField: 'groupShopId',
+          as: 'billing',
+        },
+      },
+      {
+        $addFields: {
+          billing: {
+            $filter: {
+              input: '$billing',
+              as: 'j',
+              cond: {
+                $eq: ['$$j.type', 0],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          cashback: {
+            $reduce: {
+              input: '$billing',
+              initialValue: 0,
+              in: {
+                $add: ['$$value', '$$this.cashBack'],
+              },
+            },
+          },
+        },
+      },
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Orders, agg).toArray();
-    console.log(gs);
+    console.log(
+      '🚀 ~ file: groupshops.service.ts ~ line 305 ~ GroupshopsService ~ getActiveGroupshops ~ gs',
+      gs,
+    );
     return gs;
   }
 

@@ -68,9 +68,7 @@ export class GroupshopsResolver {
   }
 
   @Query(() => QRInput, { name: 'getQrDealLink' })
-  findQrDealLink(
-    @Args('email') email: string
-  ) {
+  findQrDealLink(@Args('email') email: string) {
     return this.GroupshopsService.findfindQrDealLinkAll(email);
   }
 
@@ -108,8 +106,10 @@ export class GroupshopsResolver {
   @Query(() => [activeGroupshop], { name: 'getActiveGroupshops' })
   async getActiveGroupshops(@Args('email') email: string) {
     const result = await this.GroupshopsService.getActiveGroupshops(email);
-    console.log("🚀 ~ file: groupshops.resolver.ts ~ line 113 ~ GroupshopsResolver ~ getActiveGroupshops ~ result", result)
-    
+    console.log(
+      '🚀 ~ file: groupshops.resolver.ts ~ line 113 ~ GroupshopsResolver ~ getActiveGroupshops ~ result',
+      result,
+    );
     return result;
   }
 
