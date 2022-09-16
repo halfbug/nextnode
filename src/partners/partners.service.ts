@@ -32,10 +32,10 @@ export class PartnerService {
   ) {}
 
   async findOne(discountCode: string) {
-    console.log(
-      '🚀 ~ file: partners.service.ts ~ line 31 ~ PartnerService ~ findOne ~ discountCode',
-      discountCode,
-    );
+    // console.log(
+    //   '🚀 ~ file: partners.service.ts ~ line 31 ~ PartnerService ~ findOne ~ discountCode',
+    //   discountCode,
+    // );
     const agg = [
       {
         $match: {
@@ -921,6 +921,7 @@ export class PartnerService {
       {
         $unwind: {
           path: '$boughtProducts',
+          preserveNullAndEmptyArrays: true,
         },
       },
     ];

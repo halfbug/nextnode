@@ -20,10 +20,10 @@ export class InventoryResolver {
     const selectedFileds = info.fieldNodes[0].selectionSet.selections.map(
       (item) => item.name.value,
     );
-    console.log(
-      '🚀 ~ file: inventory.resolver.ts ~ line 38 ~ InventoryResolver ~ findStoreCollections ~ selectedFileds',
-      selectedFileds,
-    );
+    // console.log(
+    //   '🚀 ~ file: inventory.resolver.ts ~ line 38 ~ InventoryResolver ~ findStoreCollections ~ selectedFileds',
+    //   selectedFileds,
+    // );
     const withproducts = selectedFileds.includes('products');
     const collections = this.inventoryService.findStoreCollections(
       shop,

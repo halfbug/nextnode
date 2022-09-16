@@ -39,7 +39,7 @@ export class BillingListener {
       storeId,
       isPaid: plan === 0 || Date.now() < appTrialEnd.getTime() ? true : false,
     };
-    console.log('🚀 ~ fileBillingListener  ~ payload', payload);
+    // console.log('🚀 ~ fileBillingListener  ~ payload', payload);
     const newBilling = await this.billingService.create(payload);
     // console.log(
     //   '🚀 ~ file: billing.listener.ts ~ line 35 ~ BillingListener ~ createBilling ~ newBilling',

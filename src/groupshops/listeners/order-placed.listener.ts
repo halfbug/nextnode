@@ -240,10 +240,10 @@ export class OrderPlacedListener {
   @OnEvent('order.placed')
   async createGroupShop(event: OrderPlacedEvent) {
     try {
-      console.log(
-        '🚀 ~ file: order-placed.listener.ts ~ line 18 ~ OrderPlacedListener ~ createGroupShop ~ event',
-        event,
-      );
+      // console.log(
+      //   '🚀 ~ file: order-placed.listener.ts ~ line 18 ~ OrderPlacedListener ~ createGroupShop ~ event',
+      //   event,
+      // );
       const {
         order: {
           discountCode,

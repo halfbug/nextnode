@@ -160,7 +160,7 @@ export class CampaignsService {
 
     const { shop, accessToken } = await this.sotresService.findOneById(storeId); 
     const prevCampaign = await this.findOneById(id);
-    console.log("🚀 ~ file: campaigns.service.ts ~ line 163 ~ CampaignsService ~ update ~ prevCampaign", prevCampaign)
+    // console.log("🚀 ~ file: campaigns.service.ts ~ line 163 ~ CampaignsService ~ update ~ prevCampaign", prevCampaign)
     const prevProducts = prevCampaign.products;
 
     if (products && criteria === 'custom') {
@@ -212,7 +212,9 @@ export class CampaignsService {
     try{
     console.log("🚀 ~ campaignId", campaignId);    
     const allGS = await this.groupshopsService.getCampaignGS(campaignId);
+    // console.log("🚀 ~ file: campaigns.service.ts ~ line 215 === ~ CampaignsService ~ updateDiscountCode ~ allGS", allGS)
     const allPartnerGS = await this.partnerGsService.getCampaignGS(campaignId);
+    // console.log("🚀 ~ file: campaigns.service.ts ~ line 216 === ~ CampaignsService ~ updateDiscountCode ~ allPartnerGS", allPartnerGS)
     for (const key in allGS) {  
       const priceRuleId = allGS[key].discountCode.priceRuleId; 
       // get all deal products
@@ -235,6 +237,7 @@ export class CampaignsService {
       const priceRuleId = allPartnerGS[key].discountCode.priceRuleId; 
       // get all deal products
       const gsDealProduucts = allPartnerGS[key].dealProducts?.map(prd => prd.productId) ?? []
+      console.log("campaigns.service.ts ~ line 238 updateDiscountCode ~ allProduucts", [...products, ...gsDealProduucts, ...allPartnerGS[key]?.boughtProducts].map((item) => item.title))
       await this.shopifyapi.setDiscountCode(
         shop,
         'Update',

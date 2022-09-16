@@ -32,10 +32,10 @@ export class GSLoadedListener {
     }
     // 1. find groupshop all views
     const gsviews = (await this.vistorsrv.findAll(gs.id)) || [];
-    console.log(
-      '🚀 ~ file: viewed.inceptor.ts ~ line 54 ~ ViewedInterceptor ~ tap ~ gsviews',
-      gsviews,
-    );
+    // console.log(
+    //   '🚀 ~ file: viewed.inceptor.ts ~ line 54 ~ ViewedInterceptor ~ tap ~ gsviews',
+    //   gsviews,
+    // );
     // 1.5 groupshop should not be expired
     const isNotExpired = getDateDifference(gs.expiredAt).time > -1;
 

@@ -27,7 +27,7 @@ export class BillingsService {
     const id = uuid();
 
     const savedBilling = await this.billingRepository.save({ id, ...billing });
-    console.log('🚀 ~ savedBilling', savedBilling);
+    // console.log('🚀 ~ savedBilling', savedBilling);
     return savedBilling;
   }
 

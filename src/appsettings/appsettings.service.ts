@@ -65,10 +65,10 @@ export class AppsettingsService {
       },
     });
 
-    console.log(
-      '🚀 ~ file: appsettings.service.ts ~ line 62 ~ AppsettingsService ~ findSalesTargetAll ~ qurer',
-      qurer,
-    );
+    // console.log(
+    //   '🚀 ~ file: appsettings.service.ts ~ line 62 ~ AppsettingsService ~ findSalesTargetAll ~ qurer',
+    //   qurer,
+    // );
     const starget = qurer.map((rec) => {
       return rec.salestargets[0];
     });
