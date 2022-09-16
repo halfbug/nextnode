@@ -703,7 +703,7 @@ function addRightBlock(brandName, isLoaded, cashback) {
 
     rightBlock.innerHTML = `<div class="summaryContainer">
         <div class="image">
-            <img src="${window.BURL}/public/images/purple-head-mobile.png" alt="headtag" />
+            <img src="${window.BURL}/public/images/purple-head-mobile.jpg" alt="headtag" />
         </div>
         <div class="groupshop_right-block">
         <div class="cashback gs_content_right">
