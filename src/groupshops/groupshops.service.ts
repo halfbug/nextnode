@@ -955,21 +955,23 @@ export class GroupshopsService {
     const popular = gs[0].popularProducts;
     const dPopular = [];
 
-    popular?.map((item, ind) => {
-      if (ind === 0) {
-        dPopular.push(item);
-      } else {
-        if (!dPopular.find((prd) => prd.id === item.id)) {
-          // console.log(!dPopular.find((prd) => prd.id !== item.id));
-          // console.log('item here', item.id);
-
+    popular
+      ?.filter((item) => item !== null)
+      .map((item, ind) => {
+        if (ind === 0) {
           dPopular.push(item);
+        } else {
+          if (!dPopular.find((prd) => prd.id === item.id)) {
+            // console.log(!dPopular.find((prd) => prd.id !== item.id));
+            // console.log('item here', item.id);
+
+            dPopular.push(item);
+          }
         }
-      }
-    });
+      });
     gs[0].popularProducts = dPopular;
     // console.log(
-    //   '🚀 ~ file: groupshops.service.ts ~ line 471 ~ GroupshopsService ~ findOne ~ dPopular',
+    //   '🚀 ~ file: groupshops.service.ts ~ line 975 ~ GroupshopsService ~ findOne ~ dPopular',
     //   dPopular,
     // );
 
