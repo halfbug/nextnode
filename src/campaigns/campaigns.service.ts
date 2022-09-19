@@ -214,11 +214,12 @@ export class CampaignsService {
     const allGS = await this.groupshopsService.getCampaignGS(campaignId);
     // console.log("🚀 ~ file: campaigns.service.ts ~ line 215 === ~ CampaignsService ~ updateDiscountCode ~ allGS", allGS)
     const allPartnerGS = await this.partnerGsService.getCampaignGS(campaignId);
-    // console.log("🚀 ~ file: campaigns.service.ts ~ line 216 === ~ CampaignsService ~ updateDiscountCode ~ allPartnerGS", allPartnerGS)
+    console.log("🚀 ~ file: campaigns.service.ts ~ line 216 === ~ CampaignsService ~ updateDiscountCode ~ products", products)
+    console.log("🚀 ~ file: campaigns.service.ts ~ line 216 === ~ CampaignsService ~ updateDiscountCode ~ allPartnerGS", allPartnerGS)
     for (const key in allGS) {  
-      const priceRuleId = allGS[key].discountCode.priceRuleId; 
+      const priceRuleId = allGS[key]?.discountCode?.priceRuleId; 
       // get all deal products
-      const gsDealProduucts = allGS[key].dealProducts?.map(prd => prd.productId) ?? []
+      const gsDealProduucts = allGS[key]?.dealProducts?.map(prd => prd.productId) ?? []
 
       await this.shopifyapi.setDiscountCode(
         shop,
@@ -226,7 +227,7 @@ export class CampaignsService {
         accessToken,
         null,
         null,
-        [...new Set([...products, ...gsDealProduucts, ...allGS[key]?.boughtProducts])],
+        [...new Set([...products, ...gsDealProduucts ?? [], ...allGS[key]?.boughtProducts])],
         null,
         null,
         priceRuleId,
@@ -234,17 +235,17 @@ export class CampaignsService {
     }
     if (allPartnerGS && allPartnerGS.length) {
       for (const key in allPartnerGS) {  
-      const priceRuleId = allPartnerGS[key].discountCode.priceRuleId; 
+      const priceRuleId = allPartnerGS[key]?.discountCode.priceRuleId; 
       // get all deal products
-      const gsDealProduucts = allPartnerGS[key].dealProducts?.map(prd => prd.productId) ?? []
-      console.log("campaigns.service.ts ~ line 238 updateDiscountCode ~ allProduucts", [...products, ...gsDealProduucts, ...allPartnerGS[key]?.boughtProducts].map((item) => item.title))
+      const gsDealProduucts = allPartnerGS[key]?.dealProducts?.map(prd => prd.productId) ?? []
+      // console.log("campaigns.service.ts ~ line 238 updateDiscountCode ~ allProduucts", [...products, ...gsDealProduucts ?? [], ...allPartnerGS[key]?.boughtProducts ?? []].map((item) => item.title))
       await this.shopifyapi.setDiscountCode(
         shop,
         'Update',
         accessToken,
         null,
         null,
-        [...new Set([...products, ...gsDealProduucts, ...allPartnerGS[key]?.boughtProducts])],
+        [...new Set([...products, ...gsDealProduucts ?? [], ...allPartnerGS[key]?.boughtProducts ?? []])],
         null,
         null,
         priceRuleId,
@@ -257,7 +258,8 @@ catch (err) {
   console.log(
     '%ccampaigns.service.ts line:253 err',
     'color: #007acc;',
-    JSON.stringify(err, null, "\t" )
+    // JSON.stringify(err, null, "\t" )
+    err
   );
 Logger.error(err.message, CampaignsService.name)
 }
