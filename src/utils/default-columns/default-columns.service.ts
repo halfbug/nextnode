@@ -20,8 +20,14 @@ export class DefaultColumnsService {
   @Column('string', { default: 'active' })
   status: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  // @CreateDateColumn()
+  // @Column({
+  //   nullable: false,
+  //   default: () => new Date(),
+  //   type: Date,
+  // })
+  // createdAt: Date;
+  @Column() createdAt: Date = new Date();
 
   @UpdateDateColumn()
   updatedAt: Date;

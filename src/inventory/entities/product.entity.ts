@@ -64,6 +64,12 @@ export class ProductVariant {
 
   @Field(() => [SelectedOption], { nullable: 'itemsAndList' })
   selectedOptions?: SelectedOption[];
+
+  @Field({ nullable: true })
+  inventoryPolicy?: string;
+
+  @Field({ nullable: true })
+  inventoryManagement?: string;
 }
 
 @InputType('ProductInput')
@@ -131,4 +137,6 @@ export class Product {
 
   @Field({ nullable: true })
   purchaseCount?: number;
+  @Field({ nullable: true })
+  status?: string;
 }

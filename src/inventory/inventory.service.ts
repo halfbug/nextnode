@@ -5,7 +5,7 @@ import { CreateInventoryInput } from './dto/create-inventory.input';
 import { ProductQueryInput } from './dto/product-query.input';
 import { UpdateInventoryInput } from './dto/update-inventory.input';
 import Inventory from './entities/inventory.modal';
-import { Product } from './entities/product.entity';
+import { ProductVariant } from './entities/product.entity';
 @Injectable()
 export class InventoryService {
   private inventoryManager: any;
@@ -559,5 +559,22 @@ export class InventoryService {
     // console.log('🚀 ~ file: InventoryService ~ findAllProducts ~ res', res);
     return res;
     // return await manager.aggregate(Inventory, agg).toArray();
+  }
+
+  calculateOutOfStock(variants: ProductVariant[]) {
+    /* if product inventory policy is continue then it will be always in stock
+        * if product inventory management is null the item will be in stock;
+        * if product inventory policy is deny and all products variants quantiy is 0 then it will be in out of stock.
+        
+        */
+    return variants.reduce((isProductOutofStock, variant) => {
+      const isVariantOutoStock = variant.inventoryManagement
+        ? variant.inventoryPolicy.toLocaleLowerCase() === 'continue' ||
+          variant.inventoryQuantity > 0
+          ? false
+          : true
+        : false;
+      return isProductOutofStock && isVariantOutoStock;
+    }, true);
   }
 }

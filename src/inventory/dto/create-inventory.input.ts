@@ -68,4 +68,10 @@ export class CreateInventoryInput {
 
   @Field({ nullable: true })
   description?: string;
+
+  @Field({ nullable: true })
+  inventoryPolicy?: string;
+
+  @Field({ nullable: true })
+  inventoryManagement?: string;
 }

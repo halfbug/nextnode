@@ -30,10 +30,11 @@ import Orders from 'src/inventory/entities/orders.modal';
 import { UninstallService } from 'src/stores/uninstall.service';
 import { OrderCreatedEvent } from '../events/order-created.event';
 import {
+  Product,
   ProductImage,
   SelectedOption,
 } from 'src/inventory/entities/product.entity';
-import Product from 'src/campaigns/entities/product.model';
+// import Product from 'src/campaigns/entities/product.model';
 import { HttpService } from '@nestjs/axios';
 import readJsonLines from 'read-json-lines-sync';
 import { Inventory } from 'src/inventory/entities/inventory.entity';
@@ -135,16 +136,17 @@ export class WebhooksController {
       nprod.price = variants[0].node?.price; //
       nprod.featuredImage = prod?.featuredImage?.src;
       let qDifference: number;
-      const isAvailable = variants.some(
-        ({ node: { inventoryQuantity } }) => inventoryQuantity > 0,
-      );
-      nprod.outofstock = !isAvailable;
+      // const isAvailable = variants.some(
+      //   ({ node: { inventoryQuantity } }) => inventoryQuantity > 0,
+      // );
+      // nprod.outofstock = !isAvailable;
       nprod.options = prod.options.map(({ id, name, position, values }) => ({
         id,
         name,
         position,
         values,
       }));
+      nprod.outofstock = this.inventryService.calculateOutOfStock(variants);
       await this.inventryService.update(nprod);
 
       await this.inventryService.removeVariants(pid);
@@ -439,6 +441,8 @@ export class WebhooksController {
         vprod.recordType = 'ProductVariant';
         vprod.createdAtShopify = variant?.created_at;
         vprod.publishedAt = rproduct?.published_at;
+        vprod.inventoryManagement = variant?.inventory_management;
+        vprod.inventoryPolicy = variant?.inventory_policy;
         vprod.price = variant.price;
         vprod.inventoryQuantity = variant?.inventory_quantity;
         const img = new ProductImage();
@@ -519,11 +523,12 @@ export class WebhooksController {
       nprod.price = rproduct?.variants[0]?.price; //
       nprod.featuredImage = rproduct?.image?.src;
       nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
-      let qDifference: number;
-      const isAvailable = rproduct.variants.some(
-        (item) => item.inventory_quantity > 0,
-      );
-      nprod.outofstock = !isAvailable;
+      // let qDifference: number;
+      // const isAvailable = rproduct.variants.some(
+      //   (item) => item.inventory_quantity > 0,
+      // );
+
+      // !isAvailable;
       nprod.options = rproduct.options.map(
         ({ id, name, position, values }) => ({
           id,
@@ -534,6 +539,7 @@ export class WebhooksController {
       );
 
       await this.inventryService.removeVariants(rproduct?.admin_graphql_api_id);
+      const variants = [];
       rproduct.variants?.map(async (variant) => {
         const vprod = new CreateInventoryInput();
         vprod.id = variant.admin_graphql_api_id;
@@ -544,6 +550,8 @@ export class WebhooksController {
         vprod.publishedAt = rproduct?.published_at;
         vprod.featuredImage = rproduct?.image?.src;
         vprod.shop = shop;
+        vprod.inventoryManagement = variant?.inventory_management;
+        vprod.inventoryPolicy = variant?.inventory_policy;
         const img = new ProductImage();
         img.src = variant.image_id
           ? rproduct.images.filter((img) => img.id === variant.image_id)?.[0]
@@ -563,7 +571,7 @@ export class WebhooksController {
           sOpt.value = variant[`option${index + 1}`];
           return sOpt;
         });
-
+        variants.push(vprod);
         await this.inventryService.create(vprod);
       });
 
@@ -579,7 +587,12 @@ export class WebhooksController {
         this.inventryService.create(vprod);
       });
 
+      nprod.outofstock = this.inventryService.calculateOutOfStock(variants);
       await this.inventryService.update(nprod);
+      console.log(
+        '🚀 ~ file: webhooks.controller.ts ~ line 590 ~ WebhooksController ~ productUpdate ~ nprod',
+        nprod,
+      );
 
       // res.send('product updated..');
     } catch (err) {
@@ -669,16 +682,17 @@ export class WebhooksController {
       nprod.price = variants[0].node?.price; //
       nprod.featuredImage = prod?.featuredImage?.src;
       let qDifference: number;
-      const isAvailable = variants.some(
-        ({ node: { inventoryQuantity } }) => inventoryQuantity > 0,
-      );
-      nprod.outofstock = !isAvailable;
+      // const isAvailable = variants.some(
+      //   ({ node: { inventoryQuantity } }) => inventoryQuantity > 0,
+      // );
+      // nprod.outofstock = !isAvailable;
       nprod.options = prod.options.map(({ id, name, position, values }) => ({
         id,
         name,
         position,
         values,
       }));
+      nprod.outofstock = this.inventryService.calculateOutOfStock(variants);
       await this.inventryService.update(nprod);
 
       await this.inventryService.removeVariants(pid);

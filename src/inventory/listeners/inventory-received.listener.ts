@@ -43,6 +43,15 @@ export class InventoryReceivedListener {
       // add record type
       inventory.recordType = inventory.id.split('/')[3];
 
+      //add inventory management details
+      if (inventory.recordType === 'ProductVariant')
+        inventory.inventoryManagement = inventory?.inventoryItem?.tracked
+          ? 'shopify'
+          : null;
+
+      delete inventory.inventoryItem;
+      inventory.createdAt = new Date();
+      inventory.updatedAt = new Date();
       return inventory;
     });
   }

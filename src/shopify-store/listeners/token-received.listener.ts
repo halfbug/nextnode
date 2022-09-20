@@ -94,6 +94,11 @@ export class TokenReceivedListener {
                                 src
                                 
                               }
+                              inventoryPolicy
+                              inventoryItem{
+                                sku
+                                tracked
+                             }
                             }
                           }
                         }
@@ -116,8 +121,8 @@ export class TokenReceivedListener {
       },
     });
     // console.log(event);
-    // console.log(JSON.stringify(qres));
-    // console.log(qres.body['data']['bulkOperationRunQuery']['bulkOperation']);
+    console.log(JSON.stringify(qres));
+    console.log(qres.body['data']['bulkOperationRunQuery']['bulkOperation']);
     // const dopoll = true;
     if (
       qres.body['data']['bulkOperationRunQuery']['bulkOperation']['status'] ===

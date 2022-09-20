@@ -102,4 +102,10 @@ export default class Inventory extends DefaultColumnsService {
   selectedOptions?: SelectedOption[];
   @Column()
   src?: string;
+
+  @Column({ nullable: true })
+  inventoryPolicy?: string;
+
+  @Column({ nullable: true })
+  inventoryManagement?: string;
 }

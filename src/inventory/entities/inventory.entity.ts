@@ -90,4 +90,10 @@ export class Inventory {
   outofstock?: boolean;
   @Field({ nullable: true })
   src?: string;
+
+  @Field({ nullable: true })
+  inventoryPolicy?: string;
+
+  @Field({ nullable: true })
+  inventoryManagement?: string;
 }
