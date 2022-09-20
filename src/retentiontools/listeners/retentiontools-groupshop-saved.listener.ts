@@ -33,14 +33,16 @@ export class RTSSavedListener {
       await this.storesService.findOneWithActiveCampaing(shop);
 
     const blukGSCreate = getOrderList.map(async (item, index) => {
-      console.log(index + ' = ' + item.name);
-      const newOrderPlaced = new OrderPlacedEvent();
-      newOrderPlaced.klaviyo = item.customer;
-      newOrderPlaced.order = item;
-      newOrderPlaced.store = getActiveCampaing;
-      newOrderPlaced.lineItems = item.lineItems;
-      this.orderPlacedListener.createGroupShop(newOrderPlaced);
-      // this.eventEmitter.emit('order.placed', newOrderPlaced);
+      setTimeout(() => {
+        console.log(index + ' ===== ' + item.name);
+        const newOrderPlaced = new OrderPlacedEvent();
+        newOrderPlaced.klaviyo = item.customer;
+        newOrderPlaced.order = item;
+        newOrderPlaced.store = getActiveCampaing;
+        newOrderPlaced.lineItems = item.lineItems;
+        this.orderPlacedListener.createGroupShop(newOrderPlaced);
+        // this.eventEmitter.emit('order.placed', newOrderPlaced);
+      }, 2500);
     });
   }
 }

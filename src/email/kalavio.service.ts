@@ -137,17 +137,17 @@ export class KalavioService {
       originalURL: link,
       title: 'GroupShop',
     });
-
-    const res = await lastValueFrom(
-      this.httpService.post(apiUrl, body, options).pipe(map((res) => res.data)),
-    );
-    // console.log(
-    //   '🚀 ~ file: kalavio.service.ts ~ line 52 ~ KalavioService ~ generateShortLink ~ data',
-    //   res,
-    // );
-
-    // console.log('shortUrl : ' + res);
-    return res?.shortURL ?? link;
+    try {
+      const res = await lastValueFrom(
+        this.httpService
+          .post(apiUrl, body, options)
+          .pipe(map((res) => res.data)),
+      );
+      return res?.shortURL;
+    } catch (err) {
+      console.error(err);
+      return link;
+    }
   }
 
   async generateQrCode(text: string) {
