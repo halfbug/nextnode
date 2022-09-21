@@ -784,7 +784,7 @@ async function init() {
          ${csymbol}${amountCal} cashback
           on your order & unlock exclusive rewards
        `;
-            rightHeadTxt = `Get up to ${csymbol}${cashback} cashback on your order! 🎉`;
+            rightHeadTxt = `Get up to ${csymbol}${amountCal} cashback on your order! 🎉`;
           } else {
             leftHeadTxt = 'Get up to' + percentage + '% off on your order.';
             rightHeadTxt = leftHeadTxt;
@@ -887,7 +887,7 @@ async function init() {
         } else if (indx === 5) {
           clearInterval(pollit);
           document.querySelector('.groupshop_left-block').remove();
-          document.querySelector('.groupshop_right-block').remove();
+          document.querySelector('.summaryContainer').remove();
         }
       }, 1000);
     } else {
@@ -989,7 +989,7 @@ async function init() {
         } else if (indx2 === 5) {
           clearInterval(pollit2);
           document.querySelector('.groupshop_left-block').remove();
-          document.querySelector('.groupshop_right-block').remove();
+          document.querySelector('.summaryContainer').remove();
         }
       }, 1000);
     }
