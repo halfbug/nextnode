@@ -781,12 +781,12 @@ async function init() {
           if (+amountCal > 0 && members < 6) {
             leftHeadTxt = `
          Get up to     
-         ${csymbol}${amountCal} cashback
-          on your order & unlock exclusive rewards
+         <strong>${csymbol}${amountCal} cashback</strong>
+          on your order & unlock exclusive rewards.
        `;
             rightHeadTxt = `Get up to ${csymbol}${amountCal} cashback on your order! 🎉`;
           } else {
-            leftHeadTxt = 'Get up to' + percentage + '% off on your order.';
+            leftHeadTxt = 'Get up to ' + percentage + '% off on your order.';
             rightHeadTxt = leftHeadTxt;
           }
           document.querySelector('.groupshop_left-block h3').innerHTML =
@@ -796,32 +796,7 @@ async function init() {
           addRightBlock(store.brandName, true, `${csymbol}${amountCal}`);
           // document.querySelector('.gs_content').innerHTML = leftHeadTxt;
           document.querySelector('.gs_content_right').innerHTML = rightHeadTxt;
-          // document.querySelectorAll('#gscashback').forEach((elem) => {
-          //   console.log(elem);
-          //   var amountCal = `${Math.floor(cashback)
-          //     .toFixed(2)
-          //     .toString()
-          //     .replace('.00', '')}`;
-          //   if (amountCal > 0) {
-          //     elem.innerHTML = `$${Math.floor(cashback)
-          //     .toFixed(2)
-          //       .toString()
-          //       .replace('.00', '')}`;
-          //   } else {
-          //     var printMessage =
-          //       'Your friends get up to <strong>' +
-          //       mem.availedDiscount +
-          //       '% off</strong> when they shop on your link.';
-          //     document.querySelectorAll('.gs_content').forEach((elem1) => {
-          //       elem1.innerHTML = printMessage;
-          //     });
-          //     document
-          //       .querySelectorAll('.groupshop_left-block h3')
-          //       .forEach((elem2) => {
-          //         elem2.innerHTML = printMessage;
-          //       });
-          //   }
-          // });
+
           window.GSURL = window.FURL + url;
           console.log(
             '🚀 ~ file: groupshop-thanks.js ~ line 618 ~ pollit ~ window.GSURL',
