@@ -86,6 +86,10 @@ a:active {
     color: #000000;
 }
 
+.thankyouContainer > .top > .cashback .active strong {
+    font-weight: 700 !important;
+}
+
 .thankyouContainer > .top > .cashbackBtn > .buttonThnx {
     padding: 5px 15px;
     border-radius: 10px;
