@@ -643,7 +643,7 @@ function addLeftBlock(logo) {
           <div class="top">
             <div class="logoBox">
               <div style="width: 52px;z-index: 20;"><img class="logo" height="" src="${logo}"></div>
-                <div style="width: 52px;margin-left: -10px;z-index: 10;"><img class="logo" src="https://d1o2v5h7slksjm.cloudfront.net/gslogo.svg"></div>
+                <div style="width: 52px;margin-left: -10px;z-index: 10;"><img class="logo" src="https://d1o2v5h7slksjm.cloudfront.net/gslogo.png"></div>
             </div>
             <div class="cashback groupshop_left-block">
                 <h3><div class="image-placeholder" style="height: 50px !important;align-self: left;width: 120px !important;">&nbsp;</div>
@@ -688,8 +688,8 @@ function addLeftBlock(logo) {
     </div>
 </div>`;
 
-  var target = document.querySelector('.content-box:not([hidden])');
-  target.prepend(leftBlock);
+  var target = document.querySelector('.section__header');
+  target.after(leftBlock);
 }
 
 function addRightBlock(brandName, isLoaded, cashback) {
