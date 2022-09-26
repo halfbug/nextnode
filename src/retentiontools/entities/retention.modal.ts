@@ -25,6 +25,9 @@ export class Retentiontool extends DefaultColumnsService {
   orderIds?: string[];
 
   @Column({ nullable: true })
+  progress?: boolean;
+
+  @Column({ nullable: true })
   createdAt: Date;
 
   @Column({ nullable: true })

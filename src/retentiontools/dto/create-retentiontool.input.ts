@@ -28,6 +28,9 @@ export class CreateRetentiontoolInput {
   @Field(() => [String], { nullable: true })
   orderIds?: string[];
 
+  @Field({ nullable: true })
+  progress?: boolean;
+
   @Field()
   createdAt: Date;
 

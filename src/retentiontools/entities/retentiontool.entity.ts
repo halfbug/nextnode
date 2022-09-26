@@ -26,6 +26,9 @@ export class Retentiontool {
   @Field(() => [String], { nullable: true })
   orderIds?: string[];
 
+  @Field({ nullable: true })
+  progress?: boolean;
+
   @Field()
   createdAt: Date;
 
@@ -67,4 +70,9 @@ export class RetentionAnalytics {
 export class SyncStatus {
   @Field({ nullable: true })
   status?: string;
+}
+@ObjectType()
+export class ProgressStatus {
+  @Field({ nullable: true })
+  progress?: boolean;
 }

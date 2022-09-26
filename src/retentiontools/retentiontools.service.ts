@@ -50,6 +50,7 @@ export class RetentiontoolsService {
       orderIds.push(items.id);
     });
     retention.orderIds = orderIds;
+    retention.progress = true;
     const savedRetention = await this.retentionRepository.save(retention);
 
     this.rtcEvent.storeId = createRetentiontoolInput.storeId;
@@ -66,11 +67,51 @@ export class RetentiontoolsService {
   }
 
   async findAll(storeId: string) {
-    return this.retentionRepository.find({ storeId });
+    const agg = [
+      {
+        $match: {
+          storeId: storeId,
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Retentiontool, agg).toArray();
+    return gs;
   }
 
   findOne(id: string) {
     return this.retentionRepository.findOne({ id });
+  }
+
+  async update(id: string, updateStoreInput: UpdateStoreInput) {
+    await this.retentionRepository.update({ id }, updateStoreInput);
+    return await this.findOne(id);
+  }
+
+  async retentionGroupshopPrgress(storeId: string) {
+    const agg = [
+      {
+        $match: {
+          storeId: storeId,
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $limit: 1,
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Retentiontool, agg).toArray();
+    return gs[0];
   }
 
   async syncStoreCustomers(storeId: string) {

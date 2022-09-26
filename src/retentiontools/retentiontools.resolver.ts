@@ -3,6 +3,7 @@ import { RetentiontoolsService } from './retentiontools.service';
 import {
   Retentiontool,
   SyncStatus,
+  ProgressStatus,
   RetentionAnalytics,
 } from './entities/retentiontool.entity';
 import { CreateRetentiontoolInput } from './dto/create-retentiontool.input';
@@ -39,6 +40,14 @@ export class RetentiontoolsResolver {
   @Query(() => SyncStatus, { name: 'syncStoreCustomers' })
   async syncStoreCustomers(@Args('storeId') storeId: string) {
     const data = await this.retentiontoolsService.syncStoreCustomers(storeId);
+    return data;
+  }
+
+  @Query(() => ProgressStatus, { name: 'retentionGroupshopPrgress' })
+  async retentionGroupshopPrgress(@Args('storeId') storeId: string) {
+    const data = await this.retentiontoolsService.retentionGroupshopPrgress(
+      storeId,
+    );
     return data;
   }
 }
