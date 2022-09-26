@@ -290,6 +290,10 @@ a:active {
   background: #ffffff;
   padding: 5px;
 }
+
+.main .logoBox .logo {
+  display: block !important;
+}
 @media (max-width: 700px) {
   .thankyouContainer {
     background-color: #ffffff;
