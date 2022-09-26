@@ -321,40 +321,6 @@ export class GroupshopsService {
       {
         $unwind: '$shop',
       },
-      {
-        $lookup: {
-          from: 'billing',
-          localField: 'groupshops.id',
-          foreignField: 'groupShopId',
-          as: 'billing',
-        },
-      },
-      {
-        $addFields: {
-          billing: {
-            $filter: {
-              input: '$billing',
-              as: 'j',
-              cond: {
-                $eq: ['$$j.type', 0],
-              },
-            },
-          },
-        },
-      },
-      {
-        $addFields: {
-          cashback: {
-            $reduce: {
-              input: '$billing',
-              initialValue: 0,
-              in: {
-                $add: ['$$value', '$$this.cashBack'],
-              },
-            },
-          },
-        },
-      },
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Orders, agg).toArray();
