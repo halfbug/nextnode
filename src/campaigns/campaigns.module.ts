@@ -16,7 +16,7 @@ import { PartnersModule } from 'src/partners/partners.module';
     DefaultColumnsService,
     InventoryModule,
     forwardRef(() => StoresModule),
-    GroupshopsModule,
+    forwardRef(() => GroupshopsModule),
     PartnersModule,
   ],
   providers: [CampaignsResolver, CampaignsService],

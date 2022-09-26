@@ -26,6 +26,7 @@ import { StoresService } from 'src/stores/stores.service';
 import * as getSymbolFromCurrency from 'currency-symbol-map';
 import { TokenReceivedEvent } from 'src/shopify-store/events/token-received.event';
 import { UploadImageService } from 'src/shopify-store/ImageUpload/uploadimage.service';
+import { CampaignsService } from 'src/campaigns/campaigns.service';
 
 @Controller('connect')
 export class CatController {
@@ -38,6 +39,7 @@ export class CatController {
     private shopifyService: ShopifyService,
     private storeService: StoreService,
     private readonly storesService: StoresService,
+    private campaignsService: CampaignsService,
     private ordersService: OrdersService,
     private kalavioService: KalavioService,
     private uploadImageService: UploadImageService,

@@ -6,43 +6,80 @@ import {
 } from '../entities/settings.entity';
 import { BillingPlanEnum, Resource } from '../entities/store.entity';
 // import { Settings } from '../entities/settings.entity';
+
 @InputType()
-export class SettingsInput {
+export class GeneralSettingInput {
   @Field({ nullable: true })
   brandColor?: string;
-
-  @Field({ nullable: true })
-  customColor?: string;
-
   @Field({ nullable: true })
   customBg?: string;
-
   @Field({ nullable: true })
   imageUrl?: string;
-
   @Field({ nullable: true })
   youtubeUrl?: string;
-
   @Field({ nullable: true })
   media?: string;
+}
 
-  @Field(() => BannerDesignTypeEnum, { nullable: true })
-  bannerDesign: BannerDesignTypeEnum;
-
+@InputType()
+export class LayoutSettingInput {
   @Field({ nullable: true })
   bannerProductPage?: boolean;
-
   @Field({ nullable: true })
   bannerCartPage?: boolean;
-
   @Field({ nullable: true })
-  bannerLocation?: string;
-
+  bannerStyle?: string;
+  @Field({ nullable: true })
+  bannerDesign?: string;
+  @Field({ nullable: true })
+  bannerCustomColor?: string;
   @Field({ nullable: true })
   callToActionText?: string;
+  @Field({ nullable: true })
+  bannerSummaryPage?: string;
+}
 
-  @Field(() => BannerSummaryEnum, { nullable: true })
-  bannerSummaryPage?: BannerSummaryEnum;
+@InputType()
+export class MarketingSettingInput {
+  @Field({ nullable: true })
+  recoverAbandoned?: boolean;
+  @Field({ nullable: true })
+  WhatsAppnotifications?: boolean;
+  @Field({ nullable: true })
+  facebookPixels?: string;
+  @Field({ nullable: true })
+  tiktokPixels?: string;
+  @Field({ nullable: true })
+  googlePixels?: string;
+}
+@InputType()
+export class SettingsInput {
+  @Field((type) => GeneralSettingInput, { nullable: true })
+  general?: GeneralSettingInput;
+
+  @Field((type) => LayoutSettingInput, { nullable: true })
+  layout?: LayoutSettingInput;
+
+  @Field((type) => MarketingSettingInput, { nullable: true })
+  marketing?: MarketingSettingInput;
+}
+
+@InputType()
+export class SocialInput {
+  @Field({ nullable: true })
+  instagram?: string;
+
+  @Field({ nullable: true })
+  pinterest?: string;
+
+  @Field({ nullable: true })
+  tiktok?: string;
+
+  @Field({ nullable: true })
+  twitter?: string;
+
+  @Field({ nullable: true })
+  facebook?: string;
 }
 
 @InputType('SubscriptionInput')
@@ -89,6 +126,9 @@ export class CreateStoreInput {
 
   @Field((type) => SettingsInput)
   settings?: SettingsInput;
+
+  @Field((type) => SocialInput)
+  social?: SocialInput;
 
   @Field(() => BillingPlanEnum, { defaultValue: BillingPlanEnum.EXPLORE })
   plan?: BillingPlanEnum;

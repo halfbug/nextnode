@@ -1,6 +1,7 @@
 import { Column, Entity } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
 import { Settings } from './settings.model';
+import SocialLinks from 'src/campaigns/entities/social-link.model';
 import Campaign from 'src/campaigns/entities/campaign.model';
 import { BillingPlanEnum } from './store.entity';
 
@@ -51,6 +52,9 @@ export default class Store extends DefaultColumnsService {
 
   @Column((type) => Settings)
   settings?: Settings;
+
+  @Column((type) => SocialLinks)
+  social?: SocialLinks;
 
   @Column(() => Campaign)
   campaigns?: Campaign[];

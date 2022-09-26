@@ -1,7 +1,59 @@
 import { Column } from 'typeorm';
 import { BannerDesignTypeEnum, BannerSummaryEnum } from './settings.entity';
 
+export class GeneralSetting {
+  @Column({ nullable: true })
+  brandColor?: string;
+  @Column()
+  customBg?: string;
+  @Column({ nullable: true })
+  imageUrl?: string;
+  @Column({ nullable: true })
+  youtubeUrl?: string;
+  @Column({ nullable: true })
+  media?: string;
+}
+export class LayoutSetting {
+  @Column({ nullable: true })
+  bannerProductPage?: boolean;
+  @Column({ nullable: true })
+  bannerCartPage?: boolean;
+  @Column({ nullable: true })
+  bannerStyle?: string;
+  @Column({ nullable: true })
+  bannerDesign?: string;
+  @Column({ nullable: true })
+  bannerCustomColor?: string;
+  @Column({ nullable: true })
+  callToActionText?: string;
+  @Column({ nullable: true })
+  bannerSummaryPage?: string;
+}
+
+export class MarketingSetting {
+  @Column({ nullable: true })
+  recoverAbandoned?: boolean;
+  @Column({ nullable: true })
+  WhatsAppnotifications?: boolean;
+  @Column({ nullable: true })
+  facebookPixels?: string;
+  @Column({ nullable: true })
+  tiktokPixels?: string;
+  @Column({ nullable: true })
+  googlePixels?: string;
+}
 export class Settings {
+  @Column(() => GeneralSetting)
+  general?: GeneralSetting;
+
+  @Column(() => LayoutSetting)
+  layout?: LayoutSetting;
+
+  @Column(() => MarketingSetting)
+  marketing?: MarketingSetting;
+}
+
+export class CSettings {
   @Column({ nullable: true })
   brandColor: string;
 

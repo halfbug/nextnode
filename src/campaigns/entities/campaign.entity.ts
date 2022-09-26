@@ -1,6 +1,6 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { SalesTarget } from 'src/appsettings/entities/sales-target.entity';
-import { Settings } from 'src/stores/entities/settings.entity';
+import { CSettings } from 'src/stores/entities/settings.entity';
 import { Details } from './details.entity';
 import { SocialLinks } from './social-links.entity';
 
@@ -52,7 +52,7 @@ export class Campaign {
   isActive?: boolean;
 
   @Field({ nullable: true })
-  settings?: Settings;
+  settings?: CSettings;
 
   @Field({ nullable: true })
   socialLinks?: SocialLinks;

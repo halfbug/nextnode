@@ -142,6 +142,15 @@ export class CampaignsService {
     });
   }
 
+
+  async findActivecampaigns() {
+    return await this.campaignRepository.find({
+      where: {        
+        isActive: true,
+      },
+    });
+  }
+
   async update(id: string, updateCampaignInput: UpdateCampaignInput) {
     console.log(
       '🚀 ~ file:CampaignsService updateCampaignInput',

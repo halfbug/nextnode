@@ -8,6 +8,7 @@ import {
 import { Campaign } from 'src/campaigns/entities/campaign.entity';
 import { AnyScalar } from 'src/utils/any.scalarType';
 import { Settings } from './settings.entity';
+import { SocialLinks } from 'src/campaigns/entities/social-links.entity';
 
 export enum BillingPlanEnum {
   EXPLORE,
@@ -117,6 +118,9 @@ export class Store {
 
   @Field({ nullable: true })
   subscription?: Subscription;
+
+  @Field({ nullable: true })
+  social?: SocialLinks;
 
   @Field({ nullable: true })
   retentiontool?: Retentiontools;
