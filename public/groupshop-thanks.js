@@ -642,8 +642,8 @@ function addLeftBlock(logo) {
   leftBlock.innerHTML = `<div class="thankyouContainer">
           <div class="top">
             <div class="logoBox">
-              <img class="logo" height="63px" src="${logo}"></img>
-                <img class="gslogo" src="${window.BURL}/public/images/gslogo.svg">
+              <div style="width: 52px;z-index: 20;"><img class="logo" height="" src="${logo}"></div>
+                <div style="width: 52px;margin-left: -10px;z-index: 10;"><img class="logo" src="https://d1o2v5h7slksjm.cloudfront.net/gslogo.svg"></div>
             </div>
             <div class="cashback groupshop_left-block">
                 <h3><div class="image-placeholder" style="height: 50px !important;align-self: left;width: 120px !important;">&nbsp;</div>
