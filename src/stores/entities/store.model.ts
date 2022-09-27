@@ -84,6 +84,9 @@ export default class Store extends DefaultColumnsService {
   appTrialEnd: Date;
 
   @Column({ nullable: true })
+  planResetDate: Date;
+
+  @Column({ nullable: true })
   currencyCode: string;
 
   @Column({ nullable: true })

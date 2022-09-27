@@ -509,10 +509,10 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const rproduct = req.body;
-      console.log(
-        'WebhooksController ~ productUpdate ~ rproduct',
-        JSON.stringify(rproduct),
-      );
+      // console.log(
+      //   'WebhooksController ~ productUpdate ~ rproduct',
+      //   JSON.stringify(rproduct),
+      // );
       const nprod = new UpdateInventoryInput();
       // nprod.id = rproduct.id;
       nprod.id = rproduct?.admin_graphql_api_id;
@@ -1299,10 +1299,10 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const rorder = req.body;
-      console.log(
-        'WebhooksController ~ orderUpdate ~ webhookData',
-        JSON.stringify(req.body),
-      );
+      // console.log(
+      //   'WebhooksController ~ orderUpdate ~ webhookData',
+      //   JSON.stringify(req.body),
+      // );
 
       const order = new UpdateFullOrderInput();
       order.id = rorder.admin_graphql_api_id;

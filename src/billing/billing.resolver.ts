@@ -109,7 +109,7 @@ export class BillingsResolver {
       sdate,
       edate,
     );
-    console.log('🚀 getBillingByDate result', result);
+    // console.log('🚀 getBillingByDate result', result);
     return result;
   }
 
@@ -155,6 +155,7 @@ export class BillingsResolver {
       {
         subscription: { status: 'Pending', ...subscription },
         appTrialEnd: endOfTrialDate,
+        planResetDate: endOfTrialDate,
       },
     );
 

@@ -11,10 +11,10 @@ import { Settings } from './settings.entity';
 import { SocialLinks } from 'src/campaigns/entities/social-links.entity';
 
 export enum BillingPlanEnum {
-  EXPLORE,
-  LAUNCH,
-  GROWTH,
-  ENTERPRISE,
+  EXPLORE, // 30days
+  LAUNCH, //1 - 1000
+  GROWTH, // 10001 -2500
+  ENTERPRISE, //2500 - .....
 }
 registerEnumType(BillingPlanEnum, {
   name: 'BillingPlanEnum',
@@ -109,6 +109,9 @@ export class Store {
 
   @Field({ nullable: true })
   appTrialEnd: Date;
+
+  @Field({ nullable: true })
+  planResetDate: Date;
 
   @Field({ nullable: true })
   currencyCode: string;

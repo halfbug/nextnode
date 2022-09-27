@@ -1375,4 +1375,30 @@ export class GroupshopsService {
     const gs = await manager.aggregate(Groupshops, agg).toArray();
     return gs[0];
   }
+
+  async CountGSByRange(sdate: Date, edate: Date, storeId: string) {
+    const agg: any = [
+      {
+        $match: {
+          storeId,
+        },
+      },
+      {
+        $match: {
+          createdAt: {
+            $gte: sdate,
+            $lte: edate,
+          },
+        },
+      },
+      {
+        $count: 'total',
+      },
+    ];
+
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    console.log({ gs }, 'total gss');
+    return gs[0] ?? { total: 0 };
+  }
 }
