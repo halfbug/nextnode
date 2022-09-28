@@ -158,4 +158,7 @@ export class CreateStoreInput {
 
   @Field({ defaultValue: new Date() })
   updatedAt: Date;
+
+  @Field({ nullable: true })
+  planResetDate: Date;
 }

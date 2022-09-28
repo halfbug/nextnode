@@ -7,6 +7,8 @@ import { CreateStoreInput } from '../dto/create-store.input';
 import { UpdateStoreInput } from '../dto/update-store.input';
 import { StoreSavedEvent } from '../events/store-saved.event';
 import { StoresService } from '../stores.service';
+import { ConfigService } from '@nestjs/config';
+import { BillingPlanEnum } from '../entities/store.entity';
 
 @Injectable()
 export class ShopifyAPIListener {
@@ -14,6 +16,7 @@ export class ShopifyAPIListener {
     private storeService: StoresService,
     private storeSavedEvent: StoreSavedEvent,
     private readonly lifecyclesrv: LifecycleService,
+    private configService: ConfigService,
   ) {}
   @OnEvent('token.received')
   async handleTokenReceivedEvent(event: TokenReceivedEvent) {
@@ -29,6 +32,21 @@ export class ShopifyAPIListener {
     store.installationStep = 0;
     store.resources = [];
     store.hideProducts = [];
+    const trialDays = parseInt(this.configService.get('TRIAL_PERIOD'));
+
+    // on re-install app update plan back to launch and planresetdate to next 30days
+    if (store.status === 'Uninstalled') {
+      store.status = 'Active';
+      store.plan = BillingPlanEnum.LAUNCH;
+      store.planResetDate = new Date(
+        new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000).setHours(
+          23,
+          59,
+          59,
+          999,
+        ),
+      );
+    }
 
     this.storeService.createORupdate(store).then((sstore) => {
       console.log('store---------------------------saved');

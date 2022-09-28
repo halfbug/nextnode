@@ -88,6 +88,10 @@ export class StoreListener {
     } else {
       const payload = { id, totalGroupShop: (totalGroupShop ?? 0) + 1 };
       const updatedStore = await this.storeService.update(id, payload);
+      this.planUpdateEvent.store = updatedStore;
+      this.planUpdateEvent.groupshop = event.groupshop;
+      this.planUpdateEvent.revenue = event.revenue;
+      this.planUpdateEvent.emit();
     }
   }
 }
