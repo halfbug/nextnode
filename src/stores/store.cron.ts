@@ -10,7 +10,7 @@ export class StoreUpdatePlanCron {
 
   // @Cron('0 59 23 * * *')
   // @Cron(CronExpression.EVERY_DAY_AT_1AM)
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   async handleCron() {
     this.logger.debug('Called for daily cron for store plan check');
     const stores = await this.storesService.findActiveAll();
@@ -35,7 +35,7 @@ export class StoreUpdatePlanCron {
           const nextDate = new Date(
             new Date(
               store.planResetDate.getTime() + 30 * 24 * 60 * 60 * 1000,
-            ).setHours(4, 59, 59, 999),
+            ).setHours(23, 59, 59, 999),
           );
           payload = {
             id: store.id,

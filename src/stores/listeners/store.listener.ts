@@ -56,7 +56,7 @@ export class StoreListener {
       );
       console.log('🚀 ~ updateStore ~ sdate', sdate);
       console.log('🚀 ~ updateStore ~ edate', edate);
-      const newCount = (total ?? 0) + 1;
+      const newCount = total ?? 0;
       // const newCount = 1001;
 
       // check GS count of custome range (1-1000 groupshops)

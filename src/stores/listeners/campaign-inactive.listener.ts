@@ -3,13 +3,6 @@ import { OnEvent } from '@nestjs/event-emitter';
 // import moment from 'moment';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CampaignInactiveEvent } from 'src/billing/events/campaign-inactive.event';
-import { GroupShopCreated } from 'src/groupshops/events/groupshop-created.event';
-import {
-  GS_PLAN1_END_COUNT,
-  GS_PLAN2_END_COUNT,
-  GS_PLAN3_END_COUNT,
-} from 'src/utils/constant';
-import { BillingPlanEnum } from '../entities/store.entity';
 // import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { StoresService } from '../stores.service';
 
