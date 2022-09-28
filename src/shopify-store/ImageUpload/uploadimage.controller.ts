@@ -21,9 +21,17 @@ export class UploadImageController {
   @Post('')
   @UseInterceptors(FileInterceptor('image', { limits: { files: 1 } }))
   @ApiResponse({ status: HttpStatus.CREATED, type: ImageResponseDTO })
-  async upload(@UploadedFile() file: ImageFileDTO, @Res() response) {
+  async upload(
+    @Req() req,
+    @UploadedFile() file: ImageFileDTO,
+    @Res() response,
+  ) {
     try {
       const data: ImageResponseDTO = await this.uploadImageService.upload(file);
+      const dataDel = await this.uploadImageService.deleteImage(
+        req.body.previousimage,
+      );
+
       return response.status(200).json({
         message: `Image ${file.originalname} uploaded to S3`,
         data,

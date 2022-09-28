@@ -15,6 +15,24 @@ export class UploadImageService {
     return await this.uploadS3(file.buffer, S3bucket, originalname, mimetype);
   }
 
+  async deleteImage(file) {
+    const s3 = this.s3Provider.getS3();
+    const S3bucket = this.s3Provider.getBucketName();
+    s3.deleteObject(
+      {
+        Bucket: S3bucket,
+        Key: file,
+      },
+      function (err, data) {
+        if (err) {
+          console.log(err);
+          Logger.error('Error in file delete from S3', err);
+        }
+        console.log(data);
+      },
+    );
+  }
+
   async uploadS3(file, bucket, name, mimetype) {
     const s3 = this.s3Provider.getS3();
     const s3Params = {
