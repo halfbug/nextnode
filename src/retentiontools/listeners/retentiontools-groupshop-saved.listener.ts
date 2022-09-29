@@ -33,8 +33,6 @@ export class RTSSavedListener {
     );
     const getActiveCampaing =
       await this.storesService.findOneWithActiveCampaing(shop);
-    const getLatestLog =
-      await this.retentiontoolsService.retentionGroupshopPrgress(event.storeId);
 
     const blukGSCreate = getOrderList.map(async (item, index) => {
       try {
@@ -48,9 +46,17 @@ export class RTSSavedListener {
           this.orderPlacedListener.createGroupShop(newOrderPlaced);
           // this.eventEmitter.emit('order.placed', newOrderPlaced);
         }, 2500);
+        const getLatestLog =
+          await this.retentiontoolsService.retentionGroupshopPrgress(
+            event.storeId,
+          );
         getLatestLog.progress = false;
         await this.retentiontoolsService.update(getLatestLog?.id, getLatestLog);
       } catch (err) {
+        const getLatestLog =
+          await this.retentiontoolsService.retentionGroupshopPrgress(
+            event.storeId,
+          );
         getLatestLog.progress = false;
         await this.retentiontoolsService.update(getLatestLog?.id, getLatestLog);
         console.log(
