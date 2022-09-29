@@ -589,10 +589,10 @@ export class WebhooksController {
 
       nprod.outofstock = this.inventryService.calculateOutOfStock(variants);
       await this.inventryService.update(nprod);
-      console.log(
-        '🚀 ~ file: webhooks.controller.ts ~ line 590 ~ WebhooksController ~ productUpdate ~ nprod',
-        nprod,
-      );
+      // console.log(
+      //   '🚀 ~ file: webhooks.controller.ts ~ line 590 ~ WebhooksController ~ productUpdate ~ nprod',
+      //   nprod,
+      // );
 
       // res.send('product updated..');
     } catch (err) {
@@ -758,10 +758,10 @@ export class WebhooksController {
   async orderCreate(@Req() req, @Res() res) {
     try {
       const { shop } = req.query;
-      console.log(
-        'WebhooksController ~ orderCreate ~ webhookData',
-        JSON.stringify(req.body),
-      );
+      // console.log(
+      //   'WebhooksController ~ orderCreate ~ webhookData',
+      //   JSON.stringify(req.body),
+      // );
       // const webhook = req.body;
       this.orderCreatedEvent.webhook = req.body;
       this.orderCreatedEvent.shop = shop;

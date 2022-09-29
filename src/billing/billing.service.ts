@@ -676,4 +676,43 @@ export class BillingsService {
     // console.log('🚀 all store billing', allStoreBilling);
     return allStoreBilling;
   }
+  async CountGSByRange(sdate: Date, edate: Date, storeId: string) {
+    const agg: any = [
+      {
+        $match: {
+          storeId,
+        },
+      },
+      {
+        $match: {
+          createdAt: {
+            $gte: sdate,
+            $lte: edate,
+          },
+        },
+      },
+      {
+        $match: {
+          $and: [
+            {
+              type: 1,
+            },
+            {
+              plan: {
+                $ne: 0,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $count: 'total',
+      },
+    ];
+
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Billing, agg).toArray();
+    console.log({ gs }, 'total gss');
+    return gs[0] ?? { total: 0 };
+  }
 }

@@ -35,10 +35,10 @@ export class OrderCreatedListener {
       const { shop, webhook } = event;
       const whOrder = webhook;
 
-      console.log(
-        'WebhooksController ~ orderCreate ~ webhookData',
-        JSON.stringify(whOrder),
-      );
+      // console.log(
+      //   'WebhooksController ~ orderCreate ~ webhookData',
+      //   JSON.stringify(whOrder),
+      // );
       const newOrder = new CreateOrderInput();
       newOrder.id = whOrder.admin_graphql_api_id;
       newOrder.name = '#' + JSON.stringify(whOrder.order_number);

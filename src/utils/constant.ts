@@ -7,10 +7,10 @@ export const GS_CHARGE_FEE_ENTERPRISE = 0.1;
 export const GS_PLAN1_START_COUNT = 1;
 export const GS_PLAN1_END_COUNT = 100;
 export const GS_PLAN2_START_COUNT = 101;
-export const GS_PLAN2_END_COUNT = 2;
-export const GS_PLAN3_START_COUNT = 3;
-export const GS_PLAN3_END_COUNT = 4;
-export const GS_PLAN4_START_COUNT = 5;
+export const GS_PLAN2_END_COUNT = 1;
+export const GS_PLAN3_START_COUNT = 2;
+export const GS_PLAN3_END_COUNT = 2;
+export const GS_PLAN4_START_COUNT = 3;
 
 export const GS_FEES = [
   0,

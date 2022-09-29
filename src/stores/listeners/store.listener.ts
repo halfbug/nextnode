@@ -2,25 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 // import moment from 'moment';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { BillingsService } from 'src/billing/billing.service';
 import { GroupShopCreated } from 'src/groupshops/events/groupshop-created.event';
-import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import {
   GS_PLAN1_START_COUNT,
   GS_PLAN2_END_COUNT,
   GS_PLAN3_END_COUNT,
+  GS_PLAN4_START_COUNT,
 } from 'src/utils/constant';
 import { BillingPlanEnum } from '../entities/store.entity';
 import { StorePlanUpdatedEvent } from '../events/plan-updated.event';
-// import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { StoresService } from '../stores.service';
 
 @Injectable()
 export class StoreListener {
   constructor(
     private planUpdateEvent: StorePlanUpdatedEvent,
-    // private gsService: GroupshopsService,
     private storeService: StoresService,
-    private groupshopService: GroupshopsService,
+    private billingService: BillingsService,
   ) {}
 
   @OnEvent('groupshop.created')
@@ -44,7 +43,7 @@ export class StoreListener {
 
     // sdate date > traildate then
     if (Date.now() > appTrialEnd.getTime()) {
-      const { total } = await this.groupshopService.CountGSByRange(
+      const { total } = await this.billingService.CountGSByRange(
         sdate,
         edate,
         storeId,
@@ -56,7 +55,7 @@ export class StoreListener {
       );
       console.log('🚀 ~ updateStore ~ sdate', sdate);
       console.log('🚀 ~ updateStore ~ edate', edate);
-      const newCount = total ?? 0;
+      const newCount = (total ?? 0) + 1;
       // const newCount = 1001;
 
       // check GS count of custome range (1-1000 groupshops)
@@ -70,9 +69,11 @@ export class StoreListener {
       ) {
         console.log('GROWTH');
         plan = BillingPlanEnum.GROWTH;
-      } else {
+      } else if (newCount >= GS_PLAN4_START_COUNT) {
         console.log('ENTERPRISE');
         plan = BillingPlanEnum.ENTERPRISE;
+      } else {
+        plan = BillingPlanEnum.LAUNCH;
       }
       const payload = { id, plan, totalGroupShop: (totalGroupShop ?? 0) + 1 };
       const updatedStore = await this.storeService.update(id, payload);
