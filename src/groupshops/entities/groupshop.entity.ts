@@ -126,35 +126,6 @@ export class uniqueClicks {
 }
 
 @ObjectType()
-export class activeGroupshop {
-  @Field({ nullable: true })
-  shortUrl?: string;
-
-  @Field({ nullable: true })
-  name?: string;
-
-  @Field(() => [GroupShop], { nullable: 'itemsAndList' })
-  groupshops?: GroupShop[];
-
-  @Field(() => [RefundInfo], { nullable: 'itemsAndList' })
-  refundDetail?: RefundInfo[];
-
-  @Field(() => CustomerType)
-  customer?: CustomerType;
-
-  @Field({ nullable: true })
-  shop?: Store;
-
-  @Field({ nullable: true })
-  url?: string;
-}
-
-@ObjectType()
-export class GsOrders {
-  @Field(() => [Member])
-  members: Member[];
-}
-@ObjectType()
 export class OBSettings {
   @Field({ nullable: true })
   ownerUrl?: string;
@@ -264,6 +235,43 @@ export class GroupShop {
   @Field(() => [DealProducts], { nullable: 'itemsAndList' })
   refferalDealsProducts?: DealProducts[];
 }
+
+@ObjectType()
+export class activeGroupshop {
+  @Field({ nullable: true })
+  shortUrl?: string;
+
+  @Field({ nullable: true })
+  name?: string;
+
+  @Field({ nullable: true })
+  isExpired?: boolean;
+
+  @Field(() => [GroupShop], { nullable: 'itemsAndList' })
+  groupshops?: GroupShop[];
+
+  @Field(() => GroupShop, { nullable: true })
+  groupshop?: GroupShop;
+
+  @Field(() => [RefundInfo], { nullable: 'itemsAndList' })
+  refundDetail?: RefundInfo[];
+
+  @Field(() => CustomerType)
+  customer?: CustomerType;
+
+  @Field({ nullable: true })
+  shop?: Store;
+
+  @Field({ nullable: true })
+  url?: string;
+}
+
+@ObjectType()
+export class GsOrders {
+  @Field(() => [Member])
+  members: Member[];
+}
+
 @ObjectType()
 export class TotalGS {
   @Field()

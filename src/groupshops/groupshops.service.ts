@@ -282,32 +282,9 @@ export class GroupshopsService {
       {
         $lookup: {
           from: 'groupshops',
-          let: {
-            expiredAt: '$expiredAt',
-          },
           localField: 'id',
           foreignField: 'members.orderId',
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    {
-                      $gt: ['$expiredAt', new Date()],
-                    },
-                  ],
-                },
-              },
-            },
-          ],
-          as: 'groupshops',
-        },
-      },
-      {
-        $match: {
-          'groupshops.0': {
-            $exists: true,
-          },
+          as: 'groupshop',
         },
       },
       {
@@ -316,6 +293,20 @@ export class GroupshopsService {
           localField: 'shop',
           foreignField: 'shop',
           as: 'shop',
+        },
+      },
+      {
+        $unwind: '$groupshop',
+      },
+      {
+        $addFields: {
+          isExpired: {
+            $cond: {
+              if: { $gt: ['$groupshop.expiredAt', new Date()] },
+              then: false,
+              else: true,
+            },
+          },
         },
       },
       {
