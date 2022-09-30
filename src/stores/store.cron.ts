@@ -10,7 +10,7 @@ export class StoreUpdatePlanCron {
 
   // @Cron('0 59 23 * * *')
   // @Cron(CronExpression.EVERY_DAY_AT_1AM)
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
   async handleCron() {
     this.logger.debug('Called for daily cron for store plan check');
     const stores = await this.storesService.findActiveAll();
