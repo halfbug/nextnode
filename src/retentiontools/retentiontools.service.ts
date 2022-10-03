@@ -75,7 +75,7 @@ export class RetentiontoolsService {
       },
       {
         $sort: {
-          createdAt: -1,
+          _id: -1,
         },
       },
     ];
@@ -102,7 +102,7 @@ export class RetentiontoolsService {
       },
       {
         $sort: {
-          createdAt: -1,
+          _id: -1,
         },
       },
       {
