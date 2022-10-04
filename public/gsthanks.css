@@ -329,6 +329,23 @@ a:active {
     justify-content: center;
     margin-bottom: 30px;
   }
+
+  .thankyouContainer > .cashbackBtn_mobile .buttonThnx {
+    padding: 5px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: max-content;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: 0.32px;
+    color: #ffffff !important;
+    background: #1e1e1e;
+    font-family: "DM Sans";
+    font-style: normal;
+    margin-top: 20px;
+}
+
   .thankyouContainer > .cashbackBtn_mobile > .buttonSmry {
     padding: 12px 20px;
     font-family: "DM Sans";
