@@ -33,12 +33,23 @@ export class ShopifyAPIListener {
     store.resources = [];
     store.hideProducts = [];
     const trialDays = parseInt(this.configService.get('TRIAL_PERIOD'));
+    console.log('store status', store.status);
+    console.log(
+      'store plan',
+      Date.now() >= store.appTrialEnd.getTime()
+        ? BillingPlanEnum.LAUNCH
+        : BillingPlanEnum.EXPLORE,
+    );
+
     console.log('app install/uninstall');
     // on re-install app update plan back to launch and planresetdate to next 30days
     if (store.status === 'Uninstalled') {
       console.log('app re-install');
       store.status = 'Active';
-      store.plan = BillingPlanEnum.LAUNCH;
+      store.plan =
+        Date.now() >= store.appTrialEnd.getTime()
+          ? BillingPlanEnum.LAUNCH
+          : BillingPlanEnum.EXPLORE;
       store.planResetDate = new Date(
         new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000).setHours(
           23,

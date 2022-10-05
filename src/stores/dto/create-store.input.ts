@@ -161,4 +161,7 @@ export class CreateStoreInput {
 
   @Field({ nullable: true })
   planResetDate: Date;
+
+  @Field({ nullable: true })
+  appTrialEnd: Date;
 }
