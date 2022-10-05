@@ -346,6 +346,10 @@ a:active {
     margin-top: 20px;
 }
 
+.thankyouContainer > .cashbackBtn_mobile .buttonThnx a{
+  color: #ffffff;
+ }
+
   .thankyouContainer > .cashbackBtn_mobile > .buttonSmry {
     padding: 12px 20px;
     font-family: "DM Sans";
