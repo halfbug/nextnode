@@ -330,7 +330,7 @@ a:active {
     margin-bottom: 30px;
   }
 
-  .thankyouContainer > .cashbackBtn_mobile .buttonThnx > a {
+  .thankyouContainer > .cashbackBtn_mobile .buttonThnx {
     padding: 5px 15px;
     border-radius: 10px;
     cursor: pointer;
