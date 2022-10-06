@@ -69,12 +69,19 @@ export class ShopifyStoreController {
 
   @Get('me')
   async whoami(@Query('name') name: any) {
-    const { brandName, shop, id, activeCampaign } =
+    const { brandName, shop, id, activeCampaign, settings } =
       await this.storesService.findOneWithActiveCampaing(name);
-    console.log({ brandName, shop, id, activeCampaign });
-    const photo = activeCampaign.settings?.general?.imageUrl.split('/')[4];
+    // console.log(
+    //   '🚀 ~ file: shopify-store.controller.ts ~ line 73 ~ ShopifyStoreController ~ whoami ~ activeCampaign',
+    //   activeCampaign,
+    // );
+    // console.log({ settings, brandName, shop, id, activeCampaign });
+    const photo = settings?.general
+      ? settings?.general?.imageUrl.split('/')[4]
+      : activeCampaign.settings?.general?.imageUrl.split('/')[4];
     const maxReward = activeCampaign.salesTarget.rewards[2].discount;
     // const photo = await this.imageService.getSignedUrl(imgPath );
+    // console.log('response', brandName, shop, id, photo, maxReward);
     return { brandName, shop, id, photo, maxReward };
   }
   @Get('load-products')

@@ -442,9 +442,13 @@ export class InventoryService {
     const res = await manager.aggregate(Inventory, agg).toArray();
     // console.log(
     //   '🚀 ~ file: inventory.service.ts ~ line 329 ~ InventoryService ~ findProductById ~ res',
-    //   res,
+    //   res[0].length,
+    //   res[0],
     // );
-    return res[0];
+    return res.length && res[0].status !== 'ACTIVE'
+      ? { ...res[0], outofstock: true }
+      : res[0];
+
     // return await manager.aggregate(Inventory, agg).toArray();
   }
 

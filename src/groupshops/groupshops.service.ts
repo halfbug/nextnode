@@ -708,6 +708,9 @@ export class GroupshopsService {
                       $in: ['$$j.id', '$store.hideProducts'],
                     },
                   },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
                 ],
               },
             },
@@ -737,6 +740,9 @@ export class GroupshopsService {
                     $not: {
                       $in: ['$$j.id', '$store.hideProducts'],
                     },
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
                   },
                 ],
               },
@@ -908,25 +914,38 @@ export class GroupshopsService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
+    // console.log(
+    //   '🚀 ~ file: groupshops.service.ts ~ line 917 ~ GroupshopsService ~ findOne ~ gs',
+    //   gs,
+    // );
+    if (gs.length) {
+      const popular = gs[0].popularProducts;
+      const dPopular = [];
 
-    const popular = gs[0].popularProducts;
-    const dPopular = [];
-
-    popular
-      ?.filter((item) => item !== null)
-      .map((item, ind) => {
-        if (ind === 0) {
-          dPopular.push(item);
-        } else {
-          if (!dPopular.find((prd) => prd.id === item.id)) {
-            // console.log(!dPopular.find((prd) => prd.id !== item.id));
-            // console.log('item here', item.id);
-
+      popular
+        ?.filter((item) => item !== null)
+        .map((item, ind) => {
+          if (item.status.toUpperCase() !== 'ACTIVE') item.outofstock = true; // if product is draft so make it out of stock so that it is not purchaseable
+          if (ind === 0) {
             dPopular.push(item);
+          } else {
+            if (!dPopular.find((prd) => prd.id === item.id)) {
+              // console.log(!dPopular.find((prd) => prd.id !== item.id));
+              // console.log('item here', item.id);
+
+              dPopular.push(item);
+            }
           }
-        }
+        });
+      gs[0].popularProducts = dPopular;
+      gs[0].members = gs[0].members.map((member) => {
+        member.products.map((item) => {
+          if (item.status.toUpperCase() !== 'ACTIVE') item.outofstock = true;
+          return item;
+        });
+        return member;
       });
-    gs[0].popularProducts = dPopular;
+    }
     console.log(
       '🚀 ~ file: groupshops.service.ts ~ line 975 ~ GroupshopsService ~ findOne ~ gs[0]',
       gs[0],

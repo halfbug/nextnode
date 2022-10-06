@@ -429,7 +429,8 @@ export class WebhooksController {
       nprod.price = rproduct?.variants[0]?.price;
       nprod.featuredImage = rproduct?.image?.src;
       nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
-
+      // if product is not active then it will be not purchaseable.
+      if (nprod.status !== 'ACTIVE') nprod.outofstock = true;
       await this.inventryService.create(nprod);
 
       //add variat
@@ -587,7 +588,10 @@ export class WebhooksController {
         this.inventryService.create(vprod);
       });
 
-      nprod.outofstock = this.inventryService.calculateOutOfStock(variants);
+      nprod.outofstock =
+        nprod.status !== 'ACTIVE'
+          ? true
+          : this.inventryService.calculateOutOfStock(variants);
       await this.inventryService.update(nprod);
       // console.log(
       //   '🚀 ~ file: webhooks.controller.ts ~ line 590 ~ WebhooksController ~ productUpdate ~ nprod',
