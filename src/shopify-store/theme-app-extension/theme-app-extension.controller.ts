@@ -35,6 +35,7 @@ export class ThemeAppExtensionController {
             rewards: [, , { discount }],
           },
         },
+        settings,
         status,
         logoImage,
         brandName,
@@ -50,6 +51,7 @@ export class ThemeAppExtensionController {
           logoImage: `${this.configService.get('IMAGE_PATH')}${
             logoImage?.split('/')[4]
           }`,
+          settings,
           brandName,
         }),
       );
