@@ -6,6 +6,7 @@ export enum ProductTypeEnum {
   deal,
   owner,
   abandoned,
+  first, // product Owner buys which is out of campaign
 }
 
 export enum RefundStatusEnum {

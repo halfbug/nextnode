@@ -372,10 +372,14 @@ export class OrderPlacedListener {
             .filter((item) => !campaignProducts.includes(item.product.id))
             .map((nitem) => ({
               productId: nitem.product.id,
-              type: ProductTypeEnum.deal,
+              type: ProductTypeEnum.first,
               addedBy: customer.firstName,
               customerIP: customer.ip,
             }));
+          console.log(
+            '🚀 ~ file: order-placed.listener.ts ~ line 379 ~ OrderPlacedListener ~ createGroupShop ~ dealProducts',
+            dealProducts,
+          );
           const totalCampaignProducts = campaignProducts.concat(
             dealProducts.map((p) => p.productId),
           );

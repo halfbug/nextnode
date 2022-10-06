@@ -23,9 +23,9 @@ export class GroupshopsService {
     private shopifyapi: ShopifyService,
   ) {}
   async create(createGroupshopInput: CreateGroupshopInput) {
-    // console.log(
-    //   'createGroupshopInput : ' + JSON.stringify(createGroupshopInput),
-    // );
+    console.log(
+      'createGroupshopInput : ' + JSON.stringify(createGroupshopInput),
+    );
     const groupshop = this.groupshopRepository.create(createGroupshopInput);
     groupshop.dealProducts = [new DealProductsInput()];
     groupshop.id = uuid();
@@ -927,10 +927,10 @@ export class GroupshopsService {
         }
       });
     gs[0].popularProducts = dPopular;
-    // console.log(
-    //   '🚀 ~ file: groupshops.service.ts ~ line 975 ~ GroupshopsService ~ findOne ~ dPopular',
-    //   dPopular,
-    // );
+    console.log(
+      '🚀 ~ file: groupshops.service.ts ~ line 975 ~ GroupshopsService ~ findOne ~ gs[0]',
+      gs[0],
+    );
 
     return gs[0];
   }
@@ -1059,9 +1059,10 @@ export class GroupshopsService {
 
   async update(updateGroupshopInput: UpdateGroupshopInput) {
     const { id, dealProducts } = updateGroupshopInput;
-
-    updateGroupshopInput.dealProducts = [new DealProductsInput()];
-    updateGroupshopInput.dealProducts = dealProducts;
+    if (dealProducts && dealProducts.length) {
+      updateGroupshopInput.dealProducts = [new DealProductsInput()];
+      updateGroupshopInput.dealProducts = dealProducts;
+    }
     // console.log('🚀 ~ ~ update ~ dealProducts', dealProducts);
     delete updateGroupshopInput.id;
     // delete updateGroupshopInput['_id'];

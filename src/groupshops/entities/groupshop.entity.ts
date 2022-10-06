@@ -19,6 +19,7 @@ export enum ProductTypeEnum {
   deal,
   owner,
   abandoned,
+  first, // product Owner buys which is out of campaign
 }
 registerEnumType(ProductTypeEnum, {
   name: 'ProductTypeEnum',
