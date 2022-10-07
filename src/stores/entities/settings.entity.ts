@@ -47,6 +47,8 @@ export class LayoutSetting {
   @Field({ nullable: true })
   bannerDesign?: string;
   @Field({ nullable: true })
+  bannerColor?: string;
+  @Field({ nullable: true })
   bannerCustomColor?: string;
   @Field({ nullable: true })
   callToActionText?: string;

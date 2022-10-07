@@ -122,6 +122,27 @@ export class StoresService {
   }
 
   async update(id: string, updateStoreInput: UpdateStoreInput) {
+    if (updateStoreInput?.settings?.layout?.bannerDesign) {
+      const bannerDesi = updateStoreInput?.settings?.layout?.bannerDesign;
+      if (bannerDesi === '002') {
+        updateStoreInput.settings.layout.bannerColor = '#F2F2F1';
+      } else if (bannerDesi === '003') {
+        updateStoreInput.settings.layout.bannerColor = '#000000';
+      } else if (bannerDesi === '004') {
+        updateStoreInput.settings.layout.bannerColor = '#FFFFFF';
+      } else if (bannerDesi === '101') {
+        updateStoreInput.settings.layout.bannerColor = '#FFFFFF';
+      } else if (bannerDesi === '102') {
+        updateStoreInput.settings.layout.bannerColor = '#171717';
+      } else if (bannerDesi === '103') {
+        updateStoreInput.settings.layout.bannerColor = '#D3DEDC';
+      } else if (bannerDesi === '104') {
+        updateStoreInput.settings.layout.bannerColor =
+          updateStoreInput?.settings?.layout?.bannerCustomColor;
+      } else {
+        updateStoreInput.settings.layout.bannerColor = '#EEFF5C';
+      }
+    }
     await this.storeRepository.update({ id }, updateStoreInput);
     return await this.findOneById(id);
   }

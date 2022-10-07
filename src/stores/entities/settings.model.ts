@@ -23,6 +23,8 @@ export class LayoutSetting {
   @Column({ nullable: true })
   bannerDesign?: string;
   @Column({ nullable: true })
+  bannerColor?: string;
+  @Column({ nullable: true })
   bannerCustomColor?: string;
   @Column({ nullable: true })
   callToActionText?: string;
