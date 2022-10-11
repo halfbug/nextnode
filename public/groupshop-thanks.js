@@ -5,7 +5,7 @@
 console.log('v2 Script Local');
 console.log('v2 Script Triggered');
 // Define App Url
-// window.BURL = 'https://a559-39-51-79-135.eu.ngrok.io';
+// window.BURL = 'https://61dc-124-253-35-214.ngrok.io';
 // window.FURL = 'http://localhost:3000';
 window.BURL = 'https://api-stage.groupshop.co';
 window.FURL = 'http://front-stage.groupshop.co';
@@ -731,30 +731,36 @@ async function init() {
   // fetch store detail
   const store = await fetchStore(Shopify.shop);
   console.log('🚀 ~ file: groupshop-pdp.js ~ line 124 ~ init ~ store', store);
+  const bannerSummaryPage = store.settings.layout.bannerSummaryPage;
   if (['Active', 'Inactive'].includes(store.status)) {
     //create products slider
     injectStyleSheet('gsthanks.css');
     injectStyleSheet('glider.min.css');
     const csymbol = getCurrencySymbol(Shopify.checkout.currency);
-    addLeftBlock(store.logoImage);
-    addRightBlock(store.brandName, false, '');
-
-    var glider = new Glider(document.querySelector('.glider'), {
-      //   slidesToScroll: 3,
-      slidesToShow: 'auto',
-      slidesToScroll: 1,
-      itemWidth: 110,
-      duration: 0.25,
-      rewind: true,
-      arrows: {
-        prev: '.glider-prev',
-        next: '.glider-next',
-      },
-    });
-
+    if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
+      addLeftBlock(store.logoImage);
+    }
+    if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Right') {
+      addRightBlock(store.brandName, false, '');
+    }
+    if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
+      var glider = new Glider(document.querySelector('.glider'), {
+        //   slidesToScroll: 3,
+        slidesToShow: 'auto',
+        slidesToScroll: 1,
+        itemWidth: 110,
+        duration: 0.25,
+        rewind: true,
+        arrows: {
+          prev: '.glider-prev',
+          next: '.glider-next',
+        },
+      });
+    }
     let res;
     let indx = 0;
     let indx2 = 0;
+
     if (isGroupshop) {
       const pollit = setInterval(async () => {
         indx++;
@@ -789,13 +795,18 @@ async function init() {
             leftHeadTxt = 'Get up to ' + percentage + '% off on your order.';
             rightHeadTxt = leftHeadTxt;
           }
-          document.querySelector('.groupshop_left-block h3').innerHTML =
-            leftHeadTxt;
-          document.querySelector('.groupshop_left-block h3').className =
-            'active';
-          addRightBlock(store.brandName, true, `${csymbol}${amountCal}`);
-          // document.querySelector('.gs_content').innerHTML = leftHeadTxt;
-          document.querySelector('.gs_content_right').innerHTML = rightHeadTxt;
+          if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
+            document.querySelector('.groupshop_left-block h3').innerHTML =
+              leftHeadTxt;
+            document.querySelector('.groupshop_left-block h3').className =
+              'active';
+          }
+          if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Right') {
+            addRightBlock(store.brandName, true, `${csymbol}${amountCal}`);
+            // document.querySelector('.gs_content').innerHTML = leftHeadTxt;
+            document.querySelector('.gs_content_right').innerHTML =
+              rightHeadTxt;
+          }
 
           window.GSURL = window.FURL + url;
           console.log(
@@ -816,49 +827,53 @@ async function init() {
           const products = await gsPost('products', {
             campaignId: store.campaignId,
           });
+          if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
+            // var glider = Glider(this);
+            console.log(products);
+            Array(3).map((v, indx) => glider.removeItem(0));
+            glider.removeItem(0);
+            glider.removeItem(1);
+            glider.removeItem(0);
+            glider.removeItem(0);
+            randomIndx = Math.floor(Math.random() * (products.length - 10)) + 1;
+            displayProd =
+              products.length > 10
+                ? products.slice(randomIndx, randomIndx + 11)
+                : products;
 
-          // var glider = Glider(this);
-          console.log(products);
-          Array(3).map((v, indx) => glider.removeItem(0));
-          glider.removeItem(0);
-          glider.removeItem(1);
-          glider.removeItem(0);
-          glider.removeItem(0);
-          randomIndx = Math.floor(Math.random() * (products.length - 10)) + 1;
-          displayProd =
-            products.length > 10
-              ? products.slice(randomIndx, randomIndx + 11)
-              : products;
+            displayProd.map((prod) => {
+              const slide = document.createElement('a');
+              slide.href = window.GSURL;
+              slide.target = '_blank';
+              slide.className = 'gscard';
+              const pp = +prod?.price;
+              const productPrice = +pp.toFixed(2).toString().replace('.00', '');
+              console.log(
+                '🚀 ~ file: groupshop-thanks.js ~ line 654 ~ displayProd.map ~ productPrice',
+                productPrice,
+              );
+              slide.innerHTML = `<img src="${
+                prod.featuredImage
+              }"alt="img"><span class="discount">${percentage}% OFF</span><h4>${prod.title.slice(
+                0,
+                15,
+              )}..</h4><span class="bold">${csymbol}${(
+                prod.price -
+                (parseFloat(percentage) / 100) * prod.price
+              )
+                .toFixed(2)
+                .toString()
+                .replace(
+                  '.00',
+                  '',
+                )}</span> <del>${csymbol}${productPrice}</del>`;
+              glider.addItem(slide);
+              glider.refresh(true);
+              return prod;
+            });
 
-          displayProd.map((prod) => {
-            const slide = document.createElement('a');
-            slide.href = window.GSURL;
-            slide.target = '_blank';
-            slide.className = 'gscard';
-            const pp = +prod?.price;
-            const productPrice = +pp.toFixed(2).toString().replace('.00', '');
-            console.log(
-              '🚀 ~ file: groupshop-thanks.js ~ line 654 ~ displayProd.map ~ productPrice',
-              productPrice,
-            );
-            slide.innerHTML = `<img src="${
-              prod.featuredImage
-            }"alt="img"><span class="discount">${percentage}% OFF</span><h4>${prod.title.slice(
-              0,
-              15,
-            )}..</h4><span class="bold">${csymbol}${(
-              prod.price -
-              (parseFloat(percentage) / 100) * prod.price
-            )
-              .toFixed(2)
-              .toString()
-              .replace('.00', '')}</span> <del>${csymbol}${productPrice}</del>`;
-            glider.addItem(slide);
             glider.refresh(true);
-            return prod;
-          });
-
-          glider.refresh(true);
+          }
         } else if (indx === 5) {
           clearInterval(pollit);
           document.querySelector('.groupshop_left-block').remove();
@@ -904,8 +919,10 @@ async function init() {
             leftHeadTxt;
           document.querySelector('.groupshop_left-block h3').className =
             'active';
-          addRightBlock(store.brandName, true, `${csymbol}${amountCal}`);
-          document.querySelector('.gs_content_right').innerHTML = leftHeadTxt;
+          if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Right') {
+            addRightBlock(store.brandName, true, `${csymbol}${amountCal}`);
+            document.querySelector('.gs_content_right').innerHTML = leftHeadTxt;
+          }
           window.GSURL = window.FURL + url;
           [...document.querySelectorAll('.cashbackBtn')].map(
             (btn, idx) =>
