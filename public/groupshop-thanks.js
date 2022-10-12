@@ -675,11 +675,11 @@ function addLeftBlock(logo) {
    				</div>				 
         </div>
         <div class="cashbackBtn_mobile">
-            <div class="buttonThnx"><a id="gs_link" href="#">Get Cashback</a></div>
+            <div class="buttonThnx"><a id="gs_link" target="_blank" href="#">Get Cashback</a></div>
         </div>
         <div class="bottom">
             <div class="left">
-                <span><a id="gs_link" href="#">Get Cashback</a></span> <img src="${window.BURL}/public/images/arrow.svg">
+                <span><a id="gs_link" target="_blank" href="#">Get Cashback</a></span> <img src="${window.BURL}/public/images/arrow.svg">
             </div>
             <div class="right">
                 <span>Powered by</span> <img src="${window.BURL}/public/images/groupshop.svg">
@@ -696,7 +696,7 @@ function addRightBlock(brandName, isLoaded, cashback) {
   if (isLoaded) {
     document.querySelector(
       '.groupshop_right-block',
-    ).innerHTML = `<div class="cashback gs_content_right">Get up to ${cashback} cashback on your order! 🎉</div>  <div class="cashbackTxt"> Get cashback on this order and unlock exclusive discounts with Groupshop. </div> <div class="cashbackBtn"> <div class="buttonSmry"> <a id="gs_link" >Get Your Cashback</a></div></div>`;
+    ).innerHTML = `<div class="cashback gs_content_right">Get up to ${cashback} cashback on your order! 🎉</div>  <div class="cashbackTxt"> Get cashback on this order and unlock exclusive discounts with Groupshop. </div> <div class="cashbackBtn"> <div class="buttonSmry"> <a target="_blank" id="gs_link" >Get Your Cashback</a></div></div>`;
   } else {
     const rightBlock = document.createElement('div');
     rightBlock.style = 'display: flex; justify-content: center;';
@@ -715,7 +715,7 @@ function addRightBlock(brandName, isLoaded, cashback) {
         
         <div class="cashbackBtn">
         <div class="buttonSmry">
-            <a id="gs_link" ><span class="image-placeholder" style="height: 20px !important; width: 70px !important;">&nbsp;</span></a>
+            <a id="gs_link" target="_blank" ><span class="image-placeholder" style="height: 20px !important; width: 70px !important;">&nbsp;</span></a>
             </div>
         </div>
         </div>
