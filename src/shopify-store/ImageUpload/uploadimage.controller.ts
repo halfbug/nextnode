@@ -8,11 +8,13 @@ import {
   Get,
   Req,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiResponse } from '@nestjs/swagger';
 
 import { ImageFileDTO, ImageResponseDTO } from './UploadImageDTO';
 import { UploadImageService } from './uploadimage.service';
+import { Express } from 'express';
+import { UploadedFiles } from '@nestjs/common';
 
 @Controller('image')
 export class UploadImageController {
@@ -43,6 +45,31 @@ export class UploadImageController {
     }
   }
 
+  @Post('video')
+  @UseInterceptors(FilesInterceptor('video'))
+  @ApiResponse({ status: HttpStatus.CREATED, type: ImageResponseDTO })
+  async uploadFile(
+    @Req() req,
+    @UploadedFiles() file: Array<any>,
+    @Res() response,
+  ) {
+    try {        
+      const data: any = await this.uploadImageService.uploadMany(file);
+      // const dataDel = await this.uploadImageService.deleteImage(
+      //   req.body.previousimage,
+      // );
+
+      return response.status(200).json({
+        // message: `Video ${file.originalname} uploaded to S3`,
+        data,
+      });
+    } catch (error) {
+      return response
+        .status(500)
+        .json(`Failed to upload video to S3: ${error.message}`);
+    }
+  }
+
   @Get('')
   @ApiResponse({ status: HttpStatus.CREATED, type: ImageResponseDTO })
   async getImageUrl(@Req() req, @Res() response) {
@@ -60,6 +87,26 @@ export class UploadImageController {
       return response
         .status(500)
         .json(`Failed to get image from S3: ${error.message}`);
+    }
+  }
+
+  @Get('video')
+  @ApiResponse({ status: HttpStatus.CREATED, type: ImageResponseDTO })
+  async getVideoUrl(@Req() req, @Res() response) {
+    // console.log(req.query);
+    // response.send(req.query);
+    const { key } = req.query;
+
+    try {
+      const data = await this.uploadImageService.getSignedUrl(key);
+      return response.status(200).json({
+        message: `s3 url sent`,
+        data,
+      });
+    } catch (error) {
+      return response
+        .status(500)
+        .json(`Failed to get video from S3: ${error.message}`);
     }
   }
 }

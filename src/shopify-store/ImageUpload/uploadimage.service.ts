@@ -1,3 +1,4 @@
+
 import { Logger } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { S3ConfigProvider } from './S3ConfigProvider';
@@ -13,6 +14,17 @@ export class UploadImageService {
     const { originalname, mimetype } = file;
     const S3bucket = this.s3Provider.getBucketName();
     return await this.uploadS3(file.buffer, S3bucket, originalname, mimetype);
+  }
+
+  async uploadMany(files: any) {
+    let result = [];
+    for (const file of files) {
+      const { originalname, mimetype, buffer } = file;
+      const S3bucket = this.s3Provider.getBucketName();
+      let response:any = await this.uploadS3(buffer, S3bucket, originalname, mimetype);
+      result.push(response)
+    }
+    return result;
   }
 
   async deleteImage(file) {
@@ -33,7 +45,7 @@ export class UploadImageService {
     );
   }
 
-  async uploadS3(file, bucket, name, mimetype) {
+  async uploadS3(file, bucket, name, mimetype) {   
     const s3 = this.s3Provider.getS3();
     const s3Params = {
       Bucket: bucket,
@@ -43,6 +55,8 @@ export class UploadImageService {
     };
 
     const data = await this.uploadImageToS3(s3, s3Params);
+    console.log('data',data);
+    
     return data;
   }
 

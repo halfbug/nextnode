@@ -32,6 +32,8 @@ import { GsCommonModule } from './gs-common/gs-common.module';
 import { Lifecycle } from './gs-common/entities/lifecycle.modal';
 import { Visitors } from './gs-common/entities/visitors.modal';
 import { RetentiontoolsModule } from './retentiontools/retentiontools.module';
+import { VideoModule } from './videos/video.module';
+import { Video } from './videos/entities/video.modal';
 
 @Module({
   imports: [
@@ -73,6 +75,7 @@ import { RetentiontoolsModule } from './retentiontools/retentiontools.module';
             Lifecycle,
             Visitors,
             Partnermember,
+            Video,
           ],
         };
       },
@@ -97,6 +100,7 @@ import { RetentiontoolsModule } from './retentiontools/retentiontools.module';
     PartnersModule,
     GsCommonModule,
     RetentiontoolsModule,
+    VideoModule,
   ],
 })
 export class AppModule {}
