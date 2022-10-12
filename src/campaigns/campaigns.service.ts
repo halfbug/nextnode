@@ -54,6 +54,18 @@ export class CampaignsService {
         newProducts = bsproducts.map((prod) => prod.id);
         break;
 
+      case 'allproducts':
+        const npQuery1 = new ProductQueryInput();
+        npQuery1.limit = 80;
+        npQuery1.shop = shop;
+        npQuery1.sort = 1;
+        const nproducts1 = await this.inventoryService.findStoreProducts(
+          npQuery1,
+        );
+
+        newProducts = nproducts1.map((prod) => prod.id);
+        break;
+
       default:
         newProducts = [...new Set(prevProducts)] as string[];
         break;
