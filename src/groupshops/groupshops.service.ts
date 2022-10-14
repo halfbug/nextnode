@@ -312,6 +312,11 @@ export class GroupshopsService {
       {
         $unwind: '$shop',
       },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Orders, agg).toArray();
