@@ -93,6 +93,10 @@ export class RetentiontoolsService {
     return await this.findOne(id);
   }
 
+  async removeShop(storeId: string) {
+    return await this.retentionRepository.delete({ storeId });
+  }
+
   async retentionGroupshopPrgress(storeId: string) {
     const agg = [
       {

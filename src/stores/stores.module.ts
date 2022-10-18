@@ -21,6 +21,7 @@ import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
 import { CampaignInActiveListener } from './listeners/campaign-inactive.listener';
 import { GsCommonModule } from 'src/gs-common/gs-common.module';
 import { PartnersModule } from 'src/partners/partners.module';
+import { RetentiontoolsModule } from 'src/retentiontools/retentiontools.module';
 import { StoreUpdatePlanCron } from './store.cron';
 
 @Module({
@@ -31,6 +32,7 @@ import { StoreUpdatePlanCron } from './store.cron';
     forwardRef(() => ShopifyStoreModule),
     InventoryModule,
     forwardRef(() => CampaignsModule),
+    forwardRef(() => RetentiontoolsModule),
     GroupshopsModule,
     PartnersModule,
     forwardRef(() => BillingModule),

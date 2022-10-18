@@ -32,5 +32,6 @@ import { GroupshopsModule } from 'src/groupshops/groupshops.module';
     RTPCreatedEvent,
     RTSSavedListener,
   ],
+  exports: [RetentiontoolsService],
 })
 export class RetentiontoolsModule {}
