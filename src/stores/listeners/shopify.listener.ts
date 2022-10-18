@@ -33,7 +33,7 @@ export class ShopifyAPIListener {
     store.resources = [];
     store.hideProducts = [];
     const trialDays = parseInt(this.configService.get('TRIAL_PERIOD'));
-    console.log('store status', store.status);
+    console.log('store ---', store);
 
     console.log('app install/uninstall');
     // on re-install app update plan back to launch and planresetdate to next 30days
@@ -44,6 +44,7 @@ export class ShopifyAPIListener {
           ? BillingPlanEnum.LAUNCH
           : BillingPlanEnum.EXPLORE,
       );
+      //lifecycle
 
       console.log('app re-install');
       store.status = 'Active';
@@ -65,17 +66,22 @@ export class ShopifyAPIListener {
 
     this.storeService.createORupdate(store).then((sstore) => {
       console.log('store---------------------------saved');
-      // console.log(sstore);
+      console.log(sstore);
       this.storeSavedEvent.accessToken = sstore.accessToken;
       this.storeSavedEvent.shop = sstore.shop;
       this.storeSavedEvent.storeId = sstore.id;
       this.storeSavedEvent.emit();
       console.log('done');
       this.lifecyclesrv.create({
-        storeId: store.id,
+        storeId: sstore.id,
         event: EventType.installed,
         dateTime: new Date(),
       });
+      // this.lifecyclesrv.create({
+      //   storeId: store.id,
+      //   event: EventType.planReset,
+      //   dateTime: new Date(),
+      // });
     });
   }
 }

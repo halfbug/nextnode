@@ -1,3 +1,4 @@
+import { BillingPlanEnum } from 'src/stores/entities/store.entity';
 import {
   Column,
   CreateDateColumn,
@@ -12,6 +13,8 @@ export enum EventType {
   revised = 'revised',
   installed = 'installed',
   uninstalled = 'uninstalled',
+  planReset = 'planReset',
+  planChanged = 'planChanged',
 }
 
 @Entity()
@@ -32,4 +35,7 @@ export class Lifecycle {
 
   @Column()
   dataTime: Date;
+
+  @Column('enum', { nullable: true })
+  plan?: BillingPlanEnum;
 }

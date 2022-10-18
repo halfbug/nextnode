@@ -14,6 +14,7 @@ export class LifecycleService {
     dateTime?: Date;
     groupshopId?: string;
     storeId?: string;
+    plan?: number;
   }) {
     if (eventLifecycle.dateTime === null) eventLifecycle.dateTime = new Date();
     return this.lifecycleRepository.save(eventLifecycle);

@@ -4,6 +4,8 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BillingsService } from 'src/billing/billing.service';
 import { GroupShopCreated } from 'src/groupshops/events/groupshop-created.event';
+import { EventType } from 'src/gs-common/entities/lifecycle.modal';
+import { LifecycleService } from 'src/gs-common/lifecycle.service';
 import {
   GS_PLAN1_START_COUNT,
   GS_PLAN2_END_COUNT,
@@ -20,6 +22,7 @@ export class StoreListener {
     private planUpdateEvent: StorePlanUpdatedEvent,
     private storeService: StoresService,
     private billingService: BillingsService,
+    private readonly lifecyclesrv: LifecycleService,
   ) {}
 
   @OnEvent('groupshop.created')
@@ -75,8 +78,16 @@ export class StoreListener {
       } else {
         plan = BillingPlanEnum.LAUNCH;
       }
+      // plan changes and which plan in lifecycle
       const payload = { id, plan, totalGroupShop: (totalGroupShop ?? 0) + 1 };
       const updatedStore = await this.storeService.update(id, payload);
+      this.lifecyclesrv.create({
+        storeId: id,
+        event: EventType.planChanged,
+        plan,
+        dateTime: new Date(),
+      });
+
       // console.log(
       //   '🚀 ~ file: store.listener.ts ~ line 32 ~ StoreListener ~ updateStore ~ updatedStore',
       //   updatedStore,

@@ -1,12 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { EventType } from 'src/gs-common/entities/lifecycle.modal';
+import { LifecycleService } from 'src/gs-common/lifecycle.service';
 import { BillingPlanEnum } from './entities/store.entity';
 import { StoresService } from './stores.service';
 
 @Injectable()
 export class StoreUpdatePlanCron {
   private readonly logger = new Logger(StoreUpdatePlanCron.name);
-  constructor(private readonly storesService: StoresService) {}
+  constructor(
+    private readonly storesService: StoresService,
+    private readonly lifecyclesrv: LifecycleService,
+  ) {}
 
   // @Cron('0 59 23 * * *')
   // @Cron(CronExpression.EVERY_DAY_AT_1AM)
@@ -43,6 +48,13 @@ export class StoreUpdatePlanCron {
             planResetDate: nextDate,
           };
           const updatedStore = await this.storesService.update(id, payload);
+          // life cycle record
+          this.lifecyclesrv.create({
+            storeId: store.id,
+            event: EventType.planReset,
+            plan: BillingPlanEnum.LAUNCH,
+            dateTime: new Date(),
+          });
         }
         // else if (Date.now() >= store.planResetDate.getTime()) {
         //   console.log('im in plan reset');
