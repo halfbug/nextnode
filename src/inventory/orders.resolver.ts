@@ -9,6 +9,7 @@ import {
 import {
   PendingGroupshop,
   TotalOrders,
+  MostViralProducts,
 } from 'src/inventory/entities/orders.entity';
 import { OrdersService } from './orders.service';
 
@@ -49,5 +50,20 @@ export class OrdersResolver {
       endDateFormat,
       minOrderValue,
     );
+  }
+
+  @Query(() => [MostViralProducts], { name: 'mostViralProducts' })
+  async mostViralProducts(
+    @Args('shop') shop: string,
+    @Args('startDate') startDate: string,
+    @Args('endDate') endDate: string,
+  ) {
+    if (shop !== '') {
+      return await this.OrderService.findMostViralProducts(
+        shop,
+        startDate,
+        endDate,
+      );
+    }
   }
 }

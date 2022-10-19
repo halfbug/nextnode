@@ -437,6 +437,99 @@ export class OrdersService {
     return gs;
   }
 
+  async findMostViralProducts(
+    shop: string,
+    startDate: string,
+    endDate: string,
+  ) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    fullDate = `${year}${'-'}${month}${'-'}${day}`;
+    if (startDate === '-') {
+      startDate = '2021-01-21';
+      endDate = fullDate;
+    }
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              $or: [
+                {
+                  discountCode: {
+                    $regex: 'GS',
+                  },
+                },
+                {
+                  discountCode: {
+                    $regex: 'GD',
+                  },
+                },
+              ],
+            },
+            {
+              shop: shop,
+            },
+            {
+              createdAt: {
+                $gte: new Date(`${startDate}${'T00:00:01'}`),
+                $lte: new Date(`${endDate}${'T23:59:59'}`),
+              },
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'id',
+          foreignField: 'parentId',
+          as: 'LI',
+        },
+      },
+      {
+        $unwind: {
+          path: '$LI',
+        },
+      },
+      {
+        $group: {
+          _id: '$LI.product.id',
+          purchaseCount: {
+            $sum: {
+              $multiply: [1, '$LI.quantity'],
+            },
+          },
+          revenue: {
+            $sum: '$LI.discountedPrice',
+          },
+        },
+      },
+      {
+        $sort: {
+          purchaseCount: -1,
+        },
+      },
+      {
+        $limit: 4,
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: '_id',
+          foreignField: 'id',
+          as: 'productDetails',
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Orders, agg).toArray();
+    return gs;
+  }
+
   async create(createOrderInput: CreateOrderInput) {
     try {
       const order = this.ordersRepository.create(createOrderInput);

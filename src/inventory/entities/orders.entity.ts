@@ -1,5 +1,4 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
-import { CreateOrderInput } from '../dto/create-order.input';
 
 // @ObjectType('Order')
 // @InputType('OrderInput')
@@ -49,4 +48,24 @@ export class PendingGroupshop {
   haveGroupshop?: boolean;
   @Field(() => [String], { nullable: 'itemsAndList' })
   groupshops?: string[];
+}
+
+@ObjectType('productDetails')
+export class productDetails {
+  @Field({ nullable: true })
+  title?: string;
+  @Field({ nullable: true })
+  featuredImage?: string;
+}
+
+@ObjectType('MostViralProducts')
+export class MostViralProducts {
+  @Field({ nullable: true })
+  _id?: string;
+  @Field({ nullable: true })
+  purchaseCount?: string;
+  @Field({ nullable: true })
+  revenue?: string;
+  @Field(() => [productDetails], { nullable: 'itemsAndList' })
+  productDetails?: productDetails[];
 }
