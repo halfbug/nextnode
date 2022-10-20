@@ -34,6 +34,8 @@ import { Visitors } from './gs-common/entities/visitors.modal';
 import { RetentiontoolsModule } from './retentiontools/retentiontools.module';
 import { VideoModule } from './videos/video.module';
 import { Video } from './videos/entities/video.modal';
+import { AdminUsersModule } from './admin-users/admin-users.module';
+import AdminUser from './admin-users/entities/admin-user.model';
 
 @Module({
   imports: [
@@ -76,6 +78,7 @@ import { Video } from './videos/entities/video.modal';
             Visitors,
             Partnermember,
             Video,
+            AdminUser,
           ],
         };
       },
@@ -101,6 +104,7 @@ import { Video } from './videos/entities/video.modal';
     GsCommonModule,
     RetentiontoolsModule,
     VideoModule,
+    AdminUsersModule,
   ],
 })
 export class AppModule {}
