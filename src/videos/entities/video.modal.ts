@@ -4,6 +4,9 @@ import { DefaultColumnsService } from 'src/utils/default-columns/default-columns
 @Entity()
 export class Video extends DefaultColumnsService {
   @Column({ nullable: true })
+  _id: string;
+
+  @Column({ nullable: true })
   storeId: string;
 
   @Column({ nullable: true })

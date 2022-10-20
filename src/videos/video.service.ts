@@ -4,6 +4,7 @@ import { getMongoManager, Repository } from 'typeorm';
 import { CreateVideoInput } from './dto/create-video.input';
 import { UpdateVideoInput } from './dto/update-video.input';
 import { Video } from './entities/video.modal';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class VideoService {
@@ -16,15 +17,7 @@ export class VideoService {
   }
 
   async findAll(storeId: string) {
-    const agg = [
-      {
-        $match: {
-          storeId: storeId,
-        },
-      },
-    ];
-    const manager = getMongoManager();
-    const allvideoData = await manager.aggregate(Video, agg).toArray();
+    const allvideoData = await this.VideoRepository.find({ storeId });
     return allvideoData;
   }
 
@@ -32,8 +25,32 @@ export class VideoService {
     return `This action returns a #${id} video`;
   }
 
-  update(id: number, updateVideoInput: UpdateVideoInput) {
-    return `This action updates a #${id} video`;
+  async update(updateVideoInput: UpdateVideoInput) {
+    const { selectedIds, storeId } = updateVideoInput;
+    try {
+      const manager = getMongoManager();
+      await manager.updateMany(
+        Video,
+        { storeId: storeId },
+        {
+          $set: {
+            status: 'InActive',
+          },
+        },
+      );
+
+      const selectedObjId = selectedIds.map((ite: any) => ObjectId(ite));
+      await manager.updateMany(
+        Video,
+        { _id: { $in: selectedObjId } },
+        { $set: { status: 'Active' } },
+      );
+    } catch (er) {
+      console.log(er);
+    }
+    const allvideoData = await this.VideoRepository.find({ storeId });
+
+    return allvideoData;
   }
 
   remove(id: string) {

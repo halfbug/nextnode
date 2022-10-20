@@ -23,9 +23,9 @@ export class VideoResolver {
     return this.videoService.findOne(id);
   }
 
-  @Mutation(() => Video)
-  updateVideo(@Args('updateVideoInput') updateVideoInput: UpdateVideoInput) {
-    return this.videoService.update(updateVideoInput.id, updateVideoInput);
+  @Mutation(() => [Video])
+  updateVideo(@Args('UpdateVideoInput') updateVideoInput: UpdateVideoInput) {
+    return this.videoService.update(updateVideoInput);
   }
 
   @Mutation(() => Video)
