@@ -94,6 +94,7 @@ export class InventoryService {
           $or: [
             { recordType: 'ProductVariant' },
             { recordType: 'ProductImage' },
+            { recordType: 'ProductVideo' },
           ],
         },
       ],
@@ -438,6 +439,31 @@ export class InventoryService {
           as: 'images',
         },
       },
+      {
+        $lookup: {
+          from: 'inventory',
+          let: {
+            pid: '$id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ['$$pid', '$parentId'],
+                    },
+                    {
+                      $eq: ['$recordType', 'ProductVideo'],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'videos',
+        },
+      },
     ];
     const res = await manager.aggregate(Inventory, agg).toArray();
     // console.log(
@@ -445,6 +471,7 @@ export class InventoryService {
     //   res[0].length,
     //   res[0],
     // );
+    console.log('🎈 res[0]', res[0]);
     return res.length && res[0].status !== 'ACTIVE'
       ? { ...res[0], outofstock: true }
       : res[0];

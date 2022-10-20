@@ -33,6 +33,15 @@ export class ProductImage {
   @Field({ nullable: true })
   src?: string;
 }
+@InputType('ProductImageVideo')
+@ObjectType('ProductVideo')
+export class ProductVideo {
+  @Field({ nullable: true })
+  id?: string;
+
+  @Field({ nullable: true })
+  src?: string;
+}
 
 @InputType('SelectedOptionInput')
 @ObjectType('SelectedOption')
@@ -90,6 +99,9 @@ export class Product {
   @Field(() => [ProductImage], { nullable: 'itemsAndList' })
   images?: ProductImage[];
 
+  @Field(() => [ProductVideo], { nullable: 'itemsAndList' })
+  videos?: ProductVideo[];
+
   @Field(() => [ProductVariant], { nullable: 'itemsAndList' })
   variants?: ProductVariant[];
 
@@ -125,6 +137,9 @@ export class Product {
 
   @Field({ nullable: true })
   featuredImage?: string;
+
+  @Field({ nullable: true })
+  featuredVideo?: string;
 
   @Field(() => [Orders], { nullable: 'itemsAndList' })
   lineItems?: Orders[];

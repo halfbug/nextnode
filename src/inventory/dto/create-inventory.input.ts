@@ -32,6 +32,9 @@ export class CreateInventoryInput {
   featuredImage?: string;
 
   @Field({ nullable: true })
+  featuredVideo?: string;
+
+  @Field({ nullable: true })
   shop?: string;
 
   @Field({ nullable: true })

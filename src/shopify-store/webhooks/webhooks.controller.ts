@@ -43,6 +43,8 @@ import { InventorySavedEvent } from 'src/inventory/events/inventory-saved.event'
 import { OrdersSavedEvent } from 'src/inventory/events/orders-saved.event';
 import { RequestReturn } from '@shopify/shopify-api';
 import { UpdateFullOrderInput } from 'src/inventory/dto/update-fullorder.input';
+import { ProductMediaObject } from 'src/inventory/events/product-media.event';
+import { ProductMediaListener } from 'src/inventory/listeners/product-media.listner';
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -57,6 +59,7 @@ export class WebhooksController {
     private uninstallSerivice: UninstallService,
     private orderCreatedEvent: OrderCreatedEvent,
     private httpService: HttpService,
+    public productMedia: ProductMediaObject,
   ) {}
   async refreshSingleProduct(shop, accessToken, id, shopName) {
     try {
@@ -510,6 +513,9 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const rproduct = req.body;
+      this.productMedia.productId = rproduct.admin_graphql_api_id;
+      this.productMedia.shopName = shop;
+      // const ProductMedia = new ProductMediaObject();
       // console.log(
       //   'WebhooksController ~ productUpdate ~ rproduct',
       //   JSON.stringify(rproduct),
@@ -540,6 +546,9 @@ export class WebhooksController {
       );
 
       await this.inventryService.removeVariants(rproduct?.admin_graphql_api_id);
+      this.productMedia.emit();
+      const videoURL = await this.inventryService.findOne(shop, 'ProductVideo');
+      console.log('videoURL', videoURL);
       const variants = [];
       rproduct.variants?.map(async (variant) => {
         const vprod = new CreateInventoryInput();
@@ -557,7 +566,7 @@ export class WebhooksController {
         img.src = variant.image_id
           ? rproduct.images.filter((img) => img.id === variant.image_id)?.[0]
               .src
-          : rproduct?.image.src;
+          : rproduct?.image?.src;
         // rproduct?.image && rproduct?.image.src ? rproduct?.image.src : null;
 
         vprod.image = img;

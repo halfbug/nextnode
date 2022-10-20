@@ -30,7 +30,7 @@ import { StoreUpdatePlanCron } from './store.cron';
     // AnyScalar,
     DefaultColumnsService,
     forwardRef(() => ShopifyStoreModule),
-    InventoryModule,
+    forwardRef(() => InventoryModule),
     forwardRef(() => CampaignsModule),
     forwardRef(() => RetentiontoolsModule),
     GroupshopsModule,

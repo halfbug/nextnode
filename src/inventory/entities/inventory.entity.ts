@@ -86,6 +86,9 @@ export class Inventory {
   @Field()
   featuredImage?: FeatureImageType;
 
+  @Field()
+  featuredVideo?: string;
+
   @Field({ nullable: true })
   outofstock?: boolean;
   @Field({ nullable: true })

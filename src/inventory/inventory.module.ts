@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { InventoryResolver } from './inventory.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,12 +12,16 @@ import Orders from './entities/orders.modal';
 import { OrderSavedListener } from './listeners/orders-saved.listener';
 import { InventorySavedListener } from './listeners/inventory-saved.listener';
 import { OrdersResolver } from './orders.resolver';
+import { ProductMediaListener } from './listeners/product-media.listner';
+import { ProductMediaObject } from './events/product-media.event';
+import { StoresModule } from 'src/stores/stores.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Inventory, Orders]),
     DefaultColumnsService,
     HttpModule,
+    forwardRef(() => StoresModule),
   ],
   providers: [
     InventoryResolver,
@@ -28,7 +32,9 @@ import { OrdersResolver } from './orders.resolver';
     OrderSavedListener,
     InventorySavedListener,
     OrdersResolver,
+    ProductMediaListener,
+    ProductMediaObject,
   ],
-  exports: [InventoryService, OrdersService],
+  exports: [InventoryService, OrdersService, ProductMediaObject],
 })
 export class InventoryModule {}
