@@ -434,7 +434,7 @@ Logger.error(err.message, CampaignsService.name)
         }
       }, {
         '$sort': {
-          'createdAt': -1
+          '_id': -1
           }
       }
     ];
