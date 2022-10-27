@@ -130,6 +130,9 @@ export class PartnerMember extends DefaultColumnsService {
   orderId?: string;
 
   @Field({ nullable: true })
+  storeId?: string;
+
+  @Field({ nullable: true })
   orderAmount?: number;
 
   @Field({ nullable: true })

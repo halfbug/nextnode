@@ -29,11 +29,18 @@ export class PMemberArrivedListener {
   async membersaved(event: PMemberArrivedEvent) {
     console.log(
       '🚀 ~ file: pmember-arrived.listener.ts ~ line 28 ~ PMemberArrivedListener ~ membersaved ~ event',
-      event,
+      JSON.stringify(event),
     );
     const memobj = new PartnerMember();
     const {
-      pgroupshop: { id, partnerCommission },
+      pgroupshop: {
+        id,
+        partnerCommission,
+        shortUrl,
+        storeId,
+        partnerDetails: { fname, email },
+      },
+      store: { shop, brandName, logoImage },
       lineItems,
       order,
     } = event;
@@ -42,6 +49,7 @@ export class PMemberArrivedListener {
       partnerCommission,
     );
     memobj.orderId = order.id;
+    memobj.storeId = storeId;
     memobj.groupshopId = id;
     const orderAmount: number = lineItems?.reduce(
       (priceSum: number, { price, quantity }) =>
@@ -60,6 +68,48 @@ export class PMemberArrivedListener {
     memobj.lineItems = [...newLI];
     // memobj.lineItems.c = lineItems;
     const res = await this.pMemberSrv.create(memobj);
+
+    // Groupshop Influencer Commission Email
+    const gicdata = {
+      logoImage: logoImage,
+      brandName: brandName,
+      shopUrl: `https://${shop}`,
+      orderAmount: orderAmount,
+      comissionAmount: (orderAmount * parseInt(partnerCommission)) / 100,
+      customerFirstName: order.customer.firstName,
+      customerLastName: order.customer.lastName,
+      shortUrl: shortUrl,
+    };
+    const gicbody = {
+      event: 'Groupshop Influencer Commission',
+      customer_properties: {
+        $email: email,
+        $first_name: fname,
+      },
+      properties: gicdata,
+    };
+    this.kalavioService.sendKlaviyoEmail(gicbody);
+
+    // Influencer Referral Email
+    const girdata = {
+      logoImage: logoImage,
+      brandName: brandName,
+      shopUrl: `https://${shop}`,
+      discount: parseInt(partnerCommission),
+      partnerName: fname,
+      shortUrl: shortUrl,
+    };
+    const girbody = {
+      event: 'Groupshop Influencer Referral',
+      customer_properties: {
+        $email: order.customer.email,
+        $first_name: order.customer.firstName,
+        $last_name: order.customer.lastName,
+      },
+      properties: girdata,
+    };
+    this.kalavioService.sendKlaviyoEmail(girbody);
+
     console.log(
       '🚀 ~ file: pmember-arrived.listener.ts ~ line 56 ~ PMemberArrivedListener ~ membersaved ~ res',
       res,
