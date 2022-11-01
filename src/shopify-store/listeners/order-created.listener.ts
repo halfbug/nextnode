@@ -135,8 +135,8 @@ export class OrderCreatedListener {
         shop,
       );
       newOrderPlaced.lineItems = lineItems;
-      this.eventEmitter.emit('order.placed', newOrderPlaced);
-      const inv = new UpdateInventoryInput();
+      if (newOrderPlaced.store.subscription.status === 'ACTIVE')
+        this.eventEmitter.emit('order.placed', newOrderPlaced);
     } catch (err) {
       Logger.error({ err }, OrderCreatedListener.name);
     }

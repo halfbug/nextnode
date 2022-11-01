@@ -360,13 +360,13 @@ export class ShopifyService {
   }
 
   async scriptTagDelete(sid: any) {
-    // try {
-    console.log({ sid });
-    console.log(this.shop);
-    const client = await this.client(this.shop, this.accessToken);
-    const scriptTagDel = await client.query({
-      data: {
-        query: `mutation scriptTagDelete($id: ID!) {
+    try {
+      console.log({ sid });
+      console.log(this.shop);
+      const client = await this.client(this.shop, this.accessToken);
+      const scriptTagDel = await client.query({
+        data: {
+          query: `mutation scriptTagDelete($id: ID!) {
             scriptTagDelete(id: $id) {
               deletedScriptTagId
               userErrors {
@@ -375,31 +375,31 @@ export class ShopifyService {
               }
             }
           }`,
-        variables: {
-          // input: {
-          id: sid,
-          // },
+          variables: {
+            // input: {
+            id: sid,
+            // },
+          },
         },
-      },
-    });
-    console.log('🚀 ~  scriptTagDel', JSON.stringify(scriptTagDel));
-    return scriptTagDel;
-    // console.log('-------------list scriptTag');
+      });
+      console.log('🚀 ~  scriptTagDel', JSON.stringify(scriptTagDel));
+      return scriptTagDel;
+      // console.log('-------------list scriptTag');
 
-    // if (scriptTag.body['data']['scriptTagCreate'])
-    //   return scriptTag.body['data']['scriptTagCreate']['scriptTag'];
-    // else
-    //   throw new HttpException(
-    //     {
-    //       status: HttpStatus.FORBIDDEN,
-    //       error: JSON.stringify(scriptTag),
-    //     },
-    //     HttpStatus.FORBIDDEN,
-    //   );
-    // } catch (err) {
-    //   console.log(err.message);
-    //   Logger.error(err);
-    // }
+      // if (scriptTag.body['data']['scriptTagCreate'])
+      //   return scriptTag.body['data']['scriptTagCreate']['scriptTag'];
+      // else
+      //   throw new HttpException(
+      //     {
+      //       status: HttpStatus.FORBIDDEN,
+      //       error: JSON.stringify(scriptTag),
+      //     },
+      //     HttpStatus.FORBIDDEN,
+      //   );
+    } catch (err) {
+      console.log(err.message);
+      Logger.error(err);
+    }
   }
 
   async AppSubscriptionCreate(trialDays: number) {

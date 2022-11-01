@@ -1031,13 +1031,17 @@ export class WebhooksController {
         JSON.stringify(appsub),
         shop,
       );
-
-      if (appsub['app_subscription']['status'] === 'ACTIVE') {
-        this.storesService.updateField(
-          { shop },
-          { 'subscription.status': 'Active' },
-        );
-      }
+      const subscriptionStatus =
+        appsub['app_subscription']['status'].toUpperCase();
+      // if (appsub['app_subscription']['status'] === 'ACTIVE') {
+      this.storesService.updateField(
+        { shop },
+        {
+          'subscription.status': subscriptionStatus,
+          installationStep: subscriptionStatus === 'ACTIVE' ? null : 5,
+        },
+      );
+      // }
     } catch (err) {
       console.log(JSON.stringify(err));
     } finally {
