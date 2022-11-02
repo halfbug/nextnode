@@ -135,7 +135,11 @@ export class OrderCreatedListener {
         shop,
       );
       newOrderPlaced.lineItems = lineItems;
-      if (newOrderPlaced.store.subscription.status === 'ACTIVE')
+      if (
+        ['Active', 'ACTIVE', 'active'].includes(
+          newOrderPlaced.store.subscription.status,
+        )
+      )
         this.eventEmitter.emit('order.placed', newOrderPlaced);
     } catch (err) {
       Logger.error({ err }, OrderCreatedListener.name);
