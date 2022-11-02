@@ -53,6 +53,8 @@ export class MarketingSettingInput {
   tiktokPixels?: string;
   @Field({ nullable: true })
   googlePixels?: string;
+  @Field({ nullable: true })
+  snapchatPixels?: string;
 }
 @InputType()
 export class SettingsInput {

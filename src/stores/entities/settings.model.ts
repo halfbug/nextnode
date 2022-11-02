@@ -43,6 +43,8 @@ export class MarketingSetting {
   tiktokPixels?: string;
   @Column({ nullable: true })
   googlePixels?: string;
+  @Column({ nullable: true })
+  snapchatPixels?: string;
 }
 export class Settings {
   @Column(() => GeneralSetting)

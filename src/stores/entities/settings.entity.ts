@@ -68,6 +68,8 @@ export class MarketingSetting {
   tiktokPixels?: string;
   @Field({ nullable: true })
   googlePixels?: string;
+  @Field({ nullable: true })
+  snapchatPixels?: string;
 }
 
 @ObjectType()
