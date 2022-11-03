@@ -715,4 +715,32 @@ export class BillingsService {
     console.log({ gs }, 'total gss');
     return gs[0] ?? { total: 0 };
   }
+  async getStoreMonthsCount(storeId: string) {
+    const agg = [
+      {
+        $match: {
+          storeId,
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: {
+              $year: '$createdAt',
+            },
+            month: {
+              $month: '$createdAt',
+            },
+          },
+        },
+      },
+      {
+        $count: 'count',
+      },
+    ];
+    const manager = getMongoManager();
+    const TotalGS = await manager.aggregate(Billing, agg).toArray();
+    console.log('🚀 TotalGSBilling ~ TotalGS', TotalGS);
+    return TotalGS[0];
+  }
 }

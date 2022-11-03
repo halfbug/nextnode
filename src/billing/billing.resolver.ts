@@ -161,4 +161,8 @@ export class BillingsResolver {
 
     return { redirectUrl: subscription['confirmationUrl'] };
   }
+  @Query(() => Total, { name: 'getStoreMonthsCount' })
+  getStoreMonthsCount(@Args('storeId') storeId: string) {
+    return this.billingService.getStoreMonthsCount(storeId);
+  }
 }
