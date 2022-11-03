@@ -570,4 +570,25 @@ export class OrdersService {
     const { id } = updateOrderInput;
     return await this.ordersRepository.update({ id }, updateOrderInput);
   }
+
+  async findOrderLineItems(parentId: string) {
+    const agg = [
+      {
+        $match: {
+          parentId: parentId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'product.id',
+          foreignField: 'id',
+          as: 'product',
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Orders, agg).toArray();
+    return gs;
+  }
 }

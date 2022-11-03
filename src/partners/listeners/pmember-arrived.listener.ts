@@ -75,7 +75,10 @@ export class PMemberArrivedListener {
       brandName: brandName,
       shopUrl: `https://${shop}`,
       orderAmount: orderAmount,
-      comissionAmount: (orderAmount * parseInt(partnerCommission)) / 100,
+      comissionAmount: ((orderAmount * parseInt(partnerCommission)) / 100)
+        .toFixed(2)
+        .toString()
+        .replace('.00', ''),
       customerFirstName: order.customer.firstName,
       customerLastName: order.customer.lastName,
       shortUrl: shortUrl,

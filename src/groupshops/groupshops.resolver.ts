@@ -10,6 +10,7 @@ import { GroupshopsService } from './groupshops.service';
 import {
   GroupShop as Groupshop,
   Member,
+  MostViralCustomers,
   uniqueClicks,
   activeGroupshop,
 } from './entities/groupshop.entity';
@@ -185,5 +186,21 @@ export class GroupshopsResolver {
       res,
     );
     return res;
+  }
+
+  @Query(() => [MostViralCustomers], { name: 'mostViralCustomers' })
+  async mostViralProducts(
+    @Args('storeId') storeId: string,
+    @Args('startDate') startDate: string,
+    @Args('endDate') endDate: string,
+  ) {
+    if (storeId !== '') {
+      const data = await this.GroupshopsService.findMostViralCustomers(
+        storeId,
+        startDate,
+        endDate,
+      );
+      return data;
+    }
   }
 }

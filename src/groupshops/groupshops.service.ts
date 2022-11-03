@@ -1417,4 +1417,125 @@ export class GroupshopsService {
     console.log({ gs }, 'total gss');
     return gs[0] ?? { total: 0 };
   }
+
+  async findMostViralCustomers(
+    storeId: string,
+    startDate: string,
+    endDate: string,
+  ) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    fullDate = `${year}${'-'}${month}${'-'}${day}`;
+    if (startDate === '-') {
+      startDate = '2021-01-21';
+      endDate = fullDate;
+    }
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              storeId: storeId,
+            },
+            {
+              createdAt: {
+                $gte: new Date(`${startDate}${'T00:00:01'}`),
+                $lte: new Date(`${endDate}${'T23:59:59'}`),
+              },
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'visitors',
+          localField: 'id',
+          foreignField: 'groupshopId',
+          as: 'result',
+        },
+      },
+      {
+        $project: {
+          members: 1,
+          shortUrl: 1,
+          url: 1,
+          uniqueClicks: {
+            $size: '$result',
+          },
+          numMembers: {
+            $cond: {
+              if: {
+                $gt: [
+                  {
+                    $size: '$members',
+                  },
+                  1,
+                ],
+              },
+              then: {
+                $size: '$members',
+              },
+              else: 0,
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          numMembers: {
+            $ne: 0,
+          },
+        },
+      },
+      {
+        $addFields: {
+          lineItems: {
+            $reduce: {
+              input: '$members.lineItems',
+              initialValue: [],
+              in: {
+                $concatArrays: ['$$value', '$$this'],
+              },
+            },
+          },
+          refundItems: {
+            $reduce: {
+              input: '$members.refund',
+              initialValue: [],
+              in: {
+                $concatArrays: ['$$value', '$$this'],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'id',
+          as: 'members',
+        },
+      },
+      {
+        $addFields: {
+          refund: {
+            $sum: '$refundItems.amount',
+          },
+          revenue: {
+            $sum: '$lineItems.discountedPrice',
+          },
+          lineItemsCount: {
+            $size: '$lineItems',
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    return gs;
+  }
 }

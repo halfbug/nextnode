@@ -10,6 +10,7 @@ import {
   PendingGroupshop,
   TotalOrders,
   MostViralProducts,
+  OrderLineItems,
 } from 'src/inventory/entities/orders.entity';
 import { OrdersService } from './orders.service';
 
@@ -64,6 +65,15 @@ export class OrdersResolver {
         startDate,
         endDate,
       );
+    }
+  }
+
+  @Query(() => [OrderLineItems], { name: 'orderLineItems' })
+  async orderLineItems(@Args('parentId') parentId: string) {
+    if (parentId !== '') {
+      const data = await this.OrderService.findOrderLineItems(parentId);
+      console.log(JSON.stringify(data));
+      return data;
     }
   }
 }

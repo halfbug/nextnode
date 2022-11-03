@@ -69,3 +69,19 @@ export class MostViralProducts {
   @Field(() => [productDetails], { nullable: 'itemsAndList' })
   productDetails?: productDetails[];
 }
+
+@ObjectType('OrderLineItems')
+export class OrderLineItems {
+  @Field({ nullable: true })
+  _id?: string;
+  @Field({ nullable: true })
+  price?: string;
+  @Field({ nullable: true })
+  discountedPrice?: number;
+  @Field({ nullable: true })
+  quantity?: number;
+  @Field({ nullable: true })
+  totalDiscounts?: string;
+  @Field(() => [productDetails], { nullable: 'itemsAndList' })
+  product?: productDetails[];
+}

@@ -14,6 +14,8 @@ import {
 import { CustomerType } from 'src/inventory/entities/orders.entity';
 import { Product } from 'src/inventory/entities/product.entity';
 import { Store } from 'src/stores/entities/store.entity';
+import { CreateOrderInput as LineItem } from 'src/inventory/dto/create-order.input';
+import { Customer } from 'src/inventory/dto/create-order.input';
 
 export enum ProductTypeEnum {
   deal,
@@ -280,4 +282,61 @@ export class TotalGS {
 
   @Field({ nullable: true })
   count?: number;
+}
+
+@ObjectType()
+export class ViralMember {
+  @Field({ nullable: true })
+  id?: string;
+
+  @Field({ nullable: true })
+  name?: string;
+
+  @Field({ nullable: true })
+  createdAt?: Date;
+
+  @Field({ nullable: true })
+  shop?: string;
+
+  @Field({ nullable: true })
+  price?: string;
+
+  @Field({ nullable: true })
+  totalDiscounts?: string;
+
+  @Field(() => CustomerType, { nullable: true })
+  customer?: CustomerType;
+}
+
+@ObjectType()
+export class MostViralCustomers {
+  @Field()
+  _id?: string;
+
+  @Field(() => [ViralMember])
+  members?: ViralMember[];
+
+  @Field({ nullable: true })
+  uniqueClicks?: number;
+
+  @Field({ nullable: true })
+  numMembers?: number;
+
+  @Field({ nullable: true })
+  lineItemsCount?: number;
+
+  @Field({ nullable: true })
+  refund?: number;
+
+  @Field({ nullable: true })
+  revenue?: number;
+
+  @Field({ nullable: true })
+  url?: string;
+
+  @Field({ nullable: true })
+  shortUrl?: string;
+
+  @Field(() => [LineItem], { nullable: 'itemsAndList' })
+  lineItems?: LineItem[];
 }
