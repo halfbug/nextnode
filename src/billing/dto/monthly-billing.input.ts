@@ -38,6 +38,32 @@ export class MonthlyBillingInput {
   @Field()
   totalCharges?: number;
 }
+@ObjectType()
+export class MonthlyBillingInput2 {
+  @Field()
+  _id?: Date;
+
+  @Field({ nullable: true })
+  feeCharges?: number;
+
+  @Field()
+  cashBack?: number;
+
+  @Field()
+  revenue?: number;
+
+  @Field()
+  count?: number;
+
+  @Field({ nullable: true })
+  totalGS?: number;
+
+  @Field({ nullable: true })
+  feeChargesGS?: number;
+
+  @Field()
+  totalCharges?: number;
+}
 
 @ObjectType()
 export class TotalRevenue {

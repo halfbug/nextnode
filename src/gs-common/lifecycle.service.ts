@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MongoRepository, Repository } from 'typeorm';
+import { getMongoManager, MongoRepository, Repository } from 'typeorm';
 import { EventType, Lifecycle } from './entities/lifecycle.modal';
 
 @Injectable()
@@ -25,5 +25,230 @@ export class LifecycleService {
       where: { groupshopId },
       order: { dataTime: -1 },
     });
+  }
+
+  // async getBillingByDate(storeId: string, sdate: any, edate: any) {
+  async getCustomBilling(storeId: string) {
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              storeId,
+            },
+            {
+              event: 'planReset',
+            },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: '$dateTime',
+          storeId: {
+            $first: '$storeId',
+          },
+          plan: {
+            $first: '$plan',
+          },
+          dateTime: {
+            $first: '$dateTime',
+          },
+        },
+      },
+      {
+        $addFields: {
+          nextDate: {
+            $dateAdd: {
+              startDate: '$dateTime',
+              unit: 'day',
+              amount: 30,
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'billing',
+          localField: 'storeId',
+          foreignField: 'storeId',
+          as: 'billing',
+        },
+      },
+      {
+        $addFields: {
+          rangedBilling: {
+            $filter: {
+              input: '$billing',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $lte: ['$$j.createdAt', '$nextDate'],
+                  },
+                  {
+                    $gte: ['$$j.createdAt', '$dateTime'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'store',
+          localField: 'storeId',
+          foreignField: 'id',
+          as: 'store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$store',
+        },
+      },
+      {
+        $addFields: {
+          feeTotalGS: {
+            $reduce: {
+              input: {
+                $filter: {
+                  input: '$rangedBilling',
+                  cond: {
+                    $eq: ['$$this.type', 1],
+                  },
+                },
+              },
+              initialValue: 0,
+              in: {
+                $add: ['$$value', '$$this.feeCharges'],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          feeTotalCB: {
+            $reduce: {
+              input: {
+                $filter: {
+                  input: '$rangedBilling',
+                  cond: {
+                    $eq: ['$$this.type', 0],
+                  },
+                },
+              },
+              initialValue: 0,
+              in: {
+                $add: ['$$value', '$$this.feeCharges'],
+              },
+            },
+          },
+          revenue: {
+            $reduce: {
+              input: '$rangedBilling',
+              initialValue: 0,
+              in: {
+                $add: ['$$value', '$$this.revenue'],
+              },
+            },
+          },
+          trialDate: '$store.appTrialEnd',
+          createdMonthGS: {
+            $reduce: {
+              input: {
+                $filter: {
+                  input: '$rangedBilling',
+                  cond: {
+                    $and: [
+                      {
+                        $eq: ['$$this.type', 1],
+                      },
+                    ],
+                  },
+                },
+              },
+              initialValue: 0,
+              in: {
+                $add: ['$$value', 1],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          cashBack: {
+            $reduce: {
+              input: '$rangedBilling',
+              initialValue: 0,
+              in: {
+                $sum: '$$this.cashBack',
+              },
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$_id',
+          cashBack: {
+            $sum: '$cashBack',
+          },
+          revenue: {
+            $sum: '$revenue',
+          },
+          feeCharges: {
+            $sum: '$feeTotalCB',
+          },
+          feeChargesGS: {
+            $sum: {
+              $cond: {
+                if: {
+                  $gt: ['$createdAt', '$trialDate'],
+                },
+                then: '$feeTotalGS',
+                else: 0,
+              },
+            },
+          },
+          count: {
+            $count: {},
+          },
+          totalGS: {
+            $sum: '$createdMonthGS',
+          },
+          nextDate: {
+            $first: '$nextDate',
+          },
+        },
+      },
+      {
+        $project: {
+          totalCharges: {
+            $add: ['$feeCharges', '$feeChargesGS'],
+          },
+          cashBack: 1,
+          revenue: 1,
+          feeCharges: 1,
+          feeChargesGS: 1,
+          count: 1,
+          totalGS: 1,
+          nextDate: 1,
+        },
+      },
+      {
+        $sort: {
+          _id: -1,
+        },
+      },
+    ];
+    // console.log("🚀 findBillingBydate ~ agg", agg)
+    const manager = getMongoManager();
+    const TotalRes = await manager.aggregate(Lifecycle, agg).toArray();
+    console.log('🚀 get billing by date', TotalRes);
+    return TotalRes;
   }
 }

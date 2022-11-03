@@ -9,6 +9,7 @@ import { BillingListener } from './listeners/billing.listener';
 import { BillingUsageCargeCron } from './billing.cron';
 import { HttpModule } from '@nestjs/axios';
 import { GroupshopsModule } from 'src/groupshops/groupshops.module';
+import { GsCommonModule } from 'src/gs-common/gs-common.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { GroupshopsModule } from 'src/groupshops/groupshops.module';
     forwardRef(() => StoresModule),
     HttpModule,
     GroupshopsModule,
+    GsCommonModule,
   ],
   providers: [
     BillingsResolver,

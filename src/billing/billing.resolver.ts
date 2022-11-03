@@ -5,6 +5,7 @@ import { CreateBillingInput } from './dto/create-billing.input';
 import { UpdateBillingInput } from './dto/update-billing.input';
 import {
   MonthlyBillingInput,
+  MonthlyBillingInput2,
   SingleDayBillingInput,
   Total,
   TotalGS,
@@ -17,11 +18,13 @@ import { DateFormats, Days, monthsArr } from 'src/utils/functions';
 import { Metrics } from 'src/campaigns/entities/campaign.entity';
 import { ConfigService } from '@nestjs/config';
 import { UpdateStoreInput } from 'src/stores/dto/update-store.input';
+import { LifecycleService } from 'src/gs-common/lifecycle.service';
 
 @Resolver(() => Billing)
 export class BillingsResolver {
   constructor(
     private readonly billingService: BillingsService,
+    private readonly lifecycleService: LifecycleService,
     private shopifyapi: ShopifyService,
     private readonly storeService: StoresService,
     private configService: ConfigService,
@@ -161,6 +164,11 @@ export class BillingsResolver {
 
     return { redirectUrl: subscription['confirmationUrl'] };
   }
+  @Query(() => [MonthlyBillingInput2], { name: 'getCustomBilling' })
+  async getCustomBilling(@Args('storeId') storeId: string) {
+    return this.lifecycleService.getCustomBilling(storeId);
+  }
+
   @Query(() => Total, { name: 'getStoreMonthsCount' })
   getStoreMonthsCount(@Args('storeId') storeId: string) {
     return this.billingService.getStoreMonthsCount(storeId);

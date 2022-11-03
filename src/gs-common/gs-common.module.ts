@@ -10,6 +10,7 @@ import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 import { GSLoadedEvent } from './events/groupshop-loaded.event';
 import { GSLoadedListener } from './listeners/groupshop-loaded.listener';
 import { PartnersModule } from 'src/partners/partners.module';
+import { BillingModule } from 'src/billing/billing.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PartnersModule } from 'src/partners/partners.module';
     UtilsModule,
     forwardRef(() => GroupshopsModule),
     forwardRef(() => PartnersModule),
+    forwardRef(() => BillingModule),
   ],
   providers: [
     VistorsService,
