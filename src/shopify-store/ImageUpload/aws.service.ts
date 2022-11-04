@@ -20,7 +20,6 @@ export class AwsService {
       // region: process.env.AWS_REGION,
       Key: urlkey,
     };
-    // console.log('.....urlkey.......', urlkey);
 
     const data = await s3
       .upload(params)

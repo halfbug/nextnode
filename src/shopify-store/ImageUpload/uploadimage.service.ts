@@ -1,4 +1,3 @@
-
 import { Logger } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { S3ConfigProvider } from './S3ConfigProvider';
@@ -12,17 +11,28 @@ export class UploadImageService {
 
   async upload(file) {
     const { originalname, mimetype } = file;
-    const S3bucket = this.s3Provider.getBucketName();
+    const S3bucket =
+      mimetype === 'video/mp4'
+        ? this.s3Provider.getBucketNameVideo()
+        : this.s3Provider.getBucketName();
     return await this.uploadS3(file.buffer, S3bucket, originalname, mimetype);
   }
 
   async uploadMany(files: any) {
-    let result = [];
+    const result = [];
     for (const file of files) {
       const { originalname, mimetype, buffer } = file;
-      const S3bucket = this.s3Provider.getBucketName();
-      let response:any = await this.uploadS3(buffer, S3bucket, originalname, mimetype);
-      result.push(response)
+      const S3bucket =
+        mimetype === 'video/mp4'
+          ? this.s3Provider.getBucketNameVideo()
+          : this.s3Provider.getBucketName();
+      const response: any = await this.uploadS3(
+        buffer,
+        S3bucket,
+        originalname,
+        mimetype,
+      );
+      result.push(response);
     }
     return result;
   }
@@ -40,12 +50,11 @@ export class UploadImageService {
           console.log(err);
           Logger.error('Error in file delete from S3', err);
         }
-        console.log(data);
       },
     );
   }
 
-  async uploadS3(file, bucket, name, mimetype) {   
+  async uploadS3(file, bucket, name, mimetype) {
     const s3 = this.s3Provider.getS3();
     const s3Params = {
       Bucket: bucket,
@@ -55,8 +64,7 @@ export class UploadImageService {
     };
 
     const data = await this.uploadImageToS3(s3, s3Params);
-    console.log('data',data);
-    
+
     return data;
   }
 
@@ -74,6 +82,21 @@ export class UploadImageService {
   async getSignedUrl(key: string) {
     const S3 = this.s3Provider.getS3();
     const S3bucket = this.s3Provider.getBucketName();
+    const params = { Bucket: S3bucket, Key: key };
+    // console.log(S3Obj);
+    const SignedUrl = await S3.getSignedUrl('getObject', params);
+    // console.log(
+    //   '🚀 ~ file: uploadimage.service.ts ~ line 47 ~ UploadImageService ~ getSignedUrl ~ SignedUrl',
+    //   SignedUrl,
+    // );
+    return SignedUrl;
+
+    // return await this.uploadS3(file.buffer, S3bucket, originalname);
+  }
+
+  async getSignedUrlVideo(key: string) {
+    const S3 = this.s3Provider.getS3();
+    const S3bucket = this.s3Provider.getBucketNameVideo();
     const params = { Bucket: S3bucket, Key: key };
     // console.log(S3Obj);
     const SignedUrl = await S3.getSignedUrl('getObject', params);

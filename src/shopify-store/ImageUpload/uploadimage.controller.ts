@@ -53,7 +53,7 @@ export class UploadImageController {
     @UploadedFiles() file: Array<any>,
     @Res() response,
   ) {
-    try {        
+    try {
       const data: any = await this.uploadImageService.uploadMany(file);
       // const dataDel = await this.uploadImageService.deleteImage(
       //   req.body.previousimage,
@@ -93,12 +93,10 @@ export class UploadImageController {
   @Get('video')
   @ApiResponse({ status: HttpStatus.CREATED, type: ImageResponseDTO })
   async getVideoUrl(@Req() req, @Res() response) {
-    // console.log(req.query);
-    // response.send(req.query);
     const { key } = req.query;
 
     try {
-      const data = await this.uploadImageService.getSignedUrl(key);
+      const data = await this.uploadImageService.getSignedUrlVideo(key);
       return response.status(200).json({
         message: `s3 url sent`,
         data,
