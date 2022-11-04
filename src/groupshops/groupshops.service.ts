@@ -515,6 +515,7 @@ export class GroupshopsService {
                       $in: ['$$j.product.id', '$store.hideProducts'],
                     },
                   },
+                  { $ne: ['$$j.product', null] },
                 ],
               },
             },
