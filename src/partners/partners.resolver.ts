@@ -21,6 +21,7 @@ import {
 } from '@nestjs/common';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import { ViewedInterceptor } from 'src/gs-common/viewed.inceptor';
+import { TotalRevenue } from 'src/billing/dto/monthly-billing.input';
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
     GqlExecutionContext.create(ctx).getContext().req,
@@ -89,6 +90,10 @@ export class PartnersResolver {
   async findOne(@Args('code') code: string) {
     console.log('🚀 ~ file: Partners.resolver.ts ~ findOne', code);
     return this.PartnerService.findOne(await this.crypt.decrypt(code));
+  }
+  @Query(() => TotalRevenue, { name: 'getPartnerRevenue' })
+  async getPartnerRevenue(@Args('storeId') storeId: string) {
+    return this.PartnerService.getPartnerRevenue(storeId);
   }
   @Mutation(() => Partners, { name: 'addDealProductPartner' })
   addDealProductPartner(

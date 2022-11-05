@@ -927,4 +927,66 @@ export class PartnerService {
     ];
     return await manager.aggregate(Partnergroupshop, agg).toArray();
   }
+  async getPartnerRevenue(storeId: string) {
+    const agg = [
+      {
+        $match: {
+          storeId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'partnermember',
+          localField: 'id',
+          foreignField: 'groupshopId',
+          as: 'member',
+        },
+      },
+      {
+        $addFields: {
+          revenuePercent: {
+            $subtract: [
+              100,
+              {
+                $toInt: {
+                  $substr: ['$partnerRewards.baseline', 0, 2],
+                },
+              },
+            ],
+          },
+        },
+      },
+      {
+        $addFields: {
+          revenue: {
+            $reduce: {
+              input: '$member',
+              initialValue: 0,
+              in: {
+                $sum: {
+                  $divide: [
+                    {
+                      $multiply: ['$$this.orderAmount', '$revenuePercent'],
+                    },
+                    100,
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$storeId',
+          revenue: {
+            $sum: '$revenue',
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const TotalRev = await manager.aggregate(Partnergroupshop, agg).toArray();
+    return TotalRev[0];
+  }
 }
