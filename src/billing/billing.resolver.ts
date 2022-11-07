@@ -115,6 +115,22 @@ export class BillingsResolver {
     // console.log('🚀 getBillingByDate result', result);
     return result;
   }
+  @Query(() => [SingleDayBillingInput], { name: 'getCustomBillingByDate' })
+  async getCustomBillingByDate(
+    @Args('storeId') storeId: string,
+    @Args('sdate') sdate: string,
+    // @Args('edate') edate: Date,
+  ) {
+    const edate = new Date(sdate); // Now
+    edate.setDate(edate.getDate() + 30);
+    const result = await this.billingService.getBillingByDate(
+      storeId,
+      new Date(sdate),
+      edate,
+    );
+    // console.log('🚀 getCustomBillingByDate sdate', result);
+    return result;
+  }
 
   @Mutation(() => Billing)
   updateBillings(

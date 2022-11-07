@@ -26,7 +26,8 @@ export class StoreUpdatePlanCron {
     stores.map(async (store) => {
       if (
         store.subscription &&
-        store.subscription.status === 'Active' &&
+        (store.subscription.status === 'Active' ||
+          store.subscription.status === 'ACTIVE') &&
         store.planResetDate
       ) {
         console.log(`now=${Date.now()} planreset=${store.planResetDate}`);
