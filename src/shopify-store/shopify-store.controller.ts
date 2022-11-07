@@ -21,6 +21,7 @@ import { UploadImageService } from './ImageUpload/uploadimage.service';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom, map } from 'rxjs';
 import { PartnerService } from 'src/partners/partners.service';
+import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 @Controller()
 export class ShopifyStoreController {
   constructor(
@@ -38,6 +39,7 @@ export class ShopifyStoreController {
     private imageService: UploadImageService,
     private httpService: HttpService,
     private partnerGSSrv: PartnerService,
+    private readonly crypt: EncryptDecryptService,
   ) {}
 
   // @Get()
@@ -84,6 +86,23 @@ export class ShopifyStoreController {
     // console.log('response', brandName, shop, id, photo, maxReward);
     return { brandName, shop, id, photo, maxReward };
   }
+  @Get('mepartner')
+  async whoamii(@Query('name') name: any) {
+    const {
+      partnerRewards: { baseline },
+      store,
+      campaign,
+      shop,
+    } = await this.partnerGSSrv.findOne(this.crypt.decrypt(name));
+    const photo = store?.settings?.general
+      ? store?.settings?.general?.imageUrl.split('/')[4]
+      : campaign.settings?.general?.imageUrl.split('/')[4];
+    const maxReward = baseline;
+    const id = store?.id;
+    const brandName = store?.brandName;
+    return { brandName, shop, id, photo, maxReward };
+  }
+
   @Get('load-products')
   async getStoreProducts() {
     const result = await this.storeService.loadProducts();
