@@ -25,12 +25,10 @@ export class StoreUpdatePlanCron {
     );
     stores.map(async (store) => {
       if (
-        store.subscription &&
-        (store.subscription.status === 'Active' ||
-          store.subscription.status === 'ACTIVE') &&
+        (store.status === 'Active' || store.status === 'ACTIVE') &&
         store.planResetDate
       ) {
-        console.log(`now=${Date.now()} planreset=${store.planResetDate}`);
+        console.log(`planreset=${store.planResetDate} ${store.brandName}`);
 
         const id = store.id;
         let payload;
@@ -54,7 +52,7 @@ export class StoreUpdatePlanCron {
             storeId: store.id,
             event: EventType.planReset,
             plan: BillingPlanEnum.LAUNCH,
-            dateTime: new Date(),
+            dateTime: store.planResetDate,
           });
         }
         // else if (Date.now() >= store.planResetDate.getTime()) {

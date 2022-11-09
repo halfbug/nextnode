@@ -45,6 +45,9 @@ import { RequestReturn } from '@shopify/shopify-api';
 import { UpdateFullOrderInput } from 'src/inventory/dto/update-fullorder.input';
 import { ProductMediaObject } from 'src/inventory/events/product-media.event';
 import { ProductMediaListener } from 'src/inventory/listeners/product-media.listner';
+import { LifecycleService } from 'src/gs-common/lifecycle.service';
+import { EventType } from 'src/gs-common/entities/lifecycle.modal';
+import { BillingPlanEnum } from 'src/stores/entities/store.entity';
 
 @Controller('webhooks')
 export class WebhooksController {
@@ -60,6 +63,7 @@ export class WebhooksController {
     private orderCreatedEvent: OrderCreatedEvent,
     private httpService: HttpService,
     public productMedia: ProductMediaObject,
+    private lifecyclesrv: LifecycleService,
   ) {}
   async refreshSingleProduct(shop, accessToken, id, shopName) {
     try {
@@ -1386,6 +1390,21 @@ export class WebhooksController {
         shop: PurchasedProducts,
         message: 'purchaseCount updated',
       });
+    } catch (err) {
+      console.log(JSON.stringify(err));
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
+  @Post('plan-reset-date')
+  async updatePlanResetDateAllStores(@Req() req, @Res() res) {
+    try {
+      const stores = await this.storesService.findActiveAll();
+      stores.map(
+        async ({ id, planResetDate, createdAt }) =>
+          await this.storesService.update(id, { id, planResetDate: createdAt }),
+      );
+      res.send(JSON.stringify(stores));
     } catch (err) {
       console.log(JSON.stringify(err));
     } finally {

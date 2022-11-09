@@ -130,22 +130,29 @@ export class LifecycleService {
       },
       {
         $addFields: {
-          feeTotalCB: {
-            $reduce: {
-              input: {
-                $filter: {
-                  input: '$rangedBilling',
-                  cond: {
+          cashBackRec: {
+            $filter: {
+              input: '$rangedBilling',
+              cond: {
+                $and: [
+                  {
                     $eq: ['$$this.type', 0],
                   },
-                },
-              },
-              initialValue: 0,
-              in: {
-                $add: ['$$value', '$$this.feeCharges'],
+                ],
               },
             },
           },
+        },
+      },
+      {
+        $addFields: {
+          feeTotalCB: {
+            $sum: '$cashBackRec.feeCharges',
+          },
+        },
+      },
+      {
+        $addFields: {
           revenue: {
             $reduce: {
               input: '$rangedBilling',
@@ -181,11 +188,32 @@ export class LifecycleService {
       {
         $addFields: {
           cashBack: {
+            $sum: '$cashBackRec.cashBack',
+          },
+        },
+      },
+      {
+        $addFields: {
+          feeChargesGS: {
             $reduce: {
-              input: '$rangedBilling',
+              input: {
+                $filter: {
+                  input: '$rangedBilling',
+                  cond: {
+                    $and: [
+                      {
+                        $eq: ['$$this.type', 1],
+                      },
+                      {
+                        $gt: ['$createdAt', '$trialDate'],
+                      },
+                    ],
+                  },
+                },
+              },
               initialValue: 0,
               in: {
-                $sum: '$$this.cashBack',
+                $add: ['$$value', '$$this.feeCharges'],
               },
             },
           },
@@ -203,17 +231,6 @@ export class LifecycleService {
           feeCharges: {
             $sum: '$feeTotalCB',
           },
-          feeChargesGS: {
-            $sum: {
-              $cond: {
-                if: {
-                  $gt: ['$createdAt', '$trialDate'],
-                },
-                then: '$feeTotalGS',
-                else: 0,
-              },
-            },
-          },
           count: {
             $count: {},
           },
@@ -223,12 +240,18 @@ export class LifecycleService {
           nextDate: {
             $first: '$nextDate',
           },
+          feeTotalGS: {
+            $first: '$feeTotalGS',
+          },
+          feeChargesGS: {
+            $sum: '$feeChargesGS',
+          },
         },
       },
       {
         $project: {
           totalCharges: {
-            $add: ['$feeCharges', '$feeChargesGS'],
+            $add: ['$feeCharges', '$feeTotalGS'],
           },
           cashBack: 1,
           revenue: 1,

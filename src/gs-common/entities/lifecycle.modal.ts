@@ -15,6 +15,7 @@ export enum EventType {
   uninstalled = 'uninstalled',
   planReset = 'planReset',
   planChanged = 'planChanged',
+  planReset1 = 'planReset1',
 }
 
 @Entity()

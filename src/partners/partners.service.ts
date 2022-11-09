@@ -949,7 +949,7 @@ export class PartnerService {
               100,
               {
                 $toInt: {
-                  $substr: ['$partnerRewards.baseline', 0, 2],
+                  $trim: { input: '$partnerRewards.baseline', chars: '%' },
                 },
               },
             ],
