@@ -736,6 +736,35 @@ export class PartnerService {
         },
       },
       {
+        $addFields: {
+          revenuePercent: {
+            $subtract: [
+              100,
+              {
+                $toInt: {
+                  $trim: {
+                    input: '$partnerRewards.baseline',
+                    chars: '%',
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+      {
+        $addFields: {
+          revenue: {
+            $divide: [
+              {
+                $multiply: ['$revenue', '$revenuePercent'],
+              },
+              100,
+            ],
+          },
+        },
+      },
+      {
         $sort: {
           updatedAt: -1,
         },
