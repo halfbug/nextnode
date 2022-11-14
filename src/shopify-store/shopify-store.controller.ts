@@ -220,4 +220,10 @@ export class ShopifyStoreController {
       '</pre>'
     );
   }
+  @Get('billing-status')
+  async checkbillstatus() {
+    return {
+      billingStatus: this.configService.get('BILLING_LIVE'),
+    };
+  }
 }
