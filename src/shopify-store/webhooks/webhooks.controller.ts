@@ -780,9 +780,11 @@ export class WebhooksController {
       //   JSON.stringify(req.body),
       // );
       // const webhook = req.body;
-      this.orderCreatedEvent.webhook = req.body;
-      this.orderCreatedEvent.shop = shop;
-      this.orderCreatedEvent.emit();
+      if (req.body.source_name !== 'pos') {
+        this.orderCreatedEvent.webhook = req.body;
+        this.orderCreatedEvent.shop = shop;
+        this.orderCreatedEvent.emit();
+      }
 
       // res.send('order created..');
     } catch (err) {
