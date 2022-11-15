@@ -278,6 +278,7 @@ export class GroupshopSavedListener {
           last_name: res.data.klaviyo?.lastName,
           email: customerEmail,
           phone_number: validateNumber,
+          groupshop_url: shortLink,
         },
         properties: mdata,
       };
@@ -318,6 +319,7 @@ export class GroupshopSavedListener {
           $phone_number: validateNumber,
           $first_name: res.data.klaviyo?.firstName,
           $last_name: res.data.klaviyo?.lastName,
+          groupshop_url: shortLink,
           // sms_marketing_consent: sms_marketing_consent,
         },
         properties: rdata,

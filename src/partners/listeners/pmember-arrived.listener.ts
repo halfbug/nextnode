@@ -88,6 +88,7 @@ export class PMemberArrivedListener {
         customer_properties: {
           $email: email,
           $first_name: fname,
+          groupshop_url: shortUrl,
         },
         properties: gicdata,
       };
@@ -108,6 +109,7 @@ export class PMemberArrivedListener {
           $email: order.customer.email,
           $first_name: order.customer.firstName,
           $last_name: order.customer.lastName,
+          groupshop_url: shortUrl,
         },
         properties: girdata,
       };

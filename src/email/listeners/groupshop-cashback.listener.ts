@@ -198,6 +198,7 @@ export class GroupshopCashbackListener {
         $first_name: orderData[0].customer.firstName,
         $last_name: orderData[0].customer.lasttName,
         sms_marketing_consent: sms_marketing_consent,
+        groupshop_url: shortLink,
       },
       properties: mdata,
     };
