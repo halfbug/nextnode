@@ -383,9 +383,6 @@ export class BillingsService {
       {
         $match: {
           storeId: storeId,
-          type: {
-            $ne: 1,
-          },
         },
       },
       {
