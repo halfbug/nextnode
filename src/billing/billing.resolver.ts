@@ -10,6 +10,7 @@ import {
   Total,
   TotalGS,
   TotalRevenue,
+  GraphRevenue,
 } from './dto/monthly-billing.input';
 import { AppSubscription } from './entities/app-subscription.input';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
@@ -188,5 +189,23 @@ export class BillingsResolver {
   @Query(() => Total, { name: 'getStoreMonthsCount' })
   getStoreMonthsCount(@Args('storeId') storeId: string) {
     return this.billingService.getStoreMonthsCount(storeId);
+  }
+
+  @Query(() => [MonthlyBillingInput], { name: 'getGraphRevenue' })
+  getGraphRevenue(@Args('storeId') storeId: string) {
+    return this.billingService.findGraphRevenue(storeId);
+  }
+
+  @Query(() => [GraphRevenue], { name: 'getGraphRevenueByDate' })
+  getGraphRevenueByDate(
+    @Args('storeId') storeId: string,
+    @Args('startDate') startDate: string,
+    @Args('endDate') endDate: string,
+  ) {
+    return this.billingService.findGraphRevenueByDate(
+      storeId,
+      startDate,
+      endDate,
+    );
   }
 }

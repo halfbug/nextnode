@@ -10,6 +10,9 @@ export class MonthYearType {
   month?: number;
 
   @Field({ nullable: true })
+  day?: number;
+
+  @Field({ nullable: true })
   date?: number;
 }
 @ObjectType()
@@ -131,4 +134,16 @@ export class SingleDayBillingInput {
 
   @Field({ nullable: true })
   store?: Store;
+}
+
+@ObjectType()
+export class GraphRevenue {
+  @Field()
+  _id?: MonthYearType;
+
+  @Field()
+  revenue?: number;
+
+  @Field({ nullable: true })
+  graphView?: string;
 }
