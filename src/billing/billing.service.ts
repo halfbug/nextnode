@@ -354,6 +354,9 @@ export class BillingsService {
           cashBack: {
             $sum: '$cashBack',
           },
+          feeCharges: {
+            $sum: '$feeCharges',
+          },
           revenue: {
             $sum: '$revenue',
           },
@@ -380,6 +383,9 @@ export class BillingsService {
       {
         $match: {
           storeId: storeId,
+          type: {
+            $ne: 1,
+          },
         },
       },
       {
@@ -418,6 +424,9 @@ export class BillingsService {
           _id: null,
           cashBack: {
             $sum: '$cashBack',
+          },
+          feeCharges: {
+            $sum: '$feeCharges',
           },
           revenue: {
             $sum: '$revenue',

@@ -70,6 +70,9 @@ export class Metrics {
   cashBack?: number;
 
   @Field({ nullable: true })
+  feeCharges?: number;
+
+  @Field({ nullable: true })
   revenue?: number;
 
   @Field({ nullable: true })

@@ -1526,12 +1526,32 @@ export class GroupshopsService {
           refund: {
             $sum: '$refundItems.amount',
           },
-          revenue: {
-            $sum: '$lineItems.discountedPrice',
-          },
           lineItemsCount: {
             $size: '$lineItems',
           },
+        },
+      },
+      {
+        $project: {
+          revenue: {
+            $sum: {
+              $map: {
+                input: '$lineItems',
+                in: {
+                  $multiply: ['$$this.discountedPrice', '$$this.quantity'],
+                },
+              },
+            },
+          },
+          url: 1,
+          shortUrl: 1,
+          members: 1,
+          uniqueClicks: 1,
+          numMembers: 1,
+          lineItems: 1,
+          refundItems: 1,
+          refund: 1,
+          lineItemsCount: 1,
         },
       },
     ];

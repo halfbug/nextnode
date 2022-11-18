@@ -521,7 +521,10 @@ Logger.error(err.message, CampaignsService.name)
           '_id': null, 
           'cashBack': {
             '$sum': '$billings.cashBack'
-          }, 
+          },
+          'feeCharges': {
+            '$sum': '$billings.feeCharges'
+          },  
           'revenue': {
             '$sum': '$billings.revenue'
           }
