@@ -25,7 +25,8 @@ export class StoreUpdatePlanCron {
     );
     stores.map(async (store) => {
       if (
-        (store.status === 'Active' || store.status === 'ACTIVE') &&
+        ['Active', 'ACTIVE', 'active'].includes(store.status) &&
+        ['Active', 'ACTIVE', 'active'].includes(store.subscription.status) &&
         store.planResetDate
       ) {
         console.log(`planreset=${store.planResetDate} ${store.brandName}`);
