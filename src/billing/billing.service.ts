@@ -349,6 +349,21 @@ export class BillingsService {
         },
       },
       {
+        $addFields: {
+          feeCharges: {
+            $cond: {
+              if: {
+                $ne: ['$type', 1],
+              },
+              then: {
+                $ceil: '$feeCharges',
+              },
+              else: 0,
+            },
+          },
+        },
+      },
+      {
         $group: {
           _id: null,
           cashBack: {
@@ -414,6 +429,21 @@ export class BillingsService {
               ],
             },
           ],
+        },
+      },
+      {
+        $addFields: {
+          feeCharges: {
+            $cond: {
+              if: {
+                $ne: ['$type', 1],
+              },
+              then: {
+                $ceil: '$feeCharges',
+              },
+              else: 0,
+            },
+          },
         },
       },
       {
