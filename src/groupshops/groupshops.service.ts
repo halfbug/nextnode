@@ -1554,6 +1554,11 @@ export class GroupshopsService {
           lineItemsCount: 1,
         },
       },
+      {
+        $sort: {
+          _id: -1,
+        },
+      },
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
