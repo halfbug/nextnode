@@ -435,7 +435,8 @@ export class WebhooksController {
       nprod.status = rproduct?.status?.toUpperCase();
       nprod.price = rproduct?.variants[0]?.price;
       nprod.featuredImage = rproduct?.image?.src;
-      nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
+      // nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
+      nprod.description = rproduct.body_html;
       // if product is not active then it will be not purchaseable.
       if (nprod.status !== 'ACTIVE') nprod.outofstock = true;
       await this.inventryService.create(nprod);
@@ -533,7 +534,8 @@ export class WebhooksController {
       nprod.status = rproduct?.status?.toUpperCase();
       nprod.price = rproduct?.variants[0]?.price; //
       nprod.featuredImage = rproduct?.image?.src;
-      nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
+      // nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
+      nprod.description = rproduct.body_html;
       // let qDifference: number;
       // const isAvailable = rproduct.variants.some(
       //   (item) => item.inventory_quantity > 0,
@@ -952,10 +954,11 @@ export class WebhooksController {
                 const collectionObjs = productsArray.map((product) => ({
                   id: rcollection.admin_graphql_api_id,
                   title: rcollection.title,
-                  description: rcollection.body_html.replace(
-                    /<\/?[^>]+(>|$)/g,
-                    '',
-                  ),
+                  // description: rcollection.body_html.replace(
+                  //   /<\/?[^>]+(>|$)/g,
+                  //   '',
+                  // ),
+                  description: rcollection.body_html,
                   productsCount: productsArray.length,
                   sortOrder: rcollection.sort_order.toUpperCase(),
                   featuredImage: rcollection?.image?.src,
