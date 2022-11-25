@@ -491,8 +491,33 @@ export class OrdersService {
         },
       },
       {
+        $lookup: {
+          from: 'store',
+          localField: 'shop',
+          foreignField: 'shop',
+          as: 'store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$store',
+        },
+      },
+      {
         $unwind: {
           path: '$LI',
+        },
+      },
+      {
+        $addFields: {
+          hideStatus: {
+            $in: ['$LI.product.id', '$store.hideProducts'],
+          },
+        },
+      },
+      {
+        $match: {
+          hideStatus: false,
         },
       },
       {
