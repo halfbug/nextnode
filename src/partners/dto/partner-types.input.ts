@@ -1,4 +1,5 @@
 import { ObjectType, Field } from '@nestjs/graphql';
+import { BillingTierEnum } from 'src/stores/entities/store.entity';
 
 @ObjectType()
 export class TotalPGS {
@@ -10,4 +11,13 @@ export class TotalPGS {
   tierCharges?: number;
   @Field({ nullable: true })
   tierLimit?: string;
+}
+@ObjectType()
+export class StorePayloadType {
+  @Field({ nullable: true })
+  id?: string;
+  @Field({ nullable: true })
+  tier?: BillingTierEnum;
+  @Field({ nullable: true })
+  tierRecurringDate?: Date;
 }

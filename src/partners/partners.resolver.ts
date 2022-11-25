@@ -110,22 +110,24 @@ export class PartnersResolver {
   async getActivePartnersCount(@Args('storeId') storeId: string) {
     const { count } = await this.PartnerService.getActivePartnersCount(storeId);
     const { tier } = await this.storesService.findById(storeId);
-    const tierInfo = GSP_FEES1.find((itm, ind) => itm.name === tier);
-    // let obj: {
-    //   count: number;
-    //   tierName: number;
-    //   tierCharges: number;
-    //   tierLimit: string;
-    // };
-    // if (res === undefined) {
-    //   obj.count = 0;
-    //   obj.tierName = 1;
-    //   obj.tierCharges = GSP_FEES1[1].fee;
-    //   obj.tierLimit = GSP_FEES1[1].limit;
-    // } else {
-    //   obj.count = res.count;
+    // find tier Info Object of current tier. if tier field not exist then bring first free tier info
+    // eslint-disable-next-line prettier/prettier
+    const tierInfo = GSP_FEES1.find(
+      (itm, ind) => itm.index === tier,
+    );
+    console.log(
+      '🚀 tierInfo = ',
+      tierInfo,
+      '🚀 tier = ',
+      tier,
+      '🚀 count = ',
+      count,
+    );
+    const nextTierIndex = count === 0 ? tierInfo.index + 1 : tierInfo.index + 1;
+    tierInfo.name = GSP_FEES1[nextTierIndex].name;
+    tierInfo.fee = GSP_FEES1[nextTierIndex].fee;
+    tierInfo.limit = GSP_FEES1[nextTierIndex].limit;
     // }
-    console.log('🚀 tierInfo = ', tierInfo, '🚀 tier = ', tier);
     return {
       count: count ?? 0,
       tierName: tierInfo.name,

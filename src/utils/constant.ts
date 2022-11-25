@@ -54,13 +54,13 @@ export const GSP_FEES = [
   GSP_CHARGE_TIER6,
 ];
 export const GSP_FEES1 = [
-  { name: BillingTierEnum.FREE, fee: 0, limit: '3' },
-  { name: BillingTierEnum.TIER1, fee: 50, limit: '5' },
-  { name: BillingTierEnum.TIER2, fee: 100, limit: '10' },
-  { name: BillingTierEnum.TIER3, fee: 250, limit: '25' },
-  { name: BillingTierEnum.TIER4, fee: 500, limit: '50' },
-  { name: BillingTierEnum.TIER5, fee: 1000, limit: '100' },
-  { name: BillingTierEnum.TIER6, fee: 2500, limit: '100+' },
+  { index: 0, name: BillingTierEnum.FREE, fee: 0, limit: '3' },
+  { index: 1, name: BillingTierEnum.TIER1, fee: 50, limit: '5' },
+  { index: 2, name: BillingTierEnum.TIER2, fee: 100, limit: '10' },
+  { index: 3, name: BillingTierEnum.TIER3, fee: 250, limit: '25' },
+  { index: 4, name: BillingTierEnum.TIER4, fee: 500, limit: '50' },
+  { index: 5, name: BillingTierEnum.TIER5, fee: 1000, limit: '100' },
+  { index: 6, name: BillingTierEnum.TIER6, fee: 2500, limit: '100+' },
 ];
 
 export const GSP_SWITCH_NUM = [

@@ -697,6 +697,16 @@ export class PartnerService {
     }
     //  when tier switch do these steps
     // check if switch to 1, 2 then 3 then move back to 2 n then again 3 he wont be charged
+    let payload: {
+      id: string;
+      tier: any;
+      tierRecurringDate?: Date;
+    };
+    payload = {
+      id: createPartnersInput.storeId,
+      tier: latestTier,
+    };
+
     if (GSP_SWITCH_NUM.includes(gspCount) && latestTier !== tier) {
       // 1 create log
       this.lifecyclesrv.create({
@@ -719,16 +729,21 @@ export class PartnerService {
         usageDescriptonForPartnerBilling(latestTier, chargedAmount.toFixed(2)),
       );
       // 3 update store tier change , 4 update recurring date
-      const payload = {
+      payload = {
         id: createPartnersInput.storeId,
         tier: latestTier,
         tierRecurringDate: addDays(new Date(), 30),
       };
-      const updatedStore = await this.storesService.update(
-        createPartnersInput.storeId,
-        payload,
-      );
     }
+    const updatedStore = await this.storesService.update(
+      createPartnersInput.storeId,
+      payload,
+    );
+    console.log(
+      '🚀 ~ file: partners.service.ts ~ line 731 ~ PartnerService ~ create ~ updatedStore',
+      updatedStore,
+    );
+
     this.gspEvent.groupshop = newGSP;
     this.gspEvent.shop = shop;
     this.gspEvent.accessToken = accessToken;
