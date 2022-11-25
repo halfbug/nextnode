@@ -1556,7 +1556,7 @@ export class GroupshopsService {
       },
       {
         $sort: {
-          _id: -1,
+          revenue: -1,
         },
       },
     ];
