@@ -18,6 +18,28 @@ import {
 import { StoresService } from 'src/stores/stores.service';
 import { GSPCreatedEvent } from './events/create-partner-groupshop.event';
 import { KalavioService } from 'src/email/kalavio.service';
+import {
+  GSP_FEES,
+  GSP_FEES1,
+  GSP_SWITCH_NUM,
+  GS_TIER0_END_COUNT,
+  GS_TIER0_START_COUNT,
+  GS_TIER1_END_COUNT,
+  GS_TIER1_START_COUNT,
+  GS_TIER2_END_COUNT,
+  GS_TIER2_START_COUNT,
+  GS_TIER3_END_COUNT,
+  GS_TIER3_START_COUNT,
+  GS_TIER4_END_COUNT,
+  GS_TIER4_START_COUNT,
+  GS_TIER5_END_COUNT,
+  GS_TIER5_START_COUNT,
+  GS_TIER6_START_COUNT,
+} from 'src/utils/constant';
+import { LifecycleService } from 'src/gs-common/lifecycle.service';
+import { BillingTierEnum } from 'src/stores/entities/store.entity';
+import { EventType } from 'src/gs-common/entities/lifecycle.modal';
+import { addDays, usageDescriptonForPartnerBilling } from 'src/utils/functions';
 
 @Injectable()
 export class PartnerService {
@@ -29,6 +51,7 @@ export class PartnerService {
     private configService: ConfigService,
     private storesService: StoresService,
     private gspEvent: GSPCreatedEvent, // private gspListener: GSPSavedListener,
+    private lifecyclesrv: LifecycleService,
   ) {}
 
   async findOne(discountCode: string) {
@@ -587,7 +610,7 @@ export class PartnerService {
     // );
     const partner = this.partnerRepository.create(createPartnersInput);
 
-    const { shop, accessToken, brandName, logoImage } =
+    const { shop, accessToken, brandName, logoImage, subscription, tier } =
       await this.storesService.findById(createPartnersInput.storeId);
     // console.log(shop);
     // console.log(accessToken);
@@ -637,6 +660,75 @@ export class PartnerService {
     partner.createdAt = createPartnersInput.createdAt;
     partner.updatedAt = createPartnersInput.updatedAt;
     const newGSP = await this.partnerRepository.save(partner);
+    // calculate active pgs
+    // save lifecycle log of tier switch
+    // charge if trie switch
+    // store tier, tierRecurringDate
+    const currentpgs = await this.findAll(createPartnersInput.storeId);
+    console.log('🚀 ~ file: partners.service ~ currentpgs', currentpgs.length);
+    const activePGS = currentpgs.filter((item) => item.isActive === true);
+    const gspCount = activePGS.length;
+    let latestTier;
+    switch (true) {
+      case gspCount >= GS_TIER0_START_COUNT && gspCount <= GS_TIER0_END_COUNT:
+        latestTier = BillingTierEnum.FREE;
+        break;
+      case gspCount >= GS_TIER1_START_COUNT && gspCount <= GS_TIER1_END_COUNT:
+        latestTier = BillingTierEnum.TIER1;
+        break;
+      case gspCount >= GS_TIER2_START_COUNT && gspCount <= GS_TIER2_END_COUNT:
+        latestTier = BillingTierEnum.TIER2;
+        break;
+      case gspCount >= GS_TIER3_START_COUNT && gspCount <= GS_TIER3_END_COUNT:
+        latestTier = BillingTierEnum.TIER3;
+        break;
+      case gspCount >= GS_TIER4_START_COUNT && gspCount <= GS_TIER4_END_COUNT:
+        latestTier = BillingTierEnum.TIER4;
+        break;
+      case gspCount >= GS_TIER5_START_COUNT && gspCount <= GS_TIER5_END_COUNT:
+        latestTier = BillingTierEnum.TIER5;
+        break;
+      case gspCount >= GS_TIER6_START_COUNT:
+        latestTier = BillingTierEnum.TIER6;
+        break;
+
+      default:
+        break;
+    }
+    //  when tier switch do these steps
+    // check if switch to 1, 2 then 3 then move back to 2 n then again 3 he wont be charged
+    if (GSP_SWITCH_NUM.includes(gspCount) && latestTier !== tier) {
+      // 1 create log
+      this.lifecyclesrv.create({
+        storeId: createPartnersInput.storeId,
+        event: EventType.partnerTierSwitch,
+        tier: latestTier,
+        dateTime: new Date(),
+      });
+      // 2. charge merchant
+      const chargedTier = GSP_FEES1.find((item) => item.name === latestTier);
+      console.log(
+        '🚀 ~ file: partners.service.ts ~ line 710 ~ PartnerService ~ create ~ chargedTier',
+        chargedTier,
+      );
+      const chargedAmount: number = chargedTier.fee;
+      // const chargedAmount = 2;
+      const shopifyRes = await this.shopifyapi.appUsageRecordCreate(
+        subscription?.['appSubscription']['lineItems'][0]['id'],
+        chargedAmount,
+        usageDescriptonForPartnerBilling(latestTier, chargedAmount.toFixed(2)),
+      );
+      // 3 update store tier change , 4 update recurring date
+      const payload = {
+        id: createPartnersInput.storeId,
+        tier: latestTier,
+        tierRecurringDate: addDays(new Date(), 30),
+      };
+      const updatedStore = await this.storesService.update(
+        createPartnersInput.storeId,
+        payload,
+      );
+    }
     this.gspEvent.groupshop = newGSP;
     this.gspEvent.shop = shop;
     this.gspEvent.accessToken = accessToken;
@@ -789,6 +881,7 @@ export class PartnerService {
       // partnerRewards: { baseline },
     } = updatePartnersInput;
     if (updatePartnersInput.isActive) {
+      console.log('isActive === ', updatePartnersInput.isActive);
       const res = await this.partnerRepository.update(
         { id },
         updatePartnersInput,
@@ -1017,5 +1110,28 @@ export class PartnerService {
     const manager = getMongoManager();
     const TotalRev = await manager.aggregate(Partnergroupshop, agg).toArray();
     return TotalRev[0];
+  }
+  async getActivePartnersCount(storeId: string) {
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              storeId,
+            },
+            {
+              isActive: true,
+            },
+          ],
+        },
+      },
+      {
+        $count: 'count',
+      },
+    ];
+    const manager = getMongoManager();
+    const Total = await manager.aggregate(Partnergroupshop, agg).toArray();
+    const value = Total.length > 0 ? Total[0] : { count: 0 };
+    return value;
   }
 }

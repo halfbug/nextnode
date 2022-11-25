@@ -1,4 +1,8 @@
-import { BillingPlanEnum } from 'src/stores/entities/store.entity';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import {
+  BillingPlanEnum,
+  BillingTierEnum,
+} from 'src/stores/entities/store.entity';
 import {
   Column,
   CreateDateColumn,
@@ -16,27 +20,41 @@ export enum EventType {
   planReset = 'planReset',
   planChanged = 'planChanged',
   planReset1 = 'planReset1',
+  partnerTierSwitch = 'partnerTierSwitch',
+  partnerRecurringCharged = 'partnerRecurringCharged',
 }
 
 @Entity()
+@ObjectType()
+@InputType('LifecycleInput')
 export class Lifecycle {
   @ObjectIdColumn()
-  _id: string;
+  @Field({ nullable: true })
+  _id?: string;
 
   @Column()
+  @Field()
   event: EventType;
 
   @Index({ background: true })
+  @Field({ nullable: true })
   @Column({ nullable: true })
   groupshopId?: string;
 
   @Index({ background: true })
   @Column({ nullable: true })
+  @Field({ nullable: true })
   storeId?: string;
 
-  @Column()
-  dataTime: Date;
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  dateTime?: Date;
 
   @Column('enum', { nullable: true })
+  @Field({ nullable: true })
   plan?: BillingPlanEnum;
+
+  @Column('enum', { nullable: true })
+  @Field({ nullable: true })
+  tier?: BillingTierEnum;
 }

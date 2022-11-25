@@ -22,6 +22,8 @@ import {
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import { ViewedInterceptor } from 'src/gs-common/viewed.inceptor';
 import { TotalRevenue } from 'src/billing/dto/monthly-billing.input';
+import { GSP_FEES1 } from 'src/utils/constant';
+import { TotalPGS } from './dto/partner-types.input';
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
     GqlExecutionContext.create(ctx).getContext().req,
@@ -103,5 +105,32 @@ export class PartnersResolver {
       updatePartnersInput.id,
       updatePartnersInput,
     );
+  }
+  @Query(() => TotalPGS, { name: 'getActivePartnersCount' })
+  async getActivePartnersCount(@Args('storeId') storeId: string) {
+    const { count } = await this.PartnerService.getActivePartnersCount(storeId);
+    const { tier } = await this.storesService.findById(storeId);
+    const tierInfo = GSP_FEES1.find((itm, ind) => itm.name === tier);
+    // let obj: {
+    //   count: number;
+    //   tierName: number;
+    //   tierCharges: number;
+    //   tierLimit: string;
+    // };
+    // if (res === undefined) {
+    //   obj.count = 0;
+    //   obj.tierName = 1;
+    //   obj.tierCharges = GSP_FEES1[1].fee;
+    //   obj.tierLimit = GSP_FEES1[1].limit;
+    // } else {
+    //   obj.count = res.count;
+    // }
+    console.log('🚀 tierInfo = ', tierInfo, '🚀 tier = ', tier);
+    return {
+      count: count ?? 0,
+      tierName: tierInfo.name,
+      tierCharges: tierInfo.fee,
+      tierLimit: tierInfo.limit,
+    };
   }
 }

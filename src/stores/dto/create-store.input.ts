@@ -4,7 +4,11 @@ import {
   BannerDesignTypeEnum,
   BannerSummaryEnum,
 } from '../entities/settings.entity';
-import { BillingPlanEnum, Resource } from '../entities/store.entity';
+import {
+  BillingPlanEnum,
+  BillingTierEnum,
+  Resource,
+} from '../entities/store.entity';
 // import { Settings } from '../entities/settings.entity';
 
 @InputType()
@@ -137,6 +141,9 @@ export class CreateStoreInput {
   @Field(() => BillingPlanEnum, { defaultValue: BillingPlanEnum.EXPLORE })
   plan?: BillingPlanEnum;
 
+  @Field(() => BillingTierEnum, { defaultValue: BillingTierEnum.FREE })
+  tier?: BillingTierEnum;
+
   @Field({ defaultValue: 0, nullable: true })
   totalGroupShop?: number;
 
@@ -168,4 +175,7 @@ export class CreateStoreInput {
 
   @Field({ nullable: true })
   appTrialEnd: Date;
+
+  @Field({ nullable: true })
+  tierRecurringDate: Date;
 }

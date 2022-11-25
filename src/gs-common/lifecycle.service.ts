@@ -9,13 +9,7 @@ export class LifecycleService {
     @InjectRepository(Lifecycle)
     private lifecycleRepository: MongoRepository<Lifecycle>, // private shopifyapi: ShopifyService,
   ) {}
-  create(eventLifecycle: {
-    event: EventType;
-    dateTime?: Date;
-    groupshopId?: string;
-    storeId?: string;
-    plan?: number;
-  }) {
+  create(eventLifecycle: Lifecycle) {
     if (eventLifecycle.dateTime === null) eventLifecycle.dateTime = new Date();
     return this.lifecycleRepository.save(eventLifecycle);
   }
@@ -23,7 +17,7 @@ export class LifecycleService {
   findAll(groupshopId: string) {
     return this.lifecycleRepository.find({
       where: { groupshopId },
-      order: { dataTime: -1 },
+      order: { dateTime: -1 },
     });
   }
 

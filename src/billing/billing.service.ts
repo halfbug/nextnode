@@ -487,7 +487,8 @@ export class BillingsService {
     const manager = getMongoManager();
     const TotalRev = await manager.aggregate(Billing, agg).toArray();
     // console.log('🚀 findMonthlyBilling ~ TotalRevenue', TotalRev);
-    return TotalRev[0];
+    const value = TotalRev.length > 0 ? TotalRev[0] : { _id: '', revenue: 0 };
+    return value;
   }
 
   async update(id: string, updateBillingInput: UpdateBillingInput) {

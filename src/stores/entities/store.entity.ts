@@ -16,8 +16,21 @@ export enum BillingPlanEnum {
   GROWTH, // 10001 -2500
   ENTERPRISE, //2500 - .....
 }
+export enum BillingTierEnum {
+  FREE,
+  TIER1,
+  TIER2,
+  TIER3,
+  TIER4,
+  TIER5,
+  TIER6,
+  TIER7,
+}
 registerEnumType(BillingPlanEnum, {
   name: 'BillingPlanEnum',
+});
+registerEnumType(BillingTierEnum, {
+  name: 'BillingTierEnum',
 });
 
 @InputType('ResourceInput')
@@ -98,6 +111,9 @@ export class Store {
   })
   plan?: BillingPlanEnum;
 
+  @Field(() => BillingTierEnum, { defaultValue: BillingTierEnum.FREE })
+  tier?: BillingTierEnum;
+
   @Field({ defaultValue: 0, nullable: true })
   totalGroupShop?: number;
 
@@ -112,6 +128,9 @@ export class Store {
 
   @Field({ nullable: true })
   planResetDate: Date;
+
+  @Field({ nullable: true })
+  tierRecurringDate: Date;
 
   @Field({ nullable: true })
   currencyCode: string;

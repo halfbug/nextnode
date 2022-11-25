@@ -74,6 +74,11 @@ export class GSPSavedListener {
 
     await this.partnerService.update(id, ugsp);
 
+    // create billing record for partner gs
+    // check active counts
+    // if tier then charge
+    // create lifecycle gsp satrted with id, storeid event gs partner started
+
     // Send Email by Klaviyo
     const qrImage = await this.kalavioService.generateQrCode(shortLink);
     const imgPath = event.brandLogo.split('/');

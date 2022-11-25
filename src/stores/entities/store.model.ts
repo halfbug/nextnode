@@ -3,7 +3,7 @@ import { DefaultColumnsService } from 'src/utils/default-columns/default-columns
 import { Settings } from './settings.model';
 import SocialLinks from 'src/campaigns/entities/social-link.model';
 import Campaign from 'src/campaigns/entities/campaign.model';
-import { BillingPlanEnum } from './store.entity';
+import { BillingPlanEnum, BillingTierEnum } from './store.entity';
 
 export class Resource {
   @Column({ nullable: true })
@@ -65,6 +65,9 @@ export default class Store extends DefaultColumnsService {
   @Column('enum', { default: BillingPlanEnum.EXPLORE })
   plan?: BillingPlanEnum;
 
+  @Column('enum', { default: BillingTierEnum.FREE })
+  tier?: BillingTierEnum;
+
   @Column({ default: 0, nullable: true })
   totalGroupShop?: number;
 
@@ -85,6 +88,9 @@ export default class Store extends DefaultColumnsService {
 
   @Column({ nullable: true })
   planResetDate: Date;
+
+  @Column({ nullable: true })
+  tierRecurringDate: Date;
 
   @Column({ nullable: true })
   currencyCode: string;

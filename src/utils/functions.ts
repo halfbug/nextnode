@@ -1,3 +1,5 @@
+import { BillingTierEnum } from 'src/stores/entities/store.entity';
+
 export const getDateDifference = (expiredAt) => {
   const expiryDate = new Date(expiredAt);
   const currentDate = new Date();
@@ -61,4 +63,22 @@ export function DateFormats(month: string, year: string) {
     sdate,
     edate,
   };
+}
+
+export function usageDescriptonForPartnerBilling(
+  tier: BillingTierEnum,
+  totalCharge,
+) {
+  switch (tier) {
+    case BillingTierEnum.FREE:
+      return `Partner-Groupshop Free-Tier ${'(1-3 partner groupshops)'}`;
+
+    default:
+      return `Partner-Groupshop ${tier}
+      >> ${new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })} - ${totalCharge}`;
+  }
 }

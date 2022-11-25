@@ -23,6 +23,7 @@ import { GsCommonModule } from 'src/gs-common/gs-common.module';
 import { PartnersModule } from 'src/partners/partners.module';
 import { RetentiontoolsModule } from 'src/retentiontools/retentiontools.module';
 import { StoreUpdatePlanCron } from './store.cron';
+import { StoreUpdateTierCron } from './storeTier.cron';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { StoreUpdatePlanCron } from './store.cron';
     UninstallService,
     CampaignInActiveListener,
     StoreUpdatePlanCron,
+    StoreUpdateTierCron,
   ],
   exports: [
     StoresService,
