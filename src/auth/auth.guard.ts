@@ -18,10 +18,10 @@ export class AuthGuard implements CanActivate {
         IS_PUBLIC_KEY,
         [context.getHandler(), context.getClass()],
       );
-      console.log(
-        '🚀 ~ file: auth.guard.ts ~ line 22 ~ AuthGuard ~ canActivate ~ isPublic',
-        isPublic,
-      );
+      // console.log(
+      //   '🚀 ~ file: auth.guard.ts ~ line 22 ~ AuthGuard ~ canActivate ~ isPublic',
+      //   isPublic,
+      // );
       if (isPublic) {
         return true;
       }

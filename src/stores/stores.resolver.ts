@@ -7,6 +7,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AuthEntity } from 'src/auth/entities/auth.entity';
 import { AuthDecorator } from 'src/auth/auth.decorator';
+import { Public } from 'src/auth/public.decorator';
 
 @Resolver(() => Store)
 @UseGuards(AuthGuard)
@@ -28,10 +29,20 @@ export class StoresResolver {
     return this.storesService.findActiveAll();
   }
 
+  @Public()
   @Query(() => Store, { name: 'storeName' })
-  async findOne(@Info() info: any, @AuthDecorator('shop') shop: string) {
+  async findOne(
+    @Info() info: any,
+    // @AuthDecorator('shop') shop: string,
+    @Args('shop') shop: string,
+  ) {
     const selectedFileds = info.fieldNodes[0].selectionSet.selections.map(
       (item) => item.name.value,
+    );
+    // const shop = sshop ?? qshop;
+    console.log(
+      '🚀 ~ file: stores.resolver.ts ~ line 43 ~ StoresResolver ~ shop',
+      shop,
     );
     const withCampaigns = selectedFileds.includes('campaigns');
     const res = await this.storesService.findOneWithCampaings(shop);
