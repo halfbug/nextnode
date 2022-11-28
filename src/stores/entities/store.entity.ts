@@ -58,6 +58,22 @@ export class Retentiontools {
   @Field({ nullable: true })
   updatedAt?: Date;
 }
+@ObjectType('MatchingBrandName')
+export class MatchingBrandName {
+  @Field({ nullable: true })
+  id: string;
+
+  @Field({ nullable: true })
+  brandName: string;
+}
+@ObjectType('DiscoveryTools')
+export class DiscoveryTools {
+  @Field({ nullable: true })
+  status?: string;
+
+  @Field(() => [MatchingBrandName], { nullable: 'itemsAndList' })
+  matchingBrandName?: MatchingBrandName[];
+}
 
 @ObjectType('Store')
 export class Store {
@@ -146,4 +162,7 @@ export class Store {
 
   @Field({ nullable: true })
   retentiontool?: Retentiontools;
+
+  @Field(() => DiscoveryTools, { nullable: true })
+  discoveryTool?: DiscoveryTools;
 }

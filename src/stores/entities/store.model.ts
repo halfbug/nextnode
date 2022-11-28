@@ -26,6 +26,20 @@ export class Retentiontools {
   @Column({ nullable: true })
   updatedAt?: Date;
 }
+export class MatchingBrandName {
+  @Column({ nullable: true })
+  id: string;
+
+  @Column({ nullable: true })
+  brandName: string;
+}
+export class DiscoveryTools {
+  @Column({ nullable: true })
+  status?: string;
+
+  @Column(() => MatchingBrandName)
+  matchingBrandName?: MatchingBrandName[];
+}
 
 @Entity()
 export default class Store extends DefaultColumnsService {
@@ -97,4 +111,7 @@ export default class Store extends DefaultColumnsService {
 
   @Column({ nullable: true })
   timezone: string;
+
+  @Column({ nullable: true })
+  discoveryTool: DiscoveryTools;
 }

@@ -52,4 +52,14 @@ export class StoresResolver {
   removeStore(@Args('id', { type: () => String }) id: string) {
     return this.storesService.remove(id);
   }
+
+  @Mutation(() => Store)
+  updateDiscoveryTools(
+    @Args('UpdateDiscoveryTools') UpdateDiscoveryTools: UpdateStoreInput,
+  ) {
+    return this.storesService.updateDiscoveryTool(
+      UpdateDiscoveryTools.id,
+      UpdateDiscoveryTools,
+    );
+  }
 }

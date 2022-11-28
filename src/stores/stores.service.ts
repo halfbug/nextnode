@@ -288,4 +288,14 @@ export class StoresService {
     // const salesTarget = res[0].salesTarget[0].salesTargets[0];
     return { ...res[0] };
   }
+
+  async updateDiscoveryTool(storeId: any, updateDiscoveryTool: any) {
+    console.log('storeId🚀🚀🚀', storeId);
+    console.log('updateDiscoveryTool🚀🚀🚀', updateDiscoveryTool);
+    await this.storeRepository.update(
+      { id: updateDiscoveryTool.id },
+      updateDiscoveryTool,
+    );
+    return await this.findOneById(updateDiscoveryTool.id);
+  }
 }

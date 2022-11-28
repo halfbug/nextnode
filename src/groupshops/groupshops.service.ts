@@ -1564,4 +1564,439 @@ export class GroupshopsService {
     const gs = await manager.aggregate(Groupshops, agg).toArray();
     return gs;
   }
+
+  async findGSWithStoreId(storeIds: any[]) {
+    const agg = [
+      {
+        $match: {
+          storeId: {
+            $in: storeIds,
+          },
+        },
+      },
+      {
+        $addFields: {
+          numMembers: { $size: '$members' },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'dealProducts.productId',
+          foreignField: 'id',
+          as: 'InventoryProducts',
+        },
+      },
+      {
+        $match: {
+          createdAt: {
+            $gt: new Date(+new Date() - 30 * 60 * 60 * 24 * 1000),
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'store',
+          localField: 'storeId',
+          foreignField: 'id',
+          as: 'store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$store',
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'parentId',
+          as: 'lineItemsDetails',
+        },
+      },
+      {
+        $addFields: {
+          lineItemsDetails: {
+            $filter: {
+              input: '$lineItemsDetails',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $gte: ['$$j.price', '1.01'],
+                  },
+                  {
+                    $not: {
+                      $in: ['$$j.product.id', '$store.hideProducts'],
+                    },
+                  },
+                  { $ne: ['$$j.product', null] },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'lineItemsDetails.product.id',
+          foreignField: 'id',
+          as: 'popularProducts',
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    lineItems: {
+                      $filter: {
+                        input: '$lineItemsDetails',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.orderId', '$$j.parentId'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'id',
+          as: 'orderDetails',
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    orderDetail: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$orderDetails',
+                            as: 'j',
+                            cond: {
+                              $and: [
+                                {
+                                  $eq: ['$$this.orderId', '$$j.id'],
+                                },
+                                {
+                                  $not: {
+                                    $in: [
+                                      '$$this.lineItems.product.id',
+                                      '$store.hideProducts',
+                                    ],
+                                  },
+                                },
+                              ],
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          popularProducts: {
+            $map: {
+              input: '$popularProducts',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    lineItems: {
+                      $filter: {
+                        input: '$lineItemsDetails',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.id', '$$j.product.id'],
+                        },
+                      },
+                    },
+                  },
+                  {
+                    orders: {
+                      $filter: {
+                        input: '$lineItemsDetails',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.id', '$$j.product.id'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              as: 'me',
+              in: {
+                $mergeObjects: [
+                  '$$me',
+                  {
+                    products: {
+                      $map: {
+                        input: '$$me.lineItems',
+                        in: {
+                          $arrayElemAt: [
+                            {
+                              $filter: {
+                                input: '$popularProducts',
+                                as: 'j',
+                                cond: {
+                                  $eq: ['$$this.product.id', '$$j.id'],
+                                },
+                              },
+                            },
+                            0,
+                          ],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'campaign',
+          localField: 'campaignId',
+          foreignField: 'id',
+          as: 'campaign',
+        },
+      },
+      {
+        $unwind: {
+          path: '$campaign',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'campaign.products',
+          foreignField: 'id',
+          as: 'campaignProducts',
+        },
+      },
+      {
+        $addFields: {
+          campaignProducts: {
+            $filter: {
+              input: '$campaignProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $gte: ['$$j.price', '1.01'],
+                  },
+                  {
+                    $not: {
+                      $in: ['$$j.id', '$store.hideProducts'],
+                    },
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'dealProducts.productId',
+          foreignField: 'id',
+          as: 'dealsProducts',
+        },
+      },
+      {
+        $addFields: {
+          dealsProducts: {
+            $filter: {
+              input: '$dealsProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $gte: ['$$j.price', '1.01'],
+                  },
+                  {
+                    $not: {
+                      $in: ['$$j.id', '$store.hideProducts'],
+                    },
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          ownerDealsProducts: {
+            $filter: {
+              input: '$dealProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $eq: ['$$j.type', 1],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          ownerDeals: {
+            $map: {
+              input: '$ownerDealsProducts',
+              in: {
+                $arrayElemAt: [
+                  {
+                    $filter: {
+                      input: '$dealsProducts',
+                      as: 'j',
+                      cond: {
+                        $eq: ['$$this.productId', '$$j.id'],
+                      },
+                    },
+                  },
+                  0,
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          refferalDealsProducts: {
+            $filter: {
+              input: '$dealProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $eq: ['$$j.type', 0],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          reffDeals: {
+            $map: {
+              input: '$refferalDealsProducts',
+              in: {
+                $arrayElemAt: [
+                  {
+                    $filter: {
+                      input: '$dealsProducts',
+                      as: 'j',
+                      cond: {
+                        $eq: ['$$this.productId', '$$j.id'],
+                      },
+                    },
+                  },
+                  0,
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          allProducts: {
+            $concatArrays: [
+              {
+                $ifNull: ['$dealsProducts', []],
+              },
+              {
+                $ifNull: ['$campaignProducts', []],
+              },
+            ],
+          },
+        },
+      },
+      {
+        $addFields: {
+          popularProducts: {
+            $concatArrays: [
+              {
+                $ifNull: ['$reffDeals', []],
+              },
+              {
+                $ifNull: ['$popularProducts', []],
+              },
+            ],
+          },
+        },
+      },
+      {
+        $addFields: {
+          bestSeller: {
+            $filter: {
+              input: '$allProducts',
+              as: 'j',
+              cond: {
+                $gte: ['$$j.purchaseCount', 1],
+              },
+            },
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    console.log('🎈🎈🎈gs', gs);
+    return gs;
+  }
 }

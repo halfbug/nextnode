@@ -13,6 +13,7 @@ import {
   MostViralCustomers,
   uniqueClicks,
   activeGroupshop,
+  MatchingGS,
 } from './entities/groupshop.entity';
 import { CreateGroupshopInput } from './dto/create-groupshops.input';
 import { UpdateGroupshopInput } from './dto/update-groupshops.input';
@@ -201,6 +202,15 @@ export class GroupshopsResolver {
         endDate,
       );
       return data;
+    }
+  }
+
+  @Query(() => [MatchingGS], { name: 'matchingGS' })
+  async AllMatchingGS(
+    @Args({ name: 'storeId', type: () => [String] }) storeId: string[],
+  ) {
+    if (storeId.length > 0) {
+      return await this.GroupshopsService.findGSWithStoreId(storeId);
     }
   }
 }

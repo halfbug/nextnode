@@ -103,6 +103,23 @@ export class Retentiontools {
   @Field({ nullable: true })
   updatedAt?: Date;
 }
+
+@InputType()
+export class MatchingBrandNameInput {
+  @Field({ nullable: true })
+  id: string;
+
+  @Field({ nullable: true })
+  brandName: string;
+}
+@InputType()
+export class DiscoveryToolsInput {
+  @Field({ nullable: true })
+  status?: string;
+
+  @Field(() => [MatchingBrandNameInput], { nullable: 'itemsAndList' })
+  matchingBrandName?: MatchingBrandNameInput[];
+}
 @InputType()
 export class CreateStoreInput {
   @Field()
@@ -178,4 +195,7 @@ export class CreateStoreInput {
 
   @Field({ nullable: true })
   tierRecurringDate: Date;
+
+  @Field(() => DiscoveryToolsInput, { nullable: true })
+  discoveryTool?: DiscoveryToolsInput;
 }
