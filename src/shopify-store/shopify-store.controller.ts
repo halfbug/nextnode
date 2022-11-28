@@ -22,6 +22,9 @@ import { HttpService } from '@nestjs/axios';
 import { lastValueFrom, map } from 'rxjs';
 import { PartnerService } from 'src/partners/partners.service';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
+import { AuthService } from 'src/auth/auth.service';
+import { Public } from 'src/auth/public.decorator';
+@Public()
 @Controller()
 export class ShopifyStoreController {
   constructor(
@@ -40,6 +43,7 @@ export class ShopifyStoreController {
     private httpService: HttpService,
     private partnerGSSrv: PartnerService,
     private readonly crypt: EncryptDecryptService,
+    private readonly authService: AuthService,
   ) {}
 
   // @Get()
@@ -54,21 +58,42 @@ export class ShopifyStoreController {
     console.log('inside login get request');
     const { query } = req;
     const shop = query.shop as string;
-    const store = await this.storesService.findOne(shop);
-    if (store && store.status === 'Active')
-      res.redirect(this.storeService.goToAppfront(store));
-    else if (shop) return this.storeService.login(req, res, shop);
+
+    // const store = await this.storesService.findOne(shop);
+    // console.log(
+    //   '🚀 ~ file: shopify-store.controller.ts ~ line 59 ~ ShopifyStoreController ~ login ~ store',
+    //   store,
+    // );
+    // if (store && store.status === 'Active')
+    //   return await this.storeService.loginOnline(req, res, shop);
+    // else
+    if (shop) return this.storeService.login(req, res, shop);
     else console.log('referer : ', req.headers.referer);
+    // res.redirect(this.storeService.goToAppfront(store));
+    // https://native-roots-dev.myshopify.com/admin/auth/login
   }
 
   @Get('callback')
-  callback(@Req() req: Request, @Res() res: Response) {
-    console.log('inside call back auth end');
+  async callback(@Req() req: Request, @Res() res: Response) {
+    console.log('inside shoify store callback');
     console.log('req.quer :', req.query);
     console.log('req.body :', req.body);
-    return this.storeService.callback(req, res, req.query.shop);
+    const store = await this.storesService.findOne(req.query.shop as string);
+    return this.storeService.callback(
+      req,
+      res,
+      req.query.shop,
+      store && store.status !== 'Uninstalled',
+    );
   }
 
+  // @Get('online/callback')
+  // callbackOnline(@Req() req: Request, @Res() res: Response) {
+  //   console.log('inside online callback');
+  //   console.log('req.quer :', req.query);
+  //   console.log('req.body :', req.body);
+  //   return this.storeService.callback(req, res, req.query.shop);
+  // }
   @Get('me')
   async whoami(@Query('name') name: any) {
     const { brandName, shop, id, activeCampaign, settings } =
@@ -143,7 +168,6 @@ export class ShopifyStoreController {
       await this.groupshopSrv.removeShop(store.id);
       await this.storesService.removeShop(shop);
       await this.billingService.removeByShop(store.id);
-      await this.partnerGSSrv.removeShop(store.id);
       return 'done';
     } catch (error) {
       return error.message;
@@ -186,7 +210,7 @@ export class ShopifyStoreController {
 
   @Get('type')
   async tesstme() {
-    return typeof this.configService.get('BILLING_LIVE');
+    return this.configService.get('BILLING_LIVE');
   }
 
   @Get('orderinput')

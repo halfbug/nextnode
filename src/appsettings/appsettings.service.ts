@@ -78,9 +78,11 @@ export class AppsettingsService {
     // );
     return starget;
   }
-  // findOne(id: string) {
-  //   return `This action returns a #${id} appsetting`;
-  // }
+  findOne(field: string) {
+    return this.appRepository.find({
+      where: { [field]: { $ne: null } },
+    });
+  }
 
   // update(id: string, updateAppsettingInput: UpdateAppsettingInput) {
   //   return `This action updates a #${id} appsetting`;

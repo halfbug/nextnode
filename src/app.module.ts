@@ -31,6 +31,7 @@ import {
 import { GsCommonModule } from './gs-common/gs-common.module';
 import { Lifecycle } from './gs-common/entities/lifecycle.modal';
 import { Visitors } from './gs-common/entities/visitors.modal';
+import { AuthModule } from './auth/auth.module';
 import { RetentiontoolsModule } from './retentiontools/retentiontools.module';
 import { VideoModule } from './videos/video.module';
 import { Video } from './videos/entities/video.modal';
@@ -105,6 +106,7 @@ import AdminUser from './admin-users/entities/admin-user.model';
     RetentiontoolsModule,
     VideoModule,
     AdminUsersModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

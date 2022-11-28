@@ -5,7 +5,10 @@ import { Collection } from './entities/collection.entity';
 import { Product } from './entities/product.entity';
 import { ProductQueryInput } from './dto/product-query.input';
 import { TotalProducts } from './entities/totalProducts.entity';
-
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { Public } from 'src/auth/public.decorator';
+@UseGuards(AuthGuard)
 @Resolver(() => Inventory)
 export class InventoryResolver {
   constructor(private readonly inventoryService: InventoryService) {}
@@ -32,6 +35,7 @@ export class InventoryResolver {
     return collections;
   }
 
+  @Public()
   @Query(() => [Product], { name: 'products' })
   findStoreProducts(
     @Args('productQueryInput') productQueryInput: ProductQueryInput,
@@ -39,6 +43,7 @@ export class InventoryResolver {
     return this.inventoryService.findStoreProducts(productQueryInput);
   }
 
+  @Public()
   @Query(() => Product, { name: 'productById' })
   findProductById(@Args('id') id: string) {
     console.log({ id });

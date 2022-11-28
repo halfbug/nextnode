@@ -24,6 +24,7 @@ import { ViewedInterceptor } from 'src/gs-common/viewed.inceptor';
 import { TotalRevenue } from 'src/billing/dto/monthly-billing.input';
 import { GSP_FEES1 } from 'src/utils/constant';
 import { TotalPGS } from './dto/partner-types.input';
+import { Public } from 'src/auth/public.decorator';
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
     GqlExecutionContext.create(ctx).getContext().req,
@@ -64,7 +65,7 @@ export class PartnersResolver {
     // console.log('🚀 ~ file: Partners.resolver.ts ~ findAll ');
     return await this.PartnerService.findAll(storeId);
   }
-
+  @Public()
   @Mutation(() => Partners)
   updatePartnerGroupshop(
     @Args('updatePartnersInput') updatePartnersInput: UpdatePartnersInput,
@@ -87,6 +88,7 @@ export class PartnersResolver {
   findPartnerDetail(@Args('id') id: string) {
     return this.PartnerService.getpartnerDetail(id);
   }
+  @Public()
   @UseInterceptors(ViewedInterceptor)
   @Query(() => Partners, { name: 'partnerGroupshop' })
   async findOne(@Args('code') code: string) {
@@ -97,6 +99,7 @@ export class PartnersResolver {
   async getPartnerRevenue(@Args('storeId') storeId: string) {
     return this.PartnerService.getPartnerRevenue(storeId);
   }
+  @Public()
   @Mutation(() => Partners, { name: 'addDealProductPartner' })
   addDealProductPartner(
     @Args('updatePartnersInput') updatePartnersInput: UpdatePartnersInput,

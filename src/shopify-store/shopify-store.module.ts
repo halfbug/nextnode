@@ -28,6 +28,7 @@ import { OrderCreatedListener } from './listeners/order-created.listener';
 import { GSUpdatePriceRuleListener } from './listeners/groupshop-updatePricerule.listener';
 import { PartnersModule } from 'src/partners/partners.module';
 import { GsCommonModule } from 'src/gs-common/gs-common.module';
+import { AuthModule } from 'src/auth/auth.module';
 @Global()
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { GsCommonModule } from 'src/gs-common/gs-common.module';
     forwardRef(() => GroupshopsModule),
     forwardRef(() => PartnersModule),
     forwardRef(() => GsCommonModule),
+    forwardRef(() => AuthModule),
     UploadImageModule,
     BillingModule,
   ],

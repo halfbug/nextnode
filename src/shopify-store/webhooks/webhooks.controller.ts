@@ -48,7 +48,8 @@ import { ProductMediaListener } from 'src/inventory/listeners/product-media.list
 import { LifecycleService } from 'src/gs-common/lifecycle.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { BillingPlanEnum } from 'src/stores/entities/store.entity';
-
+import { Public } from 'src/auth/public.decorator';
+@Public()
 @Controller('webhooks')
 export class WebhooksController {
   constructor(
@@ -1252,21 +1253,31 @@ export class WebhooksController {
                 (item) => item.recordType === 'Product',
               );
 
-              products.map((product) => {
-                console.log(
-                  '\x1b[36m%s\x1b[0m',
-                  '------ product.title : ',
+              // products.map((product) => {
+              //   console.log(
+              //     '\x1b[36m%s\x1b[0m',
+              //     '------ product.title : ',
 
-                  product.title,
+              //     product.title,
+              //   );
+              //   // this.inventryService.remove(product.id);
+              //   product.purchaseCount = 0;
+
+              //   this.inventryService.update(product);
+              //   this.inventryService.removeChildren(product.id);
+              //   this.inventryService.insertMany(
+              //     inventArr.filter((item) => item.parentId === product.id),
+              //   );
+              // });
+              // setTimeout(
+              //   async () =>
+              await this.inventryService.removeShop(shop),
+                //   5000,
+                // );
+                setTimeout(
+                  async () => await this.inventryService.insertMany(inventArr),
+                  5000,
                 );
-                // this.inventryService.remove(product.id);
-                product.purchaseCount = 0;
-                this.inventryService.update(product);
-                this.inventryService.removeChildren(product.id);
-                this.inventryService.insertMany(
-                  inventArr.filter((item) => item.parentId === product.id),
-                );
-              });
               console.log('color: #26bfa5;', '------------------------------');
               console.log(
                 '%cwebhooks.controller.ts line:1114 total inventory received',

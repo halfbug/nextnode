@@ -17,6 +17,7 @@ export class Resource {
 export class Subscription {
   @Column({ nullable: true })
   status?: string;
+  confirmationUrl?: string;
 }
 
 export class Retentiontools {

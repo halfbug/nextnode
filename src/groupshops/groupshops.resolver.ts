@@ -32,6 +32,7 @@ import { LifecycleService } from 'src/gs-common/lifecycle.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { GSUpdatePriceRuleEvent } from './events/groupshop-update-price-rule.event';
 import { TotalGS } from 'src/billing/dto/monthly-billing.input';
+import { Public } from 'src/auth/public.decorator';
 
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
@@ -99,12 +100,13 @@ export class GroupshopsResolver {
     return result;
   }
 
+  @Public()
   @Query(() => activeGroupshop, { name: 'getActiveGroupshop' })
   async getActiveGroupshop(@Args('storeId') storeId: string) {
     const result = await this.GroupshopsService.getActiveGroupshop(storeId);
     return result;
   }
-
+  @Public()
   @Query(() => [activeGroupshop], { name: 'getActiveGroupshops' })
   async getActiveGroupshops(@Args('email') email: string) {
     const result = await this.GroupshopsService.getActiveGroupshops(email);
@@ -115,6 +117,7 @@ export class GroupshopsResolver {
     return result;
   }
 
+  @Public()
   @UseInterceptors(ViewedInterceptor)
   @Query(() => Groupshop, { name: 'groupshop' })
   async findOne(@Args('code') code: string, @Args('status') status: string) {
@@ -159,7 +162,7 @@ export class GroupshopsResolver {
     }
     return await this.GroupshopsService.findOne(await this.crypt.decrypt(code));
   }
-
+  @Public()
   @Mutation(() => Groupshop, { name: 'addDealProduct' })
   addDealProduct(
     @Args('updateGroupshopInput') updateGroupshopInput: UpdateGroupshopInput,

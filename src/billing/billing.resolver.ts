@@ -20,6 +20,8 @@ import { Metrics } from 'src/campaigns/entities/campaign.entity';
 import { ConfigService } from '@nestjs/config';
 import { UpdateStoreInput } from 'src/stores/dto/update-store.input';
 import { LifecycleService } from 'src/gs-common/lifecycle.service';
+import { AuthDecorator } from 'src/auth/auth.decorator';
+import { AuthEntity } from 'src/auth/entities/auth.entity';
 
 @Resolver(() => Billing)
 export class BillingsResolver {
@@ -150,9 +152,11 @@ export class BillingsResolver {
 
   @Mutation(() => AppSubscription, { name: 'billingSubscription' })
   async getBillingSubs(
-    @Args('shop') shop: string,
-    @Args('accessToken') accessToken: string,
+    // @Args('shop') shop: string,
+    // @Args('accessToken') accessToken: string,
+    @AuthDecorator('currentSession') currentSession: AuthEntity,
   ) {
+    const { shop, accessToken } = currentSession;
     this.shopifyapi.shop = shop;
     this.shopifyapi.accessToken = accessToken;
     const store: UpdateStoreInput = await this.storeService.findOne(shop);

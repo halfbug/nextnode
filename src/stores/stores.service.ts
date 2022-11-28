@@ -88,11 +88,11 @@ export class StoresService {
       },
     ];
     const res = await manager.aggregate(Store, agg).toArray();
-    // console.log(
-    //   '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
-    //   res[0],
-    // );
-    if (typeof res[0].industry === 'string') {
+    console.log(
+      '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
+      res[0],
+    );
+    if (typeof res[0]?.industry === 'string') {
       return { ...res[0], industry: [res[0].industry] };
     } else {
       return { ...res[0] };

@@ -1,10 +1,16 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
-import Shopify, { AuthQuery, ApiVersion } from '@shopify/shopify-api';
+import Shopify, {
+  ApiVersion,
+  AuthQuery,
+  RegisterReturn,
+  SessionInterface,
+} from '@shopify/shopify-api';
 import { HttpService } from '@nestjs/axios';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { TokenReceivedEvent } from '../events/token-received.event';
+import { lastValueFrom, map } from 'rxjs';
 
 @Injectable()
 export class ShopifyService {
@@ -28,9 +34,12 @@ export class ShopifyService {
     });
   }
 
-  async currentSession(req: Request, res: Response) {
-    console.log('test stage');
-    return await Shopify.Utils.loadCurrentSession(req, res, false);
+  async currentSession(req: Request, res: Response, isOnline: boolean) {
+    return await Shopify.Utils.loadCurrentSession(req, res, isOnline);
+  }
+
+  async storeSession(session: SessionInterface) {
+    return await Shopify.Session.MemorySessionStorage;
   }
 
   async client(shop: string, accessToken: string) {
@@ -41,29 +50,115 @@ export class ShopifyService {
     return new Shopify.Clients.Rest(shop, accessToken);
   }
 
-  async beginAuth(req: Request, res: Response, shop: string) {
-    return await Shopify.Auth.beginAuth(req, res, shop, '/callback', false);
+  async beginAuth(
+    req: Request,
+    res: Response,
+    shop: string,
+    redirectUrl = '/callback',
+    isOnline = false,
+  ) {
+    return await Shopify.Auth.beginAuth(req, res, shop, redirectUrl, isOnline);
   }
   async validateAuth(req: Request, res: Response) {
     try {
-      await Shopify.Auth.validateAuthCallback(
+      const sess = await Shopify.Auth.validateAuthCallback(
         req,
         res,
         req.query as unknown as AuthQuery,
       ); // req.query must be cast to unkown and then AuthQuery in order to be accepted
+      console.log({ sess });
+      return sess;
     } catch (error) {
-      console.error(JSON.stringify(error)); // in practice these should be handled more gracefully
+      console.error(error); // in practice these should be handled more gracefully
+      Logger.error(error, ShopifyService.name);
+    }
+  }
+
+  async validateAuthOnline(req: Request, res: Response) {
+    try {
+      // const sess = await Shopify.Auth.validateAuthCallback(
+      //   req,
+      //   res,
+      //   req.query as unknown as AuthQuery,
+      // ); // req.query must be cast to unkown and then AuthQuery in order to be accepted
+      // console.log({ sess });
+      const shop = req.query.shop as string;
+      // /* eslint-disable @typescript-eslint/naming-convention */
+      const body = JSON.stringify({
+        client_id: this.configService.get('SHOPIFY_API_KEY'),
+        client_secret: this.configService.get('SHOPIFY_API_SECRET'),
+        code: req.query.code,
+      });
+      /* eslint-enable @typescript-eslint/naming-convention */
+
+      // const postParams = {
+      //   path: '/admin/oauth/access_token',
+      //   type: DataType.JSON,
+      //   data: body,
+      // };
+      // const cleanShop = sanitizeShop(query.shop, true)!;
+
+      // const client = new HttpClient(cleanShop);
+      // const postResponse = await client.post(postParams);
+      // Accept: 'application/json',
+      const options = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+      // this.httpService
+      //   .post(`https://${shop}/admin/oauth/access_token`, body, options)
+      //   .subscribe(
+      //     (res) => {
+      //       console.log(res.data);
+      //       return res.data;
+      //     },
+      //     (error) => {
+      //       //Error callback
+      //       console.error('error caught in component');
+      //       // console.log(error);
+
+      //       //throw error;   //You can also throw the error to a global error handler
+      //     },
+      //   );
+      const res = await lastValueFrom(
+        this.httpService
+          .post(`https://${shop}/admin/oauth/access_token`, body, options)
+          .pipe(map((res) => res.data)),
+      );
+      console.log(
+        '🚀 ~ file: shopify.service.ts ~ line 123 ~ ShopifyService ~ validateAuthOnline ~ res',
+        res,
+      );
+      // const session: Session = createSession(
+      //   postResponse,
+      //   cleanShop,
+      //   stateFromCookie,
+      //   isOnline,
+      // );
+      return res;
+    } catch (error) {
+      console.error(error); // in practice these should be handled more gracefully
       Logger.error(error, ShopifyService.name);
     }
   }
 
   async offlineSession(shop: string) {
+    // const session = await Shopify.Utils.loadOfflineSession(shop);
     const session = await Shopify.Utils.loadOfflineSession(shop);
     const tokenReceivedEvent = new TokenReceivedEvent();
     tokenReceivedEvent.token = session.accessToken;
     tokenReceivedEvent.session = session;
     this.eventEmitter.emit('token.received', tokenReceivedEvent);
+    // await Shopify.Utils.deleteOfflineSession(shop);
     return session;
+  }
+
+  emitTokenReceivedEvent(session) {
+    const tokenReceivedEvent = new TokenReceivedEvent();
+    tokenReceivedEvent.token = session.accessToken;
+    tokenReceivedEvent.session = session;
+    this.eventEmitter.emit('token.received', tokenReceivedEvent);
   }
 
   offlineSessionID(shop: string) {
@@ -527,8 +622,16 @@ export class ShopifyService {
       Logger.debug(sdetail, ShopifyService.name);
       return sdetail;
     } catch (err) {
-      console.log(err.message);
+      // console.log(err.message);
       Logger.error(err, ShopifyService.name);
+      throw new HttpException(
+        {
+          status: HttpStatus.UNAUTHORIZED,
+          error: JSON.stringify(err.message),
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+      // return err;
     }
   }
 

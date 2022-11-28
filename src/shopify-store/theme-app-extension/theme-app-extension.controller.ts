@@ -12,7 +12,8 @@ import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { ConfigService } from '@nestjs/config';
 import { StoresService } from 'src/stores/stores.service';
 import { PartnerService } from 'src/partners/partners.service';
-
+import { Public } from 'src/auth/public.decorator';
+@Public()
 @Controller('ext')
 export class ThemeAppExtensionController {
   constructor(

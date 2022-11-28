@@ -27,7 +27,8 @@ import * as getSymbolFromCurrency from 'currency-symbol-map';
 import { TokenReceivedEvent } from 'src/shopify-store/events/token-received.event';
 import { UploadImageService } from 'src/shopify-store/ImageUpload/uploadimage.service';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
-
+import { Public } from 'src/auth/public.decorator';
+@Public()
 @Controller('connect')
 export class CatController {
   [x: string]: any;

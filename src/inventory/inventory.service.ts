@@ -38,6 +38,7 @@ export class InventoryService {
 
   async update(updateInvenotryInput: UpdateInventoryInput) {
     const { id } = updateInvenotryInput;
+    await this.remove(id);
     // return await this.inventoryRepository.update({ id }, updateInvenotryInput);
     // return await this.inventoryRepository.save(updateInvenotryInput);
     const manager = getMongoManager();

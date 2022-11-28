@@ -15,11 +15,13 @@ import { ImageFileDTO, ImageResponseDTO } from './UploadImageDTO';
 import { UploadImageService } from './uploadimage.service';
 import { Express } from 'express';
 import { UploadedFiles } from '@nestjs/common';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('image')
 export class UploadImageController {
   constructor(private readonly uploadImageService: UploadImageService) {}
 
+  @Public()
   @Post('')
   @UseInterceptors(FileInterceptor('image', { limits: { files: 1 } }))
   @ApiResponse({ status: HttpStatus.CREATED, type: ImageResponseDTO })
@@ -45,6 +47,7 @@ export class UploadImageController {
     }
   }
 
+  @Public()
   @Post('video')
   @UseInterceptors(FilesInterceptor('video'))
   @ApiResponse({ status: HttpStatus.CREATED, type: ImageResponseDTO })
@@ -70,6 +73,7 @@ export class UploadImageController {
     }
   }
 
+  @Public()
   @Get('')
   @ApiResponse({ status: HttpStatus.CREATED, type: ImageResponseDTO })
   async getImageUrl(@Req() req, @Res() response) {

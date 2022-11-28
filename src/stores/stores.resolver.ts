@@ -3,8 +3,13 @@ import { StoresService } from './stores.service';
 import { Store } from './entities/store.entity';
 import { CreateStoreInput } from './dto/create-store.input';
 import { UpdateStoreInput } from './dto/update-store.input';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthEntity } from 'src/auth/entities/auth.entity';
+import { AuthDecorator } from 'src/auth/auth.decorator';
 
 @Resolver(() => Store)
+@UseGuards(AuthGuard)
 export class StoresResolver {
   constructor(private readonly storesService: StoresService) {}
 
@@ -24,7 +29,7 @@ export class StoresResolver {
   }
 
   @Query(() => Store, { name: 'storeName' })
-  async findOne(@Args('shop') shop: string, @Info() info: any) {
+  async findOne(@Info() info: any, @AuthDecorator('shop') shop: string) {
     const selectedFileds = info.fieldNodes[0].selectionSet.selections.map(
       (item) => item.name.value,
     );
@@ -48,10 +53,10 @@ export class StoresResolver {
     return this.storesService.update(updateStoreInput.id, updateStoreInput);
   }
 
-  @Mutation(() => Store)
-  removeStore(@Args('id', { type: () => String }) id: string) {
-    return this.storesService.remove(id);
-  }
+  // @Mutation(() => Store)
+  // removeStore(@Args('id', { type: () => String }) id: string) {
+  //   return this.storesService.remove(id);
+  // }
 
   @Mutation(() => Store)
   updateDiscoveryTools(

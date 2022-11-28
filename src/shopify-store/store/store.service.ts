@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Shopify, { ApiVersion, AuthQuery } from '@shopify/shopify-api';
+import Store from 'src/stores/entities/store.model';
 import { ShopifyService } from '../shopify/shopify.service';
 
 @Injectable()
@@ -41,7 +42,12 @@ export class StoreService {
   }
 
   async login(req, res, shop) {
-    const authRoute = await this.shopifyapi.beginAuth(req, res, shop);
+    const authRoute = await this.shopifyapi.beginAuth(
+      req,
+      res,
+      shop,
+      '/callback',
+    );
     // console.log(
     //   '🚀 ~ file: store.service.ts ~ line 45 ~ StoreService ~ login ~ authRoute',
     //   JSON.stringify(authRoute),
@@ -49,7 +55,22 @@ export class StoreService {
     return res.redirect(authRoute);
   }
 
-  async callback(req, res, shop) {
+  // async loginOnline(req, res, shop) {
+  //   console.log('loginOnline');
+  //   const authRoute = await this.shopifyapi.beginAuth(
+  //     req,
+  //     res,
+  //     shop,
+  //     '/online/callback',
+  //     true,
+  //   );
+  //   console.log(
+  //     '🚀 ~ file: auth.service.ts ~ line 22 ~ AuthService ~ loginOnline ~ authRoute',
+  //     authRoute,
+  //   );
+  //   return authRoute;
+  // }
+  async callback(req, res, shop, isStoreExist) {
     console.log(
       '🚀 ~ file: store.service.ts ~ line 49 ~ StoreService ~ callback ~ shop',
       JSON.stringify(shop),
@@ -60,15 +81,28 @@ export class StoreService {
       ' file: store.service.ts ~ line 51 ~ StoreService ~ callback ~ validateRes',
       JSON.stringify(validateRes),
     );
-    const offlineSessRes = await this.shopifyapi.offlineSession(shop);
-    console.log(
-      '🚀 ~ file: store.service.ts ~ line 56 ~ StoreService ~ callback ~ offlineSessRes',
-      JSON.stringify(offlineSessRes),
-    );
 
-    res.header('shop', shop);
-    const shopName = shop.split('.')[0];
-    return res.redirect(`${this.configService.get('FRONT')}/${shopName}/0`); // wherever you want your user to end up after OAuth completes
+    // this.shopifyapi.emitTokenReceivedEvent(validateRes);
+    const session = await this.shopifyapi.currentSession(req, res, true);
+    console.log('🚀 ----------currentSession --------~ online', session);
+
+    // @todo: update offine token to database
+
+    //   check change of scope
+    if (!Shopify.Context.SCOPES.equals(session.scope)) {
+      return res.redirect(`https://${shop}/admin/oauth/authorize`); // Scopes have changed, the app should redirect the merchant to OAuth
+    }
+    if (!isStoreExist) {
+      const offlineSessRes = await this.shopifyapi.offlineSession(shop);
+      console.log(
+        '🚀 ~ file: store.service.ts ~ line 56 ~ StoreService ~ callback ~ offlineSessRes',
+        JSON.stringify(offlineSessRes),
+      );
+    }
+    return res.redirect(`/auth?store=${shop}`);
+
+    // const shopName = shop.split('.')[0];
+    // return res.redirect(`${this.configService.get('FRONT')}/${shopName}/0`); // wherever you want your user to end up after OAuth completes
   }
 
   async loadSession(shop: string) {
