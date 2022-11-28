@@ -1,4 +1,3 @@
-import { freemem } from 'os';
 import { BillingTierEnum } from 'src/stores/entities/store.entity';
 
 export const TEST = 'test';
@@ -62,6 +61,7 @@ export const GSP_FEES1 = [
   { index: 5, name: BillingTierEnum.TIER5, fee: 1000, limit: '100' },
   { index: 6, name: BillingTierEnum.TIER6, fee: 2500, limit: '100+' },
 ];
+console.log('🚀 ~ file: constant.ts ~ line 57 ~ GSP_FEES1 real', GSP_FEES1);
 
 export const GSP_SWITCH_NUM = [
   GS_TIER1_START_COUNT,

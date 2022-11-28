@@ -168,6 +168,7 @@ export class ShopifyStoreController {
       await this.groupshopSrv.removeShop(store.id);
       await this.storesService.removeShop(shop);
       await this.billingService.removeByShop(store.id);
+      await this.partnerGSSrv.removeShop(store.id);
       return 'done';
     } catch (error) {
       return error.message;

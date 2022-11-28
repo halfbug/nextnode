@@ -11,6 +11,12 @@ export class TotalPGS {
   tierCharges?: number;
   @Field({ nullable: true })
   tierLimit?: string;
+  @Field({ nullable: true })
+  currentTierName?: number;
+  @Field({ nullable: true })
+  currentTierCharges?: number;
+  @Field({ nullable: true })
+  currentTierLimit?: string;
 }
 @ObjectType()
 export class StorePayloadType {

@@ -111,13 +111,21 @@ export class PartnersResolver {
   }
   @Query(() => TotalPGS, { name: 'getActivePartnersCount' })
   async getActivePartnersCount(@Args('storeId') storeId: string) {
+    console.log(
+      '🚀 ~ file: partners.resolver.ts ~ line 111 ~ PartnersResolver ~ getActivePartnersCount ~ storeId',
+      storeId,
+    );
     const { count } = await this.PartnerService.getActivePartnersCount(storeId);
     const { tier } = await this.storesService.findById(storeId);
     // find tier Info Object of current tier. if tier field not exist then bring first free tier info
-    // eslint-disable-next-line prettier/prettier
-    const tierInfo = GSP_FEES1.find(
-      (itm, ind) => itm.index === tier,
+    console.log(
+      '🚀 ~ file: partners.resolver.ts ~ line 120 ~ PartnersResolver ~ getActivePartnersCount ~ GSP_FEES1',
+      GSP_FEES1,
     );
+    const tierInfo = { ...GSP_FEES1[tier] };
+    // .find(
+    //   (itm, ind) => itm.index == tier,
+    // );
     console.log(
       '🚀 tierInfo = ',
       tierInfo,
@@ -126,16 +134,20 @@ export class PartnersResolver {
       '🚀 count = ',
       count,
     );
-    const nextTierIndex = count === 0 ? tierInfo.index + 1 : tierInfo.index + 1;
-    tierInfo.name = GSP_FEES1[nextTierIndex].name;
-    tierInfo.fee = GSP_FEES1[nextTierIndex].fee;
-    tierInfo.limit = GSP_FEES1[nextTierIndex].limit;
-    // }
+    const nextTierIndex = tierInfo.index + 1;
+    const nexttierInfo = { ...GSP_FEES1[nextTierIndex] };
+    console.log(
+      '🚀 ~ file: partners.resolver.ts ~ line 135 ~ PartnersResolver ~ getActivePartnersCount ~ netxtierInfo',
+      nexttierInfo,
+    );
     return {
       count: count ?? 0,
-      tierName: tierInfo.name,
-      tierCharges: tierInfo.fee,
-      tierLimit: tierInfo.limit,
+      tierName: nexttierInfo.name,
+      tierCharges: nexttierInfo.fee,
+      tierLimit: nexttierInfo.limit,
+      currentTierName: tierInfo.name,
+      currentTierCharges: tierInfo.fee,
+      currentTierLimit: tierInfo.limit,
     };
   }
 }
