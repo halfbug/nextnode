@@ -52,7 +52,11 @@ export class AuthController {
     console.log('auth - req.quer :', req.query);
     console.log('auth - req.body :', req.body);
     const session = await this.shopifyService.validateAuth(req, res);
-    console.log(session);
+    console.log(
+      '🚀 ~ file: auth.controller.ts ~ line 55 ~ AuthController ~ callback ~ session',
+      session,
+    );
+
     //get session
     const currentSession = await this.shopifyService.currentSession(
       req,
@@ -64,13 +68,14 @@ export class AuthController {
       currentSession,
     );
     //  sign JWT token
+    const mainSession = currentSession.isOnline ? currentSession : session;
     const {
       id,
       shop,
       expires,
       accessToken,
       onlineAccessInfo: { associated_user: user },
-    } = currentSession;
+    } = mainSession;
 
     const token = this.authService.signJwt({
       id,
