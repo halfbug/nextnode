@@ -1045,7 +1045,11 @@ export class WebhooksController {
         appsub['app_subscription']['status'].toUpperCase();
       // if (appsub['app_subscription']['status'] === 'ACTIVE') {
       this.storesService.updateField(
-        { shop },
+        {
+          shop,
+          'subscription.appSubscription.id':
+            appsub['app_subscription'].admin_graphql_api_id,
+        },
         {
           'subscription.status': subscriptionStatus,
           installationStep: subscriptionStatus === 'ACTIVE' ? null : 5,

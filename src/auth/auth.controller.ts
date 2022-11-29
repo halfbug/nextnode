@@ -19,7 +19,7 @@ import { Public } from './public.decorator';
 import { v4 as uuid } from 'uuid';
 import { AuthEntity, User } from './entities/auth.entity';
 import { randomInt } from 'crypto';
-import { AuthDecorator } from 'src/auth/auth.decorator';
+// import { AuthDecorator } from 'src/auth/auth.decorator';
 // import { UpdateAuthDto } from './dto/update-auth.dto';
 
 @Controller('auth')
