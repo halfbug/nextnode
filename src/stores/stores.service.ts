@@ -241,6 +241,72 @@ export class StoresService {
     return { ...res[0] };
   }
 
+  async findOneWithActiveCampaingProducts(shop: string): Promise<Store> {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          shop: {
+            $regex: shop,
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'campaign',
+          let: {
+            store_id: '$id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ['$storeId', '$$store_id'],
+                    },
+                    {
+                      $eq: ['$isActive', true],
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              $sort: {
+                'campaign.createdAt': -1,
+              },
+            },
+            {
+              $limit: 1,
+            },
+          ],
+          as: 'activeCampaign',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'activeCampaign.products',
+          foreignField: 'id',
+          as: 'allProducts',
+        },
+      },
+      {
+        $unwind: {
+          path: '$activeCampaign',
+        },
+      },
+    ];
+    const res = await manager.aggregate(Store, agg).toArray();
+    // console.log(
+    //   '🚀 ~ file: stores.service.ts ~ line 69 ~ StoresService ~ findOneByName ~ res',
+    //   res,
+    // );
+    // const salesTarget = res[0].salesTarget[0].salesTargets[0];
+    return { ...res[0] };
+  }
+
   async findOneWithActiveCampaignByStoreId(storeId: string) {
     const manager = getMongoManager();
     const agg = [

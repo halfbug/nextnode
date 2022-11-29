@@ -9,6 +9,7 @@ import { Campaign } from 'src/campaigns/entities/campaign.entity';
 import { AnyScalar } from 'src/utils/any.scalarType';
 import { Settings } from './settings.entity';
 import { SocialLinks } from 'src/campaigns/entities/social-links.entity';
+import { Product } from 'src/inventory/entities/product.entity';
 
 export enum BillingPlanEnum {
   EXPLORE, // 30days
@@ -121,6 +122,9 @@ export class Store {
 
   @Field(() => Campaign, { nullable: true })
   activeCampaign?: Campaign;
+
+  @Field(() => [Product], { nullable: 'itemsAndList' })
+  allProducts?: Product[];
 
   @Field(() => BillingPlanEnum, {
     defaultValue: BillingPlanEnum.EXPLORE,

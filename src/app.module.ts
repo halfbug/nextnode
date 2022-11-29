@@ -36,7 +36,10 @@ import { RetentiontoolsModule } from './retentiontools/retentiontools.module';
 import { VideoModule } from './videos/video.module';
 import { Video } from './videos/entities/video.modal';
 import { AdminUsersModule } from './admin-users/admin-users.module';
+import { ChannelModule } from './channel/channel.module';
 import AdminUser from './admin-users/entities/admin-user.model';
+import Channel from './channel/entities/channel.model';
+import ChannelGroupshop from './channel/entities/channelgroupshop.model';
 
 @Module({
   imports: [
@@ -80,6 +83,8 @@ import AdminUser from './admin-users/entities/admin-user.model';
             Partnermember,
             Video,
             AdminUser,
+            Channel,
+            ChannelGroupshop,
           ],
         };
       },
@@ -106,6 +111,7 @@ import AdminUser from './admin-users/entities/admin-user.model';
     RetentiontoolsModule,
     VideoModule,
     AdminUsersModule,
+    ChannelModule,
     AuthModule,
   ],
 })

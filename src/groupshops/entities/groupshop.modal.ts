@@ -165,4 +165,10 @@ export class Groupshops extends DefaultColumnsService {
 
   @Column({ nullable: true })
   isInfluencer?: boolean;
+
+  @Column({ nullable: true })
+  isChannel?: boolean;
+
+  @Column()
+  channelId?: string;
 }
