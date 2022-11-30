@@ -3,6 +3,7 @@ import { VideoService } from './video.service';
 import { Video } from './entities/video.entity';
 import { CreateVideoInput } from './dto/create-video.input';
 import { UpdateVideoInput } from './dto/update-video.input';
+import { Public } from 'src/auth/public.decorator';
 
 @Resolver(() => Video)
 export class VideoResolver {
@@ -13,6 +14,7 @@ export class VideoResolver {
     return this.videoService.create(createVideoInput);
   }
 
+  @Public()
   @Query(() => [Video], { name: 'videos' })
   findAll(@Args('storeId', { type: () => String }) storeId: string) {
     return this.videoService.findAll(storeId);
