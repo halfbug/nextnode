@@ -44,20 +44,20 @@ export class ChannelGroupshopService {
     });
     const channelGroupshop = await this.channelGroupshopRepository.save(temp);
     const _id = channelGroupshop._id;
-    const { shop, accessToken } = await this.storesService.findById(
+    const { shop, accessToken, brandName } = await this.storesService.findById(
       createChannelGroupshopInput.storeId,
     );
 
     const {
       rewards: { baseline },
       name,
+      slugName,
     } = await this.channelService.findOne(channelGroupshop.channelId);
 
     const title = ChannelGroupshopService.formatTitle(_id);
-
-    const cryptURL = `/${shop.split('.')[0]}/ch/${name}/${this.crypt.encrypt(
-      title,
-    )}`;
+    const cryptURL = `/${
+      shop.split('.')[0]
+    }/ch/${slugName}/${this.crypt.encrypt(title)}`;
     const fulllink = `${this.configSevice.get('FRONT')}${cryptURL}`;
     const shortLink = await this.kalavioService.generateShortLink(fulllink);
 
@@ -85,6 +85,25 @@ export class ChannelGroupshopService {
     );
 
     const gs = await this.update(id, ucg);
+
+    const mdata = {
+      firstName: createChannelGroupshopInput.customerDetail.firstName,
+      lastName: createChannelGroupshopInput.customerDetail.lastName,
+      email: createChannelGroupshopInput.customerDetail.email,
+      shortUrl: shortLink,
+      percentage: baseline,
+      channelName: name,
+      brandName: brandName,
+    };
+    const body = {
+      event: 'Groupshop Channel Creation',
+      customer_properties: {
+        $email: createChannelGroupshopInput.customerDetail.email,
+      },
+      properties: mdata,
+    };
+    this.kalavioService.sendKlaviyoEmail(body);
+
     return gs;
   }
 
