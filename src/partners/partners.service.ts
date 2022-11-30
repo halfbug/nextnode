@@ -708,26 +708,28 @@ export class PartnerService {
     };
 
     if (GSP_SWITCH_NUM.includes(gspCount) && latestTier !== tier) {
-      // 1 create log
-      this.lifecyclesrv.create({
-        storeId: createPartnersInput.storeId,
-        event: EventType.partnerTierSwitch,
-        tier: latestTier,
-        dateTime: new Date(),
-      });
-      // 2. charge merchant
+      // 1. charge merchant
       const chargedTier = GSP_FEES1.find((item) => item.name === latestTier);
       console.log(
         '🚀 ~ file: partners.service.ts ~ line 710 ~ PartnerService ~ create ~ chargedTier',
         chargedTier,
       );
+      console.log('merchant charged for partner tier');
       const chargedAmount: number = chargedTier.fee;
-      // const chargedAmount = 2;
       const shopifyRes = await this.shopifyapi.appUsageRecordCreate(
         subscription?.['appSubscription']['lineItems'][0]['id'],
         chargedAmount,
         usageDescriptonForPartnerBilling(latestTier, chargedAmount.toFixed(2)),
       );
+      // 2 create log
+      this.lifecyclesrv.create({
+        storeId: createPartnersInput.storeId,
+        event: EventType.partnerTierSwitch,
+        tier: latestTier,
+        dateTime: new Date(),
+        charge: chargedAmount,
+      });
+
       // 3 update store tier change , 4 update recurring date
       payload = {
         id: createPartnersInput.storeId,

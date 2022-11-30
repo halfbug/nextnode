@@ -57,4 +57,8 @@ export class Lifecycle {
   @Column('enum', { nullable: true })
   @Field({ nullable: true })
   tier?: BillingTierEnum;
+
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  charge?: number;
 }

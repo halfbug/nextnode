@@ -35,7 +35,7 @@ export class StoreUpdateTierCron {
     private partnerService: PartnerService,
   ) {}
   @Cron('30 0 23 * * *')
-  //   @Cron(CronExpression.EVERY_DAY_AT_)
+  // @Cron(CronExpression.EVERY_10_SECONDS)
   async handleTierCron() {
     // console.log('im in cron');
     try {
@@ -115,23 +115,27 @@ export class StoreUpdateTierCron {
               tierRecurringDate: nextDate,
               tier: latestTier.name,
             };
-            const shopifyRes = await this.shopifyapi.appUsageRecordCreate(
-              store.subscription?.['appSubscription']['lineItems'][0]['id'],
-              chargedAmount,
-              usageDescriptonForPartnerBilling(
-                store.tier,
-                chargedAmount.toFixed(2),
-              ),
-            );
-            // update the recurr date in store for next 30 days
+            if (latestTier.fee !== 0) {
+              // 1. charge merchant for active gs tier
+              const shopifyRes = await this.shopifyapi.appUsageRecordCreate(
+                store.subscription?.['appSubscription']['lineItems'][0]['id'],
+                chargedAmount,
+                usageDescriptonForPartnerBilling(
+                  store.tier,
+                  chargedAmount.toFixed(2),
+                ),
+              );
+            }
+            // 2. update the recurr date in store for next 30 days
             const updatedStore = await this.storesService.update(id, payload);
 
-            // life cycle record
+            // 3. life cycle record
             this.lifecyclesrv.create({
               storeId: store.id,
               event: EventType.partnerRecurringCharged,
               tier: store.tier,
               dateTime: new Date(),
+              charge: chargedAmount,
             });
           }
         }

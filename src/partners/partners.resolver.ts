@@ -22,7 +22,16 @@ import {
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import { ViewedInterceptor } from 'src/gs-common/viewed.inceptor';
 import { TotalRevenue } from 'src/billing/dto/monthly-billing.input';
-import { GSP_FEES1 } from 'src/utils/constant';
+import {
+  GSP_FEES1,
+  GSP_SWITCH_NUM,
+  GS_TIER1_START_COUNT,
+  GS_TIER2_START_COUNT,
+  GS_TIER3_START_COUNT,
+  GS_TIER4_START_COUNT,
+  GS_TIER5_START_COUNT,
+  GS_TIER6_START_COUNT,
+} from 'src/utils/constant';
 import { TotalPGS } from './dto/partner-types.input';
 import { Public } from 'src/auth/public.decorator';
 export const ReqDecorator = createParamDecorator(
@@ -109,37 +118,19 @@ export class PartnersResolver {
       updatePartnersInput,
     );
   }
-  @Query(() => TotalPGS, { name: 'getActivePartnersCount' })
-  async getActivePartnersCount(@Args('storeId') storeId: string) {
-    console.log(
-      '🚀 ~ file: partners.resolver.ts ~ line 111 ~ PartnersResolver ~ getActivePartnersCount ~ storeId',
-      storeId,
-    );
+  @Query(() => TotalPGS, { name: 'getAllPartnerTiersInfo' })
+  async getAllPartnerTiersInfo(@Args('storeId') storeId: string) {
     const { count } = await this.PartnerService.getActivePartnersCount(storeId);
     const { tier } = await this.storesService.findById(storeId);
-    // find tier Info Object of current tier. if tier field not exist then bring first free tier info
-    console.log(
-      '🚀 ~ file: partners.resolver.ts ~ line 120 ~ PartnersResolver ~ getActivePartnersCount ~ GSP_FEES1',
-      GSP_FEES1,
-    );
-    const tierInfo = { ...GSP_FEES1[tier] };
-    // .find(
-    //   (itm, ind) => itm.index == tier,
+    // console.log(
+    //   '🚀 partners.resolver:125 ~ getAllPartnerTiersInfo ~ tier',
+    //   tier,
     // );
-    console.log(
-      '🚀 tierInfo = ',
-      tierInfo,
-      '🚀 tier = ',
-      tier,
-      '🚀 count = ',
-      count,
-    );
+    // find tier Info Object of current tier. if tier field not exist then bring first free tier info
+    // if not tier in store show first
+    const tierInfo = tier ? { ...GSP_FEES1[tier] } : { ...GSP_FEES1[0] };
     const nextTierIndex = tierInfo.index + 1;
     const nexttierInfo = { ...GSP_FEES1[nextTierIndex] };
-    console.log(
-      '🚀 ~ file: partners.resolver.ts ~ line 135 ~ PartnersResolver ~ getActivePartnersCount ~ netxtierInfo',
-      nexttierInfo,
-    );
     return {
       count: count ?? 0,
       tierName: nexttierInfo.name,
@@ -148,6 +139,8 @@ export class PartnersResolver {
       currentTierName: tierInfo.name,
       currentTierCharges: tierInfo.fee,
       currentTierLimit: tierInfo.limit,
+      switchCount: [...GSP_SWITCH_NUM],
+      allTiersInfo: GSP_FEES1,
     };
   }
 }

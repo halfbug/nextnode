@@ -53,15 +53,63 @@ export const GSP_FEES = [
   GSP_CHARGE_TIER6,
 ];
 export const GSP_FEES1 = [
-  { index: 0, name: BillingTierEnum.FREE, fee: 0, limit: '3' },
-  { index: 1, name: BillingTierEnum.TIER1, fee: 50, limit: '5' },
-  { index: 2, name: BillingTierEnum.TIER2, fee: 100, limit: '10' },
-  { index: 3, name: BillingTierEnum.TIER3, fee: 250, limit: '25' },
-  { index: 4, name: BillingTierEnum.TIER4, fee: 500, limit: '50' },
-  { index: 5, name: BillingTierEnum.TIER5, fee: 1000, limit: '100' },
-  { index: 6, name: BillingTierEnum.TIER6, fee: 2500, limit: '100+' },
+  {
+    index: 0,
+    name: BillingTierEnum.FREE,
+    fee: 0,
+    limit: '3',
+    switchStartCount: GS_TIER0_START_COUNT,
+    staticName: 'FREE',
+  },
+  {
+    index: 1,
+    switchStartCount: GS_TIER1_START_COUNT,
+    name: BillingTierEnum.TIER1,
+    fee: 50,
+    limit: '5',
+    staticName: 'TIER1',
+  },
+  {
+    index: 2,
+    switchStartCount: GS_TIER2_START_COUNT,
+    name: BillingTierEnum.TIER2,
+    fee: 100,
+    limit: '10',
+    staticName: 'TIER2',
+  },
+  {
+    index: 3,
+    switchStartCount: GS_TIER3_START_COUNT,
+    name: BillingTierEnum.TIER3,
+    fee: 250,
+    limit: '25',
+    staticName: 'TIER3',
+  },
+  {
+    index: 4,
+    switchStartCount: GS_TIER4_START_COUNT,
+    name: BillingTierEnum.TIER4,
+    fee: 500,
+    limit: '50',
+    staticName: 'TIER4',
+  },
+  {
+    index: 5,
+    switchStartCount: GS_TIER5_START_COUNT,
+    name: BillingTierEnum.TIER5,
+    fee: 1000,
+    limit: '100',
+    staticName: 'TIER5',
+  },
+  {
+    index: 6,
+    switchStartCount: GS_TIER6_START_COUNT,
+    name: BillingTierEnum.TIER6,
+    fee: 2500,
+    limit: '100+',
+    staticName: 'TIER6',
+  },
 ];
-console.log('🚀 ~ file: constant.ts ~ line 57 ~ GSP_FEES1 real', GSP_FEES1);
 
 export const GSP_SWITCH_NUM = [
   GS_TIER1_START_COUNT,
