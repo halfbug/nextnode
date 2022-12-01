@@ -84,4 +84,10 @@ export class ChannelGroupShop {
 
   @Field({ nullable: true })
   isActive?: boolean;
+
+  @Field(() => [Product], { nullable: 'itemsAndList' })
+  ownerProducts?: Product[];
+
+  @Field(() => [Product], { nullable: 'itemsAndList' })
+  refferalProducts?: Product[];
 }

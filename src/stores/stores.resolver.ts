@@ -54,6 +54,7 @@ export class StoresResolver {
     else return this.storesService.findOneByName(shop);
   }
 
+  @Public()
   @Query(() => Store, { name: 'activeCampaignWithProducts' })
   async findOneCampaign(@Args('shop') shop: string, @Info() info: any) {
     return this.storesService.findOneWithActiveCampaingProducts(shop);

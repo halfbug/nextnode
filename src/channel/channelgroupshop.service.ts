@@ -50,7 +50,6 @@ export class ChannelGroupshopService {
 
     const {
       rewards: { baseline },
-      name,
       slugName,
     } = await this.channelService.findOne(channelGroupshop.channelId);
 
@@ -196,14 +195,6 @@ export class ChannelGroupshopService {
       },
       {
         $lookup: {
-          from: 'partnermember',
-          localField: 'id',
-          foreignField: 'groupshopId',
-          as: 'memberDetails',
-        },
-      },
-      {
-        $lookup: {
           from: 'inventory',
           localField: 'memberDetails.lineItems.product.id',
           foreignField: 'id',
@@ -227,7 +218,7 @@ export class ChannelGroupshopService {
               cond: {
                 $and: [
                   {
-                    $eq: ['$$j.isInfluencer', false],
+                    $eq: ['$$j.type', 0],
                   },
                 ],
               },
@@ -245,14 +236,14 @@ export class ChannelGroupshopService {
       },
       {
         $addFields: {
-          influencerProducts: {
+          ownerProducts: {
             $filter: {
               input: '$dealProducts',
               as: 'j',
               cond: {
                 $and: [
                   {
-                    $eq: ['$$j.isInfluencer', true],
+                    $eq: ['$$j.type', 1],
                   },
                 ],
               },
@@ -263,9 +254,9 @@ export class ChannelGroupshopService {
       {
         $lookup: {
           from: 'inventory',
-          localField: 'influencerProducts.productId',
+          localField: 'ownerProducts.productId',
           foreignField: 'id',
-          as: 'influencerProducts',
+          as: 'ownerProducts',
         },
       },
       {
@@ -344,14 +335,6 @@ export class ChannelGroupshopService {
         },
       },
       {
-        $lookup: {
-          from: 'visitors',
-          localField: 'id',
-          foreignField: 'groupshopId',
-          as: 'visitors',
-        },
-      },
-      {
         $project: {
           bestSeller: {
             $slice: ['$bestSeller', 0, 20],
@@ -378,18 +361,15 @@ export class ChannelGroupshopService {
           partnerDetails: 1,
           memberDetails: 1,
           refferalProducts: 1,
-          influencerProducts: 1,
+          ownerProducts: 1,
           isActive: 1,
           partnerCommission: 1,
-          visitors: {
-            $size: '$visitors',
-          },
         },
       },
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(ChannelGroupshop, agg).toArray();
-    console.log('🛑 🛑 🛑 gs[0]', gs[0].customerDetail);
+    console.log('🛑 🛑 🛑 gs[0]', gs[0]);
     return gs[0];
   }
 

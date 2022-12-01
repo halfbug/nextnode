@@ -48,6 +48,9 @@ export default class ChannelGroupshop extends DefaultColumnsService {
   @Column(() => Member)
   members?: Member[];
 
+  @Column()
+  isActive?: boolean;
+
   // @Column(() => Milestone)
   // milestones: Milestone[];
 }
