@@ -107,8 +107,35 @@ export class ChannelGroupshopService {
     return gs;
   }
 
-  findAll() {
-    return this.channelGroupshopRepository.find();
+  async findAllSignup(storeId) {
+    const agg = [
+      {
+        $match: {
+          storeId: storeId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'channel',
+          localField: 'channelId',
+          foreignField: 'id',
+          as: 'channel',
+        },
+      },
+      {
+        $unwind: {
+          path: '$channel',
+        },
+      },
+      {
+        $sort: {
+          _id: -1,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(ChannelGroupshop, agg).toArray();
+    return gs;
   }
 
   findOne(id: string) {

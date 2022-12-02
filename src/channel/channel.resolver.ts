@@ -9,7 +9,10 @@ import { UpdateChannelInput } from './dto/update-channel.input';
 import { NotFoundException } from '@nestjs/common';
 import { ChannelGroupshopService } from './channelgroupshop.service';
 import { CreateChannelGroupshopInput } from './dto/create-channel-groupshop.input';
-import { ChannelGroupShop } from './entities/channelgroupshop.entity';
+import {
+  ChannelGroupShop,
+  SignUpUsers,
+} from './entities/channelgroupshop.entity';
 import { StoresService } from 'src/stores/stores.service';
 import { UpdateChannelGroupshopInput } from './dto/update-channel-groupshop.input';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
@@ -92,6 +95,12 @@ export class ChannelResolver {
     } else {
       throw new NotFoundException('Products not found in active campaign');
     }
+  }
+
+  @Public()
+  @Query(() => [SignUpUsers], { name: 'getRecentSignup' })
+  async findAllSignup(@Args('storeId') storeId: string) {
+    return this.channelGroupshopService.findAllSignup(storeId);
   }
 
   @Public()

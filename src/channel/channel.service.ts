@@ -27,11 +27,11 @@ export class ChannelService {
       {
         $match: {
           storeId: storeId,
-          isActive: true,
         },
       },
       {
         $sort: {
+          isActive: -1,
           _id: -1,
         },
       },
