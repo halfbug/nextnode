@@ -89,7 +89,11 @@ export class StoreService {
     // @todo: update offine token to database
 
     //   check change of scope
-    if (!Shopify.Context.SCOPES.equals(session.scope)) {
+    if (
+      !Shopify.Context.SCOPES.equals(
+        (session && session.scope) || validateRes.scope,
+      )
+    ) {
       return res.redirect(`https://${shop}/admin/oauth/authorize`); // Scopes have changed, the app should redirect the merchant to OAuth
     }
     if (!isStoreExist) {

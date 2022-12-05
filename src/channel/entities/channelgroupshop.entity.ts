@@ -13,6 +13,7 @@ import {
   Member,
   Milestone,
 } from 'src/groupshops/entities/groupshop.entity';
+import { Channel } from 'src/channel/entities/channel.entity';
 import {
   CreateOrderInput as Order,
   Customer,
@@ -90,4 +91,34 @@ export class ChannelGroupShop {
 
   @Field(() => [Product], { nullable: 'itemsAndList' })
   refferalProducts?: Product[];
+}
+
+@ObjectType()
+export class SignUpUsers {
+  @Field({ nullable: true })
+  customerDetail: Customer;
+
+  @Field()
+  channelId: string;
+
+  @Field(() => ID)
+  id: string;
+
+  @Field()
+  campaignId: string;
+
+  @Field()
+  storeId: string;
+
+  @Field()
+  url: string;
+
+  @Field({ nullable: true })
+  shortUrl?: string;
+
+  @Field(() => DiscountCode)
+  discountCode: DiscountCode;
+
+  @Field(() => Channel)
+  channel: Channel;
 }
