@@ -208,6 +208,7 @@ export class GroupshopsResolver {
     }
   }
 
+  @Public()
   @Query(() => [MatchingGS], { name: 'matchingGS' })
   async AllMatchingGS(
     @Args({ name: 'storeId', type: () => [String] }) storeId: string[],
