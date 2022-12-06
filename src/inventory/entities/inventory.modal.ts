@@ -65,7 +65,7 @@ export default class Inventory extends DefaultColumnsService {
   @Column()
   shopifyCreatedAt?: string;
 
-  @Column('string', { default: null, nullable: true })
+  @Column({ default: 'Product', nullable: true })
   recordType: string;
 
   @Column({ nullable: true })
@@ -83,8 +83,8 @@ export default class Inventory extends DefaultColumnsService {
   @Column()
   featuredImage?: string;
 
-  @Column()
-  shop?: string;
+  @Column({ default: 'no shop' })
+  shop: string;
 
   @Column()
   parentId?: string;
@@ -108,4 +108,7 @@ export default class Inventory extends DefaultColumnsService {
 
   @Column({ nullable: true })
   inventoryManagement?: string;
+
+  @Column({ default: 0 })
+  purchaseCount: number;
 }

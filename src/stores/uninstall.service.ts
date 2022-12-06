@@ -38,12 +38,6 @@ export class UninstallService {
       const store: UpdateStoreInput = await this.storesService.findOne(shop);
       this.shopifyService.accessToken = store.accessToken;
       this.shopifyService.shop = shop;
-      if (store?.resources?.length > 0)
-        store?.resources?.map((res) => {
-          if (res.type === 'scriptTag') {
-            this.shopifyService.scriptTagDelete(res.id);
-          }
-        });
       await this.inventorySrv.removeShop(shop);
       await this.ordersSrv.removeShop(shop);
       await this.campaignSrv.removeShop(store.id);
@@ -66,6 +60,12 @@ export class UninstallService {
         event: EventType.uninstalled,
         dateTime: new Date(),
       });
+      if (store?.resources?.length > 0)
+        store?.resources?.map((res) => {
+          if (res.type === 'scriptTag') {
+            this.shopifyService.scriptTagDelete(res.id);
+          }
+        });
       Logger.debug(`${shop}--uninstalled`, UninstallService.name);
     } catch (error) {
       return error.message;

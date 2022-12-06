@@ -21,13 +21,13 @@ export class DefaultColumnsService {
   status: string;
 
   // @CreateDateColumn()
-  // @Column({
-  //   nullable: false,
-  //   default: () => new Date(),
-  //   type: Date,
-  // })
-  // createdAt: Date;
-  @Column() createdAt: Date = new Date();
+  @Column({
+    nullable: false,
+    default: () => new Date(),
+    type: Date,
+  })
+  createdAt: Date;
+  // @Column() createdAt: Date = new Date();
 
   @UpdateDateColumn()
   updatedAt: Date;

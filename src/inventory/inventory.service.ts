@@ -18,42 +18,45 @@ export class InventoryService {
   }
 
   async create(createInventoryInput: CreateInventoryInput): Promise<Inventory> {
-    // console.log(
-    //   '🚀 ~ file: inventory.service.ts ~ line 21 ~ InventoryService ~ create ~ CreateInventoryInput',
-    //   createInventoryInput,
-    // );
-    const inventory = this.inventoryRepository.create(createInventoryInput);
-    if (createInventoryInput.recordType === 'ProductVariant') {
-      inventory.selectedOptions = [...createInventoryInput.selectedOptions];
-      inventory.image = createInventoryInput.image ?? null;
+    try {
+      // console.log(
+      //   '🚀 ~ file: inventory.service.ts ~ line 21 ~ InventoryService ~ create ~ CreateInventoryInput',
+      //   createInventoryInput,
+      // );
+      const inventory = this.inventoryRepository.create(createInventoryInput);
+      // console.log(
+      //   '🚀 ~ file: inventory.service.ts:26 ~ InventoryService ~ create ~ inventory',
+      //   inventory,
+      // );
+      if (createInventoryInput.recordType === 'ProductVariant') {
+        inventory.selectedOptions = [...createInventoryInput.selectedOptions];
+        inventory.image = createInventoryInput.image ?? null;
+      }
+
+      return await this.inventoryRepository.save(inventory);
+    } catch (error) {
+      console.log(error);
     }
-
-    // console.log(
-    //   '🚀 ~ file: inventory.service.ts ~ line 21 ~ InventoryService ~ create ~ inventory',
-    //   inventory,
-    // );
-
-    return await this.inventoryRepository.save(inventory);
   }
 
   async update(updateInvenotryInput: UpdateInventoryInput) {
     const { id } = updateInvenotryInput;
-    await this.remove(id);
-    // return await this.inventoryRepository.update({ id }, updateInvenotryInput);
+    // await this.remove(id);
+    return await this.inventoryRepository.update({ id }, updateInvenotryInput);
     // return await this.inventoryRepository.save(updateInvenotryInput);
-    const manager = getMongoManager();
-    try {
-      return await manager.updateOne(
-        Inventory,
-        { id },
-        { $set: { ...updateInvenotryInput } },
-        {
-          upsert: true,
-        },
-      );
-    } catch (err) {
-      console.log(err);
-    }
+    // const manager = getMongoManager();
+    // try {
+    //   return await manager.updateOne(
+    //     Inventory,
+    //     { id },
+    //     { $set: { ...updateInvenotryInput } },
+    //     {
+    //       upsert: true,
+    //     },
+    //   );
+    // } catch (err) {
+    //   console.log(err);
+    // }
   }
 
   async updateInventory(id: string, dif: number, field: string) {
@@ -317,9 +320,17 @@ export class InventoryService {
   }
 
   async setPurchaseCount(inventory: any) {
-    const manager = getMongoManager();
+    console.log(
+      '🚀 ~ file: inventory.service.ts:320 ~ InventoryService ~ setPurchaseCount ~ inventory',
+      JSON.stringify(inventory),
+    );
+    try {
+      const manager = getMongoManager();
 
-    return await manager.bulkWrite(Inventory, inventory);
+      return await manager.bulkWrite(Inventory, inventory);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async getBestSellerProducts(shop: string) {
@@ -472,7 +483,7 @@ export class InventoryService {
     //   res[0].length,
     //   res[0],
     // );
-    console.log('🎈 res[0]', res[0]);
+    // console.log('🎈 res[0]', res[0]);
     return res.length && res[0].status !== 'ACTIVE'
       ? { ...res[0], outofstock: true }
       : res[0];
