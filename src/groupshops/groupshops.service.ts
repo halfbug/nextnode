@@ -1590,7 +1590,7 @@ export class GroupshopsService {
       {
         $match: {
           createdAt: {
-            $gt: new Date(+new Date() - 30 * 60 * 60 * 24 * 1000),
+            $gt: new Date(+new Date() - 3 * 60 * 60 * 24 * 1000),
           },
         },
       },
@@ -1996,7 +1996,7 @@ export class GroupshopsService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(Groupshops, agg).toArray();
-    console.log('🎈🎈🎈gs', gs);
+    console.log('🚀🚀gs', gs);
     return gs;
   }
 }

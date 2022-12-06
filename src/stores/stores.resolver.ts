@@ -19,6 +19,7 @@ export class StoresResolver {
     return this.storesService.create(createStoreInput);
   }
 
+  @Public()
   @Query(() => [Store], { name: 'stores' })
   findAll() {
     return this.storesService.findAll();
@@ -75,6 +76,7 @@ export class StoresResolver {
   //   return this.storesService.remove(id);
   // }
 
+  @Public()
   @Mutation(() => Store)
   updateDiscoveryTools(
     @Args('UpdateDiscoveryTools') UpdateDiscoveryTools: UpdateStoreInput,

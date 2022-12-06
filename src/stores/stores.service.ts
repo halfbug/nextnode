@@ -356,8 +356,6 @@ export class StoresService {
   }
 
   async updateDiscoveryTool(storeId: any, updateDiscoveryTool: any) {
-    console.log('storeId🚀🚀🚀', storeId);
-    console.log('updateDiscoveryTool🚀🚀🚀', updateDiscoveryTool);
     await this.storeRepository.update(
       { id: updateDiscoveryTool.id },
       updateDiscoveryTool,
