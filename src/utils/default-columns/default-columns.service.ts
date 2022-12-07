@@ -26,7 +26,7 @@ export class DefaultColumnsService {
     default: () => new Date(),
     type: Date,
   })
-  createdAt: Date;
+  createdAt: Date = new Date();
   // @Column() createdAt: Date = new Date();
 
   @UpdateDateColumn()

@@ -19,6 +19,7 @@ import {
   Customer,
 } from 'src/inventory/dto/create-order.input';
 import { Product } from 'src/inventory/entities/product.entity';
+import { PartnerMember } from 'src/partners/entities/partner.entity';
 import { Store } from 'src/stores/entities/store.entity';
 
 @ObjectType()
@@ -83,8 +84,8 @@ export class ChannelGroupShop {
   @Field(() => [Product], { nullable: 'itemsAndList' })
   bestSeller?: Product[];
 
-  @Field({ nullable: true })
-  isActive?: boolean;
+  // @Field({ nullable: true })
+  // isActive?: boolean;
 
   @Field(() => [Product], { nullable: 'itemsAndList' })
   ownerProducts?: Product[];

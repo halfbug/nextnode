@@ -31,6 +31,8 @@ import { RefAddedEvent } from '../events/refferal-added.event';
 import { PartnerService } from 'src/partners/partners.service';
 import { Partnergroupshop } from 'src/partners/entities/partner.modal';
 import { PMemberArrivedEvent } from 'src/partners/events/pmember-arrived.event';
+import { ChannelGroupshopService } from 'src/channel/channelgroupshop.service';
+import { UpdateChannelGroupshopInput } from 'src/channel/dto/update-channel-groupshop.input';
 
 @Injectable()
 export class OrderPlacedListener {
@@ -44,6 +46,7 @@ export class OrderPlacedListener {
     private addedRef: RefAddedEvent,
     private partnerSrv: PartnerService,
     private pmemberArrived: PMemberArrivedEvent,
+    private channelGSService: ChannelGroupshopService,
   ) {}
 
   accessToken: string;
@@ -287,14 +290,15 @@ export class OrderPlacedListener {
       if (+totalProductPrice > 1) {
         let ugroupshop = null;
         let pgroupshop = null;
+        let cgroupshop = null;
         if (discountCode) {
           // const updateGroupshop = await this.gsService.findOne(discountCode);
           ugroupshop = new UpdateGroupshopInput();
+          cgroupshop = new UpdateChannelGroupshopInput();
           ugroupshop = await this.gsService.findOneWithLineItems(discountCode);
           pgroupshop = await this.partnerSrv.findOne(discountCode);
-          console.log(
-            '🚀 ~ file: order-placed.listener.ts ~ line 293 ~ OrderPlacedListener ~ createGroupShop ~ pgroupshop',
-            pgroupshop,
+          cgroupshop = await this.channelGSService.findChannelGroupshopByCode(
+            discountCode,
           );
         }
         if (ugroupshop) {
@@ -366,6 +370,28 @@ export class OrderPlacedListener {
           this.pmemberArrived.lineItems = event.lineItems;
           this.pmemberArrived.emit();
           // create billing for partner
+        } else if (cgroupshop) {
+          gsMember.role = RoleTypeEnum.referral;
+          gsMember.availedDiscount = parseFloat(
+            cgroupshop.discountCode.percentage,
+          );
+          if (cgroupshop.members && cgroupshop.members.length) {
+            cgroupshop.members = [
+              ...cgroupshop?.members.map((m: any) => ({
+                orderId: m.orderId,
+                lineItems: m.lineItems,
+                role: m.role,
+                availedDiscount: m.availedDiscount,
+              })),
+              gsMember,
+            ];
+          } else {
+            cgroupshop.members = [gsMember];
+          }
+          await this.channelGSService.update(cgroupshop.id, {
+            id: cgroupshop.id,
+            members: cgroupshop.members,
+          });
         } else {
           ownerDiscount = !!discountCode && true;
           const dealProducts = newLineItems

@@ -90,8 +90,15 @@ export class ChannelResolver {
     const {
       activeCampaign: { products },
     } = campaign;
+    // const gs = await this.channelGroupshopService.findByOwnerEmail(
+    //   createChannelGroupshopInput?.customerDetail?.email,
+    // );
     if (products.length > 0) {
-      return this.channelGroupshopService.create(createChannelGroupshopInput);
+      // if (!gs) {
+      //   return this.channelGroupshopService.create(createChannelGroupshopInput);
+      // }
+      // throw new Error('Groupshop with this email already exist');
+      return this.channelGroupshopService.create(createChannelGroupshopInput); // commented code is for check duplicate email
     } else {
       throw new NotFoundException('Products not found in active campaign');
     }

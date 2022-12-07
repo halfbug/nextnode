@@ -31,25 +31,23 @@ export class ChannelGroupshopService {
   }
 
   async create(createChannelGroupshopInput: CreateChannelGroupshopInput) {
-    console.log(
-      '🚀 ~ file: channelgroupshop.service.ts ~ line 34 ~ ChannelGroupshopService ~ create ~ createChannelGroupshopInput',
-      createChannelGroupshopInput,
-    );
+    const { members, ...filteredCreateChannelGroupshopInput } =
+      createChannelGroupshopInput;
     const id = uuid();
     const temp = this.channelGroupshopRepository.create({
       id,
-      expiredAt: addDays(new Date(), 30),
-      isActive: createChannelGroupshopInput?.isActive ?? true,
-      ...createChannelGroupshopInput,
+      expiredAt: addDays(new Date(), 13),
+      ...filteredCreateChannelGroupshopInput,
     });
     const channelGroupshop = await this.channelGroupshopRepository.save(temp);
     const _id = channelGroupshop._id;
     const { shop, accessToken, brandName } = await this.storesService.findById(
-      createChannelGroupshopInput.storeId,
+      filteredCreateChannelGroupshopInput.storeId,
     );
 
     const {
       rewards: { baseline },
+      name,
       slugName,
     } = await this.channelService.findOne(channelGroupshop.channelId);
 
@@ -62,6 +60,7 @@ export class ChannelGroupshopService {
 
     let ucg = null;
     ucg = new UpdateChannelGroupshopInput();
+    ucg.members = [];
     ucg.url = cryptURL;
     ucg.shortUrl = shortLink;
     // bought product + campaign products will go to setDiscount below
@@ -86,9 +85,9 @@ export class ChannelGroupshopService {
     const gs = await this.update(id, ucg);
 
     const mdata = {
-      firstName: createChannelGroupshopInput.customerDetail.firstName,
-      lastName: createChannelGroupshopInput.customerDetail.lastName,
-      email: createChannelGroupshopInput.customerDetail.email,
+      firstName: filteredCreateChannelGroupshopInput.customerDetail.firstName,
+      lastName: filteredCreateChannelGroupshopInput.customerDetail.lastName,
+      email: filteredCreateChannelGroupshopInput.customerDetail.email,
       shortUrl: shortLink,
       percentage: baseline,
       channelName: name,
@@ -97,7 +96,7 @@ export class ChannelGroupshopService {
     const body = {
       event: 'Groupshop Channel Creation',
       customer_properties: {
-        $email: createChannelGroupshopInput.customerDetail.email,
+        $email: filteredCreateChannelGroupshopInput.customerDetail.email,
       },
       properties: mdata,
     };
@@ -145,10 +144,22 @@ export class ChannelGroupshopService {
     });
   }
 
+  findByOwnerEmail(email: string) {
+    return this.channelGroupshopRepository.findOne({
+      where: {
+        'customerDetail.email': email,
+      },
+    });
+  }
+
   async update(
     id: string,
     updateChannelGroupshopInput: UpdateChannelGroupshopInput,
   ) {
+    console.log(
+      '🚀 ~ file: channelgroupshop.service.ts:133 ~ ChannelGroupshopService ~ updateChannelGroupshopInput',
+      updateChannelGroupshopInput,
+    );
     await this.channelGroupshopRepository.update(
       { id },
       updateChannelGroupshopInput,
@@ -342,7 +353,16 @@ export class ChannelGroupshopService {
                           $arrayElemAt: [
                             {
                               $filter: {
-                                input: '$popularProducts',
+                                input: {
+                                  $concatArrays: [
+                                    {
+                                      $ifNull: ['$popularProducts', []],
+                                    },
+                                    {
+                                      $ifNull: ['$allProducts', []],
+                                    },
+                                  ],
+                                },
                                 as: 'j',
                                 cond: {
                                   $eq: ['$$this.product.id', '$$j.id'],
@@ -353,6 +373,45 @@ export class ChannelGroupshopService {
                           ],
                         },
                       },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'id',
+          as: 'orders',
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              as: 'me',
+              in: {
+                $mergeObjects: [
+                  '$$me',
+                  {
+                    orderDetail: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$orders',
+                            as: 'j',
+                            cond: {
+                              $eq: ['$$me.orderId', '$$j.id'],
+                            },
+                          },
+                        },
+                        0,
+                      ],
                     },
                   },
                 ],
@@ -396,7 +455,6 @@ export class ChannelGroupshopService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(ChannelGroupshop, agg).toArray();
-    console.log('🛑 🛑 🛑 gs[0]', gs[0]);
     return gs[0];
   }
 
