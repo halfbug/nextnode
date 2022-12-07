@@ -17,6 +17,10 @@ export class InventorySavedListener {
 
   @OnEvent('inventory.*')
   async countProductInventory(event: InventorySavedEvent) {
+    console.log(
+      '🚀 ~ file: inventory-saved.listener.ts:20 ~ InventorySavedListener ~ countProductInventory ~ event',
+      event,
+    );
     if (event.type && ['saved', 'outofstock'].includes(event.type)) {
       const StoreProducts: Product[] =
         await this.inventoryService.findAllProducts(event.shop);

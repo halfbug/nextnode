@@ -430,17 +430,28 @@ export class WebhooksController {
       nprod.createdAtShopify = rproduct?.created_at;
       nprod.publishedAt = rproduct?.published_at;
       nprod.title = rproduct?.title;
-      nprod.currencyCode = prodinfo?.currencyCode;
       nprod.shop = shop;
       nprod.recordType = 'Product';
       nprod.status = rproduct?.status?.toUpperCase();
       nprod.price = rproduct?.variants[0]?.price;
       nprod.featuredImage = rproduct?.image?.src;
+      nprod.createdAt = new Date();
+      nprod.outofstock = false;
+      nprod.purchaseCount = 0;
       // nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
       nprod.description = rproduct.body_html;
       // if product is not active then it will be not purchaseable.
       if (nprod.status !== 'ACTIVE') nprod.outofstock = true;
-      await this.inventryService.create(nprod);
+      nprod.currencyCode = prodinfo?.currencyCode;
+      const pcreated = await this.inventryService.create(nprod);
+      // console.log(
+      //   '🚀 ~ file: webhooks.controller.ts:453 ~ createProducts ~ pcreated',
+      //   pcreated,
+      // );
+      // console.log(
+      //   '🚀 ~ file: webhooks.controller.ts:453 ~ createProducts ~ nprod',
+      //   nprod,
+      // );
 
       //add variat
       const vprod = nprod;
@@ -454,12 +465,15 @@ export class WebhooksController {
         vprod.inventoryManagement = variant?.inventory_management;
         vprod.inventoryPolicy = variant?.inventory_policy;
         vprod.price = variant.price;
+        vprod.createdAt = new Date();
         vprod.inventoryQuantity = variant?.inventory_quantity;
         const img = new ProductImage();
         img.src = variant.image_id
           ? rproduct.images.filter((img) => img.id === variant.image_id)?.[0]
               .src
-          : rproduct?.image.src;
+          : rproduct.image
+          ? rproduct.image.src
+          : null;
         vprod.image = img;
         vprod.selectedOptions = rproduct.options.map((item, index) => {
           const sOpt = new SelectedOption();
@@ -519,6 +533,10 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const rproduct = req.body;
+      console.log(
+        '🚀 ~ file: webhooks.controller.ts:522 ~ productUpdate ~ rproduct',
+        rproduct,
+      );
       this.productMedia.productId = rproduct.admin_graphql_api_id;
       this.productMedia.shopName = shop;
       // const ProductMedia = new ProductMediaObject();
@@ -1256,7 +1274,9 @@ export class WebhooksController {
               const products = inventArr.filter(
                 (item) => item.recordType === 'Product',
               );
-
+              products.map((product) => {
+                this.inventryService.remove(product.id);
+              });
               // products.map((product) => {
               //   console.log(
               //     '\x1b[36m%s\x1b[0m',

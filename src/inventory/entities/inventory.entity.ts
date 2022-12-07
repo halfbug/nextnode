@@ -99,4 +99,7 @@ export class Inventory {
 
   @Field({ nullable: true })
   inventoryManagement?: string;
+
+  @Field({ defaultValue: 0 })
+  purchaseCount: number;
 }

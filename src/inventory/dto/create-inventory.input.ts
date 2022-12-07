@@ -77,4 +77,13 @@ export class CreateInventoryInput {
 
   @Field({ nullable: true })
   inventoryManagement?: string;
+
+  @Field({ defaultValue: new Date() })
+  createdAt?: Date;
+
+  @Field({ defaultValue: new Date() })
+  updatedAt?: Date;
+
+  @Field({ defaultValue: 0 })
+  purchaseCount: number;
 }
