@@ -79,7 +79,9 @@ export class BillingUsageCargeCron {
         allstoresBilling,
       );
       stores.map(async (store) => {
-        if (store.subscription.status === 'Active') {
+        if (
+          ['Active', 'ACTIVE', 'active'].includes(store.subscription.status)
+        ) {
           // console.log(
           //   '🚀 ~ file: billing.cron.ts ~ line 65 ~ BillingUsageCargeCron ~ stores.map ~ store',
           //   store,
