@@ -156,10 +156,6 @@ export class ChannelGroupshopService {
     id: string,
     updateChannelGroupshopInput: UpdateChannelGroupshopInput,
   ) {
-    console.log(
-      '🚀 ~ file: channelgroupshop.service.ts:133 ~ ChannelGroupshopService ~ updateChannelGroupshopInput',
-      updateChannelGroupshopInput,
-    );
     await this.channelGroupshopRepository.update(
       { id },
       updateChannelGroupshopInput,
@@ -450,6 +446,19 @@ export class ChannelGroupshopService {
           ownerProducts: 1,
           isActive: 1,
           partnerCommission: 1,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(ChannelGroupshop, agg).toArray();
+    return gs[0];
+  }
+
+  async findChannelGS(discountCode: string) {
+    const agg = [
+      {
+        $match: {
+          'discountCode.title': discountCode,
         },
       },
     ];

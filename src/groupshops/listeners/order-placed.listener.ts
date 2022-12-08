@@ -297,9 +297,7 @@ export class OrderPlacedListener {
           cgroupshop = new UpdateChannelGroupshopInput();
           ugroupshop = await this.gsService.findOneWithLineItems(discountCode);
           pgroupshop = await this.partnerSrv.findOne(discountCode);
-          cgroupshop = await this.channelGSService.findChannelGroupshopByCode(
-            discountCode,
-          );
+          cgroupshop = await this.channelGSService.findChannelGS(discountCode);
         }
         if (ugroupshop) {
           console.log('🚀 ugroupshop groupshop', ugroupshop);
@@ -376,22 +374,11 @@ export class OrderPlacedListener {
             cgroupshop.discountCode.percentage,
           );
           if (cgroupshop.members && cgroupshop.members.length) {
-            cgroupshop.members = [
-              ...cgroupshop?.members.map((m: any) => ({
-                orderId: m.orderId,
-                lineItems: m.lineItems,
-                role: m.role,
-                availedDiscount: m.availedDiscount,
-              })),
-              gsMember,
-            ];
+            cgroupshop.members = [...cgroupshop.members, gsMember];
           } else {
             cgroupshop.members = [gsMember];
           }
-          await this.channelGSService.update(cgroupshop.id, {
-            id: cgroupshop.id,
-            members: cgroupshop.members,
-          });
+          await this.channelGSService.update(cgroupshop.id, cgroupshop);
         } else {
           ownerDiscount = !!discountCode && true;
           const dealProducts = newLineItems
