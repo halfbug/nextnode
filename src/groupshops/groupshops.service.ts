@@ -717,6 +717,9 @@ export class GroupshopsService {
                   {
                     $eq: ['$$j.status', 'ACTIVE'],
                   },
+                  {
+                    $ne: ['$$j.publishedAt', null],
+                  },
                 ],
               },
             },
@@ -749,6 +752,9 @@ export class GroupshopsService {
                   },
                   {
                     $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                  {
+                    $ne: ['$$j.publishedAt', null],
                   },
                 ],
               },
