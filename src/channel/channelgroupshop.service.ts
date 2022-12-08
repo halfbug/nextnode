@@ -156,12 +156,72 @@ export class ChannelGroupshopService {
     id: string,
     updateChannelGroupshopInput: UpdateChannelGroupshopInput,
   ) {
-    await this.channelGroupshopRepository.update(
-      { id },
-      updateChannelGroupshopInput,
-    );
-    const gs = await this.findOne(id);
-    return gs;
+    try {
+      const gs = await this.findChannelGS(
+        updateChannelGroupshopInput.discountCode.title,
+      );
+
+      if (
+        updateChannelGroupshopInput.dealProducts &&
+        updateChannelGroupshopInput.dealProducts.length
+      ) {
+        const { shop, accessToken } = await this.storesService.findById(
+          updateChannelGroupshopInput?.storeId,
+        );
+        const campaign = await this.storesService.findOneWithActiveCampaing(
+          shop,
+        );
+        const {
+          activeCampaign: { products },
+        } = campaign;
+        const boughtProducts = [];
+        if (gs.members && gs.members.length) {
+          gs.members.forEach((m) => {
+            m.lineItems.forEach((l) => {
+              boughtProducts.push(l.product.id);
+            });
+          });
+        }
+
+        console.log('186  ', shop, accessToken, [
+          ...new Set([
+            ...products,
+            ...(updateChannelGroupshopInput.dealProducts.map(
+              (p) => p.productId,
+            ) ?? []),
+            ...boughtProducts,
+          ]),
+        ]);
+
+        await this.shopifyapi.setDiscountCode(
+          shop,
+          'Update',
+          accessToken,
+          null,
+          null,
+          [
+            ...new Set([
+              ...products,
+              ...(updateChannelGroupshopInput.dealProducts.map(
+                (p) => p.productId,
+              ) ?? []),
+              ...boughtProducts,
+            ]),
+          ],
+          null,
+          null,
+          updateChannelGroupshopInput.discountCode.priceRuleId,
+        );
+      }
+      await this.channelGroupshopRepository.update(
+        { id },
+        updateChannelGroupshopInput,
+      );
+      const cgs = await this.findOne(id);
+      return cgs;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   async findChannelGroupshopByCode(discountCode: string) {
