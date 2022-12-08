@@ -31,21 +31,18 @@ export class ChannelGroupshopService {
   }
 
   async create(createChannelGroupshopInput: CreateChannelGroupshopInput) {
-    console.log(
-      '🚀 ~ file: channelgroupshop.service.ts ~ line 34 ~ ChannelGroupshopService ~ create ~ createChannelGroupshopInput',
-      createChannelGroupshopInput,
-    );
+    const { members, ...filteredCreateChannelGroupshopInput } =
+      createChannelGroupshopInput;
     const id = uuid();
     const temp = this.channelGroupshopRepository.create({
       id,
-      expiredAt: addDays(new Date(), 30),
-      isActive: createChannelGroupshopInput?.isActive ?? true,
-      ...createChannelGroupshopInput,
+      expiredAt: addDays(new Date(), 13),
+      ...filteredCreateChannelGroupshopInput,
     });
     const channelGroupshop = await this.channelGroupshopRepository.save(temp);
     const _id = channelGroupshop._id;
     const { shop, accessToken, brandName } = await this.storesService.findById(
-      createChannelGroupshopInput.storeId,
+      filteredCreateChannelGroupshopInput.storeId,
     );
 
     const {
@@ -63,6 +60,7 @@ export class ChannelGroupshopService {
 
     let ucg = null;
     ucg = new UpdateChannelGroupshopInput();
+    ucg.members = [];
     ucg.url = cryptURL;
     ucg.shortUrl = shortLink;
     // bought product + campaign products will go to setDiscount below
@@ -87,9 +85,9 @@ export class ChannelGroupshopService {
     const gs = await this.update(id, ucg);
 
     const mdata = {
-      firstName: createChannelGroupshopInput.customerDetail.firstName,
-      lastName: createChannelGroupshopInput.customerDetail.lastName,
-      email: createChannelGroupshopInput.customerDetail.email,
+      firstName: filteredCreateChannelGroupshopInput.customerDetail.firstName,
+      lastName: filteredCreateChannelGroupshopInput.customerDetail.lastName,
+      email: filteredCreateChannelGroupshopInput.customerDetail.email,
       shortUrl: shortLink,
       percentage: baseline,
       channelName: name,
@@ -98,7 +96,7 @@ export class ChannelGroupshopService {
     const body = {
       event: 'Groupshop Channel Creation',
       customer_properties: {
-        $email: createChannelGroupshopInput.customerDetail.email,
+        $email: filteredCreateChannelGroupshopInput.customerDetail.email,
       },
       properties: mdata,
     };
@@ -146,16 +144,84 @@ export class ChannelGroupshopService {
     });
   }
 
+  findByOwnerEmail(email: string) {
+    return this.channelGroupshopRepository.findOne({
+      where: {
+        'customerDetail.email': email,
+      },
+    });
+  }
+
   async update(
     id: string,
     updateChannelGroupshopInput: UpdateChannelGroupshopInput,
   ) {
-    await this.channelGroupshopRepository.update(
-      { id },
-      updateChannelGroupshopInput,
-    );
-    const gs = await this.findOne(id);
-    return gs;
+    try {
+      const gs = await this.findChannelGS(
+        updateChannelGroupshopInput.discountCode.title,
+      );
+
+      if (
+        updateChannelGroupshopInput.dealProducts &&
+        updateChannelGroupshopInput.dealProducts.length
+      ) {
+        const { shop, accessToken } = await this.storesService.findById(
+          updateChannelGroupshopInput?.storeId,
+        );
+        const campaign = await this.storesService.findOneWithActiveCampaing(
+          shop,
+        );
+        const {
+          activeCampaign: { products },
+        } = campaign;
+        const boughtProducts = [];
+        if (gs.members && gs.members.length) {
+          gs.members.forEach((m) => {
+            m.lineItems.forEach((l) => {
+              boughtProducts.push(l.product.id);
+            });
+          });
+        }
+
+        console.log('186  ', shop, accessToken, [
+          ...new Set([
+            ...products,
+            ...(updateChannelGroupshopInput.dealProducts.map(
+              (p) => p.productId,
+            ) ?? []),
+            ...boughtProducts,
+          ]),
+        ]);
+
+        await this.shopifyapi.setDiscountCode(
+          shop,
+          'Update',
+          accessToken,
+          null,
+          null,
+          [
+            ...new Set([
+              ...products,
+              ...(updateChannelGroupshopInput.dealProducts.map(
+                (p) => p.productId,
+              ) ?? []),
+              ...boughtProducts,
+            ]),
+          ],
+          null,
+          null,
+          updateChannelGroupshopInput.discountCode.priceRuleId,
+        );
+      }
+      await this.channelGroupshopRepository.update(
+        { id },
+        updateChannelGroupshopInput,
+      );
+      const cgs = await this.findOne(id);
+      return cgs;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   async findChannelGroupshopByCode(discountCode: string) {
@@ -223,14 +289,6 @@ export class ChannelGroupshopService {
       },
       {
         $lookup: {
-          from: 'partnermember',
-          localField: 'id',
-          foreignField: 'groupshopId',
-          as: 'memberDetails',
-        },
-      },
-      {
-        $lookup: {
           from: 'inventory',
           localField: 'memberDetails.lineItems.product.id',
           foreignField: 'id',
@@ -254,7 +312,7 @@ export class ChannelGroupshopService {
               cond: {
                 $and: [
                   {
-                    $eq: ['$$j.isInfluencer', false],
+                    $eq: ['$$j.type', 0],
                   },
                 ],
               },
@@ -272,14 +330,14 @@ export class ChannelGroupshopService {
       },
       {
         $addFields: {
-          influencerProducts: {
+          ownerProducts: {
             $filter: {
               input: '$dealProducts',
               as: 'j',
               cond: {
                 $and: [
                   {
-                    $eq: ['$$j.isInfluencer', true],
+                    $eq: ['$$j.type', 1],
                   },
                 ],
               },
@@ -290,9 +348,9 @@ export class ChannelGroupshopService {
       {
         $lookup: {
           from: 'inventory',
-          localField: 'influencerProducts.productId',
+          localField: 'ownerProducts.productId',
           foreignField: 'id',
-          as: 'influencerProducts',
+          as: 'ownerProducts',
         },
       },
       {
@@ -351,7 +409,16 @@ export class ChannelGroupshopService {
                           $arrayElemAt: [
                             {
                               $filter: {
-                                input: '$popularProducts',
+                                input: {
+                                  $concatArrays: [
+                                    {
+                                      $ifNull: ['$popularProducts', []],
+                                    },
+                                    {
+                                      $ifNull: ['$allProducts', []],
+                                    },
+                                  ],
+                                },
                                 as: 'j',
                                 cond: {
                                   $eq: ['$$this.product.id', '$$j.id'],
@@ -372,10 +439,41 @@ export class ChannelGroupshopService {
       },
       {
         $lookup: {
-          from: 'visitors',
-          localField: 'id',
-          foreignField: 'groupshopId',
-          as: 'visitors',
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'id',
+          as: 'orders',
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              as: 'me',
+              in: {
+                $mergeObjects: [
+                  '$$me',
+                  {
+                    orderDetail: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$orders',
+                            as: 'j',
+                            cond: {
+                              $eq: ['$$me.orderId', '$$j.id'],
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
         },
       },
       {
@@ -405,18 +503,27 @@ export class ChannelGroupshopService {
           partnerDetails: 1,
           memberDetails: 1,
           refferalProducts: 1,
-          influencerProducts: 1,
+          ownerProducts: 1,
           isActive: 1,
           partnerCommission: 1,
-          visitors: {
-            $size: '$visitors',
-          },
         },
       },
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(ChannelGroupshop, agg).toArray();
-    console.log('🛑 🛑 🛑 gs[0]', gs[0].customerDetail);
+    return gs[0];
+  }
+
+  async findChannelGS(discountCode: string) {
+    const agg = [
+      {
+        $match: {
+          'discountCode.title': discountCode,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(ChannelGroupshop, agg).toArray();
     return gs[0];
   }
 

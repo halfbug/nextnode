@@ -13,6 +13,7 @@ import { RefAddedEvent } from './events/refferal-added.event';
 import { GsCommonModule } from 'src/gs-common/gs-common.module';
 import { GSUpdatePriceRuleEvent } from './events/groupshop-update-price-rule.event';
 import { PartnersModule } from 'src/partners/partners.module';
+import { ChannelModule } from 'src/channel/channel.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PartnersModule } from 'src/partners/partners.module';
     UtilsModule,
     forwardRef(() => GsCommonModule),
     forwardRef(() => PartnersModule),
+    forwardRef(() => ChannelModule),
   ],
   providers: [
     GroupshopsResolver,
