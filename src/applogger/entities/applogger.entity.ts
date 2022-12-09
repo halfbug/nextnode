@@ -28,9 +28,9 @@ export class AppLogger extends DefaultColumnsService {
   @Column()
   context: string;
 
-  @Column()
-  @Field()
-  message: string;
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  message?: string;
 
   @Column({ nullable: true })
   @Field({ nullable: true })

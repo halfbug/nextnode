@@ -20,12 +20,12 @@ export class Gslogger extends ConsoleLogger {
     }
     // console.log({ message });
   }
-  error(exception: any, context?: string) {
+  error(exception: any, stack?: string, context?: string) {
     super.error(exception.message, context);
     const elog = new CreateAppLoggerInput();
-    elog.stack = exception.stack;
+    elog.stack = stack ?? exception.stack;
     elog.context = context.toUpperCase();
-    elog.message = exception.message;
+    elog.message = exception.message ?? exception;
     elog.level = 'error';
     this.apploggerService.create(elog);
   }
