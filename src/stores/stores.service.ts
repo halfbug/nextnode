@@ -362,4 +362,33 @@ export class StoresService {
     );
     return await this.findOneById(updateDiscoveryTool.id);
   }
+
+  async removeDiscoveryToolsInStoreName(storeId: string) {
+    const stores = await this.storeRepository.find();
+
+    const bulkwrite = stores.map((store) => {
+      return {
+        updateOne: {
+          filter: { id: store.id },
+          update: {
+            $set: {
+              discoveryTool: {
+                status: store.discoveryTool.status,
+                matchingBrandName: store.discoveryTool.matchingBrandName.filter(
+                  (storematching) => storematching.id !== storeId,
+                ),
+              },
+            },
+          },
+        },
+      };
+    });
+
+    try {
+      const manager = getMongoManager();
+      return await manager.bulkWrite(Store, bulkwrite);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 }

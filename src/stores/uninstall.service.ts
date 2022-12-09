@@ -51,7 +51,7 @@ export class UninstallService {
       store.totalGroupShop = 0;
       store.plan = BillingPlanEnum.EXPLORE;
       store.logoImage = '';
-      store.brandName = '';
+      // store.brandName = '';
       store.settings = null;
       store.subscription.status = 'Zero Trial';
       await this.storesService.update(store.id, store);
@@ -66,6 +66,7 @@ export class UninstallService {
             this.shopifyService.scriptTagDelete(res.id);
           }
         });
+      await this.storesService.removeDiscoveryToolsInStoreName(store.id);
       Logger.debug(`${shop}--uninstalled`, UninstallService.name);
     } catch (error) {
       return error.message;
