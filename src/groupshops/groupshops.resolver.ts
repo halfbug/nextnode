@@ -15,6 +15,7 @@ import {
   activeGroupshop,
   MatchingGS,
 } from './entities/groupshop.entity';
+import { MostViralProducts } from 'src/inventory/entities/orders.entity';
 import { CreateGroupshopInput } from './dto/create-groupshops.input';
 import { UpdateGroupshopInput } from './dto/update-groupshops.input';
 import {
@@ -193,7 +194,7 @@ export class GroupshopsResolver {
   }
 
   @Query(() => [MostViralCustomers], { name: 'mostViralCustomers' })
-  async mostViralProducts(
+  async mostViralCustomers(
     @Args('storeId') storeId: string,
     @Args('startDate') startDate: string,
     @Args('endDate') endDate: string,
@@ -205,6 +206,15 @@ export class GroupshopsResolver {
         endDate,
       );
       return data;
+    }
+  }
+
+  @Query(() => [MostViralProducts], { name: 'mostCampaignViralProducts' })
+  async mostCampaignViralProducts(@Args('campaignId') campaignId: string) {
+    if (campaignId !== '') {
+      return await this.GroupshopsService.findCampaignMostViralProducts(
+        campaignId,
+      );
     }
   }
 

@@ -2005,4 +2005,104 @@ export class GroupshopsService {
     console.log('🚀🚀gs', gs);
     return gs;
   }
+
+  async findCampaignMostViralProducts(campaignId: string) {
+    const agg = [
+      {
+        $match: {
+          campaignId: campaignId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'parentId',
+          as: 'LI',
+        },
+      },
+      {
+        $lookup: {
+          from: 'store',
+          localField: 'storeId',
+          foreignField: 'id',
+          as: 'store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$LI',
+        },
+      },
+      {
+        $match: {
+          $and: [
+            {
+              $or: [
+                {
+                  'LI.discountCode': {
+                    $regex: 'GS',
+                  },
+                },
+                {
+                  'LI.discountCode': {
+                    $regex: 'GD',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          hideStatus: {
+            $in: ['$LI.product.id', '$store.hideProducts'],
+          },
+        },
+      },
+      {
+        $match: {
+          hideStatus: false,
+        },
+      },
+      {
+        $group: {
+          _id: '$LI.product.id',
+          purchaseCount: {
+            $sum: {
+              $multiply: [1, '$LI.quantity'],
+            },
+          },
+          revenue: {
+            $sum: '$LI.discountedPrice',
+          },
+        },
+      },
+      {
+        $sort: {
+          purchaseCount: -1,
+        },
+      },
+      {
+        $limit: 4,
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: '_id',
+          foreignField: 'id',
+          as: 'productDetails',
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Groupshops, agg).toArray();
+    return gs;
+  }
 }
