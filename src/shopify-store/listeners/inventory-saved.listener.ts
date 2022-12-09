@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ShopifyService } from '../shopify/shopify.service';
@@ -149,6 +149,7 @@ export class InvenotrySavedListener {
         }, 3000);
       } else console.log(JSON.stringify(qres.body['data']));
     } catch (err) {
+      Logger.error(err, InvenotrySavedListener.name);
       console.log(JSON.stringify(err));
     }
   }
@@ -316,6 +317,7 @@ export class InvenotrySavedListener {
       console.log('webhook registered');
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, InvenotrySavedListener.name);
     }
   }
 }

@@ -759,12 +759,12 @@ export class BillingsService {
         this.httpService.get(apiUrl).pipe(map((res) => res.data)),
       );
 
-      Logger.warn(res, BillingsService.name);
+      Logger.debug(res, BillingsService.name);
       // console.log('shortUrl : ' + res);
       return parseFloat(res['result'].toFixed(2)) ?? 0;
     } catch (err) {
-      return 0;
       Logger.error(err, BillingsService.name);
+      return 0;
     }
   }
 

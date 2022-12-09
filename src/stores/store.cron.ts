@@ -17,7 +17,11 @@ export class StoreUpdatePlanCron {
   // @Cron(CronExpression.EVERY_DAY_AT_1AM)
   @Cron(CronExpression.EVERY_DAY_AT_1AM)
   async handleCron() {
-    this.logger.debug('Called for daily cron for store plan check');
+    this.logger.log(
+      'Called for daily cron for store plan check',
+      StoreUpdatePlanCron.name,
+      true,
+    );
     const stores = await this.storesService.findActiveAll();
     console.log(
       'file: store.cron line 15 ~ stores',

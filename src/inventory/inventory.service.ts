@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getMongoManager, Repository } from 'typeorm';
 import { CreateInventoryInput } from './dto/create-inventory.input';
@@ -35,6 +35,7 @@ export class InventoryService {
 
       return await this.inventoryRepository.save(inventory);
     } catch (error) {
+      Logger.error(error, InventoryService.name);
       console.log(error);
     }
   }
@@ -75,6 +76,10 @@ export class InventoryService {
   }
 
   async remove(id: string) {
+    Logger.warn(
+      `product ${id} is removed from database`,
+      InventoryService.name,
+    );
     console.log(
       '%c ',
       'font-size: 1px; padding: 240px 123.5px; background-size: 247px 480px; background: no-repeat url(https://i2.wp.com/i.giphy.com/media/11ZSwQNWba4YF2/giphy-downsized.gif?w=770&amp;ssl=1);',

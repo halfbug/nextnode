@@ -184,7 +184,12 @@ export class ShopifyService {
       //   }
       // });
       // console.log(JSON.stringify(response));
-      // return response;
+      Logger.log(
+        `${topic}-webhook - registered for ${shop}`,
+        'WEBHOOKS_REGISTERED',
+        true,
+      );
+      return response;
     } catch (error) {
       console.log('error : ', error);
     }
@@ -493,7 +498,7 @@ export class ShopifyService {
       //   );
     } catch (err) {
       console.log(err.message);
-      Logger.error(err);
+      Logger.error(err, ShopifyService.name);
     }
   }
 

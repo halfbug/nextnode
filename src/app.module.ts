@@ -37,9 +37,11 @@ import { VideoModule } from './videos/video.module';
 import { Video } from './videos/entities/video.modal';
 import { AdminUsersModule } from './admin-users/admin-users.module';
 import { ChannelModule } from './channel/channel.module';
+import { AppLoggerModule } from './applogger/applogger.module';
 import AdminUser from './admin-users/entities/admin-user.model';
 import Channel from './channel/entities/channel.model';
 import ChannelGroupshop from './channel/entities/channelgroupshop.model';
+import { AppLogger } from './applogger/entities/applogger.entity';
 
 @Module({
   imports: [
@@ -85,6 +87,7 @@ import ChannelGroupshop from './channel/entities/channelgroupshop.model';
             AdminUser,
             Channel,
             ChannelGroupshop,
+            AppLogger,
           ],
         };
       },
@@ -113,6 +116,7 @@ import ChannelGroupshop from './channel/entities/channelgroupshop.model';
     AdminUsersModule,
     ChannelModule,
     AuthModule,
+    AppLoggerModule,
   ],
 })
 export class AppModule {}

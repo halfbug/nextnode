@@ -167,7 +167,7 @@ export class StoresService {
 
       return true;
     } catch (err) {
-      Logger.error(err);
+      Logger.error(err, StoresService.name);
       return false;
     }
   }

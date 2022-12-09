@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { StoresService } from 'src/stores/stores.service';
@@ -74,6 +74,7 @@ export class ProductMediaListener {
       );
     } catch (err) {
       console.log({ err });
+      Logger.error(err, ProductMediaListener.name);
     }
   }
 }

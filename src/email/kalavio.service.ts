@@ -146,6 +146,7 @@ export class KalavioService {
       return res?.shortURL;
     } catch (err) {
       console.error(err);
+      Logger.error(err, KalavioService.name);
       return link;
     }
   }
@@ -155,6 +156,7 @@ export class KalavioService {
       return await qrcode.toDataURL(text);
     } catch (err) {
       console.error(err);
+      Logger.error(err, KalavioService.name);
       return false;
     }
   }

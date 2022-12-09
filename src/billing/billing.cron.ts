@@ -70,7 +70,7 @@ export class BillingUsageCargeCron {
           'Billing live is false',
         );
       // this.logger.error('Called every 30 seconds');
-      this.logger.debug(`Started At : ${new Date()}`);
+      this.logger.log(`Billing Cron Started`, BillingUsageCargeCron.name, true);
       const stores = await this.storesService.findActiveAll();
 
       const allstoresBilling = await this.billingService.getAllStoreBilling();
@@ -90,7 +90,7 @@ export class BillingUsageCargeCron {
             (storeBilling) => storeBilling.store === store.id,
           );
 
-          Logger.warn(`${store.shop} - ${store.id}`, 'BillingUsageCargeCron');
+          // Logger.warn(`${store.shop} - ${store.id}`, 'BillingUsageCargeCron');
           console.log(
             '🚀 ~ file: billing.cron.ts ~ line 30 ~ BillingUsageCargeCron ~ stores.map ~ useageQuery',
             useageQuery,

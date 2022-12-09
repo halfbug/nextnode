@@ -282,7 +282,7 @@ catch (err) {
     // JSON.stringify(err, null, "\t" )
     err
   );
-Logger.error(err.message, CampaignsService.name)
+Logger.error(err, CampaignsService.name)
 }
 
   } // end update 

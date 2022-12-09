@@ -44,7 +44,11 @@ export class StoreUpdateTierCron {
           StoreUpdateTierCron.name,
           'Billing live is false',
         );
-      this.logger1.debug('Called for daily cron for store tier check');
+      this.logger1.log(
+        'Called for daily cron for store tier check',
+        StoreUpdateTierCron.name,
+        true,
+      );
       const stores = await this.storesService.findActiveAll();
       console.log(
         'file: storeTier.cron line 35 ~ stores',

@@ -67,8 +67,9 @@ export class UninstallService {
           }
         });
       await this.storesService.removeDiscoveryToolsInStoreName(store.id);
-      Logger.debug(`${shop}--uninstalled`, UninstallService.name);
+      Logger.warn(`${shop}--uninstalled`, UninstallService.name);
     } catch (error) {
+      Logger.error(error, UninstallService.name);
       return error.message;
     }
   }

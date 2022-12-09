@@ -497,6 +497,7 @@ export class WebhooksController {
       });
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, 'product-created');
     } finally {
       res.status(HttpStatus.OK).send();
     }
@@ -523,6 +524,7 @@ export class WebhooksController {
       // res.send('store updated..');
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, 'uninstalled');
     } finally {
       res.status(HttpStatus.OK).send();
     }
@@ -635,6 +637,7 @@ export class WebhooksController {
       // res.send('product updated..');
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, 'product-updated');
     } finally {
       res.status(HttpStatus.OK).send();
     }
@@ -810,6 +813,7 @@ export class WebhooksController {
       // res.send('order created..');
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, 'order-created');
     } finally {
       res.status(HttpStatus.OK).send();
     }
@@ -829,8 +833,13 @@ export class WebhooksController {
         JSON.stringify(rproduct.id),
       );
       // res.send(result.deletedCount);
+      Logger.warn(
+        `product : ${rproduct.id} is deleted from ${shop}`,
+        'product-deleted',
+      );
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, 'product-deleted');
     } finally {
       res.status(HttpStatus.OK).send();
     }
@@ -858,6 +867,7 @@ export class WebhooksController {
       // res.send(result.deletedCount);
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, 'collection-created');
     } finally {
       res.status(HttpStatus.OK).send();
     }
@@ -1000,6 +1010,7 @@ export class WebhooksController {
       }
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, 'collection-updated');
     } finally {
       res.status(HttpStatus.OK).send();
     }
@@ -1022,6 +1033,7 @@ export class WebhooksController {
       // res.send(result.deletedCount);
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, 'billing-failure');
     } finally {
       res.status(HttpStatus.OK).send();
     }
@@ -1073,9 +1085,17 @@ export class WebhooksController {
           installationStep: subscriptionStatus === 'ACTIVE' ? null : 5,
         },
       );
+      Logger.warn(
+        'AppSubscription status: ' +
+          subscriptionStatus +
+          ' set for shop :' +
+          shop,
+        'app-subscriptionStatus',
+      );
       // }
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, 'app-Subscription');
     } finally {
       res.status(HttpStatus.OK).send();
     }
@@ -1175,6 +1195,11 @@ export class WebhooksController {
                               title
                               displayName
                               inventoryQuantity
+                              inventoryPolicy
+                              inventoryItem{
+                                sku
+                                tracked
+                             }
                               price
                               selectedOptions{
                                 name
@@ -1253,7 +1278,8 @@ export class WebhooksController {
                   inventory.price;
                 inventory.currencyCode =
                   inventory?.priceRangeV2?.maxVariantPrice?.currencyCode;
-
+                // inventory.inventoryManagement = inventory?.inventory_management;
+                // inventory.inventoryPolicy = inventory?.inventory_policy;
                 //rename inventory __parentId
                 if (inventory.__parentId) {
                   inventory.parentId = inventory.__parentId;
@@ -1264,7 +1290,12 @@ export class WebhooksController {
 
                 // add record type
                 inventory.recordType = inventory.id.split('/')[3];
-
+                //add inventory management details
+                if (inventory.recordType === 'ProductVariant')
+                  inventory.inventoryManagement = inventory?.inventoryItem
+                    ?.tracked
+                    ? 'shopify'
+                    : null;
                 inventory.createdAt = new Date();
                 inventory.updatedAt = new Date();
                 return inventory;
@@ -1274,9 +1305,9 @@ export class WebhooksController {
               const products = inventArr.filter(
                 (item) => item.recordType === 'Product',
               );
-              products.map((product) => {
-                this.inventryService.remove(product.id);
-              });
+              // products.map((product) => {
+              //   this.inventryService.remove(product.id);
+              // });
               // products.map((product) => {
               //   console.log(
               //     '\x1b[36m%s\x1b[0m',
@@ -1314,19 +1345,21 @@ export class WebhooksController {
                 products.length,
               );
               // OrdersSavedEvent -- Purchase Count
-              const ordersSavedEvent = new OrdersSavedEvent();
-              ordersSavedEvent.shop = shop;
-              ordersSavedEvent.accessToken = accessToken;
-              this.eventEmitter.emit('orders.saved', ordersSavedEvent);
-              // InventorySavedEvent -- out of stock
-              const inventorySavedEvent = new InventorySavedEvent();
-              inventorySavedEvent.shop = shop;
-              inventorySavedEvent.accessToken = accessToken;
-              inventorySavedEvent.type = 'outofstock';
-              this.eventEmitter.emit(
-                'inventory.outofstock',
-                inventorySavedEvent,
-              );
+              setTimeout(() => {
+                const ordersSavedEvent = new OrdersSavedEvent();
+                ordersSavedEvent.shop = shop;
+                ordersSavedEvent.accessToken = accessToken;
+                this.eventEmitter.emit('orders.saved', ordersSavedEvent);
+                // InventorySavedEvent -- out of stock
+                const inventorySavedEvent = new InventorySavedEvent();
+                inventorySavedEvent.shop = shop;
+                inventorySavedEvent.accessToken = accessToken;
+                inventorySavedEvent.type = 'outofstock';
+                this.eventEmitter.emit(
+                  'inventory.outofstock',
+                  inventorySavedEvent,
+                );
+              }, 10000);
             });
           }
         }, 3000);
@@ -1334,25 +1367,31 @@ export class WebhooksController {
       return JSON.stringify(JSON.stringify(qres.body['data']));
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, 'bulkProducts');
     }
   }
 
   @Get('inevent')
   async importEvents(@Query('shopName') shopName: any) {
+    Logger.log(`testlog`, 'WEBHOOKS_REGISTERED', true);
     // try {
     // http://localhost:5000/webhooks/inevent?shopName=native-roots-dev.myshopify.com
-    const { shop, accessToken } = await this.storesService.findOne(shopName);
-    // OrdersSavedEvent -- Purchase Count
-    const ordersSavedEvent = new OrdersSavedEvent();
-    ordersSavedEvent.shop = shop;
-    ordersSavedEvent.accessToken = accessToken;
-    this.eventEmitter.emit('orders.saved', ordersSavedEvent);
-    // InventorySavedEvent -- out of stock
-    const inventorySavedEvent = new InventorySavedEvent();
-    inventorySavedEvent.shop = shop;
-    inventorySavedEvent.accessToken = accessToken;
-    inventorySavedEvent.type = 'outofstock';
-    this.eventEmitter.emit('inventory.outofstock', inventorySavedEvent);
+    try {
+      const { shop, accessToken } = await this.storesService.findOne(shopName);
+      // OrdersSavedEvent -- Purchase Count
+      const ordersSavedEvent = new OrdersSavedEvent();
+      ordersSavedEvent.shop = shop;
+      ordersSavedEvent.accessToken = accessToken;
+      this.eventEmitter.emit('orders.saved', ordersSavedEvent);
+      // InventorySavedEvent -- out of stock
+      const inventorySavedEvent = new InventorySavedEvent();
+      inventorySavedEvent.shop = shop;
+      inventorySavedEvent.accessToken = accessToken;
+      inventorySavedEvent.type = 'outofstock';
+      this.eventEmitter.emit('inventory.outofstock', inventorySavedEvent);
+    } catch (error) {
+      Logger.error(error, 'Inevent test log');
+    }
   }
 
   @Post('order-updated?')
@@ -1394,6 +1433,7 @@ export class WebhooksController {
       // res.send('order created..');
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, 'order-updated');
     } finally {
       res.status(HttpStatus.OK).send();
     }
@@ -1432,6 +1472,7 @@ export class WebhooksController {
       });
     } catch (err) {
       console.log(JSON.stringify(err));
+      Logger.error(err, 'updatepurchasecount');
     } finally {
       res.status(HttpStatus.OK).send();
     }
