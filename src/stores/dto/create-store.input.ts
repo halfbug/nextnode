@@ -94,6 +94,8 @@ export class SocialInput {
 export class Subscription {
   @Field({ nullable: true })
   status?: string;
+  @Field({ nullable: true })
+  confirmationUrl?: string;
 }
 @InputType('RetentiontoolsInput')
 export class Retentiontools {

@@ -38,14 +38,14 @@ export class UninstallService {
       const store: UpdateStoreInput = await this.storesService.findOne(shop);
       this.shopifyService.accessToken = store.accessToken;
       this.shopifyService.shop = shop;
-      await this.inventorySrv.removeShop(shop);
-      await this.ordersSrv.removeShop(shop);
-      await this.campaignSrv.removeShop(store.id);
-      await this.groupshopSrv.removeShop(store.id);
+      this.inventorySrv.removeShop(shop);
+      this.ordersSrv.removeShop(shop);
+      this.campaignSrv.removeShop(store.id);
+      this.groupshopSrv.removeShop(store.id);
       // await this.storesService.removeShop(shop);
-      await this.billingService.removeByShop(store.id);
-      await this.partnerGSSrv.removeShop(store.id);
-      await this.retentiontoolsService.removeShop(store.id);
+      this.billingService.removeByShop(store.id);
+      this.partnerGSSrv.removeShop(store.id);
+      this.retentiontoolsService.removeShop(store.id);
       store.status = 'Uninstalled';
       store.installationStep = 0;
       store.totalGroupShop = 0;
@@ -54,6 +54,7 @@ export class UninstallService {
       // store.brandName = '';
       store.settings = null;
       store.subscription.status = 'Zero Trial';
+      store.subscription.confirmationUrl = '';
       await this.storesService.update(store.id, store);
       this.lifecyclesrv.create({
         storeId: store.id,
