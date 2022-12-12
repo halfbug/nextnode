@@ -209,17 +209,6 @@ export class GroupshopsResolver {
     }
   }
 
-  @Query(() => [MostViralCustomers], { name: 'mostCampaignViralCustomers' })
-  async mostCampaignViralCustomers(@Args('campaignId') campaignId: string) {
-    if (campaignId !== '') {
-      const data =
-        await this.GroupshopsService.findMostViralCustomersByCampaign(
-          campaignId,
-        );
-      return data;
-    }
-  }
-
   @Query(() => [MostViralProducts], { name: 'mostCampaignViralProducts' })
   async mostCampaignViralProducts(@Args('campaignId') campaignId: string) {
     if (campaignId !== '') {
