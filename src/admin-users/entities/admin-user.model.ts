@@ -1,14 +1,29 @@
-import { Column, Entity } from 'typeorm';
+import { BeforeInsert, Column, Entity } from 'typeorm';
 import { DefaultColumnsService } from 'src/utils/default-columns/default-columns.service';
+import * as bcrypt from 'bcrypt';
 
 @Entity()
 export default class AdminUser extends DefaultColumnsService {
   @Column()
-  username: string;
+  firstName: string;
+
+  @Column({ nullable: true })
+  lastName: string;
+
+  @Column()
+  email: string;
 
   @Column()
   password: string;
 
-  @Column('string')
-  roles: string[];
+  @Column()
+  roles?: string[];
+
+  @Column({ nullable: true })
+  status: string;
+
+  @BeforeInsert() async hashPassword() {
+    console.log(this.password);
+    this.password = await bcrypt.hash(this.password, 10);
+  }
 }

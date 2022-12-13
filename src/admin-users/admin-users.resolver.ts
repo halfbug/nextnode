@@ -22,7 +22,7 @@ export class AdminUsersResolver {
 
   @Query(() => AdminUser, { name: 'getAdminUser' })
   findOne(@Args('id', { type: () => String }) id: string) {
-    return this.adminUsersService.findOne(id);
+    return this.adminUsersService.findOne('id', id);
   }
 
   @Query(() => AdminUser, { name: 'getAdminUserByUserName' })

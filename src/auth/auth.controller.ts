@@ -8,6 +8,8 @@ import {
   Delete,
   Req,
   Res,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response } from 'express';
@@ -19,6 +21,7 @@ import { Public } from './public.decorator';
 import { v4 as uuid } from 'uuid';
 import { AuthEntity, User } from './entities/auth.entity';
 import { randomInt } from 'crypto';
+import { AdminUsersService } from 'src/admin-users/admin-users.service';
 // import { AuthDecorator } from 'src/auth/auth.decorator';
 // import { UpdateAuthDto } from './dto/update-auth.dto';
 
@@ -30,6 +33,7 @@ export class AuthController {
     private shopifyService: ShopifyService,
     private configService: ConfigService,
     private storesService: StoresService,
+    private userService: AdminUsersService,
   ) {}
 
   @Get()
@@ -188,26 +192,33 @@ export class AuthController {
     console.log('staffLogin');
     // 1. get email and password from front server
     console.log('auth - req.body :', req.body);
-    // 2. @Todo @Mayur-505 verify email and password from database admin user collection
-    // 3. generate jwt token
-    const userInfo: AuthEntity = {
-      id: uuid(),
-      user: {
-        id: randomInt(3),
-        first_name: 'admin',
-        last_name: 'user',
-        email: req.body.email,
-      },
-      isGSAdminUser: true,
-      expires: new Date(new Date().setDate(new Date().getDate() + 3)), // expires 3d
-    };
-    const token = this.authService.signJwt(userInfo);
-    console.log(
-      '🚀 ~ file: auth.controller.ts ~ line 64 ~ AuthController ~ callback ~ token',
-      token,
-    );
-    // 4. send jwt token to front server
-    res.status(200).send({ token });
+    // 2. @Todo verify email and password from database admin user collection
+    const registerdUser = await this.userService.verify({
+      email: req.body.email,
+      password: req.body.password,
+    });
+    if (registerdUser) {
+      // 3. generate jwt token
+      const userInfo: AuthEntity = {
+        id: uuid(),
+        user: {
+          id: randomInt(3),
+          first_name: registerdUser.firstName,
+          last_name: registerdUser.lastName ?? '',
+          email: registerdUser.email,
+        },
+        isGSAdminUser: true,
+        expires: new Date(new Date().setDate(new Date().getDate() + 3)), // expires 3d
+      };
+      const token = this.authService.signJwt(userInfo);
+      console.log(
+        '🚀 ~ file: auth.controller.ts ~ line 64 ~ AuthController ~ callback ~ token',
+        token,
+      );
+      // 4. send jwt token to front server
+      res.status(200).send({ token });
+    } else
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
   }
 
   @Post('storeLogin')

@@ -1,14 +1,21 @@
 import { InputType, Field } from '@nestjs/graphql';
-
+import { IsNotEmpty, IsEmail, MinLength } from 'class-validator';
 @InputType()
 export class CreateAdminUserInput {
-  @Field({ defaultValue: new Date() })
-  createdAt: Date;
+  @Field({ nullable: true })
+  @IsNotEmpty()
+  @MinLength(3)
+  firstName: string;
 
   @Field({ nullable: true })
-  username: string;
+  lastName: string;
 
-  @Field({ nullable: true })
+  @Field()
+  @IsEmail()
+  email: string;
+
+  @Field()
+  @IsNotEmpty()
   password: string;
 
   @Field(() => [String], { nullable: true })

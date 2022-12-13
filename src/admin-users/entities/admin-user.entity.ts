@@ -5,11 +5,17 @@ export class AdminUser {
   @Field(() => ID)
   id: string;
 
-  @Field({ nullable: true })
-  username: string;
+  @Field()
+  firstName: string;
 
-  // @Field({ nullable: true })
-  // password: string;
+  @Field({ nullable: true })
+  lastName: string;
+
+  @Field()
+  email: string;
+
+  @Field()
+  password: string;
 
   @Field(() => [String])
   roles: string[];

@@ -9,6 +9,7 @@ import { AuthGuard } from './auth.guard';
 import { AuthDecorator } from './auth.decorator';
 import { APP_GUARD } from '@nestjs/core';
 import { Public } from './public.decorator';
+import { AdminUsersModule } from 'src/admin-users/admin-users.module';
 
 @Global()
 @Module({
@@ -16,6 +17,7 @@ import { Public } from './public.decorator';
     StoresModule,
     forwardRef(() => ShopifyStoreModule),
     ConfigModule,
+    AdminUsersModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
