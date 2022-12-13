@@ -22,6 +22,8 @@ import { UpdateStoreInput } from 'src/stores/dto/update-store.input';
 import { LifecycleService } from 'src/gs-common/lifecycle.service';
 import { AuthDecorator } from 'src/auth/auth.decorator';
 import { AuthEntity } from 'src/auth/entities/auth.entity';
+import { EventType } from 'src/gs-common/entities/lifecycle.modal';
+import { BillingPlanEnum } from 'src/stores/entities/store.entity';
 
 @Resolver(() => Billing)
 export class BillingsResolver {
@@ -182,6 +184,13 @@ export class BillingsResolver {
         planResetDate: endOfTrialDate,
       },
     );
+    // create lifecycle log for planReset Date to show billing record
+    this.lifecycleService.create({
+      storeId: store.id,
+      event: EventType.planReset,
+      plan: BillingPlanEnum.EXPLORE, // new store plan will be explore
+      dateTime: new Date(),
+    });
 
     return { redirectUrl: subscription['confirmationUrl'] };
   }
