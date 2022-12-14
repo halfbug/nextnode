@@ -308,7 +308,7 @@ export class InventoryService {
       },
       {
         $sort: {
-          publishedAt: sort ?? -1,
+          publishedAt: sort,
         },
       },
       {
