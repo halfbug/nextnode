@@ -231,6 +231,64 @@ export class BillingsService {
     return gs;
   }
 
+  async findGraphCampaignRevenue(storeId: string, campaignId: string) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    fullDate = `${year}${'-01-01'}`;
+    const agg = [
+      {
+        $match: {
+          storeId: storeId,
+          createdAt: {
+            $gte: new Date(fullDate),
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'groupshops',
+          localField: 'groupShopId',
+          foreignField: 'id',
+          as: 'campaign',
+        },
+      },
+      {
+        $unwind: {
+          path: '$campaign',
+        },
+      },
+      {
+        $match: {
+          'campaign.campaignId': campaignId,
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: {
+              $year: '$createdAt',
+            },
+            month: {
+              $month: '$createdAt',
+            },
+          },
+          revenue: {
+            $sum: '$revenue',
+          },
+        },
+      },
+      {
+        $sort: {
+          _id: -1,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Billing, agg).toArray();
+    return gs;
+  }
+
   async findGraphRevenueByDate(storeId: string, startDate: any, endDate: any) {
     const date1 = new Date(startDate);
     const date2 = new Date(endDate);

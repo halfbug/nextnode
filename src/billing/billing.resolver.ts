@@ -209,6 +209,16 @@ export class BillingsResolver {
     return this.billingService.findGraphRevenue(storeId);
   }
 
+  @Query(() => [MonthlyBillingInput], { name: 'getGraphRevenueByCampaign' })
+  getGraphRevenueByCampaign(
+    @Args('campaignId') campaignId: string,
+    @Args('storeId') storeId: string,
+  ) {
+    if (campaignId !== '') {
+      return this.billingService.findGraphCampaignRevenue(storeId, campaignId);
+    }
+  }
+
   @Query(() => [GraphRevenue], { name: 'getGraphRevenueByDate' })
   getGraphRevenueByDate(
     @Args('storeId') storeId: string,
