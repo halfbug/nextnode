@@ -282,10 +282,6 @@ export class InventoryService {
   }
   async findStoreProducts(productQueryInput: ProductQueryInput) {
     const { shop, sort, limit } = productQueryInput;
-    console.log(
-      '🚀 ~ file: inventory.service.ts:285 ~ InventoryService ~ findStoreProducts ~ productQueryInput',
-      productQueryInput,
-    );
     const manager = getMongoManager();
 
     const agg = [
@@ -316,7 +312,7 @@ export class InventoryService {
         },
       },
       {
-        $limit: limit ?? 10000,
+        $limit: limit,
       },
     ];
     return await manager.aggregate(Inventory, agg).toArray();
