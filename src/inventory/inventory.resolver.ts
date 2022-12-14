@@ -40,6 +40,11 @@ export class InventoryResolver {
   findStoreProducts(
     @Args('productQueryInput') productQueryInput: ProductQueryInput,
   ) {
+    console.log(
+      '🚀 ~ file: inventory.resolver.ts:43 ~ InventoryResolver ~ productQueryInput',
+      productQueryInput,
+    );
+
     return this.inventoryService.findStoreProducts(productQueryInput);
   }
 
