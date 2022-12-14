@@ -22,7 +22,7 @@ async function bootstrap() {
   // this is from NestJS docs
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
+      whitelist: false,
       transform: true,
     }),
   );
