@@ -38,14 +38,19 @@ export class InventoryResolver {
   @Public()
   @Query(() => [Product], { name: 'products' })
   findStoreProducts(
-    @Args('productQueryInput') productQueryInput: ProductQueryInput,
+    // @Args('productQueryInput') productQueryInput: ProductQueryInput,
+    @Args('shop') shop: string,
+    @Args('sort') sort: number,
+    @Args('limit') limit: number,
   ) {
     console.log(
       '🚀 ~ file: inventory.resolver.ts:43 ~ InventoryResolver ~ productQueryInput',
-      productQueryInput,
+      shop,
+      limit,
+      sort,
     );
 
-    return this.inventoryService.findStoreProducts(productQueryInput);
+    return this.inventoryService.findStoreProducts({ shop, sort, limit });
   }
 
   @Public()
