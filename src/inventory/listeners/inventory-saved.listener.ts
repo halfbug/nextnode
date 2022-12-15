@@ -6,6 +6,7 @@ import { OrdersSavedEvent } from '../events/orders-saved.event';
 import { OrdersService } from '../orders.service';
 import { Product, ProductVariant } from '../entities/product.entity';
 import { InventorySavedEvent } from '../events/inventory-saved.event';
+import { InventoryDoneEvent } from '../events/inventory-done.event';
 
 @Injectable()
 export class InventorySavedListener {
@@ -13,6 +14,7 @@ export class InventorySavedListener {
     private inventoryService: InventoryService,
     private ordersService: OrdersService,
     private eventEmitter: EventEmitter2,
+    private inventoryDoneEvent: InventoryDoneEvent,
   ) {}
 
   @OnEvent('inventory.*')
@@ -50,6 +52,9 @@ export class InventorySavedListener {
 
       await this.inventoryService.setPurchaseCount(blukWrite);
       console.log('Product out of stock updated...');
+      this.inventoryDoneEvent.shop = event.shop;
+      this.inventoryDoneEvent.accessToken = event.accessToken;
+      this.inventoryDoneEvent.emit();
     }
   }
 }

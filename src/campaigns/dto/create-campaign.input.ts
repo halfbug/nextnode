@@ -37,7 +37,7 @@ export class CreateCampaignInput {
   expiredAt: Date;
 
   @Field({ nullable: true })
-  criteria: string;
+  criteria: 'newest' | 'bestseller' | 'allproducts' | 'custom';
 
   @Field({ nullable: true })
   storeId: string;

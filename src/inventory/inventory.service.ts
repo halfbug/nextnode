@@ -325,10 +325,10 @@ export class InventoryService {
   }
 
   async setPurchaseCount(inventory: any) {
-    console.log(
-      '🚀 ~ file: inventory.service.ts:320 ~ InventoryService ~ setPurchaseCount ~ inventory',
-      JSON.stringify(inventory),
-    );
+    // console.log(
+    //   '🚀 ~ file: inventory.service.ts:320 ~ InventoryService ~ setPurchaseCount ~ inventory',
+    //   JSON.stringify(inventory),
+    // );
     try {
       const manager = getMongoManager();
 

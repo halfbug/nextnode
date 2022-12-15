@@ -53,7 +53,8 @@ export class UninstallService {
       store.logoImage = '';
       // store.brandName = '';
       store.settings = null;
-      store.subscription.status = 'Zero Trial';
+      if (store.subscription) store.subscription.status = 'Zero Trial';
+      else store.subscription = { status: 'Zero Trial' };
       store.subscription.confirmationUrl = '';
       await this.storesService.update(store.id, store);
       this.lifecyclesrv.create({
@@ -61,15 +62,19 @@ export class UninstallService {
         event: EventType.uninstalled,
         dateTime: new Date(),
       });
-      if (store?.resources?.length > 0)
-        store?.resources?.map((res) => {
-          if (res.type === 'scriptTag') {
-            this.shopifyService.scriptTagDelete(res.id);
-          }
-        });
+      // if (store?.resources?.length > 0)
+      //   store?.resources?.map((res) => {
+      //     if (res.type === 'scriptTag') {
+      //       this.shopifyService.scriptTagDelete(res.id);
+      //     }
+      //   });
       await this.storesService.removeDiscoveryToolsInStoreName(store.id);
       Logger.warn(`${shop}--uninstalled`, UninstallService.name);
     } catch (error) {
+      console.log(
+        '🚀 ~ file: uninstall.service.ts:73 ~ UninstallService ~ deleteStoreByName ~ error',
+        error,
+      );
       Logger.error(error, UninstallService.name);
       return error.message;
     }

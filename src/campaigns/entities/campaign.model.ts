@@ -19,7 +19,7 @@ export default class Campaign extends DefaultColumnsService {
   joinExisting: boolean;
 
   @Column({ nullable: true })
-  criteria: string;
+  criteria: 'newest' | 'bestseller' | 'allproducts' | 'custom';
 
   // @Column(() => Product)
   // products?: Product[];

@@ -24,7 +24,7 @@ export class Gslogger extends ConsoleLogger {
     super.error(exception.message, context);
     const elog = new CreateAppLoggerInput();
     elog.stack = stack ?? exception.stack;
-    elog.context = context.toUpperCase();
+    elog.context = context ? context.toUpperCase() : stack.toUpperCase();
     elog.message = exception.message ?? exception;
     elog.level = 'error';
     this.apploggerService.create(elog);
@@ -32,7 +32,7 @@ export class Gslogger extends ConsoleLogger {
   warn(message: any, context?: string) {
     super.warn(message, context);
     const elog = new CreateAppLoggerInput();
-    elog.context = context.toUpperCase();
+    elog.context = context?.toUpperCase();
     elog.message = message;
     elog.level = 'warn';
     this.apploggerService.create(elog);

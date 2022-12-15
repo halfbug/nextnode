@@ -33,6 +33,7 @@ export class CampaignsService {
   ) {}
 
   async setProducts(shop, criteria, prevProducts) {
+    console.log("🚀 ~ file: campaigns.service.ts:36 ~ CampaignsService ~ setProducts ~ criteria", criteria)
     let newProducts: string[] = [];
     switch (criteria) {
       case 'newest':
@@ -43,6 +44,7 @@ export class CampaignsService {
         const nproducts = await this.inventoryService.findStoreProducts(
           npQuery,
         );
+        console.log("🚀 ~ file: campaigns.service.ts:47 ~ CampaignsService ~ setProducts ~ nproducts", nproducts)
 
         newProducts = nproducts.map((prod) => prod.id);
         break;
@@ -70,6 +72,7 @@ export class CampaignsService {
         newProducts = [...new Set(prevProducts)] as string[];
         break;
     }
+    console.log("🚀 ~ file: campaigns.service.ts:77 ~ CampaignsService ~ setProducts ~ newProducts", newProducts)
     return newProducts;
   }
 
@@ -164,6 +167,7 @@ export class CampaignsService {
   }
 
   async update(id: string, updateCampaignInput: UpdateCampaignInput) {
+    console.log("🚀 ~ file: campaigns.service.ts:167 ~ CampaignsService ~ update ~ id", id)
     console.log(
       '🚀 ~ file:CampaignsService updateCampaignInput',
       updateCampaignInput,
@@ -203,6 +207,7 @@ export class CampaignsService {
       );
     }
     updateCampaignInput.expiredAt = (isActive === false) ? new Date() : null ;   
+    console.log("🚀 ~ file: campaigns.service.ts:206 ~ CampaignsService ~ update ~ updateCampaignInput", updateCampaignInput)
 
     await this.campaignRepository.update({ id }, updateCampaignInput);    
     

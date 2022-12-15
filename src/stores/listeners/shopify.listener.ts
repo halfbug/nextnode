@@ -37,7 +37,7 @@ export class ShopifyAPIListener {
 
     console.log('app install/uninstall');
     // on re-install app update plan back to launch and planresetdate to next 30days
-    if (store.status === 'Uninstalled') {
+    if (store.status === 'Uninstalled' && store.appTrialEnd) {
       console.log(
         'store plan',
         Date.now() >= store.appTrialEnd.getTime()

@@ -9,6 +9,7 @@ import { InventoryModule } from 'src/inventory/inventory.module';
 import { StoresModule } from 'src/stores/stores.module';
 import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 import { PartnersModule } from 'src/partners/partners.module';
+import { InventorySavedCampaignsListener } from './listeners/inventory-saved-campaigns.listener';
 
 @Module({
   imports: [
@@ -19,7 +20,11 @@ import { PartnersModule } from 'src/partners/partners.module';
     forwardRef(() => GroupshopsModule),
     PartnersModule,
   ],
-  providers: [CampaignsResolver, CampaignsService],
+  providers: [
+    CampaignsResolver,
+    CampaignsService,
+    InventorySavedCampaignsListener,
+  ],
   exports: [CampaignsService],
 })
 export class CampaignsModule {}

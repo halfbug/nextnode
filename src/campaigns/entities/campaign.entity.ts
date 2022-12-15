@@ -22,7 +22,7 @@ export class Campaign {
   name: string;
 
   @Field({ nullable: true })
-  criteria: string;
+  criteria: 'newest' | 'bestseller' | 'allproducts' | 'custom';
 
   @Field({ nullable: true, defaultValue: false })
   joinExisting: boolean;

@@ -1451,10 +1451,10 @@ export class WebhooksController {
       const PurchasedProducts =
         await this.orderService.getPurchasedProductsLastSixMonth(shop, nowdate);
 
-      console.log(
-        '🚀 ~ file: webhooks.controller.ts ~ line 1337 ~ WebhooksController ~ updatePurchaseCount ~ PurchasedProducts',
-        PurchasedProducts.slice(0, 2),
-      );
+      // console.log(
+      //   '🚀 ~ file: webhooks.controller.ts ~ line 1337 ~ WebhooksController ~ updatePurchaseCount ~ PurchasedProducts',
+      //   PurchasedProducts.slice(0, 2),
+      // );
       const blukWrite = PurchasedProducts.map((item) => {
         return {
           updateOne: {
