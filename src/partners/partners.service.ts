@@ -8,7 +8,11 @@ import {
 } from './dto/create-partners.input';
 import { UpdatePartnersInput } from './dto/update-partners.input';
 import { ConfigService } from '@nestjs/config';
-import { partnerDetails, Partnergroupshop } from './entities/partner.modal';
+import {
+  partnerDetails,
+  Partnergroupshop,
+  Partnermember,
+} from './entities/partner.modal';
 import { v4 as uuid } from 'uuid';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import {
@@ -1150,5 +1154,130 @@ export class PartnerService {
     const Total = await manager.aggregate(Partnergroupshop, agg).toArray();
     const value = Total.length > 0 ? Total[0] : { count: 0 };
     return value;
+  }
+
+  async overviewPartnerMetric(storeId: string, startFrom, toDate) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    fullDate = `${year}${'-'}${month}${'-'}${day}`;
+    if (startFrom === '-') {
+      startFrom = '2021-01-21';
+      toDate = fullDate;
+    }
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              storeId: storeId,
+            },
+            {
+              createdAt: {
+                $gte: new Date(`${startFrom}${'T00:00:01'}`),
+                $lte: new Date(`${toDate}${'T23:59:59'}`),
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: {
+          path: '$lineItems',
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          cashBack: {
+            $sum: '$lineItems.totalDiscounts',
+          },
+          revenue: {
+            $sum: '$orderAmount',
+          },
+        },
+      },
+    ];
+
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Partnermember, agg).toArray();
+    console.log(gs);
+    return gs;
+  }
+
+  async partnerUniqueClicks(storeId: string, startFrom, toDate) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    fullDate = `${year}${'-'}${month}${'-'}${day}`;
+    if (startFrom === '-') {
+      startFrom = '2021-01-21';
+      toDate = fullDate;
+    }
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              storeId: storeId,
+            },
+            {
+              createdAt: {
+                $gte: new Date(`${startFrom}${'T00:00:01'}`),
+                $lte: new Date(`${toDate}${'T23:59:59'}`),
+              },
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'visitors',
+          localField: 'id',
+          foreignField: 'groupshopId',
+          as: 'result',
+        },
+      },
+      {
+        $lookup: {
+          from: 'partnermember',
+          localField: 'id',
+          foreignField: 'groupshopId',
+          as: 'members',
+        },
+      },
+      {
+        $project: {
+          uniqueClicks: {
+            $size: '$result',
+          },
+          numOrders: {
+            $size: '$members',
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          uniqueClicks: {
+            $sum: '$uniqueClicks',
+          },
+          totalOrderCount: {
+            $sum: '$numOrders',
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Partnergroupshop, agg).toArray();
+    const response = {
+      uniqueVisitors: gs[0]?.uniqueClicks || 0,
+      totalOrders: gs[0]?.totalOrderCount || 0,
+    };
+    return response;
   }
 }

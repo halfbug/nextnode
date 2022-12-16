@@ -7,9 +7,11 @@ import {
   GqlExecutionContext,
 } from '@nestjs/graphql';
 import { PartnerService } from './partners.service';
+import { PMemberService } from './pmember.service';
 import { Partnergroupshop as Partners } from './entities/partner.entity';
 import { CreatePartnersInput } from './dto/create-partners.input';
 import { UpdatePartnersInput } from './dto/update-partners.input';
+import { Metrics } from 'src/campaigns/entities/campaign.entity';
 import { StoresService } from 'src/stores/stores.service';
 import {
   createParamDecorator,
@@ -34,6 +36,7 @@ import {
 } from 'src/utils/constant';
 import { TotalPGS } from './dto/partner-types.input';
 import { Public } from 'src/auth/public.decorator';
+import { uniqueClicks } from 'src/groupshops/entities/groupshop.entity';
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
     GqlExecutionContext.create(ctx).getContext().req,
@@ -91,6 +94,34 @@ export class PartnersResolver {
     @Args('storeId') storeId: string,
   ) {
     return this.PartnerService.existPartnerGroupshop(email, storeId);
+  }
+
+  @Query(() => [Metrics], { name: 'overviewPartnerMetric' })
+  async overviewPartnerMetric(
+    @Args('storeId') storeId: string,
+    @Args('startFrom') startFrom: string,
+    @Args('toDate') toDate: string,
+  ) {
+    const result = await this.PartnerService.overviewPartnerMetric(
+      storeId,
+      startFrom,
+      toDate,
+    );
+    return result;
+  }
+
+  @Query(() => uniqueClicks, { name: 'getPartnerUniqueClicks' })
+  async getPartnerUniqueClicks(
+    @Args('storeId') storeId: string,
+    @Args('startFrom') startFrom: string,
+    @Args('toDate') toDate: string,
+  ) {
+    const result = await this.PartnerService.partnerUniqueClicks(
+      storeId,
+      startFrom,
+      toDate,
+    );
+    return result;
   }
 
   @Query(() => Partners, { name: 'getPartnerDetail' })
