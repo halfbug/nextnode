@@ -13,4 +13,7 @@ export class CreateVideoInput {
 
   @Field({ nullable: true })
   status?: string;
+
+  @Field({ nullable: true })
+  orderId?: number;
 }

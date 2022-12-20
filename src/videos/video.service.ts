@@ -35,16 +35,18 @@ export class VideoService {
         {
           $set: {
             status: 'InActive',
+            orderId: 0,
           },
         },
       );
 
-      const selectedObjId = selectedIds.map((ite: any) => ObjectId(ite));
-      await manager.updateMany(
-        Video,
-        { _id: { $in: selectedObjId } },
-        { $set: { status: 'Active' } },
-      );
+      for (let i = 0; i < selectedIds.length; i++) {
+        await manager.updateOne(
+          Video,
+          { _id: ObjectId(selectedIds[i]) },
+          { $set: { status: 'Active', orderId: i + 1 } },
+        );
+      }
     } catch (er) {
       console.log(er);
     }

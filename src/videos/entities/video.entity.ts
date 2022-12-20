@@ -18,6 +18,9 @@ export class Video {
   status: string;
 
   @Field({ nullable: true })
+  orderId: number;
+
+  @Field({ nullable: true })
   createdAt: string;
 
   @Field({ nullable: true })

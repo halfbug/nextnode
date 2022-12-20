@@ -9,6 +9,7 @@ import { Public } from 'src/auth/public.decorator';
 export class VideoResolver {
   constructor(private readonly videoService: VideoService) {}
 
+  @Public()
   @Mutation(() => Video)
   createVideo(@Args('CreateVideoInput') createVideoInput: CreateVideoInput) {
     return this.videoService.create(createVideoInput);
@@ -25,6 +26,7 @@ export class VideoResolver {
     return this.videoService.findOne(id);
   }
 
+  @Public()
   @Mutation(() => [Video])
   updateVideo(@Args('UpdateVideoInput') updateVideoInput: UpdateVideoInput) {
     return this.videoService.update(updateVideoInput);

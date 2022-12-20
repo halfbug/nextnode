@@ -19,6 +19,9 @@ export class Video extends DefaultColumnsService {
   status: string;
 
   @Column({ nullable: true })
+  orderId: number;
+
+  @Column({ nullable: true })
   createdAt: Date;
 
   @Column({ nullable: true })
