@@ -36,7 +36,10 @@ import {
 } from 'src/utils/constant';
 import { TotalPGS } from './dto/partner-types.input';
 import { Public } from 'src/auth/public.decorator';
-import { uniqueClicks } from 'src/groupshops/entities/groupshop.entity';
+import {
+  MostPartnerViralCustomers,
+  uniqueClicks,
+} from 'src/groupshops/entities/groupshop.entity';
 export const ReqDecorator = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) =>
     GqlExecutionContext.create(ctx).getContext().req,
@@ -108,6 +111,22 @@ export class PartnersResolver {
       toDate,
     );
     return result;
+  }
+
+  @Query(() => [MostPartnerViralCustomers], { name: 'partnerViralCustomers' })
+  async partnerViralCustomers(
+    @Args('storeId') storeId: string,
+    @Args('startDate') startDate: string,
+    @Args('endDate') endDate: string,
+  ) {
+    if (storeId !== '') {
+      const data = await this.PartnerService.partnerMostViralCustomers(
+        storeId,
+        startDate,
+        endDate,
+      );
+      return data;
+    }
   }
 
   @Query(() => uniqueClicks, { name: 'getPartnerUniqueClicks' })

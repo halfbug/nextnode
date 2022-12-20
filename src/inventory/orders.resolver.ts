@@ -68,6 +68,21 @@ export class OrdersResolver {
     }
   }
 
+  @Query(() => [MostViralProducts], { name: 'partnerMostViralProducts' })
+  async partnerMostViralProducts(
+    @Args('shop') shop: string,
+    @Args('startDate') startDate: string,
+    @Args('endDate') endDate: string,
+  ) {
+    if (shop !== '') {
+      return await this.OrderService.findPartnerViralProducts(
+        shop,
+        startDate,
+        endDate,
+      );
+    }
+  }
+
   @Query(() => [OrderLineItems], { name: 'orderLineItems' })
   async orderLineItems(@Args('parentId') parentId: string) {
     if (parentId !== '') {

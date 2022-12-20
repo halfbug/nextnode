@@ -71,6 +71,24 @@ export class DiscountCode {
 }
 
 @ObjectType()
+export class PartnerDetails {
+  @Field({ nullable: true })
+  fname: string;
+  @Field({ nullable: true })
+  email: string;
+}
+
+@ObjectType()
+export class CustomerInfo {
+  @Field({ nullable: true })
+  firstName: string;
+  @Field({ nullable: true })
+  lastName: string;
+  @Field({ nullable: true })
+  email: string;
+}
+
+@ObjectType()
 export class Refund {
   @Field(() => RefundStatusEnum, { nullable: true })
   status: RefundStatusEnum;
@@ -309,6 +327,27 @@ export class ViralMember {
 }
 
 @ObjectType()
+export class ViralPartnerMember {
+  @Field({ nullable: true })
+  id?: string;
+
+  @Field({ nullable: true })
+  groupshopId?: string;
+
+  @Field({ nullable: true })
+  orderId?: Date;
+
+  @Field({ nullable: true })
+  orderAmount?: number;
+
+  @Field({ nullable: true })
+  comissionAmount?: number;
+
+  @Field(() => CustomerInfo, { nullable: true })
+  customerInfo?: CustomerInfo;
+}
+
+@ObjectType()
 export class MostViralCustomers {
   @Field()
   _id?: string;
@@ -339,6 +378,53 @@ export class MostViralCustomers {
 
   @Field(() => [LineItem], { nullable: 'itemsAndList' })
   lineItems?: LineItem[];
+}
+@ObjectType()
+export class MostPartnerViralCustomers {
+  @Field()
+  _id?: string;
+
+  @Field({ nullable: true })
+  storeId?: string;
+
+  @Field({ nullable: true })
+  url?: string;
+
+  @Field({ nullable: true })
+  shortUrl?: string;
+
+  @Field({ nullable: true })
+  partnerCommission?: string;
+
+  @Field(() => DiscountCode, { nullable: true })
+  discountCode?: DiscountCode;
+
+  @Field(() => PartnerDetails, { nullable: true })
+  partnerDetails?: PartnerDetails;
+
+  @Field(() => [ViralPartnerMember])
+  members?: ViralPartnerMember[];
+
+  @Field(() => [ViralMember])
+  orderName?: ViralMember[];
+
+  @Field({ nullable: true })
+  uniqueClicks?: number;
+
+  @Field({ nullable: true })
+  numMembers?: number;
+
+  @Field({ nullable: true })
+  revenue?: number;
+
+  @Field({ nullable: true })
+  lineItemsCount?: number;
+
+  @Field({ nullable: true })
+  refund?: number;
+
+  @Field()
+  createdAt: Date;
 }
 
 @ObjectType()

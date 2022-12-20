@@ -1207,6 +1207,104 @@ export class PartnerService {
     return gs;
   }
 
+  async partnerMostViralCustomers(
+    storeId: string,
+    startDate: string,
+    endDate: string,
+  ) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2);
+    const day = ('0' + d.getDate()).slice(-2);
+    fullDate = `${year}${'-'}${month}${'-'}${day}`;
+    if (startDate === '-') {
+      startDate = '2021-01-21';
+      endDate = fullDate;
+    }
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              storeId: storeId,
+            },
+            {
+              createdAt: {
+                $gte: new Date(`${startDate}${'T00:00:01'}`),
+                $lte: new Date(`${endDate}${'T23:59:59'}`),
+              },
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'visitors',
+          localField: 'id',
+          foreignField: 'groupshopId',
+          as: 'result',
+        },
+      },
+      {
+        $lookup: {
+          from: 'partnermember',
+          localField: 'id',
+          foreignField: 'groupshopId',
+          as: 'members',
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'id',
+          as: 'orderName',
+        },
+      },
+      {
+        $addFields: {
+          lineItems: {
+            $reduce: {
+              input: '$members.lineItems',
+              initialValue: [],
+              in: {
+                $concatArrays: ['$$value', '$$this'],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          refund: {
+            $sum: '$lineItems.totalDiscounts',
+          },
+          revenue: {
+            $sum: '$members.orderAmount',
+          },
+          uniqueClicks: {
+            $size: '$result',
+          },
+          numMembers: {
+            $size: '$members',
+          },
+          lineItemsCount: {
+            $size: '$lineItems',
+          },
+        },
+      },
+      {
+        $sort: {
+          revenue: -1,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Partnergroupshop, agg).toArray();
+    return gs;
+  }
+
   async partnerUniqueClicks(storeId: string, startFrom, toDate) {
     let fullDate = '';
     const d = new Date();
