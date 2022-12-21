@@ -1,10 +1,9 @@
-import { InputType, Field } from '@nestjs/graphql';
+import { InputType, Field, Int } from '@nestjs/graphql';
 import {
   DealProductsInput,
   DiscountCodeInput,
   MemberInput,
 } from 'src/groupshops/dto/create-groupshops.input';
-import { Member } from 'src/groupshops/entities/groupshop.entity';
 import { Customer } from 'src/inventory/dto/create-order.input';
 
 @InputType()
@@ -32,6 +31,12 @@ export class CreateChannelGroupshopInput {
 
   @Field(() => [MemberInput])
   members?: MemberInput[];
+
+  @Field(() => Int, { defaultValue: 0 })
+  totalProducts?: number;
+
+  @Field(() => [String], { nullable: 'itemsAndList' })
+  allProducts?: string[]; // to update discount code
 
   // @Field({ nullable: true })
   // isActive: boolean;

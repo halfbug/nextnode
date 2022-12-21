@@ -70,6 +70,7 @@ export class ChannelGroupshopService {
       activeCampaign: { products, id: activeCampId },
     } = campaign;
     ucg.campaignId = activeCampId;
+    ucg.totalProducts = products.length;
 
     ucg.discountCode = await this.shopifyapi.setDiscountCode(
       shop,
@@ -82,7 +83,7 @@ export class ChannelGroupshopService {
       null,
     );
 
-    const gs = await this.update(id, ucg);
+    await this.channelGroupshopRepository.update({ id }, ucg);
 
     const mdata = {
       firstName: filteredCreateChannelGroupshopInput.customerDetail.firstName,
@@ -102,7 +103,7 @@ export class ChannelGroupshopService {
     };
     this.kalavioService.sendKlaviyoEmail(body);
 
-    return gs;
+    return await this.findOne(id);
   }
 
   async findAllSignup(storeId) {
@@ -152,15 +153,12 @@ export class ChannelGroupshopService {
     });
   }
 
+  // update deal products
   async update(
     id: string,
     updateChannelGroupshopInput: UpdateChannelGroupshopInput,
   ) {
     try {
-      const gs = await this.findChannelGS(
-        updateChannelGroupshopInput.discountCode.title,
-      );
-
       if (
         updateChannelGroupshopInput.dealProducts &&
         updateChannelGroupshopInput.dealProducts.length
@@ -168,30 +166,6 @@ export class ChannelGroupshopService {
         const { shop, accessToken } = await this.storesService.findById(
           updateChannelGroupshopInput?.storeId,
         );
-        const campaign = await this.storesService.findOneWithActiveCampaing(
-          shop,
-        );
-        const {
-          activeCampaign: { products },
-        } = campaign;
-        const boughtProducts = [];
-        if (gs.members && gs.members.length) {
-          gs.members.forEach((m) => {
-            m.lineItems.forEach((l) => {
-              boughtProducts.push(l.product.id);
-            });
-          });
-        }
-
-        console.log('186  ', shop, accessToken, [
-          ...new Set([
-            ...products,
-            ...(updateChannelGroupshopInput.dealProducts.map(
-              (p) => p.productId,
-            ) ?? []),
-            ...boughtProducts,
-          ]),
-        ]);
 
         await this.shopifyapi.setDiscountCode(
           shop,
@@ -199,24 +173,20 @@ export class ChannelGroupshopService {
           accessToken,
           null,
           null,
-          [
-            ...new Set([
-              ...products,
-              ...(updateChannelGroupshopInput.dealProducts.map(
-                (p) => p.productId,
-              ) ?? []),
-              ...boughtProducts,
-            ]),
-          ],
+          updateChannelGroupshopInput.allProducts,
           null,
           null,
           updateChannelGroupshopInput.discountCode.priceRuleId,
         );
+        const { allProducts, ...filteredInput } = updateChannelGroupshopInput;
+        await this.channelGroupshopRepository.update(
+          { id },
+          {
+            ...filteredInput,
+            totalProducts: updateChannelGroupshopInput.allProducts.length,
+          },
+        );
       }
-      await this.channelGroupshopRepository.update(
-        { id },
-        updateChannelGroupshopInput,
-      );
       const cgs = await this.findOne(id);
       return cgs;
     } catch (error) {
