@@ -1073,6 +1073,17 @@ export class WebhooksController {
       );
       const subscriptionStatus =
         appsub['app_subscription']['status'].toUpperCase();
+      const payload =
+        subscriptionStatus === 'ACTIVE'
+          ? {
+              'subscription.status': subscriptionStatus,
+              installationStep: null,
+            }
+          : {
+              'subscription.status': subscriptionStatus,
+              installationStep: 5,
+              'subscription.confirmationUrl': '',
+            };
       // if (appsub['app_subscription']['status'] === 'ACTIVE') {
       this.storesService.updateField(
         {
@@ -1080,10 +1091,7 @@ export class WebhooksController {
           'subscription.appSubscription.id':
             appsub['app_subscription'].admin_graphql_api_id,
         },
-        {
-          'subscription.status': subscriptionStatus,
-          installationStep: subscriptionStatus === 'ACTIVE' ? null : 5,
-        },
+        payload,
       );
       Logger.warn(
         'AppSubscription status: ' +
