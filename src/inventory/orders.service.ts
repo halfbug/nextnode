@@ -459,25 +459,29 @@ export class OrdersService {
             {
               $or: [
                 {
-                  discountCode: {
-                    $regex: 'GD',
-                  },
+                  $and: [
+                    {
+                      discountCode: {
+                        $not: {
+                          $regex: '^GSP.*',
+                        },
+                      },
+                    },
+                    {
+                      discountCode: {
+                        $not: {
+                          $regex: '^GSC.*',
+                        },
+                      },
+                    },
+                    {
+                      discountCode: {
+                        $regex: '^GS',
+                      },
+                    },
+                  ],
                 },
               ],
-            },
-            {
-              discountCode: {
-                $not: {
-                  $regex: '^GSP.*',
-                },
-              },
-            },
-            {
-              discountCode: {
-                $not: {
-                  $regex: '^GSC.*',
-                },
-              },
             },
             {
               shop: shop,

@@ -1184,15 +1184,17 @@ export class PartnerService {
         },
       },
       {
-        $unwind: {
-          path: '$lineItems',
+        $addFields: {
+          cashback: {
+            $sum: '$lineItems.totalDiscounts',
+          },
         },
       },
       {
         $group: {
           _id: null,
           cashBack: {
-            $sum: '$lineItems.totalDiscounts',
+            $sum: '$cashback',
           },
           revenue: {
             $sum: '$orderAmount',
@@ -1377,5 +1379,140 @@ export class PartnerService {
       totalOrders: gs[0]?.totalOrderCount || 0,
     };
     return response;
+  }
+
+  async findGraphpartnerRevenue(storeId: string) {
+    let fullDate = '';
+    const d = new Date();
+    const year = d.getFullYear();
+    fullDate = `${year}${'-01-01'}`;
+    const agg = [
+      {
+        $match: {
+          storeId: storeId,
+          createdAt: {
+            $gte: new Date(fullDate),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: {
+              $year: '$createdAt',
+            },
+            month: {
+              $month: '$createdAt',
+            },
+          },
+          revenue: {
+            $sum: '$orderAmount',
+          },
+        },
+      },
+      {
+        $sort: {
+          _id: -1,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Partnermember, agg).toArray();
+    return gs;
+  }
+
+  async findGraphPartnerRevenueByDate(
+    storeId: string,
+    startDate: any,
+    endDate: any,
+  ) {
+    const date1 = new Date(startDate);
+    const date2 = new Date(endDate);
+    const timeDiff = date2.getTime() - date1.getTime();
+    // To calculate the no. of days between two dates
+    const numDays = timeDiff / (1000 * 3600 * 24) + 1;
+    let graphView = 'Month';
+    if (numDays <= 31) {
+      graphView = 'Day';
+    }
+    if (numDays > 365) {
+      graphView = 'Year';
+    }
+    const agg: any = [
+      {
+        $match: {
+          storeId: storeId,
+          createdAt: {
+            $gte: new Date(`${startDate}${'T00:00:01'}`),
+            $lte: new Date(`${endDate}${'T23:59:59'}`),
+          },
+        },
+      },
+    ];
+    if (graphView === 'Day') {
+      agg?.push({
+        $group: {
+          _id: {
+            month: {
+              $month: '$createdAt',
+            },
+            day: {
+              $dayOfMonth: '$createdAt',
+            },
+          },
+          revenue: {
+            $sum: '$orderAmount',
+          },
+        },
+      });
+    }
+    if (graphView === 'Month') {
+      agg?.push({
+        $group: {
+          _id: {
+            year: {
+              $year: '$createdAt',
+            },
+            month: {
+              $month: '$createdAt',
+            },
+          },
+          revenue: {
+            $sum: '$orderAmount',
+          },
+        },
+      });
+    }
+    if (graphView === 'Year') {
+      agg?.push({
+        $group: {
+          _id: {
+            year: {
+              $year: '$createdAt',
+            },
+          },
+          revenue: {
+            $sum: '$orderAmount',
+          },
+        },
+      });
+    }
+    agg?.push(
+      {
+        $addFields: {
+          graphView: graphView,
+        },
+      },
+      {
+        $sort: {
+          _id: 1,
+        },
+      },
+    );
+
+    const manager = getMongoManager();
+    const result = await manager.aggregate(Partnermember, agg).toArray();
+    console.log(JSON.stringify(result));
+    return result;
   }
 }

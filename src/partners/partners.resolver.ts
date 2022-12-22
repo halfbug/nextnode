@@ -23,7 +23,11 @@ import {
 } from '@nestjs/common';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import { ViewedInterceptor } from 'src/gs-common/viewed.inceptor';
-import { TotalRevenue } from 'src/billing/dto/monthly-billing.input';
+import {
+  GraphRevenue,
+  MonthlyBillingInput,
+  TotalRevenue,
+} from 'src/billing/dto/monthly-billing.input';
 import {
   GSP_FEES1,
   GSP_SWITCH_NUM,
@@ -127,6 +131,24 @@ export class PartnersResolver {
       );
       return data;
     }
+  }
+
+  @Query(() => [MonthlyBillingInput], { name: 'graphPartnerRevenue' })
+  getGraphRevenue(@Args('storeId') storeId: string) {
+    return this.PartnerService.findGraphpartnerRevenue(storeId);
+  }
+
+  @Query(() => [GraphRevenue], { name: 'getGraphPartnerRevenueByDate' })
+  getGraphPartnerRevenueByDate(
+    @Args('storeId') storeId: string,
+    @Args('startDate') startDate: string,
+    @Args('endDate') endDate: string,
+  ) {
+    return this.PartnerService.findGraphPartnerRevenueByDate(
+      storeId,
+      startDate,
+      endDate,
+    );
   }
 
   @Query(() => uniqueClicks, { name: 'getPartnerUniqueClicks' })
