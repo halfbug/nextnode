@@ -75,6 +75,22 @@ export class InventoryService {
     }
   }
 
+  async updateProduct(id: string, updatedfields: any) {
+    const manager = getMongoManager();
+    console.log('updateInventory', id, updatedfields);
+
+    try {
+      return await manager.findOneAndUpdate(
+        Inventory,
+        { id },
+        // { ...updatedfields },
+        { $set: { ...updatedfields } },
+      );
+    } catch (err) {
+      console.log(err, 'updateInventory err');
+    }
+  }
+
   async remove(id: string) {
     Logger.warn(
       `product ${id} is removed from database`,

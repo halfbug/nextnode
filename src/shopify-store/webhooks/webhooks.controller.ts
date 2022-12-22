@@ -49,6 +49,7 @@ import { LifecycleService } from 'src/gs-common/lifecycle.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { BillingPlanEnum } from 'src/stores/entities/store.entity';
 import { Public } from 'src/auth/public.decorator';
+import { CampaignsService } from 'src/campaigns/campaigns.service';
 @Public()
 @Controller('webhooks')
 export class WebhooksController {
@@ -65,6 +66,7 @@ export class WebhooksController {
     private httpService: HttpService,
     public productMedia: ProductMediaObject,
     private lifecyclesrv: LifecycleService,
+    private campaignService: CampaignsService,
   ) {}
   async refreshSingleProduct(shop, accessToken, id, shopName) {
     try {
@@ -828,15 +830,43 @@ export class WebhooksController {
         'WebhooksController ~ productDelete ~ rproduct',
         JSON.stringify(rproduct),
       );
+      const { id: storeId } = await this.storesService.findOne(shop);
 
-      const { result } = await this.inventryService.remove(
-        JSON.stringify(rproduct.id),
-      );
+      // const { result } = await this.inventryService.remove(
+      //   JSON.stringify(rproduct.id),
+      // );
       // res.send(result.deletedCount);
       Logger.warn(
         `product : ${rproduct.id} is deleted from ${shop}`,
         'product-deleted',
       );
+      const PrdId = `gid://shopify/Product/${rproduct.id}`;
+
+      //  1 products are not deleted from the database but are marked out of stock and set deleted product status to DELETED
+      await this.inventryService.updateProduct(PrdId, {
+        status: 'DELETED',
+        outofstock: true,
+      });
+      //  2 if they are part of any campaign remove them from campaign products
+      const allCampaign = await this.campaignService.findAll(storeId);
+      const filteredCampaigns = allCampaign.filter((campaign) =>
+        campaign.products.includes(PrdId),
+      );
+      console.log(
+        '🚀 ~ file: webhooks.controller.ts:854 ~ productDelete ~ filteredCampaigns',
+        filteredCampaigns,
+      );
+      filteredCampaigns.map(async (campaign) => {
+        const updatedPrd = campaign.products.filter((prd) => prd !== PrdId);
+        return await this.campaignService.update(campaign.id, {
+          storeId,
+          products: updatedPrd,
+          criteria: campaign.criteria,
+          id: campaign.id,
+        });
+      });
+
+      //  3 update groupshop page query so that it can display deleted bought products as discontinued products.
     } catch (err) {
       console.log(JSON.stringify(err));
       Logger.error(err, 'product-deleted');
