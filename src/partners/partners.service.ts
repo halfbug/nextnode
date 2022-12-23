@@ -805,10 +805,36 @@ export class PartnerService {
         },
       },
       {
+        $lookup: {
+          from: 'visitors',
+          localField: 'members.groupshopId',
+          foreignField: 'groupshopId',
+          as: 'visitors',
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'id',
+          as: 'orders',
+        },
+      },
+      {
+        $unwind: {
+          path: '$orders',
+        },
+      },
+      {
         $group: {
           _id: '$id',
           revenue: {
             $sum: '$members.orderAmount',
+          },
+          lineitemsCount: {
+            $sum: {
+              $size: '$members.lineItems',
+            },
           },
           comissionAmount: {
             $sum: '$members.comissionAmount',
@@ -831,6 +857,9 @@ export class PartnerService {
           url: {
             $first: '$url',
           },
+          visitors: {
+            $sum: { $size: '$visitors' },
+          },
           partnerCommission: {
             $first: '$partnerCommission',
           },
@@ -842,6 +871,9 @@ export class PartnerService {
           },
           id: {
             $first: '$id',
+          },
+          orders: {
+            $push: '$orders',
           },
           updatedAt: {
             $first: '$updatedAt',
@@ -1205,7 +1237,6 @@ export class PartnerService {
 
     const manager = getMongoManager();
     const gs = await manager.aggregate(Partnermember, agg).toArray();
-    console.log(gs);
     return gs;
   }
 
@@ -1512,7 +1543,6 @@ export class PartnerService {
 
     const manager = getMongoManager();
     const result = await manager.aggregate(Partnermember, agg).toArray();
-    console.log(JSON.stringify(result));
     return result;
   }
 }

@@ -42,6 +42,16 @@ export class partnerDetails {
 }
 
 @ObjectType()
+export class Orders {
+  @Field({ nullable: true })
+  id: string;
+  @Field({ nullable: true })
+  name: string;
+  @Field({ nullable: true })
+  shopifyCreatedAt: string;
+}
+
+@ObjectType()
 export class Partnergroupshop {
   @Field(() => ID)
   id: string;
@@ -115,8 +125,15 @@ export class Partnergroupshop {
   @Field(() => Int, { defaultValue: 0 })
   totalProducts: number;
 
+  @Field(() => Int, { defaultValue: 0 })
+  lineitemsCount?: number;
+
+  @Field(() => [Orders], { nullable: 'itemsAndList' })
+  orders?: Orders[];
+
   @Field(() => Int, { nullable: true })
   visitors: number;
+
   @Field(() => [PartnerMember], { nullable: 'itemsAndList' })
   memberDetails?: PartnerMember[];
 }
