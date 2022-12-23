@@ -48,7 +48,11 @@ export class UploadImageService {
       function (err, data) {
         if (err) {
           console.log(err);
-          Logger.error('Error in file delete from S3', err);
+          Logger.error(
+            'Error in file delete from S3',
+            err,
+            UploadImageService.name,
+          );
         }
       },
     );

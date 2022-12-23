@@ -142,7 +142,7 @@ export class OrderCreatedListener {
       )
         this.eventEmitter.emit('order.placed', newOrderPlaced);
     } catch (err) {
-      Logger.error({ err }, OrderCreatedListener.name);
+      Logger.error(err, OrderCreatedListener.name);
     }
   }
 }
