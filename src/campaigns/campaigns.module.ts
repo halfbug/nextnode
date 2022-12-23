@@ -10,6 +10,7 @@ import { StoresModule } from 'src/stores/stores.module';
 import { GroupshopsModule } from 'src/groupshops/groupshops.module';
 import { PartnersModule } from 'src/partners/partners.module';
 import { InventorySavedCampaignsListener } from './listeners/inventory-saved-campaigns.listener';
+import { ProductOutofstockListner } from './listeners/product-outofstock.listner';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { InventorySavedCampaignsListener } from './listeners/inventory-saved-cam
     CampaignsResolver,
     CampaignsService,
     InventorySavedCampaignsListener,
+    ProductOutofstockListner,
   ],
   exports: [CampaignsService],
 })

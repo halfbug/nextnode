@@ -16,6 +16,7 @@ import { ProductMediaListener } from './listeners/product-media.listner';
 import { ProductMediaObject } from './events/product-media.event';
 import { StoresModule } from 'src/stores/stores.module';
 import { InventoryDoneEvent } from './events/inventory-done.event';
+import { ProductOutofstockEvent } from './events/product-outofstock.event';
 
 @Module({
   imports: [
@@ -36,12 +37,14 @@ import { InventoryDoneEvent } from './events/inventory-done.event';
     ProductMediaListener,
     ProductMediaObject,
     InventoryDoneEvent,
+    ProductOutofstockEvent,
   ],
   exports: [
     InventoryService,
     OrdersService,
     ProductMediaObject,
     InventoryDoneEvent,
+    ProductOutofstockEvent,
   ],
 })
 export class InventoryModule {}

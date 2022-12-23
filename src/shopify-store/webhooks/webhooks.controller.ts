@@ -49,6 +49,7 @@ import { LifecycleService } from 'src/gs-common/lifecycle.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { BillingPlanEnum } from 'src/stores/entities/store.entity';
 import { Public } from 'src/auth/public.decorator';
+import { ProductOutofstockEvent } from 'src/inventory/events/product-outofstock.event';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
 @Public()
 @Controller('webhooks')
@@ -65,6 +66,7 @@ export class WebhooksController {
     private orderCreatedEvent: OrderCreatedEvent,
     private httpService: HttpService,
     public productMedia: ProductMediaObject,
+    public campaignStock: ProductOutofstockEvent,
     private lifecyclesrv: LifecycleService,
     private campaignService: CampaignsService,
   ) {}
@@ -576,8 +578,7 @@ export class WebhooksController {
 
       await this.inventryService.removeVariants(rproduct?.admin_graphql_api_id);
       this.productMedia.emit();
-      const videoURL = await this.inventryService.findOne(shop, 'ProductVideo');
-      console.log('videoURL', videoURL);
+      this.inventryService.findOne(shop, 'ProductVideo');
       const variants = [];
       rproduct.variants?.map(async (variant) => {
         const vprod = new CreateInventoryInput();
@@ -635,7 +636,10 @@ export class WebhooksController {
       //   '🚀 ~ file: webhooks.controller.ts ~ line 590 ~ WebhooksController ~ productUpdate ~ nprod',
       //   nprod,
       // );
-
+      if (nprod.outofstock) {
+        this.campaignStock.shop = shop;
+        this.campaignStock.emit();
+      }
       // res.send('product updated..');
     } catch (err) {
       console.log(JSON.stringify(err));
