@@ -62,8 +62,13 @@ export class OrderCreatedListener {
         whOrder.shipping_address?.phone ?? whOrder.customer?.phone;
       newOrder.discountInfo = whOrder.discount_codes;
       newOrder.customer = new Customer();
-      newOrder.customer.firstName = whOrder.customer?.first_name;
-      newOrder.customer.lastName = whOrder.customer?.last_name;
+      if (whOrder.customer?.last_name === null) {
+        newOrder.customer.firstName = whOrder.billing_address?.first_name;
+        newOrder.customer.lastName = whOrder.billing_address?.last_name;
+      } else {
+        newOrder.customer.firstName = whOrder.customer?.first_name;
+        newOrder.customer.lastName = whOrder.customer?.last_name;
+      }
       newOrder.customer.email = whOrder.customer?.email;
       newOrder.customer.ip = whOrder?.browser_ip;
       newOrder.customer.phone =
