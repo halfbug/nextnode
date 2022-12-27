@@ -14,6 +14,7 @@ import { GsCommonModule } from 'src/gs-common/gs-common.module';
 import { GSUpdatePriceRuleEvent } from './events/groupshop-update-price-rule.event';
 import { PartnersModule } from 'src/partners/partners.module';
 import { ChannelModule } from 'src/channel/channel.module';
+import { StoresModule } from 'src/stores/stores.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ChannelModule } from 'src/channel/channel.module';
     forwardRef(() => GsCommonModule),
     forwardRef(() => PartnersModule),
     forwardRef(() => ChannelModule),
+    forwardRef(() => StoresModule),
   ],
   providers: [
     GroupshopsResolver,

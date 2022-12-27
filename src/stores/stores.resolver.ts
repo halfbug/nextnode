@@ -8,6 +8,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { AuthEntity } from 'src/auth/entities/auth.entity';
 import { AuthDecorator } from 'src/auth/auth.decorator';
 import { Public } from 'src/auth/public.decorator';
+import { MatchingGS } from './dto/matchingGS.input';
 
 @Resolver(() => Store)
 @UseGuards(AuthGuard)
@@ -85,5 +86,15 @@ export class StoresResolver {
       UpdateDiscoveryTools.id,
       UpdateDiscoveryTools,
     );
+  }
+
+  @Public()
+  @Query(() => [MatchingGS], { name: 'matchingGS' })
+  async AllMatchingGS(
+    @Args({ name: 'storeId', type: () => [String] }) storeId: string[],
+  ) {
+    if (storeId.length > 0) {
+      return await this.storesService.findMatchingGS(storeId);
+    }
   }
 }

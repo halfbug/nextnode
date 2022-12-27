@@ -10,6 +10,11 @@ import { AnyScalar } from 'src/utils/any.scalarType';
 import { Settings } from './settings.entity';
 import { SocialLinks } from 'src/campaigns/entities/social-links.entity';
 import { Product } from 'src/inventory/entities/product.entity';
+import {
+  DealProducts,
+  GroupShop,
+  Member,
+} from 'src/groupshops/entities/groupshop.entity';
 
 export enum BillingPlanEnum {
   EXPLORE, // 30days
@@ -169,4 +174,7 @@ export class Store {
 
   @Field(() => DiscoveryTools, { nullable: true })
   discoveryTool?: DiscoveryTools;
+
+  @Field({ nullable: true })
+  recentgs?: string;
 }

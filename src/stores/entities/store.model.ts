@@ -115,4 +115,7 @@ export default class Store extends DefaultColumnsService {
 
   @Column({ nullable: true })
   discoveryTool: DiscoveryTools;
+
+  @Column({ nullable: true })
+  recentgs: string;
 }

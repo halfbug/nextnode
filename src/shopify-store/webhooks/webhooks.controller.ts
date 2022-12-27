@@ -1534,4 +1534,17 @@ export class WebhooksController {
       res.status(HttpStatus.OK).send();
     }
   }
+
+  @Get('load-recentgs')
+  async loadRecentGS(@Res() res) {
+    try {
+      const recentGS = await this.storesService.loadRecentGS();
+      res.send(JSON.stringify(recentGS));
+    } catch (err) {
+      console.log(JSON.stringify(err));
+      Logger.error(err, 'load-recentgs');
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
 }

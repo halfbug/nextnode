@@ -355,6 +355,19 @@ export class StoresService {
     return { ...res[0] };
   }
 
+  async updateRecentGS(gs: any) {
+    try {
+      const manager = getMongoManager();
+      await manager.updateOne(
+        Store,
+        { id: gs.storeId },
+        { $set: { recentgs: gs.id } },
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   async updateDiscoveryTool(storeId: any, updateDiscoveryTool: any) {
     await this.storeRepository.update(
       { id: updateDiscoveryTool.id },
@@ -390,5 +403,290 @@ export class StoresService {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  async findMatchingGS(storeId: string[]) {
+    const agg = [
+      {
+        $match: {
+          id: {
+            $in: storeId,
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'groupshops',
+          localField: 'recentgs',
+          foreignField: 'id',
+          as: 'groupshops',
+        },
+      },
+      {
+        $unwind: {
+          path: '$groupshops',
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'groupshops.members.orderId',
+          foreignField: 'parentId',
+          as: 'lineItemsDetails',
+        },
+      },
+      {
+        $addFields: {
+          lineItemsDetails: {
+            $filter: {
+              input: '$lineItemsDetails',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $gte: ['$$j.price', '1.01'],
+                  },
+                  {
+                    $not: {
+                      $in: ['$$j.product.id', '$hideProducts'],
+                    },
+                  },
+                  {
+                    $ne: ['$$j.product', null],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'lineItemsDetails.product.id',
+          foreignField: 'id',
+          as: 'popularProducts',
+        },
+      },
+      {
+        $lookup: {
+          from: 'campaign',
+          localField: 'groupshops.campaignId',
+          foreignField: 'id',
+          as: 'campaign',
+        },
+      },
+      {
+        $unwind: {
+          path: '$campaign',
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$groupshops.members',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    lineItems: {
+                      $filter: {
+                        input: '$lineItemsDetails',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.orderId', '$$j.parentId'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'id',
+          as: 'orderDetails',
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    orderDetail: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$orderDetails',
+                            as: 'j',
+                            cond: {
+                              $and: [
+                                {
+                                  $eq: ['$$this.orderId', '$$j.id'],
+                                },
+                                {
+                                  $not: {
+                                    $in: [
+                                      '$$this.lineItemsDetails.product.id',
+                                      '$hideProducts',
+                                    ],
+                                  },
+                                },
+                              ],
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'campaign.products',
+          foreignField: 'id',
+          as: 'campaignProducts',
+        },
+      },
+      {
+        $addFields: {
+          campaignProducts: {
+            $filter: {
+              input: '$campaignProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $gte: ['$$j.price', '1.01'],
+                  },
+                  {
+                    $not: {
+                      $in: ['$$j.id', '$hideProducts'],
+                    },
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'groupshops.dealProducts.productId',
+          foreignField: 'id',
+          as: 'dealsProducts',
+        },
+      },
+      {
+        $addFields: {
+          dealsProducts: {
+            $filter: {
+              input: '$dealsProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $gte: ['$$j.price', '1.01'],
+                  },
+                  {
+                    $not: {
+                      $in: ['$$j.id', '$hideProducts'],
+                    },
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          bestSeller: {
+            $filter: {
+              input: '$campaignProducts',
+              as: 'j',
+              cond: {
+                $gte: ['$$j.purchaseCount', 1],
+              },
+            },
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const storeWithGS = await manager.aggregate(Store, agg).toArray();
+    return storeWithGS;
+  }
+
+  async loadRecentGS() {
+    const agg = [
+      {
+        $lookup: {
+          from: 'groupshops',
+          let: { recentgs: '$id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [{ $eq: ['$storeId', '$$recentgs'] }],
+                },
+              },
+            },
+            {
+              $sort: {
+                createdAt: -1,
+              },
+            },
+            {
+              $limit: 1,
+            },
+          ],
+          as: 'recentgs',
+        },
+      },
+      {
+        $unwind: {
+          path: '$recentgs',
+        },
+      },
+      {
+        $addFields: {
+          recentgs: '$recentgs.id',
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const updateRecentGS = await manager.aggregate(Store, agg).toArray();
+    for (let i = 0; i < updateRecentGS.length; i++) {
+      await manager.updateOne(
+        Store,
+        { id: updateRecentGS[i].id },
+        { $set: { recentgs: updateRecentGS[i].recentgs } },
+      );
+    }
+    return updateRecentGS;
   }
 }

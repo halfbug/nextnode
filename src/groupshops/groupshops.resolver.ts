@@ -13,7 +13,6 @@ import {
   MostViralCustomers,
   uniqueClicks,
   activeGroupshop,
-  MatchingGS,
 } from './entities/groupshop.entity';
 import { MostViralProducts } from 'src/inventory/entities/orders.entity';
 import { CreateGroupshopInput } from './dto/create-groupshops.input';
@@ -226,16 +225,6 @@ export class GroupshopsResolver {
       return await this.GroupshopsService.findCampaignMostViralProducts(
         campaignId,
       );
-    }
-  }
-
-  @Public()
-  @Query(() => [MatchingGS], { name: 'matchingGS' })
-  async AllMatchingGS(
-    @Args({ name: 'storeId', type: () => [String] }) storeId: string[],
-  ) {
-    if (storeId.length > 0) {
-      return await this.GroupshopsService.findGSWithStoreId(storeId);
     }
   }
 }

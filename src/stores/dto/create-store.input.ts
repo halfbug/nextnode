@@ -200,4 +200,7 @@ export class CreateStoreInput {
 
   @Field(() => DiscoveryToolsInput, { nullable: true })
   discoveryTool?: DiscoveryToolsInput;
+
+  @Field({ nullable: true })
+  recentgs?: string;
 }

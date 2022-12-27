@@ -280,7 +280,7 @@ export class activeGroupshop {
   @Field(() => CustomerType)
   customer?: CustomerType;
 
-  @Field({ nullable: true })
+  @Field(() => Store)
   shop?: Store;
 
   @Field({ nullable: true })
@@ -425,82 +425,4 @@ export class MostPartnerViralCustomers {
 
   @Field()
   createdAt: Date;
-}
-
-@ObjectType()
-export class MatchingGS {
-  @Field(() => ID)
-  id: string;
-
-  @Field(() => [Member])
-  members: Member[];
-
-  @Field(() => Number, { nullable: true })
-  numMembers?: number;
-
-  @Field()
-  campaignId: string;
-
-  @Field()
-  storeId: string;
-
-  @Field(() => Int, { defaultValue: 0 })
-  totalProducts: number;
-
-  @Field(() => [DealProducts], { nullable: 'itemsAndList' })
-  dealProducts?: DealProducts[];
-
-  @Field()
-  url: string;
-
-  @Field({ nullable: true })
-  shortUrl?: string;
-
-  @Field({ nullable: true })
-  exipredShortLink?: string;
-
-  @Field()
-  createdAt: Date;
-
-  @Field()
-  expiredAt: Date;
-
-  @Field(() => DiscountCode)
-  discountCode: DiscountCode;
-
-  @Field(() => [Milestone])
-  milestones: Milestone[];
-
-  @Field(() => Store, { nullable: true })
-  store?: Store;
-
-  @Field(() => [Product], { nullable: 'itemsAndList' })
-  popularProducts?: Product[];
-
-  @Field(() => Campaign, { nullable: true })
-  campaign?: Campaign;
-
-  @Field(() => [Product], { nullable: 'itemsAndList' })
-  allProducts?: Product[];
-
-  @Field(() => [Product], { nullable: 'itemsAndList' })
-  bestSeller?: Product[];
-
-  @Field(() => OBSettings, { nullable: true })
-  obSettings?: OBSettings;
-
-  @Field(() => [Product], { nullable: 'itemsAndList' })
-  ownerDeals?: Product[];
-
-  @Field(() => [Product], { nullable: 'itemsAndList' })
-  reffDeals?: Product[];
-
-  @Field(() => [DealProducts], { nullable: 'itemsAndList' })
-  ownerDealsProducts?: DealProducts[];
-
-  @Field(() => [DealProducts], { nullable: 'itemsAndList' })
-  refferalDealsProducts?: DealProducts[];
-
-  @Field(() => [Product], { nullable: 'itemsAndList' })
-  InventoryProducts?: Product[];
 }
