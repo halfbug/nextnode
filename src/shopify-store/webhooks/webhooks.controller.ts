@@ -850,6 +850,7 @@ export class WebhooksController {
       await this.inventryService.updateProduct(PrdId, {
         status: 'DELETED',
         outofstock: true,
+        featuredImage: 'https://d1o2v5h7slksjm.cloudfront.net/discontinued.png',
       });
       //  2 if they are part of any campaign remove them from campaign products
       const allCampaign = await this.campaignService.findAll(storeId);

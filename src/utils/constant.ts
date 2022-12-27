@@ -1,5 +1,7 @@
+import { IsUUID } from 'class-validator';
+import { Product } from 'src/inventory/entities/product.entity';
 import { BillingTierEnum } from 'src/stores/entities/store.entity';
-
+import { v4 as uuid } from 'uuid';
 export const TEST = 'test';
 export const GS_CHARGE_CASHBACK = 10;
 export const GS_CHARGE_FEE_LAUNCH = 0.25;
@@ -119,6 +121,17 @@ export const GSP_SWITCH_NUM = [
   GS_TIER5_START_COUNT,
   GS_TIER6_START_COUNT,
 ];
-
+export const dummyProduct = (): Product => {
+  const obj = {
+    id: 'PDELETED',
+    description: 'this product is deleted from the store. ',
+    status: 'DELETED',
+    title: 'Discontinued Product',
+    price: '000',
+    outofstock: true,
+    featuredImage: 'https://d1o2v5h7slksjm.cloudfront.net/discontinued.png',
+  };
+  return { ...obj, id: uuid() };
+};
 const GS_CHARGE_PARTNER_COMISSION = 10;
 // find totalcount < PARTNER_Billing.gsNum

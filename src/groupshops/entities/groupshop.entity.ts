@@ -236,7 +236,7 @@ export class GroupShop {
   campaign?: Campaign;
 
   @Field(() => [Product], { nullable: 'itemsAndList' })
-  allProducts?: Product[];
+  allProducts?: (Product | undefined)[];
 
   @Field(() => [Product], { nullable: 'itemsAndList' })
   bestSeller?: Product[];

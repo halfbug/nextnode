@@ -86,14 +86,14 @@ export class GroupshopCashbackListener {
             const VariantId = items.variant.id;
 
             let variantTitle = '';
-            items.product[0].variants.map((variant) => {
+            items?.product[0]?.variants.map((variant) => {
               if (VariantId == variant.id) {
                 variantTitle = variant.title;
               }
             });
             const resData = {
               product_title: items.product[0].title,
-              variant_title: variantTitle,
+              variant_title: variantTitle ?? 'Discontinued',
               orderProductImage: items.product[0].featuredImage,
               orderProductId: productID,
               orderPrice: items.price,

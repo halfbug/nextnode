@@ -14,6 +14,7 @@ import { AddDealProductInput } from './dto/add-deal-product.input';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import Orders from 'src/inventory/entities/orders.modal';
 import { DateFormats } from 'src/utils/functions';
+import { dummyProduct } from 'src/utils/constant';
 import { StoresService } from 'src/stores/stores.service';
 
 @Injectable()
@@ -849,6 +850,8 @@ export class GroupshopsService {
         $addFields: {
           allProducts: {
             $concatArrays: [
+              // '$dealsProducts',
+              // '$campaignProducts',
               {
                 $ifNull: ['$dealsProducts', []],
               },
@@ -935,36 +938,66 @@ export class GroupshopsService {
     // );
     if (gs.length) {
       const popular = gs[0].popularProducts;
-      const dPopular = [];
-
-      popular
-        ?.filter((item) => item !== null)
-        .map((item, ind) => {
-          if (item.status.toUpperCase() !== 'ACTIVE') item.outofstock = true; // if product is draft so make it out of stock so that it is not purchaseable
-          if (ind === 0) {
+      console.log(
+        '🚀 ~ file: groupshops.service.ts:935 ~ GroupshopsService ~ findOne ~ popular',
+        popular,
+      );
+      let dPopular = [];
+      if (!popular.length) {
+        console.log('im in null');
+        dPopular = [dummyProduct()];
+      } else {
+        popular
+          // ?.filter((item) => item !== null)
+          .map((item, ind) => {
+            if (item.status.toUpperCase() !== 'ACTIVE') item.outofstock = true; // if product is draft so make it out of stock so that it is not purchaseable
             dPopular.push(item);
-          } else {
-            if (!dPopular.find((prd) => prd.id === item.id)) {
-              // console.log(!dPopular.find((prd) => prd.id !== item.id));
-              // console.log('item here', item.id);
+            // if (ind === 0) {
+            //   dPopular.push(item);
+            // } else {
+            //   if (!dPopular.find((prd) => prd.id === item.id)) {
+            //     // console.log(!dPopular.find((prd) => prd.id !== item.id));
+            //     // console.log('item here', item.id);
 
-              dPopular.push(item);
+            //     dPopular.push(item);
+            //   }
+            // }
+          });
+      }
+      gs[0].popularProducts = dPopular;
+
+      gs[0].members = gs[0].members.map((member) => {
+        member.products = member.products.map((item) => {
+          console.log(
+            '🚀 ~ file: groupshops.service.ts:967 ~ GroupshopsService ~ member.products.map ~ item',
+            item,
+          );
+          if (!Boolean(item)) {
+            console.log('inside null chekc');
+            // dummyProduct.id = uuid();
+            console.log(
+              '🚀 ~ file: groupshops.service.ts:986 ~ GroupshopsService ~ member.products=member.products.map ~ dummyProduct',
+              dummyProduct(),
+            );
+            return dummyProduct();
+          } else {
+            if (item.status.toUpperCase() !== 'ACTIVE') {
+              item.outofstock = true;
             }
+            return item;
           }
         });
-      gs[0].popularProducts = dPopular;
-      gs[0].members = gs[0].members.map((member) => {
-        member.products.map((item) => {
-          if (item.status.toUpperCase() !== 'ACTIVE') item.outofstock = true;
-          return item;
-        });
+        // console.log(
+        //   '🚀 ~ file: groupshops.service.ts:984 ~ GroupshopsService ~ gs[0].members=gs[0].members.map ~ member',
+        //   newMember,
+        // );
         return member;
       });
     }
-    console.log(
-      '🚀 ~ file: groupshops.service.ts ~ line 975 ~ GroupshopsService ~ findOne ~ gs[0]',
-      gs[0],
-    );
+    // console.log(
+    //   '🚀 ~ file: groupshops.service.ts ~ line 975 ~ GroupshopsService allProducts',
+    //   gs[0].allProducts,
+    // );
 
     return gs[0];
   }
