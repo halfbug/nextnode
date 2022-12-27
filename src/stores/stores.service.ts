@@ -550,6 +550,27 @@ export class StoresService {
                       ],
                     },
                   },
+                  {
+                    products: {
+                      $map: {
+                        input: '$$this.lineItems',
+                        in: {
+                          $arrayElemAt: [
+                            {
+                              $filter: {
+                                input: '$popularProducts',
+                                as: 'j',
+                                cond: {
+                                  $eq: ['$$this.product.id', '$$j.id'],
+                                },
+                              },
+                            },
+                            0,
+                          ],
+                        },
+                      },
+                    },
+                  },
                 ],
               },
             },
