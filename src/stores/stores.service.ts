@@ -578,6 +578,42 @@ export class StoresService {
         },
       },
       {
+        $addFields: {
+          popularProducts: {
+            $map: {
+              input: '$popularProducts',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    lineItems: {
+                      $filter: {
+                        input: '$lineItemsDetails',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.id', '$$j.product.id'],
+                        },
+                      },
+                    },
+                  },
+                  {
+                    orders: {
+                      $filter: {
+                        input: '$lineItemsDetails',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$this.id', '$$j.product.id'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
         $lookup: {
           from: 'inventory',
           localField: 'campaign.products',
