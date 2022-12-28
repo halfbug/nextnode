@@ -55,14 +55,21 @@ export class ChannelGroupshopService {
     const cryptURL = `/${
       shop.split('.')[0]
     }/ch/${slugName}/${this.crypt.encrypt(title)}`;
+    const expiredFulllink = `${this.configSevice.get(
+      'FRONT',
+    )}${cryptURL}/status&activated`;
     const fulllink = `${this.configSevice.get('FRONT')}${cryptURL}`;
     const shortLink = await this.kalavioService.generateShortLink(fulllink);
+    const expiredShortLink = await this.kalavioService.generateShortLink(
+      expiredFulllink,
+    );
 
     let ucg = null;
     ucg = new UpdateChannelGroupshopInput();
     ucg.members = [];
     ucg.url = cryptURL;
     ucg.shortUrl = shortLink;
+    ucg.expiredShortLink = expiredShortLink;
     // bought product + campaign products will go to setDiscount below
     // also add in db
     const campaign = await this.storesService.findOneWithActiveCampaing(shop);
@@ -458,6 +465,7 @@ export class ChannelGroupshopService {
           totalProducts: 1,
           shortUrl: 1,
           url: 1,
+          expiredShortLink: 1,
           expiredAt: 1,
           dealProducts: 1,
           discountCode: 1,
@@ -490,6 +498,66 @@ export class ChannelGroupshopService {
         $match: {
           'discountCode.title': discountCode,
         },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(ChannelGroupshop, agg).toArray();
+    return gs[0];
+  }
+
+  async updateExpireDate(
+    updateGroupshopInput: UpdateChannelGroupshopInput,
+    code: string,
+  ) {
+    const { id } = updateGroupshopInput;
+
+    delete updateGroupshopInput.id;
+    await this.channelGroupshopRepository.update({ id }, updateGroupshopInput);
+    return await this.findChannelGroupshopByCode(code);
+  }
+
+  async getActiveChannelGroupshopURL(storeId: string) {
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              storeId,
+            },
+            {
+              expiredAt: {
+                $gte: new Date(),
+              },
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'channel',
+          localField: 'channelId',
+          foreignField: 'id',
+          as: 'channel',
+        },
+      },
+      {
+        $unwind: {
+          path: '$channel',
+        },
+      },
+      {
+        $match: {
+          'channel.isActive': true,
+        },
+      },
+      {
+        $project: {
+          url: 1,
+          shortUrl: 1,
+        },
+      },
+      {
+        $limit: 1,
       },
     ];
     const manager = getMongoManager();

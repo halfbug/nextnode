@@ -23,6 +23,12 @@ export class CreateChannelGroupshopInput {
   @Field({ nullable: true })
   shortUrl?: string;
 
+  @Field({ nullable: true })
+  expiredShortLink?: string;
+
+  @Field({ nullable: true })
+  expiredAt?: Date;
+
   @Field(() => DiscountCodeInput)
   discountCode?: DiscountCodeInput;
 

@@ -17,6 +17,11 @@ import { StoresService } from 'src/stores/stores.service';
 import { UpdateChannelGroupshopInput } from './dto/update-channel-groupshop.input';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import { Public } from 'src/auth/public.decorator';
+import { addDays, getDateDifference } from 'src/utils/functions';
+import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
+import { EventType } from 'src/gs-common/entities/lifecycle.modal';
+import { LifecycleService } from 'src/gs-common/lifecycle.service';
+import { activeGroupshop } from 'src/groupshops/entities/groupshop.entity';
 
 @Resolver(() => Channel)
 export class ChannelResolver {
@@ -25,6 +30,8 @@ export class ChannelResolver {
     private readonly channelGroupshopService: ChannelGroupshopService,
     private storesService: StoresService,
     private crypt: EncryptDecryptService,
+    private shopifyapi: ShopifyService,
+    private readonly lifecyclesrv: LifecycleService,
   ) {}
 
   @Mutation(() => Channel)
@@ -131,7 +138,55 @@ export class ChannelResolver {
 
   @Public()
   @Query(() => ChannelGroupShop, { name: 'getChannelGroupshopByCode' })
-  async findChannelGroupshopByCode(@Args('code') code: string) {
+  async findChannelGroupshopByCode(
+    @Args('code') code: string,
+    @Args('status') status: string,
+  ) {
+    if (status === 'activated') {
+      const Dcode = await this.crypt.decrypt(code);
+      const groupshop = await this.channelGroupshopService.findChannelGS(Dcode);
+      const isExpired = !(getDateDifference(groupshop.expiredAt).time > -1);
+      if (isExpired) {
+        //update groupshop expire date
+        const newExpiredate = addDays(new Date(), 7);
+        const updateGS = await this.channelGroupshopService.updateExpireDate(
+          {
+            expiredAt: newExpiredate,
+            id: groupshop.id,
+          },
+          Dcode,
+        );
+
+        // add lifcycle event for revised groupshop
+        this.lifecyclesrv.create({
+          groupshopId: groupshop.id,
+          event: EventType.revised,
+          dateTime: new Date(),
+        });
+        this.lifecyclesrv.create({
+          groupshopId: groupshop.id,
+          event: EventType.expired,
+          dateTime: newExpiredate,
+        });
+
+        const { shop, accessToken } = await this.storesService.findById(
+          updateGS?.storeId,
+        );
+
+        await this.shopifyapi.setDiscountCode(
+          shop,
+          'Update',
+          accessToken,
+          updateGS.discountCode.title,
+          null,
+          null,
+          updateGS.createdAt,
+          newExpiredate,
+          updateGS.discountCode.priceRuleId,
+        );
+        return updateGS;
+      }
+    }
     const gs = await this.channelGroupshopService.findChannelGroupshopByCode(
       await this.crypt.decrypt(code),
     );
@@ -140,5 +195,13 @@ export class ChannelResolver {
     } else {
       throw new NotFoundException(`Not Found channel groupshop`);
     }
+  }
+
+  @Public()
+  @Query(() => activeGroupshop, { name: 'getActiveChannelGroupshopURL' })
+  async getActiveChannelGroupshopURL(@Args('storeId') storeId: string) {
+    const result =
+      await this.channelGroupshopService.getActiveChannelGroupshopURL(storeId);
+    return result;
   }
 }

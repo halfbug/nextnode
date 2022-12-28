@@ -52,7 +52,7 @@ export class ChannelGroupShop {
   shortUrl?: string;
 
   @Field({ nullable: true })
-  exipredShortLink?: string;
+  expiredShortLink?: string;
 
   @Field()
   createdAt: Date;

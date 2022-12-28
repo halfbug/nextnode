@@ -9,6 +9,7 @@ import ChannelGroupshop from './entities/channelgroupshop.model';
 import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
 import { StoresModule } from 'src/stores/stores.module';
 import { EmailModule } from 'src/email/email.module';
+import { GsCommonModule } from 'src/gs-common/gs-common.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { EmailModule } from 'src/email/email.module';
     forwardRef(() => ShopifyStoreModule),
     forwardRef(() => StoresModule),
     forwardRef(() => EmailModule),
+    forwardRef(() => GsCommonModule),
   ],
   providers: [ChannelResolver, ChannelService, ChannelGroupshopService],
   exports: [ChannelService, ChannelGroupshopService],

@@ -37,7 +37,7 @@ export default class ChannelGroupshop extends DefaultColumnsService {
   shortUrl?: string;
 
   @Column()
-  exipredUrl?: string;
+  expiredUrl?: string;
 
   @Column()
   expiredAt: Date;
