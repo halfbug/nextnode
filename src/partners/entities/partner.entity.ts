@@ -131,7 +131,7 @@ export class Partnergroupshop {
   @Field(() => [Orders], { nullable: 'itemsAndList' })
   orders?: Orders[];
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => Int, { defaultValue: 0 })
   visitors: number;
 
   @Field(() => [PartnerMember], { nullable: 'itemsAndList' })

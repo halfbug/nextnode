@@ -780,31 +780,6 @@ export class PartnerService {
         },
       },
       {
-        $project: {
-          purchases: {
-            $size: '$members',
-          },
-          id: 1,
-          members: 1,
-          campaignId: 1,
-          discountCode: 1,
-          partnerRewards: 1,
-          partnerDetails: 1,
-          isActive: 1,
-          partnerCommission: 1,
-          shortUrl: 1,
-          url: 1,
-          updatedAt: 1,
-        },
-      },
-      {
-        $unwind: {
-          path: '$members',
-          includeArrayIndex: 'typeIndex',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
         $lookup: {
           from: 'visitors',
           localField: 'members.groupshopId',
@@ -821,13 +796,7 @@ export class PartnerService {
         },
       },
       {
-        $unwind: {
-          path: '$orders',
-        },
-      },
-      {
-        $group: {
-          _id: '$id',
+        $addFields: {
           revenue: {
             $sum: '$members.orderAmount',
           },
@@ -839,49 +808,14 @@ export class PartnerService {
           comissionAmount: {
             $sum: '$members.comissionAmount',
           },
-          partnerRewards: {
-            $first: '$partnerRewards',
-          },
-          partnerDetails: {
-            $first: '$partnerDetails',
-          },
-          discountCode: {
-            $first: '$discountCode',
+          visitors: {
+            $sum: {
+              $size: '$visitors',
+            },
           },
           purchases: {
-            $first: '$purchases',
+            $size: '$members',
           },
-          shortUrl: {
-            $first: '$shortUrl',
-          },
-          url: {
-            $first: '$url',
-          },
-          visitors: {
-            $sum: { $size: '$visitors' },
-          },
-          partnerCommission: {
-            $first: '$partnerCommission',
-          },
-          campaignId: {
-            $first: '$campaignId',
-          },
-          isActive: {
-            $first: '$isActive',
-          },
-          id: {
-            $first: '$id',
-          },
-          orders: {
-            $push: '$orders',
-          },
-          updatedAt: {
-            $first: '$updatedAt',
-          },
-        },
-      },
-      {
-        $addFields: {
           revenuePercent: {
             $subtract: [
               100,
@@ -916,6 +850,26 @@ export class PartnerService {
       },
     ];
     const manager = getMongoManager();
+    const gs = await manager.aggregate(Partnergroupshop, agg).toArray();
+    return gs;
+  }
+
+  async findActivePartners(storeId: string) {
+    const manager = getMongoManager();
+    const agg: any = [
+      {
+        $match: {
+          $and: [
+            {
+              isActive: true,
+            },
+            {
+              storeId: storeId,
+            },
+          ],
+        },
+      },
+    ];
     const gs = await manager.aggregate(Partnergroupshop, agg).toArray();
     return gs;
   }

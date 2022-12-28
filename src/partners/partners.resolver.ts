@@ -117,6 +117,13 @@ export class PartnersResolver {
     return result;
   }
 
+  @Public()
+  @Query(() => [Partners], { name: 'activePartners' })
+  async findActivePartners(@Args('storeId') storeId: string) {
+    const data = await this.PartnerService.findActivePartners(storeId);
+    return data;
+  }
+
   @Query(() => [MostPartnerViralCustomers], { name: 'partnerViralCustomers' })
   async partnerViralCustomers(
     @Args('storeId') storeId: string,
