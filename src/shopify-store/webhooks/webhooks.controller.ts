@@ -847,6 +847,8 @@ export class WebhooksController {
       const PrdId = `gid://shopify/Product/${rproduct.id}`;
 
       //  1 products are not deleted from the database but are marked out of stock and set deleted product status to DELETED
+      // await this.inventryService.removeVariants(PrdId);
+
       await this.inventryService.updateProduct(PrdId, {
         status: 'DELETED',
         outofstock: true,
