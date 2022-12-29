@@ -39,7 +39,7 @@ export class GroupshopsService {
     groupshop.milestones = [new MilestoneInput()];
     groupshop.milestones = createGroupshopInput.milestones;
     // groupshop.members.map...
-    this.storesrv.updateRecentGS(groupshop);
+    await this.storesrv.updateRecentGS(groupshop);
 
     return this.groupshopRepository.save(groupshop);
   }
