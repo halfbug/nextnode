@@ -956,6 +956,8 @@ export class GroupshopsService {
             } else if (item?.status?.toUpperCase() !== 'ACTIVE') {
               item.outofstock = true; // if product is draft so make it out of stock so that it is not purchaseable
               dPopular.push(item);
+            } else {
+              dPopular.push(item);
             }
 
             // if (ind === 0) {
