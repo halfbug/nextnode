@@ -938,10 +938,10 @@ export class GroupshopsService {
     // );
     if (gs.length) {
       const popular = gs[0].popularProducts;
-      console.log(
-        '🚀 ~ file: groupshops.service.ts:935 ~ GroupshopsService ~ findOne ~ popular',
-        popular,
-      );
+      // console.log(
+      //   '🚀 ~ file: groupshops.service.ts:935 ~ GroupshopsService ~ findOne ~ popular',
+      //   popular,
+      // );
       let dPopular = [];
       if (!popular.length) {
         console.log('im in null');
@@ -975,37 +975,38 @@ export class GroupshopsService {
       gs[0].popularProducts = dPopular;
 
       gs[0].members = gs[0].members.map((member) => {
-        member.products = member.products.map((item) => {
-          console.log(
-            '🚀 ~ file: groupshops.service.ts:967 ~ GroupshopsService ~ member.products.map ~ item',
-            item,
-          );
-          if (!Boolean(item)) {
-            console.log('inside null chekc');
-            // dummyProduct.id = uuid();
+        if (!member.products.length) {
+          member.products = [dummyProduct()];
+        } else {
+          member.products = member.products.map((item) => {
             console.log(
-              '🚀 ~ file: groupshops.service.ts:986 ~ GroupshopsService ~ member.products=member.products.map ~ dummyProduct',
-              dummyProduct(),
+              '🚀 ~ file: groupshops.service.ts:967 ~ GroupshopsService ~ member.products.map ~ item',
+              item,
             );
-            return dummyProduct();
-          } else {
-            if (item.status.toUpperCase() !== 'ACTIVE') {
-              item.outofstock = true;
+            if (!Boolean(item)) {
+              console.log('inside null chekc');
+              // dummyProduct.id = uuid();
+              console.log(
+                '🚀 ~ file: groupshops.service.ts:986 ~ GroupshopsService ~ member.products=member.products.map ~ dummyProduct',
+                dummyProduct(),
+              );
+              return dummyProduct();
+            } else {
+              if (item.status.toUpperCase() !== 'ACTIVE') {
+                item.outofstock = true;
+              }
+              return item;
             }
-            return item;
-          }
-        });
-        // console.log(
-        //   '🚀 ~ file: groupshops.service.ts:984 ~ GroupshopsService ~ gs[0].members=gs[0].members.map ~ member',
-        //   newMember,
-        // );
+          });
+        }
         return member;
       });
     }
-    // console.log(
-    //   '🚀 ~ file: groupshops.service.ts ~ line 975 ~ GroupshopsService allProducts',
-    //   gs[0].allProducts,
-    // );
+    console.log(
+      '🚀 ~ file: groupshops.service.ts ~ line 975 ~ GroupshopsService allProducts',
+      gs[0].allProducts.length,
+      gs[0].members[0].products.length,
+    );
 
     return gs[0];
   }
