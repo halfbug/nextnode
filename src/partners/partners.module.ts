@@ -32,6 +32,6 @@ import { PMemberService } from './pmember.service';
     PMemberArrivedListener,
     PMemberService,
   ],
-  exports: [PartnerService, PMemberArrivedEvent],
+  exports: [PartnerService, PMemberService, PMemberArrivedEvent],
 })
 export class PartnersModule {}

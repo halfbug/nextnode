@@ -9,6 +9,7 @@ import { VistorsService } from 'src/gs-common/vistors.service';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { OrdersService } from 'src/inventory/orders.service';
 import { PartnerService } from 'src/partners/partners.service';
+import { PMemberService } from 'src/partners/pmember.service';
 import { RetentiontoolsService } from 'src/retentiontools/retentiontools.service';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { UpdateStoreInput } from './dto/update-store.input';
@@ -28,6 +29,7 @@ export class UninstallService {
     private configService: ConfigService,
     private readonly lifecyclesrv: LifecycleService,
     private partnerGSSrv: PartnerService,
+    private partnerMember: PMemberService,
     private retentiontoolsService: RetentiontoolsService,
     private visitorSrv: VistorsService,
   ) {}
@@ -45,6 +47,7 @@ export class UninstallService {
       // await this.storesService.removeShop(shop);
       this.billingService.removeByShop(store.id);
       this.partnerGSSrv.removeShop(store.id);
+      this.partnerMember.removeShop(store.id);
       this.retentiontoolsService.removeShop(store.id);
       store.status = 'Uninstalled';
       store.installationStep = 0;

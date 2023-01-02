@@ -21,6 +21,7 @@ import { UploadImageService } from './ImageUpload/uploadimage.service';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom, map } from 'rxjs';
 import { PartnerService } from 'src/partners/partners.service';
+import { PMemberService } from 'src/partners/pmember.service';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import { AuthService } from 'src/auth/auth.service';
 import { Public } from 'src/auth/public.decorator';
@@ -42,6 +43,7 @@ export class ShopifyStoreController {
     private imageService: UploadImageService,
     private httpService: HttpService,
     private partnerGSSrv: PartnerService,
+    private partnerMember: PMemberService,
     private readonly crypt: EncryptDecryptService,
     private readonly authService: AuthService,
   ) {}
@@ -169,6 +171,7 @@ export class ShopifyStoreController {
       await this.storesService.removeShop(shop);
       await this.billingService.removeByShop(store.id);
       await this.partnerGSSrv.removeShop(store.id);
+      await this.partnerMember.removeShop(store.id);
       return 'done';
     } catch (error) {
       return error.message;

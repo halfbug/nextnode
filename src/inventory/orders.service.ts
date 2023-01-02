@@ -663,6 +663,7 @@ export class OrdersService {
       {
         $sort: {
           purchaseCount: -1,
+          revenue: -1,
         },
       },
       {

@@ -49,6 +49,10 @@ export class PMemberService {
     return this.pmemberRepository.find({ groupshopId });
   }
 
+  async removeShop(storeId: string) {
+    return await this.pmemberRepository.delete({ storeId });
+  }
+
   async update(id: string, partnerMemberInput: PartnerMember) {
     const res = await this.pmemberRepository.update({ id }, partnerMemberInput);
     return res;
