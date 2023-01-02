@@ -552,6 +552,7 @@ export class OrdersService {
         $sort: {
           purchaseCount: -1,
           revenue: -1,
+          'LI.product.title': 1,
         },
       },
       {
@@ -664,6 +665,7 @@ export class OrdersService {
         $sort: {
           purchaseCount: -1,
           revenue: -1,
+          'LI.product.title': 1,
         },
       },
       {
