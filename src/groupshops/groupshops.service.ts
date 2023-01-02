@@ -1812,13 +1812,16 @@ export class GroupshopsService {
             },
           },
           revenue: {
-            $sum: '$LI.discountedPrice',
+            $sum: {
+              $multiply: ['$LI.discountedPrice', '$LI.quantity'],
+            },
           },
         },
       },
       {
         $sort: {
           purchaseCount: -1,
+          revenue: -1,
         },
       },
       {
