@@ -13,6 +13,8 @@ import { ConfigService } from '@nestjs/config';
 import { StoresService } from 'src/stores/stores.service';
 import { PartnerService } from 'src/partners/partners.service';
 import { Public } from 'src/auth/public.decorator';
+import { ChannelService } from 'src/channel/channel.service';
+import { ChannelGroupshopService } from 'src/channel/channelgroupshop.service';
 @Public()
 @Controller('ext')
 export class ThemeAppExtensionController {
@@ -22,6 +24,8 @@ export class ThemeAppExtensionController {
     private groupshopSrv: GroupshopsService,
     private storesService: StoresService,
     private partnerSrv: PartnerService,
+    private channelService: ChannelService,
+    private channelGroupshopService: ChannelGroupshopService,
   ) {}
   @Get('store')
   async getStoreWithActiveCampaign(@Req() req, @Res() res) {
@@ -174,6 +178,36 @@ export class ThemeAppExtensionController {
       );
     } catch (err) {
       res.send(JSON.stringify({ activeMember: null, url: null }));
+    } finally {
+      // res.status(HttpStatus.OK).send();
+    }
+  }
+
+  @Post('channel')
+  async getChannelDetails(@Req() req, @Res() res) {
+    try {
+      const { discountCode } = req.body;
+      console.log({ discountCode });
+
+      const {
+        url,
+        channelId,
+        customerDetail: { firstName: fname },
+      } = await this.channelGroupshopService.findChannelGS(discountCode);
+      const {
+        rewards: { baseline },
+      } = await this.channelService.findOne(channelId);
+      const formatName = `${fname[0].toUpperCase()}${fname.slice(1)}`;
+
+      res.send(
+        JSON.stringify({
+          url,
+          baseline,
+          fname: formatName,
+        }),
+      );
+    } catch (err) {
+      res.send(JSON.stringify({ baseline: null, url: null, fname: null }));
     } finally {
       // res.status(HttpStatus.OK).send();
     }

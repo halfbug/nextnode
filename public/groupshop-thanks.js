@@ -598,7 +598,10 @@ var totalOrderAmount = lineItems.reduce((priceSum, { price, quantity }) => {
   return thisPrice;
 }, 0);
 const isGroupshop =
-  discountCode && discountCode.slice(0, 3) === 'GSP' ? false : true;
+  discountCode &&
+  (discountCode.slice(0, 3) === 'GSP' || discountCode.slice(0, 3) === 'GSC')
+    ? false
+    : true;
 console.log('🚀  groupshop-thanks isGroupshop', isGroupshop);
 
 async function fetchStore(shop) {
@@ -883,9 +886,12 @@ async function init() {
     } else {
       const pollit2 = setInterval(async () => {
         indx2++;
-        res = await gsPost('partner', {
-          discountCode,
-        });
+        res = await gsPost(
+          discountCode.slice(0, 3) === 'GSC' ? 'channel' : 'partner',
+          {
+            discountCode,
+          },
+        );
         console.log(
           '🚀 ~ file: groupshop-thanks.js ~ line 657 ~ pollit2 ~ res',
           res,
