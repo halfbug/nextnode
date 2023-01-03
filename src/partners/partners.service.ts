@@ -1381,6 +1381,11 @@ export class PartnerService {
         },
       },
       {
+        $unwind: {
+          path: '$lineItems',
+        },
+      },
+      {
         $group: {
           _id: {
             year: {
@@ -1391,7 +1396,9 @@ export class PartnerService {
             },
           },
           revenue: {
-            $sum: '$orderAmount',
+            $sum: {
+              $multiply: ['$lineItems.discountedPrice', '$lineItems.quantity'],
+            },
           },
         },
       },
