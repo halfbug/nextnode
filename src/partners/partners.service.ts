@@ -1440,6 +1440,11 @@ export class PartnerService {
           },
         },
       },
+      {
+        $unwind: {
+          path: '$lineItems',
+        },
+      },
     ];
     if (graphView === 'Day') {
       agg?.push({
@@ -1453,7 +1458,9 @@ export class PartnerService {
             },
           },
           revenue: {
-            $sum: '$orderAmount',
+            $sum: {
+              $multiply: ['$lineItems.discountedPrice', '$lineItems.quantity'],
+            },
           },
         },
       });
@@ -1470,7 +1477,9 @@ export class PartnerService {
             },
           },
           revenue: {
-            $sum: '$orderAmount',
+            $sum: {
+              $multiply: ['$lineItems.discountedPrice', '$lineItems.quantity'],
+            },
           },
         },
       });
@@ -1484,7 +1493,9 @@ export class PartnerService {
             },
           },
           revenue: {
-            $sum: '$orderAmount',
+            $sum: {
+              $multiply: ['$lineItems.discountedPrice', '$lineItems.quantity'],
+            },
           },
         },
       });
