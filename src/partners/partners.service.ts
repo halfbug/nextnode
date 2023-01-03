@@ -797,8 +797,28 @@ export class PartnerService {
       },
       {
         $addFields: {
+          lineItems: {
+            $reduce: {
+              input: '$members.lineItems',
+              initialValue: [],
+              in: {
+                $concatArrays: ['$$value', '$$this'],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
           revenue: {
-            $sum: '$members.orderAmount',
+            $sum: {
+              $map: {
+                input: '$lineItems',
+                in: {
+                  $multiply: ['$$this.discountedPrice', '$$this.quantity'],
+                },
+              },
+            },
           },
           lineitemsCount: {
             $sum: {
@@ -815,31 +835,6 @@ export class PartnerService {
           },
           purchases: {
             $size: '$members',
-          },
-          revenuePercent: {
-            $subtract: [
-              100,
-              {
-                $toInt: {
-                  $trim: {
-                    input: '$partnerRewards.baseline',
-                    chars: '%',
-                  },
-                },
-              },
-            ],
-          },
-        },
-      },
-      {
-        $addFields: {
-          revenue: {
-            $divide: [
-              {
-                $multiply: ['$revenue', '$revenuePercent'],
-              },
-              100,
-            ],
           },
         },
       },
