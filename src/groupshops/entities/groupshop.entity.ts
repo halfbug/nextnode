@@ -348,12 +348,21 @@ export class ViralPartnerMember {
 }
 
 @ObjectType()
+export class Owner {
+  @Field({ nullable: true })
+  orderId?: string;
+}
+
+@ObjectType()
 export class MostViralCustomers {
   @Field()
   _id?: string;
 
   @Field(() => [ViralMember])
   members?: ViralMember[];
+
+  @Field(() => [ViralMember])
+  owner?: ViralMember[];
 
   @Field({ nullable: true })
   uniqueClicks?: number;

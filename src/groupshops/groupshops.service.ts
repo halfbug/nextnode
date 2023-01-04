@@ -1510,8 +1510,16 @@ export class GroupshopsService {
         },
       },
       {
+        $addFields: {
+          owner: {
+            $first: '$members',
+          },
+        },
+      },
+      {
         $project: {
           members: 1,
+          owner: 1,
           shortUrl: 1,
           url: 1,
           uniqueClicks: {
@@ -1596,6 +1604,14 @@ export class GroupshopsService {
           },
           url: 1,
           shortUrl: 1,
+          owner: {
+            $filter: {
+              input: '$members',
+              cond: {
+                $eq: ['$$this.id', '$owner.orderId'],
+              },
+            },
+          },
           members: 1,
           uniqueClicks: 1,
           numMembers: 1,
