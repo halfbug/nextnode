@@ -357,7 +357,7 @@ Logger.error(err, CampaignsService.name)
     const agg = [
       {
         '$match': {
-          'storeId': storeId,
+          'storeId': storeId
         }
       }, {
         '$lookup': {
@@ -394,17 +394,37 @@ Logger.error(err, CampaignsService.name)
               'input': '$billings', 
               'initialValue': {
                 'tcashback': 0, 
-                'trevenue': 0
+                'trevenue': 0, 
+                'tfeeCharges': 0
               }, 
               'in': {
                 'tcashback': {
                   '$add': [
-                    '$$value.tcashback', {$ifNull: ['$$this.cashBack', 0]}
+                    '$$value.tcashback', {
+                      '$ifNull': [
+                        '$$this.cashBack', 0
+                      ]
+                    }
+                  ]
+                }, 
+                'tfeeCharges': {
+                  '$add': [
+                    '$$value.tfeeCharges', {
+                      '$ifNull': [
+                        {
+                          '$ceil': '$$this.feeCharges'
+                        }, 0
+                      ]
+                    }
                   ]
                 }, 
                 'trevenue': {
                   '$add': [
-                    '$$value.trevenue', {$ifNull: ['$$this.revenue', 0]}
+                    '$$value.trevenue', {
+                      '$ifNull': [
+                        '$$this.revenue', 0
+                      ]
+                    }
                   ]
                 }
               }
@@ -424,6 +444,11 @@ Logger.error(err, CampaignsService.name)
                 '$detail.tcashback', 0
               ]
             }, 
+            'totalFeeCharges': {
+              '$ifNull': [
+                '$detail.tfeeCharges', 0
+              ]
+            }, 
             'totalRevenue': {
               '$ifNull': [
                 '$detail.trevenue', 0
@@ -441,7 +466,7 @@ Logger.error(err, CampaignsService.name)
       }, {
         '$sort': {
           '_id': -1
-          }
+        }
       }
     ];
   // console.log(agg);

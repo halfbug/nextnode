@@ -11,4 +11,7 @@ export class Details {
 
   @Field({ nullable: true })
   totalCashback: number;
+
+  @Field({ nullable: true })
+  totalFeeCharges: number;
 }
