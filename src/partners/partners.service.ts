@@ -821,9 +821,7 @@ export class PartnerService {
             },
           },
           lineitemsCount: {
-            $sum: {
-              $size: '$members.lineItems',
-            },
+            $size: '$lineItems',
           },
           comissionAmount: {
             $sum: '$members.comissionAmount',
