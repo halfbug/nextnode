@@ -314,6 +314,9 @@ export class ViralMember {
   createdAt?: Date;
 
   @Field({ nullable: true })
+  shopifyCreatedAt?: string;
+
+  @Field({ nullable: true })
   shop?: string;
 
   @Field({ nullable: true })
