@@ -472,19 +472,8 @@ export class BillingsService {
             {
               'result.createdAt': {
                 $gte: new Date(`${startFrom}${'T00:00:01'}`),
+                $lte: new Date(`${toDate}${'T23:59:59'}`),
               },
-            },
-            {
-              $or: [
-                {
-                  'result.createdAt': {
-                    $lte: new Date(`${toDate}${'T23:59:59'}`),
-                  },
-                },
-                {
-                  'result.expiredAt': fullDate === toDate ? null : '',
-                },
-              ],
             },
           ],
         },

@@ -1253,19 +1253,8 @@ export class GroupshopsService {
             {
               createdAt: {
                 $gte: new Date(`${startFrom}${'T00:00:01'}`),
+                $lte: new Date(`${toDate}${'T23:59:59'}`),
               },
-            },
-            {
-              $or: [
-                {
-                  createdAt: {
-                    $lte: new Date(`${toDate}${'T23:59:59'}`),
-                  },
-                },
-                {
-                  expiredAt: fullDate === toDate ? null : '',
-                },
-              ],
             },
           ],
         },
@@ -1343,19 +1332,8 @@ export class GroupshopsService {
             {
               createdAt: {
                 $gte: new Date(`${startFrom}${'T00:00:01'}`),
+                $lte: new Date(`${toDate}${'T23:59:59'}`),
               },
-            },
-            {
-              $or: [
-                {
-                  createdAt: {
-                    $lte: new Date(`${toDate}${'T23:59:59'}`),
-                  },
-                },
-                {
-                  expiredAt: fullDate === toDate ? null : '',
-                },
-              ],
             },
           ],
         },

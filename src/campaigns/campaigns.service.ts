@@ -514,18 +514,9 @@ Logger.error(err, CampaignsService.name)
               'storeId': storeId
             }, {
               'createdAt': {
-                '$gte': new Date(`${startFrom}${'T00:00:01'}`)
+                '$gte': new Date(`${startFrom}${'T00:00:01'}`),
+                '$lte': new Date(`${toDate}${'T23:59:59'}`),
               }
-            }, {
-              '$or': [
-                {
-                  'expiredAt': {
-                    '$lte': new Date(`${toDate}${'T23:59:59'}`)
-                  }
-                }, {
-                  'expiredAt': fullDate === toDate ? null : '',
-                }
-              ]
             }
           ]
         }
@@ -586,18 +577,9 @@ Logger.error(err, CampaignsService.name)
               'storeId': storeId
             }, {
               'createdAt': {
-                '$gte': new Date(`${startFrom}${'T00:00:01'}`)
+                '$gte': new Date(`${startFrom}${'T00:00:01'}`),
+                '$lte': new Date(`${toDate}${'T23:59:59'}`),
               }
-            }, {
-              '$or': [
-                {
-                  'expiredAt': {
-                    '$lte': new Date(`${toDate}${'T23:59:59'}`)
-                  }
-                }, {
-                  'expiredAt': fullDate === toDate ? null : '',
-                }
-              ]
             }
           ]
         }
