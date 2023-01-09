@@ -356,24 +356,24 @@ Logger.error(err, CampaignsService.name)
     const manager = getMongoManager();
     const agg = [
       {
-        '$match': {
-          'storeId': storeId
+        $match: {
+          storeId: storeId
         }
       }, {
-        '$lookup': {
-          'from': 'groupshops', 
-          'localField': 'id', 
-          'foreignField': 'campaignId', 
-          'as': 'groupshops'
+        $lookup: {
+          from: 'groupshops', 
+          localField: 'id', 
+          foreignField: 'campaignId', 
+          as: 'groupshops'
         }
       }, {
-        '$addFields': {
-          'totalGroupshops': {
-            '$reduce': {
-              'input': '$groupshops', 
-              'initialValue': 0, 
-              'in': {
-                '$add': [
+        $addFields: {
+          totalGroupshops: {
+            $reduce: {
+              input: '$groupshops', 
+              initialValue: 0, 
+              in: {
+                $add: [
                   '$$value', 1
                 ]
               }
@@ -382,46 +382,56 @@ Logger.error(err, CampaignsService.name)
         }
       }, {
         '$lookup': {
-          'from': 'billing', 
-          'localField': 'groupshops.id', 
-          'foreignField': 'groupShopId', 
-          'as': 'billings'
+          from: 'billing', 
+          localField: 'groupshops.id', 
+          foreignField: 'groupShopId', 
+          as: 'billings'
         }
       }, {
-        '$addFields': {
-          'detail': {
-            '$reduce': {
-              'input': '$billings', 
-              'initialValue': {
+        $addFields: {
+          detail: {
+            $reduce: {
+              input: '$billings', 
+              initialValue: {
                 'tcashback': 0, 
                 'trevenue': 0, 
                 'tfeeCharges': 0
               }, 
-              'in': {
-                'tcashback': {
-                  '$add': [
+              in: {
+                tcashback: {
+                  $add: [
                     '$$value.tcashback', {
-                      '$ifNull': [
+                      $ifNull: [
                         '$$this.cashBack', 0
                       ]
                     }
                   ]
                 }, 
-                'tfeeCharges': {
-                  '$add': [
+                tfeeCharges:  {
+                  $add: [
                     '$$value.tfeeCharges', {
-                      '$ifNull': [
-                        {
-                          '$ceil': '$$this.feeCharges'
-                        }, 0
-                      ]
+                      $cond: {
+                        if: {
+                          '$ne': [
+                            '$$this.type', 1
+                          ]
+                        }, 
+                        then: {
+                          '$ifNull': [
+                            {
+                              '$ceil': '$$this.feeCharges'
+                            }, 0
+                          ]
+                        }, 
+                        else: 0
+                      }
                     }
                   ]
                 }, 
-                'trevenue': {
-                  '$add': [
+                trevenue: {
+                  $add: [
                     '$$value.trevenue', {
-                      '$ifNull': [
+                      $ifNull: [
                         '$$this.revenue', 0
                       ]
                     }
@@ -432,40 +442,40 @@ Logger.error(err, CampaignsService.name)
           }
         }
       }, {
-        '$set': {
-          'details': {
-            'totalGroupshops': {
-              '$ifNull': [
+        $set: {
+          details: {
+            totalGroupshops: {
+              $ifNull: [
                 '$totalGroupshops', 0
               ]
             }, 
-            'totalCashback': {
-              '$ifNull': [
+            totalCashback: {
+              $ifNull: [
                 '$detail.tcashback', 0
               ]
             }, 
-            'totalFeeCharges': {
-              '$ifNull': [
+            totalFeeCharges: {
+              $ifNull: [
                 '$detail.tfeeCharges', 0
               ]
             }, 
-            'totalRevenue': {
-              '$ifNull': [
+            totalRevenue: {
+              $ifNull: [
                 '$detail.trevenue', 0
               ]
             }
           }
         }
       }, {
-        '$project': {
-          'billings': 0, 
-          'groupshops': 0, 
-          'totalGroupshops': 0, 
-          'detail': 0
+        $project: {
+          billings: 0, 
+          groupshops: 0, 
+          totalGroupshops: 0, 
+          detail: 0
         }
       }, {
-        '$sort': {
-          '_id': -1
+        $sort: {
+          _id: -1
         }
       }
     ];
