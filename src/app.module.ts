@@ -42,6 +42,8 @@ import AdminUser from './admin-users/entities/admin-user.model';
 import Channel from './channel/entities/channel.model';
 import ChannelGroupshop from './channel/entities/channelgroupshop.model';
 import { AppLogger } from './applogger/entities/applogger.entity';
+import { DropsGroupshopModule } from './drops-groupshop/drops-groupshop.module';
+import DropsGroupshop from './drops-groupshop/entities/dropsgroupshop.model';
 
 @Module({
   imports: [
@@ -88,6 +90,7 @@ import { AppLogger } from './applogger/entities/applogger.entity';
             Channel,
             ChannelGroupshop,
             AppLogger,
+            DropsGroupshop,
           ],
         };
       },
@@ -117,6 +120,7 @@ import { AppLogger } from './applogger/entities/applogger.entity';
     ChannelModule,
     AuthModule,
     AppLoggerModule,
+    DropsGroupshopModule,
   ],
 })
 export class AppModule {}
