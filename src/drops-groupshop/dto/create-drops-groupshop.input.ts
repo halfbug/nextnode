@@ -1,11 +1,55 @@
-import { InputType, Field } from '@nestjs/graphql';
+import { InputType, Field, ObjectType } from '@nestjs/graphql';
+import {
+  DiscountCodeInput,
+  MemberInput,
+  MilestoneInput,
+  OBSettingsInput,
+} from 'src/groupshops/dto/create-groupshops.input';
 import { Customer } from 'src/inventory/dto/create-order.input';
 
 @InputType()
-export class CreateDropsGroupshopInput {
-  @Field()
-  customerDetail: Customer;
+export class DropCustomer {
+  @Field({ nullable: true })
+  klaviyoId: string;
+  @Field({ nullable: true })
+  firstName: string;
+  @Field({ nullable: true })
+  lastName: string;
+  @Field({ nullable: true })
+  email: string;
+  @Field({ nullable: true })
+  phone: string;
+}
 
-  @Field()
-  storeId: string;
+@InputType()
+export class CreateDropsGroupshopInput {
+  @Field({ nullable: true })
+  storeId?: string;
+
+  @Field({ nullable: true })
+  url?: string;
+
+  @Field({ nullable: true })
+  shortUrl?: string;
+
+  @Field({ nullable: true })
+  expiredUrl?: string;
+
+  @Field({ nullable: true })
+  expiredShortUrl?: string;
+
+  @Field(() => DiscountCodeInput)
+  discountCode?: DiscountCodeInput;
+
+  @Field(() => DropCustomer)
+  customerDetail: DropCustomer;
+
+  @Field(() => [MemberInput])
+  members?: MemberInput[];
+
+  @Field(() => MilestoneInput)
+  milestones: MilestoneInput[];
+
+  @Field(() => OBSettingsInput, { nullable: true })
+  obSettings?: OBSettingsInput;
 }

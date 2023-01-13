@@ -14,17 +14,21 @@ export class DropsGroupshopService {
   ) {}
 
   async create(createDropsGroupshopInput: CreateDropsGroupshopInput) {
+    console.log(
+      '🚀 ~ file: drops-groupshop.service ~ line 19 ~ groupshop.service ~ create ~ createDropsGroupshopInput',
+      createDropsGroupshopInput,
+    );
     const id = uuid();
-    const dropsGroupshop = await this.DropsGroupshopRepository.create({
+    const drops = this.DropsGroupshopRepository.create({
       id,
       ...createDropsGroupshopInput,
     });
-    await this.DropsGroupshopRepository.save(dropsGroupshop);
-    return dropsGroupshop;
+    const newGSP = await this.DropsGroupshopRepository.save(drops);
+    console.log('dropsdrops ', newGSP);
   }
 
   findAll() {
-    return `This action returns all dropsGroupshop`;
+    return this.DropsGroupshopRepository.find();
   }
 
   findOne(id: number) {

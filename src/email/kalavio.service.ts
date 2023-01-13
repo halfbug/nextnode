@@ -89,7 +89,7 @@ export class KalavioService {
     }
   }
 
-  async klaviyoProfileUpdate(input) {
+  async klaviyoProfileSmsUpdate(input) {
     const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
     const customerEmail = input.email;
     const urlKlaviyo = `${this.configService.get(
@@ -119,6 +119,24 @@ export class KalavioService {
           .pipe(map((res) => res.data)),
       );
     }
+  }
+
+  async klaviyoProfileUpdate(ProfileId, shortLink) {
+    const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
+    const options = {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    };
+    const profileUrlKlaviyo = `${this.configService.get(
+      'KLAVIYO_BASE_URL',
+    )}${'/v1/person/'}${ProfileId}${'?groupshop_url='}${shortLink}${'&api_key='}${PRIVATE_KEY}`;
+    await lastValueFrom(
+      this.httpService
+        .put(profileUrlKlaviyo, options)
+        .pipe(map((res) => res.data)),
+    );
   }
 
   async generateShortLink(link: string) {
@@ -168,8 +186,8 @@ export class KalavioService {
       {
         $match: {
           expiredAt: {
-            $gte: new Date(date + 'T00:00:01.654Z'),
-            $lt: new Date(date + 'T23:59:59.654Z'),
+            $gte: new Date(`${date}${'T00:00:01'}`),
+            $lte: new Date(`${date}${'T23:59:59'}`),
           },
         },
       },

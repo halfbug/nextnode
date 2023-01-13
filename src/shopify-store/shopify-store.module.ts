@@ -27,6 +27,7 @@ import { OrderCreatedEvent } from './events/order-created.event';
 import { OrderCreatedListener } from './listeners/order-created.listener';
 import { GSUpdatePriceRuleListener } from './listeners/groupshop-updatePricerule.listener';
 import { PartnersModule } from 'src/partners/partners.module';
+import { DropsGroupshopModule } from 'src/drops-groupshop/drops-groupshop.module';
 import { GsCommonModule } from 'src/gs-common/gs-common.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { ChannelModule } from 'src/channel/channel.module';
@@ -42,6 +43,7 @@ import { ChannelModule } from 'src/channel/channel.module';
     CampaignsModule,
     forwardRef(() => GroupshopsModule),
     forwardRef(() => PartnersModule),
+    forwardRef(() => DropsGroupshopModule),
     forwardRef(() => GsCommonModule),
     forwardRef(() => AuthModule),
     forwardRef(() => ChannelModule),

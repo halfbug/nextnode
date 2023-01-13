@@ -10,6 +10,10 @@ import {
 } from '@nestjs/common';
 import { CreateInventoryInput } from 'src/inventory/dto/create-inventory.input';
 import {
+  CreateDropsGroupshopInput,
+  DropCustomer,
+} from 'src/drops-groupshop/dto/create-drops-groupshop.input';
+import {
   CreateOrderInput,
   Customer,
   DiscountInfo,
@@ -26,6 +30,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderPlacedEvent } from '../events/order-placed.envent';
 import { ShopifyService } from '../shopify/shopify.service';
 import { KalavioService } from 'src/email/kalavio.service';
+import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
+import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import Orders from 'src/inventory/entities/orders.modal';
 import { UninstallService } from 'src/stores/uninstall.service';
 import { OrderCreatedEvent } from '../events/order-created.event';
@@ -49,8 +55,10 @@ import { LifecycleService } from 'src/gs-common/lifecycle.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { BillingPlanEnum } from 'src/stores/entities/store.entity';
 import { Public } from 'src/auth/public.decorator';
+import { v4 as uuid } from 'uuid';
 import { ProductOutofstockEvent } from 'src/inventory/events/product-outofstock.event';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
+import { DiscountCodeInput } from 'src/groupshops/dto/create-groupshops.input';
 @Public()
 @Controller('webhooks')
 export class WebhooksController {
@@ -60,6 +68,8 @@ export class WebhooksController {
     private inventryService: InventoryService,
     private orderService: OrdersService,
     private kalavioService: KalavioService,
+    private dropsGroupshopService: DropsGroupshopService,
+    private crypt: EncryptDecryptService,
     private eventEmitter: EventEmitter2,
     private configSevice: ConfigService,
     private uninstallSerivice: UninstallService,
@@ -1549,5 +1559,50 @@ export class WebhooksController {
     } finally {
       res.status(HttpStatus.OK).send();
     }
+  }
+
+  @Post('klaviyo-drops')
+  async klaviyoDrops(@Req() req, @Res() res) {
+    const webdata = req.body;
+    const { shop } = req.query;
+    const { id, accessToken, brandName } = await this.storesService.findOne(
+      shop,
+    );
+    const discountTitle = `GSD${Date.now()}`;
+    const cryptURL = `/${shop.split('.')[0]}/drops/${this.crypt.encrypt(
+      discountTitle,
+    )}`;
+    const expiredFulllink = `${this.configSevice.get(
+      'FRONT',
+    )}${cryptURL}/status&activated`;
+    const fulllink = `${this.configSevice.get('FRONT')}${cryptURL}`;
+    const shortLink = await this.kalavioService.generateShortLink(fulllink);
+    const expiredShortLink = await this.kalavioService.generateShortLink(
+      expiredFulllink,
+    );
+    const dgroupshop = new CreateDropsGroupshopInput();
+    dgroupshop.storeId = id;
+    dgroupshop.url = cryptURL;
+    dgroupshop.shortUrl = shortLink;
+    dgroupshop.expiredUrl = expiredFulllink;
+    dgroupshop.expiredShortUrl = expiredShortLink;
+
+    const discountCode = new DiscountCodeInput();
+    discountCode.title = discountTitle;
+    discountCode.percentage = null;
+    discountCode.priceRuleId = null;
+    dgroupshop.discountCode = discountCode;
+
+    const dropCustomer = new DropCustomer();
+    dropCustomer.klaviyoId = webdata.id;
+    dropCustomer.firstName = webdata.first_name;
+    dropCustomer.lastName = webdata.last_name;
+    dropCustomer.email = webdata.email;
+    dropCustomer.phone = webdata.phone_number;
+
+    dgroupshop.customerDetail = dropCustomer;
+    await this.dropsGroupshopService.create(dgroupshop);
+    await this.kalavioService.klaviyoProfileUpdate(webdata.id, shortLink);
+    return res.status(200).send('success');
   }
 }
