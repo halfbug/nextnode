@@ -1,4 +1,6 @@
 import { InputType, ID, Field } from '@nestjs/graphql';
+import { DiscountCodeInput } from 'src/groupshops/dto/create-groupshops.input';
+import { PartnerRewardsInput } from 'src/partners/dto/create-partners.input';
 import { AnyScalar } from 'src/utils/any.scalarType';
 import {
   BannerDesignTypeEnum,
@@ -122,6 +124,32 @@ export class DiscoveryToolsInput {
   @Field(() => [MatchingBrandNameInput], { nullable: 'itemsAndList' })
   matchingBrandName?: MatchingBrandNameInput[];
 }
+@InputType('DropsInput')
+export class DropsInput {
+  @Field({ nullable: true })
+  status?: string;
+
+  @Field({ nullable: true })
+  isVideoEnabled?: boolean;
+
+  @Field({ nullable: true })
+  spotlightColletionId?: string;
+
+  @Field({ nullable: true })
+  spotlightDiscount?: DiscountCodeInput;
+
+  @Field({ nullable: true })
+  latestCollectionId?: string;
+
+  @Field({ nullable: true })
+  bestSellerCollectionId?: string;
+
+  @Field({ nullable: true })
+  allProductsCollectionId?: string;
+
+  @Field({ nullable: true })
+  rewards?: PartnerRewardsInput;
+}
 @InputType()
 export class CreateStoreInput {
   @Field()
@@ -203,4 +231,7 @@ export class CreateStoreInput {
 
   @Field({ nullable: true })
   recentgs?: string;
+
+  @Field({ nullable: true })
+  drops?: DropsInput;
 }

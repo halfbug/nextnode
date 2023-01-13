@@ -4,6 +4,10 @@ import { Settings } from './settings.model';
 import SocialLinks from 'src/campaigns/entities/social-link.model';
 import Campaign from 'src/campaigns/entities/campaign.model';
 import { BillingPlanEnum, BillingTierEnum } from './store.entity';
+import {
+  DiscountCode,
+  PartnerRewards,
+} from 'src/partners/entities/partner.modal';
 
 export class Resource {
   @Column({ nullable: true })
@@ -40,6 +44,31 @@ export class DiscoveryTools {
 
   @Column(() => MatchingBrandName)
   matchingBrandName?: MatchingBrandName[];
+}
+export class Drops {
+  @Column({ nullable: true })
+  status?: string;
+
+  @Column({ nullable: true })
+  isVideoEnabled?: boolean;
+
+  @Column({ nullable: true })
+  spotlightColletionId?: string;
+
+  @Column({ nullable: true })
+  spotlightDiscount?: DiscountCode;
+
+  @Column({ nullable: true })
+  latestCollectionId?: string;
+
+  @Column({ nullable: true })
+  bestSellerCollectionId?: string;
+
+  @Column({ nullable: true })
+  allProductsCollectionId?: string;
+
+  @Column({ nullable: true })
+  rewards?: PartnerRewards;
 }
 
 @Entity()
@@ -118,4 +147,7 @@ export default class Store extends DefaultColumnsService {
 
   @Column({ nullable: true })
   recentgs: string;
+
+  @Column({ nullable: true })
+  drops: Drops;
 }

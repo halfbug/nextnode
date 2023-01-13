@@ -9,9 +9,11 @@ import { Campaign } from 'src/campaigns/entities/campaign.entity';
 import { AnyScalar } from 'src/utils/any.scalarType';
 import { Settings } from './settings.entity';
 import { SocialLinks } from 'src/campaigns/entities/social-links.entity';
+import { PartnerRewards } from 'src/partners/entities/partner.entity';
 import { Product } from 'src/inventory/entities/product.entity';
 import {
   DealProducts,
+  DiscountCode,
   GroupShop,
   Member,
 } from 'src/groupshops/entities/groupshop.entity';
@@ -79,6 +81,32 @@ export class DiscoveryTools {
 
   @Field(() => [MatchingBrandName], { nullable: 'itemsAndList' })
   matchingBrandName?: MatchingBrandName[];
+}
+@ObjectType('Drops')
+export class Drops {
+  @Field({ nullable: true })
+  status?: string;
+
+  @Field({ nullable: true, defaultValue: false })
+  isVideoEnabled?: boolean;
+
+  @Field({ nullable: true })
+  spotlightColletionId?: string;
+
+  @Field({ nullable: true })
+  spotlightDiscount?: DiscountCode;
+
+  @Field({ nullable: true })
+  latestCollectionId?: string;
+
+  @Field({ nullable: true })
+  bestSellerCollectionId?: string;
+
+  @Field({ nullable: true })
+  allProductsCollectionId?: string;
+
+  @Field({ nullable: true })
+  rewards?: PartnerRewards;
 }
 
 @ObjectType('Store')
@@ -177,4 +205,7 @@ export class Store {
 
   @Field({ nullable: true })
   recentgs?: string;
+
+  @Field(() => Drops, { nullable: true })
+  drops?: Drops;
 }
