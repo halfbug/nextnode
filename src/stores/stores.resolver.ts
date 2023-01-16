@@ -62,13 +62,11 @@ export class StoresResolver {
     return this.storesService.findOneWithActiveCampaingProducts(shop);
   }
 
-  @Public()
   @Query(() => Store, { name: 'store' })
   findOneById(@Args('id') id: string) {
     return this.storesService.findOneById(id);
   }
 
-  @Public()
   @Mutation(() => Store)
   updateStore(@Args('updateStoreInput') updateStoreInput: UpdateStoreInput) {
     return this.storesService.update(updateStoreInput.id, updateStoreInput);

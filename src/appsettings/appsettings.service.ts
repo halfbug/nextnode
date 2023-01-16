@@ -91,4 +91,12 @@ export class AppsettingsService {
   // remove(id: string) {
   //   return `This action removes a #${id} appsetting`;
   // }
+
+  async findbytype(type: string) {
+    const temp = await this.appRepository.findOne({
+      where: { type: type },
+    });
+    console.log('temp🎈', temp);
+    return temp;
+  }
 }
