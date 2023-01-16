@@ -129,6 +129,14 @@ export class GroupshopsService {
           },
         },
       },
+      {
+        $limit: 1000,
+      },
+      {
+        $sort: {
+          _id: -1,
+        },
+      },
     ];
 
     if (shop)
