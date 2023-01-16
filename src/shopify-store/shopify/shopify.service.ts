@@ -256,6 +256,10 @@ export class ShopifyService {
               itemEntitlements: {
                 productIds: products,
               },
+              combinesWith: {
+                productDiscounts:
+                  title.includes('GSD') || title.includes('GSL') ? true : false,
+              },
               customerSelection: {
                 forAllCustomers: true,
               },

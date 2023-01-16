@@ -1565,9 +1565,22 @@ export class WebhooksController {
   async klaviyoDrops(@Req() req, @Res() res) {
     const webdata = req.body;
     const { shop } = req.query;
-    const { id, accessToken, brandName } = await this.storesService.findOne(
+    const {
+      id,
+      accessToken,
+      drops: {
+        rewards: { baseline },
+        bestSellerCollectionId,
+        latestCollectionId,
+        allProductsCollectionId,
+      },
+    } = await this.storesService.findOne(shop);
+
+    const dropsProducts = await this.inventryService.getProductsByCollectionIDs(
       shop,
+      [bestSellerCollectionId, latestCollectionId, allProductsCollectionId],
     );
+
     const discountTitle = `GSD${Date.now()}`;
     const cryptURL = `/${shop.split('.')[0]}/drops/${this.crypt.encrypt(
       discountTitle,
@@ -1587,10 +1600,18 @@ export class WebhooksController {
     dgroupshop.expiredUrl = expiredFulllink;
     dgroupshop.expiredShortUrl = expiredShortLink;
 
-    const discountCode = new DiscountCodeInput();
-    discountCode.title = discountTitle;
-    discountCode.percentage = null;
-    discountCode.priceRuleId = null;
+    const discountCode = await this.shopifyService.setDiscountCode(
+      shop,
+      'Create',
+      accessToken,
+      discountTitle,
+      parseInt(baseline, 10),
+      dropsProducts?.length > 100
+        ? dropsProducts.slice(0, 100).map((p: Product) => p.id)
+        : dropsProducts?.map((p: Product) => p.id) ?? [],
+      new Date(),
+      null,
+    );
     dgroupshop.discountCode = discountCode;
 
     const dropCustomer = new DropCustomer();

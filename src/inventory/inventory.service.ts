@@ -608,6 +608,72 @@ export class InventoryService {
     // return await manager.aggregate(Inventory, agg).toArray();
   }
 
+  // find specific collection products
+  async getProductsByCollectionIDs(shop: string, ids: string[]) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          shop,
+          id: {
+            $in: ids,
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'parentId',
+          foreignField: 'id',
+          as: 'products',
+        },
+      },
+      {
+        $addFields: {
+          products: {
+            $filter: {
+              input: '$products',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $ne: ['$$j.publishedAt', null],
+                  },
+                  {
+                    $ne: ['$$j.outofstock', true],
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $unwind: {
+          path: '$products',
+        },
+      },
+      {
+        $group: {
+          _id: '$recordType',
+          products: {
+            $push: '$products',
+          },
+        },
+      },
+      {
+        $project: {
+          products: 1,
+        },
+      },
+    ];
+    const res = await manager.aggregate(Inventory, agg).toArray();
+    return [...new Set(res[0].products)];
+  }
+
   // it find all products, variants, collection, images
   async findAllProductsOnly(shop: string) {
     const manager = getMongoManager();

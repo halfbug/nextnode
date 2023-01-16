@@ -19,12 +19,11 @@ export class DropsGroupshopService {
       createDropsGroupshopInput,
     );
     const id = uuid();
-    const drops = this.DropsGroupshopRepository.create({
+    const dropsGroupshop = await this.DropsGroupshopRepository.create({
       id,
       ...createDropsGroupshopInput,
     });
-    const newGSP = await this.DropsGroupshopRepository.save(drops);
-    console.log('dropsdrops ', newGSP);
+    await this.DropsGroupshopRepository.save(dropsGroupshop);
   }
 
   findAll() {

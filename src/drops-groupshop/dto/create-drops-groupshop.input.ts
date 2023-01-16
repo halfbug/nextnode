@@ -38,16 +38,16 @@ export class CreateDropsGroupshopInput {
   @Field({ nullable: true })
   expiredShortUrl?: string;
 
-  @Field(() => DiscountCodeInput)
+  @Field(() => DiscountCodeInput, { nullable: true })
   discountCode?: DiscountCodeInput;
 
   @Field(() => DropCustomer)
   customerDetail: DropCustomer;
 
-  @Field(() => [MemberInput])
+  @Field(() => [MemberInput], { nullable: true })
   members?: MemberInput[];
 
-  @Field(() => MilestoneInput)
+  @Field(() => MilestoneInput, { nullable: true })
   milestones: MilestoneInput[];
 
   @Field(() => OBSettingsInput, { nullable: true })

@@ -9,6 +9,7 @@ import { AuthEntity } from 'src/auth/entities/auth.entity';
 import { AuthDecorator } from 'src/auth/auth.decorator';
 import { Public } from 'src/auth/public.decorator';
 import { MatchingGS } from './dto/matchingGS.input';
+import { DiscountCode } from 'src/groupshops/entities/groupshop.entity';
 
 @Resolver(() => Store)
 @UseGuards(AuthGuard)
@@ -96,5 +97,13 @@ export class StoresResolver {
     if (storeId.length > 0) {
       return await this.storesService.findMatchingGS(storeId);
     }
+  }
+
+  @Mutation(() => DiscountCode, { name: 'createspotlightDiscount' })
+  async createspotlightDiscount(
+    @Args('storeId')
+    storeId: string,
+  ) {
+    return await this.storesService.createspotlightDiscount(storeId);
   }
 }

@@ -6,12 +6,22 @@ import { UpdateStoreInput } from './dto/update-store.input';
 import Store from './entities/store.model';
 import { v4 as uuid } from 'uuid';
 import { Resource } from './entities/store.entity';
+import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
+import { InventoryService } from 'src/inventory/inventory.service';
+import { Product } from 'src/inventory/entities/product.entity';
 
 @Injectable()
 export class StoresService {
   constructor(
     @InjectRepository(Store) private storeRepository: Repository<Store>,
+    private shopifyapi: ShopifyService,
+    private inventoryService: InventoryService,
   ) {}
+
+  static formatSpotlightDiscountTitle(name: string) {
+    return `GSL${name}`;
+  }
+
   create(createStoreInput: CreateStoreInput): Promise<Store> {
     const id = uuid();
     const store = this.storeRepository.create({ id, ...createStoreInput });
@@ -745,5 +755,34 @@ export class StoresService {
       );
     }
     return updateRecentGS;
+  }
+
+  async createspotlightDiscount(storeId: string) {
+    const {
+      shop,
+      accessToken,
+      _id,
+      drops: {
+        spotlightDiscount: { percentage },
+        spotlightColletionId,
+      },
+    } = await this.findById(storeId);
+    const spotlightProducts =
+      await this.inventoryService.getProductsByCollectionIDs(shop, [
+        spotlightColletionId,
+      ]);
+    const discountCode = await this.shopifyapi.setDiscountCode(
+      shop,
+      'Create',
+      accessToken,
+      StoresService.formatSpotlightDiscountTitle(_id),
+      parseInt(percentage, 10),
+      spotlightProducts?.length > 100
+        ? spotlightProducts.slice(0, 100).map((p: Product) => p.id)
+        : spotlightProducts?.map((p: Product) => p.id) ?? [],
+      new Date(),
+      null,
+    );
+    return discountCode;
   }
 }
