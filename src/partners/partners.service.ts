@@ -661,8 +661,6 @@ export class PartnerService {
     partner.partnerRewards = createPartnersInput.partnerRewards;
     partner.partnerCommission = createPartnersInput.partnerCommission;
     partner.isActive = true;
-    partner.createdAt = createPartnersInput.createdAt;
-    partner.updatedAt = createPartnersInput.updatedAt;
     const newGSP = await this.partnerRepository.save(partner);
     // calculate active pgs
     // save lifecycle log of tier switch
