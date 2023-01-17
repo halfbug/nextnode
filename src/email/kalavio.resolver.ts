@@ -9,11 +9,13 @@ import {
 import { CreateSignUpInput } from './dto/create-signup.input';
 import { SignUp } from './entities/kalavio.entity';
 import { KalavioService } from './kalavio.service';
+import { Public } from 'src/auth/public.decorator';
 
 @Resolver(SignUp)
 export class KalavioResolver {
   constructor(private readonly kalavioService: KalavioService) {}
 
+  @Public()
   @Mutation(() => SignUp)
   createSignUp(
     @Args('createSignUpInput') createSignUpInput: CreateSignUpInput,
