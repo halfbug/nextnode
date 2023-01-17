@@ -504,7 +504,7 @@ export class InventoryService {
     //   res[0].length,
     //   res[0],
     // );
-    // console.log('🎈 res[0]', res[0]);
+    console.log('🎈 res[0]', res[0]);
     return res.length && res[0].status !== 'ACTIVE'
       ? { ...res[0], outofstock: true }
       : res[0];

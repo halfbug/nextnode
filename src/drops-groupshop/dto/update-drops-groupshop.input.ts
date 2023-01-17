@@ -7,4 +7,7 @@ export class UpdateDropsGroupshopInput extends PartialType(
 ) {
   @Field(() => Int)
   id: number;
+
+  @Field(() => Date)
+  expiredAt: Date;
 }

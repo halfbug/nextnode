@@ -4,10 +4,15 @@ import { DropsGroupshop } from './entities/drops-groupshop.entity';
 import { CreateDropsGroupshopInput } from './dto/create-drops-groupshop.input';
 import { UpdateDropsGroupshopInput } from './dto/update-drops-groupshop.input';
 import { Public } from 'src/auth/public.decorator';
+import { NotFoundException } from '@nestjs/common';
+import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 
 @Resolver(() => DropsGroupshop)
 export class DropsGroupshopResolver {
-  constructor(private readonly dropsGroupshopService: DropsGroupshopService) {}
+  constructor(
+    private readonly dropsGroupshopService: DropsGroupshopService,
+    private readonly crypt: EncryptDecryptService,
+  ) {}
 
   @Public()
   @Mutation(() => DropsGroupshop)
@@ -26,6 +31,19 @@ export class DropsGroupshopResolver {
   @Query(() => DropsGroupshop, { name: 'dropsGroupshop' })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.dropsGroupshopService.findOne(id);
+  }
+
+  @Public()
+  @Query(() => DropsGroupshop, { name: 'DropGroupshop' })
+  async findDropsGroupshopByCode(@Args('code') code: string) {
+    const gs = await this.dropsGroupshopService.findDropGroupshopByCode(
+      await this.crypt.decrypt(code),
+    );
+    if (gs) {
+      return gs;
+    } else {
+      throw new NotFoundException(`Not Found drops groupshop`);
+    }
   }
 
   @Mutation(() => DropsGroupshop)

@@ -6,6 +6,8 @@ import {
   OBSettings,
 } from 'src/groupshops/entities/groupshop.entity';
 import { Customer } from 'src/inventory/dto/create-order.input';
+import { Product } from 'src/inventory/entities/product.entity';
+import { Store } from 'src/stores/entities/store.entity';
 
 @ObjectType()
 export class DropsGroupshop {
@@ -42,6 +44,21 @@ export class DropsGroupshop {
   @Field(() => [Milestone])
   milestones: Milestone[];
 
+  @Field(() => [Product])
+  bestSellerProducts?: Product[];
+
+  @Field(() => [Product])
+  spotlightProducts?: Product[];
+
+  @Field(() => [Product])
+  allProducts?: Product[];
+
+  @Field(() => [Product])
+  latestProducts?: Product[];
+
   @Field(() => OBSettings, { nullable: true })
   obSettings?: OBSettings;
+
+  @Field(() => Store, { nullable: true })
+  store?: Store;
 }

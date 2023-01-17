@@ -7,6 +7,7 @@ import {
   OBSettings,
 } from 'src/groupshops/entities/groupshop.modal';
 import { Customer } from 'src/inventory/entities/orders.modal';
+import Store from 'src/stores/entities/store.model';
 
 @Entity()
 export default class DropsGroupshop extends DefaultColumnsService {
