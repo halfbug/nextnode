@@ -5,8 +5,8 @@ import { InputType, Field, Int, PartialType } from '@nestjs/graphql';
 export class UpdateDropsGroupshopInput extends PartialType(
   CreateDropsGroupshopInput,
 ) {
-  @Field(() => Int)
-  id: number;
+  @Field(() => String, { nullable: true })
+  id: string;
 
   @Field(() => Date)
   expiredAt: Date;

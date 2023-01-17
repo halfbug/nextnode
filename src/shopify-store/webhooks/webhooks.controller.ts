@@ -10,10 +10,6 @@ import {
 } from '@nestjs/common';
 import { CreateInventoryInput } from 'src/inventory/dto/create-inventory.input';
 import {
-  CreateDropsGroupshopInput,
-  DropCustomer,
-} from 'src/drops-groupshop/dto/create-drops-groupshop.input';
-import {
   CreateOrderInput,
   Customer,
   DiscountInfo,
@@ -35,6 +31,7 @@ import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt
 import Orders from 'src/inventory/entities/orders.modal';
 import { UninstallService } from 'src/stores/uninstall.service';
 import { OrderCreatedEvent } from '../events/order-created.event';
+import { DropCreatedEvent } from 'src/drops-groupshop/events/drop-created.event';
 import {
   Product,
   ProductImage,
@@ -74,6 +71,7 @@ export class WebhooksController {
     private configSevice: ConfigService,
     private uninstallSerivice: UninstallService,
     private orderCreatedEvent: OrderCreatedEvent,
+    private dropCreatedEvent: DropCreatedEvent,
     private httpService: HttpService,
     public productMedia: ProductMediaObject,
     public campaignStock: ProductOutofstockEvent,
@@ -1563,67 +1561,16 @@ export class WebhooksController {
 
   @Post('klaviyo-drops')
   async klaviyoDrops(@Req() req, @Res() res) {
-    const webdata = req.body;
-    const { shop } = req.query;
-    const {
-      id,
-      accessToken,
-      drops: {
-        rewards: { baseline },
-        bestSellerCollectionId,
-        latestCollectionId,
-        allProductsCollectionId,
-      },
-    } = await this.storesService.findOne(shop);
-
-    const dropsProducts = await this.inventryService.getProductsByCollectionIDs(
-      shop,
-      [bestSellerCollectionId, latestCollectionId, allProductsCollectionId],
-    );
-
-    const discountTitle = `GSD${Date.now()}`;
-    const cryptURL = `/${shop.split('.')[0]}/drops/${this.crypt.encrypt(
-      discountTitle,
-    )}`;
-    const expiredFulllink = `${this.configSevice.get(
-      'FRONT',
-    )}${cryptURL}/status&activated`;
-    const fulllink = `${this.configSevice.get('FRONT')}${cryptURL}`;
-    const shortLink = await this.kalavioService.generateShortLink(fulllink);
-    const expiredShortLink = await this.kalavioService.generateShortLink(
-      expiredFulllink,
-    );
-    const dgroupshop = new CreateDropsGroupshopInput();
-    dgroupshop.storeId = id;
-    dgroupshop.url = cryptURL;
-    dgroupshop.shortUrl = shortLink;
-    dgroupshop.expiredUrl = expiredFulllink;
-    dgroupshop.expiredShortUrl = expiredShortLink;
-
-    const discountCode = await this.shopifyService.setDiscountCode(
-      shop,
-      'Create',
-      accessToken,
-      discountTitle,
-      parseInt(baseline, 10),
-      dropsProducts?.length > 100
-        ? dropsProducts.slice(0, 100).map((p: Product) => p.id)
-        : dropsProducts?.map((p: Product) => p.id) ?? [],
-      new Date(),
-      null,
-    );
-    dgroupshop.discountCode = discountCode;
-
-    const dropCustomer = new DropCustomer();
-    dropCustomer.klaviyoId = webdata.id;
-    dropCustomer.firstName = webdata.first_name;
-    dropCustomer.lastName = webdata.last_name;
-    dropCustomer.email = webdata.email;
-    dropCustomer.phone = webdata.phone_number;
-
-    dgroupshop.customerDetail = dropCustomer;
-    await this.dropsGroupshopService.create(dgroupshop);
-    await this.kalavioService.klaviyoProfileUpdate(webdata.id, shortLink);
-    return res.status(200).send('success');
+    try {
+      const { shop } = req.query;
+      this.dropCreatedEvent.webhook = req.body;
+      this.dropCreatedEvent.shop = shop;
+      this.dropCreatedEvent.emit();
+    } catch (err) {
+      console.log(JSON.stringify(err));
+      Logger.error(err, 'drop-created');
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
   }
 }

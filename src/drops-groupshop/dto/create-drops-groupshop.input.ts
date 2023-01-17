@@ -52,4 +52,10 @@ export class CreateDropsGroupshopInput {
 
   @Field(() => OBSettingsInput, { nullable: true })
   obSettings?: OBSettingsInput;
+
+  @Field({ nullable: true })
+  status?: string;
+
+  @Field({ nullable: true })
+  expiredAt?: Date;
 }

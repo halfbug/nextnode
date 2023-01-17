@@ -61,4 +61,7 @@ export class DropsGroupshop {
 
   @Field(() => Store, { nullable: true })
   store?: Store;
+
+  @Field({ nullable: true })
+  expiredAt?: Date;
 }

@@ -132,11 +132,16 @@ export class KalavioService {
     const profileUrlKlaviyo = `${this.configService.get(
       'KLAVIYO_BASE_URL',
     )}${'/v1/person/'}${ProfileId}${'?groupshop_url='}${shortLink}${'&api_key='}${PRIVATE_KEY}`;
-    await lastValueFrom(
-      this.httpService
-        .put(profileUrlKlaviyo, options)
-        .pipe(map((res) => res.data)),
-    );
+    try {
+      await lastValueFrom(
+        this.httpService
+          .put(profileUrlKlaviyo, options)
+          .pipe(map((res) => res.data)),
+      );
+    } catch (err) {
+      console.error(err);
+      Logger.error(err, 'klaviyoProfileUpdate');
+    }
   }
 
   async generateShortLink(link: string) {

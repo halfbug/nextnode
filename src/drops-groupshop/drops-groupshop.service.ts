@@ -321,11 +321,39 @@ export class DropsGroupshopService {
     return `This action returns a #${id} dropsGroupshop`;
   }
 
-  update(id: number, updateDropsGroupshopInput: UpdateDropsGroupshopInput) {
-    return `This action updates a #${id} dropsGroupshop`;
+  async update(
+    id: string,
+    updateDropsGroupshopInput: UpdateDropsGroupshopInput,
+  ) {
+    return await this.DropsGroupshopRepository.update(
+      { id },
+      updateDropsGroupshopInput,
+    );
   }
 
   remove(id: number) {
     return `This action removes a #${id} dropsGroupshop`;
+  }
+
+  async findExpiredDropGroupshhop() {
+    const agg = [
+      {
+        $match: {
+          $and: [
+            {
+              status: 'Active',
+            },
+            {
+              expiredAt: {
+                $lte: new Date(),
+              },
+            },
+          ],
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const result = await manager.aggregate(DropsGroupshop, agg).toArray();
+    return result;
   }
 }
