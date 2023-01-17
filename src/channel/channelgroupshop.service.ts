@@ -160,7 +160,6 @@ export class ChannelGroupshopService {
     });
   }
 
-  // update deal products
   async update(
     id: string,
     updateChannelGroupshopInput: UpdateChannelGroupshopInput,
@@ -168,8 +167,11 @@ export class ChannelGroupshopService {
     try {
       if (
         updateChannelGroupshopInput.dealProducts &&
-        updateChannelGroupshopInput.dealProducts.length
+        updateChannelGroupshopInput.dealProducts.length &&
+        updateChannelGroupshopInput.allProducts &&
+        updateChannelGroupshopInput.allProducts.length
       ) {
+        // update deal products and discount code
         const { shop, accessToken } = await this.storesService.findById(
           updateChannelGroupshopInput?.storeId,
         );
@@ -191,6 +193,13 @@ export class ChannelGroupshopService {
           {
             ...filteredInput,
             totalProducts: updateChannelGroupshopInput.allProducts.length,
+          },
+        );
+      } else {
+        await this.channelGroupshopRepository.update(
+          { id },
+          {
+            ...updateChannelGroupshopInput,
           },
         );
       }
@@ -267,7 +276,7 @@ export class ChannelGroupshopService {
       {
         $lookup: {
           from: 'inventory',
-          localField: 'memberDetails.lineItems.product.id',
+          localField: 'members.lineItems.product.id',
           foreignField: 'id',
           as: 'popularProducts',
         },
