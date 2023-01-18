@@ -59,10 +59,18 @@ export class DropsGroupshopService {
         },
       },
       {
+        $lookup: {
+          from: 'inventory',
+          localField: 'bestSeller.parentId',
+          foreignField: 'id',
+          as: 'bestSellerProducts',
+        },
+      },
+      {
         $addFields: {
-          bestSeller: {
+          bestSellerProducts: {
             $filter: {
-              input: '$bestSeller',
+              input: '$bestSellerProducts',
               as: 'j',
               cond: {
                 $and: [
@@ -76,14 +84,6 @@ export class DropsGroupshopService {
               },
             },
           },
-        },
-      },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'bestSeller.parentId',
-          foreignField: 'id',
-          as: 'bestSellerProducts',
         },
       },
       {
