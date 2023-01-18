@@ -257,8 +257,7 @@ export class ShopifyService {
                 productIds: products,
               },
               combinesWith: {
-                productDiscounts:
-                  title.includes('GSD') || title.includes('GSL') ? true : false,
+                productDiscounts: title.includes('GSD') ? true : false,
               },
               customerSelection: {
                 forAllCustomers: true,
@@ -351,6 +350,170 @@ export class ShopifyService {
       percentage: percentage?.toString(),
       priceRuleId: priceRuleId,
     };
+  }
+
+  async setAutomaticDiscountCode(
+    shop: string,
+    action: string,
+    accessToken: string,
+    title?: string,
+    percentage?: number,
+    collectionIds?: string[],
+    oldcollectionIds?: string[],
+    starts?: Date,
+    ends?: Date,
+    id?: string,
+  ) {
+    try {
+      // if (percentage) {
+      console.log({ title });
+      // console.log({ percentage });
+      const client = await this.client(shop, accessToken);
+      let automaticDiscount: any;
+
+      if (action === 'Create')
+        automaticDiscount = await client.query({
+          data: {
+            query: `mutation discountAutomaticBasicCreate($automaticBasicDiscount: DiscountAutomaticBasicInput!) {
+            discountAutomaticBasicCreate(automaticBasicDiscount: $automaticBasicDiscount) {
+              automaticDiscountNode {
+                id,
+                automaticDiscount {
+                  ... on DiscountAutomaticBasic {
+                    title
+                    customerGets {
+                      value {
+                        ... on DiscountPercentage {
+                          percentage
+                        }
+                      }
+                  }
+                }
+                
+                }
+              }
+              userErrors {
+                field
+                message
+              }
+            }
+          }`,
+            variables: {
+              automaticBasicDiscount: {
+                combinesWith: {
+                  productDiscounts: true,
+                },
+                customerGets: {
+                  items: {
+                    collections: {
+                      add: collectionIds,
+                    },
+                  },
+                  value: {
+                    percentage: parseFloat((percentage / 100).toString()),
+                  },
+                },
+                minimumRequirement: {
+                  quantity: {
+                    greaterThanOrEqualToQuantity: '1',
+                  },
+                },
+                startsAt: starts,
+                title: title,
+              },
+            },
+          },
+        });
+      else {
+        // console.log('inside update option');
+        let variables: any = { id };
+        if (percentage)
+          variables = {
+            id,
+            automaticBasicDiscount: {
+              customerGets: {
+                value: {
+                  percentage: parseFloat((percentage / 100).toString()),
+                },
+              },
+            },
+          };
+        else if (collectionIds && oldcollectionIds)
+          variables = {
+            id,
+            automaticBasicDiscount: {
+              customerGets: {
+                items: {
+                  collections: {
+                    add: collectionIds,
+                    remove: oldcollectionIds,
+                  },
+                },
+              },
+            },
+          };
+        else
+          variables = {
+            id,
+            automaticBasicDiscount: {
+              startsAt: starts,
+              endsAt: ends,
+            },
+          };
+
+        automaticDiscount = await client.query({
+          data: {
+            query: `mutation discountAutomaticBasicUpdate($automaticBasicDiscount: DiscountAutomaticBasicInput!, $id: ID!) {
+              discountAutomaticBasicUpdate(automaticBasicDiscount: $automaticBasicDiscount, id: $id) {
+                automaticDiscountNode {
+                  id,
+                  automaticDiscount {
+                    ... on DiscountAutomaticBasic {
+                      title
+                      customerGets {
+                        value {
+                          ... on DiscountPercentage {
+                            percentage
+                          }
+                        }
+                    }
+                  }
+                  
+                  }
+                }
+                userErrors {
+                  field
+                  message
+                }
+              }
+            }`,
+            variables,
+          },
+        });
+      }
+      const {
+        [`discountAutomaticBasic${action}`]: {
+          automaticDiscountNode: {
+            id: priceRuleId,
+            automaticDiscount: {
+              title: title1,
+              customerGets: {
+                value: { percentage: percentage1 },
+              },
+            },
+          },
+        },
+      } = automaticDiscount.body['data'];
+      return {
+        title: title ?? title1,
+        percentage: percentage1?.toString(),
+        priceRuleId: priceRuleId,
+      };
+    } catch (err) {
+      console.log(err.message);
+      Logger.error(err, ShopifyService.name);
+      return err.message;
+    }
   }
 
   // updateDiscountCode(shop: shop, accessToken: string, variables: any) {

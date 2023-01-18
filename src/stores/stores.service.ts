@@ -767,22 +767,36 @@ export class StoresService {
         spotlightColletionId,
       },
     } = await this.findById(storeId);
-    const spotlightProducts =
-      await this.inventoryService.getProductsByCollectionIDs(shop, [
-        spotlightColletionId,
-      ]);
-    const discountCode = await this.shopifyapi.setDiscountCode(
+    // const spotlightProducts =
+    //   await this.inventoryService.getProductsByCollectionIDs(shop, [
+    //     spotlightColletionId,
+    //   ]);
+
+    const discountCode = await this.shopifyapi.setAutomaticDiscountCode(
       shop,
       'Create',
       accessToken,
       StoresService.formatSpotlightDiscountTitle(_id),
       parseInt(percentage, 10),
-      spotlightProducts?.length > 100
-        ? spotlightProducts.slice(0, 100).map((p: Product) => p.id)
-        : spotlightProducts?.map((p: Product) => p.id) ?? [],
-      new Date(),
+      [spotlightColletionId],
       null,
+      new Date(),
     );
+
+    // For Update
+
+    // const discountCode = await this.shopifyapi.setAutomaticDiscountCode(
+    //   shop,
+    //   'Update',
+    //   accessToken,
+    //   StoresService.formatSpotlightDiscountTitle(_id),
+    //   null, // percentage update parseInt(percentage, 10)
+    //   ['gid://shopify/Collection/238360985766'], // new collection id
+    //   ['gid://shopify/Collection/238356332710'], // old collection id
+    //   null,
+    //   null,
+    //   'gid://shopify/DiscountAutomaticNode/1396298088614', // id is neccesarry for update
+    // );
     return discountCode;
   }
 }
