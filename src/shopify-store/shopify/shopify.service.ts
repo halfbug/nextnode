@@ -427,7 +427,24 @@ export class ShopifyService {
       else {
         // console.log('inside update option');
         let variables: any = { id };
-        if (percentage)
+        if (percentage && collectionIds && oldcollectionIds) {
+          variables = {
+            id,
+            automaticBasicDiscount: {
+              customerGets: {
+                value: {
+                  percentage: parseFloat((percentage / 100).toString()),
+                },
+                items: {
+                  collections: {
+                    add: collectionIds,
+                    remove: oldcollectionIds,
+                  },
+                },
+              },
+            },
+          };
+        } else if (percentage) {
           variables = {
             id,
             automaticBasicDiscount: {
@@ -438,7 +455,7 @@ export class ShopifyService {
               },
             },
           };
-        else if (collectionIds && oldcollectionIds)
+        } else if (collectionIds && oldcollectionIds) {
           variables = {
             id,
             automaticBasicDiscount: {
@@ -452,7 +469,7 @@ export class ShopifyService {
               },
             },
           };
-        else
+        } else {
           variables = {
             id,
             automaticBasicDiscount: {
@@ -460,6 +477,7 @@ export class ShopifyService {
               endsAt: ends,
             },
           };
+        }
 
         automaticDiscount = await client.query({
           data: {
@@ -506,13 +524,12 @@ export class ShopifyService {
       } = automaticDiscount.body['data'];
       return {
         title: title ?? title1,
-        percentage: percentage1?.toString(),
+        percentage: (percentage1 * 100).toFixed(0)?.toString(),
         priceRuleId: priceRuleId,
       };
     } catch (err) {
       console.log(err.message);
       Logger.error(err, ShopifyService.name);
-      return err.message;
     }
   }
 

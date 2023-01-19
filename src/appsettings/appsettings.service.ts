@@ -96,7 +96,6 @@ export class AppsettingsService {
     const temp = await this.appRepository.findOne({
       where: { type: type },
     });
-    console.log('temp🎈', temp);
     return temp;
   }
 }
