@@ -290,6 +290,7 @@ export class DropsGroupshopService {
           totalProducts: 1,
           shortUrl: 1,
           url: 1,
+          obSettings: 1,
           expiredUrl: 1,
           expiredShortLink: 1,
           expiredAt: 1,

@@ -60,6 +60,9 @@ export class DropCreatedListener {
         const cryptURL = `/${shop.split('.')[0]}/drops/${this.crypt.encrypt(
           discountTitle,
         )}`;
+        const ownerUrl = `/${shop.split('.')[0]}/drops/${this.crypt.encrypt(
+          discountTitle,
+        )}/owner&${this.crypt.encrypt(new Date().toDateString())}`;
         const expiredFulllink = `${this.configSevice.get(
           'FRONT',
         )}${cryptURL}/status&activated`;
@@ -71,6 +74,10 @@ export class DropCreatedListener {
         const dgroupshop = new CreateDropsGroupshopInput();
         dgroupshop.storeId = id;
         dgroupshop.url = cryptURL;
+        dgroupshop.obSettings = {
+          step: 0,
+          ownerUrl,
+        };
         dgroupshop.shortUrl = shortLink;
         dgroupshop.expiredUrl = expiredFulllink;
         dgroupshop.expiredShortUrl = expiredShortLink;

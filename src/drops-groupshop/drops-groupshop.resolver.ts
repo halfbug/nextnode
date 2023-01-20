@@ -4,8 +4,9 @@ import { DropsGroupshop } from './entities/drops-groupshop.entity';
 import { CreateDropsGroupshopInput } from './dto/create-drops-groupshop.input';
 import { UpdateDropsGroupshopInput } from './dto/update-drops-groupshop.input';
 import { Public } from 'src/auth/public.decorator';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UseInterceptors } from '@nestjs/common';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
+import { ViewedInterceptor } from 'src/gs-common/viewed.inceptor';
 
 @Resolver(() => DropsGroupshop)
 export class DropsGroupshopResolver {
@@ -34,9 +35,11 @@ export class DropsGroupshopResolver {
   }
 
   @Public()
+  // @UseInterceptors(ViewedInterceptor)
   @Query(() => DropsGroupshop, { name: 'DropGroupshop' })
   async findDropsGroupshopByCode(@Args('code') code: string) {
     const gs = await this.dropsGroupshopService.findDropGroupshopByCode(
+      // code,
       await this.crypt.decrypt(code),
     );
     if (gs) {
@@ -46,6 +49,7 @@ export class DropsGroupshopResolver {
     }
   }
 
+  @Public()
   @Mutation(() => DropsGroupshop)
   updateDropsGroupshop(
     @Args('updateDropsGroupshopInput')
