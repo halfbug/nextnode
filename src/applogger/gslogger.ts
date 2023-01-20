@@ -23,7 +23,7 @@ export class Gslogger extends ConsoleLogger {
   error(exception: any, stack?: string, context?: string) {
     super.error(exception.message, context);
     const elog = new CreateAppLoggerInput();
-    elog.stack = stack ?? exception.stack;
+    elog.stack = stack.length > 30 ? exception.stack : stack;
     elog.context = context ? context.toUpperCase() : stack.toUpperCase();
     elog.message = exception.message ?? exception;
     elog.level = 'error';
