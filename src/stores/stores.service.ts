@@ -154,7 +154,10 @@ export class StoresService {
       }
     } else if (updateStoreInput?.drops) {
       const oldStoreData = await this.findById(id);
-      if (!oldStoreData?.drops?.spotlightDiscount?.percentage) {
+      if (
+        !oldStoreData?.drops?.spotlightDiscount?.percentage &&
+        updateStoreInput?.drops?.spotlightDiscount?.percentage
+      ) {
         const discountCode = await this.shopifyapi.setAutomaticDiscountCode(
           oldStoreData.shop,
           'Create',
@@ -165,7 +168,9 @@ export class StoresService {
           null,
           new Date(),
         );
-        updateStoreInput.drops.spotlightDiscount = discountCode;
+        if (discountCode) {
+          updateStoreInput.drops.spotlightDiscount = discountCode;
+        }
       } else if (
         updateStoreInput.drops?.spotlightDiscount?.percentage !==
           oldStoreData?.drops?.spotlightDiscount?.percentage &&
@@ -184,7 +189,9 @@ export class StoresService {
           null,
           oldStoreData.drops.spotlightDiscount.priceRuleId, // id is neccesarry for update
         );
-        updateStoreInput.drops.spotlightDiscount = discountCode;
+        if (discountCode) {
+          updateStoreInput.drops.spotlightDiscount = discountCode;
+        }
       } else if (
         updateStoreInput.drops?.spotlightDiscount?.percentage !==
         oldStoreData?.drops?.spotlightDiscount?.percentage
@@ -201,7 +208,9 @@ export class StoresService {
           null,
           oldStoreData.drops.spotlightDiscount.priceRuleId, // id is neccesarry for update
         );
-        updateStoreInput.drops.spotlightDiscount = discountCode;
+        if (discountCode) {
+          updateStoreInput.drops.spotlightDiscount = discountCode;
+        }
       } else if (
         updateStoreInput.drops?.spotlightColletionId !==
         oldStoreData?.drops?.spotlightColletionId
@@ -212,13 +221,15 @@ export class StoresService {
           oldStoreData.accessToken,
           StoresService.formatSpotlightDiscountTitle(oldStoreData._id),
           null, // percentage update parseInt(percentage, 10)
-          [updateStoreInput.drops.spotlightColletionId], // new collection id
-          [oldStoreData.drops.spotlightColletionId], // old collection id
+          [updateStoreInput.drops?.spotlightColletionId], // new collection id
+          [oldStoreData.drops?.spotlightColletionId], // old collection id
           null,
           null,
           oldStoreData.drops.spotlightDiscount.priceRuleId, // id is neccesarry for update
         );
-        updateStoreInput.drops.spotlightDiscount = discountCode;
+        if (discountCode) {
+          updateStoreInput.drops.spotlightDiscount = discountCode;
+        }
       }
     }
     await this.storeRepository.update({ id }, updateStoreInput);
