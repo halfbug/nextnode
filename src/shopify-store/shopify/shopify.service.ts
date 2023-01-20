@@ -345,10 +345,10 @@ export class ShopifyService {
         },
       });
     }
-    // console.log(
-    //   '🚀 ~ file: shopify.service.ts ~ line 196 ~ ShopifyService ~ priceRule',
-    //   JSON.stringify(priceRule),
-    // );
+    console.log(
+      '🚀 ~ file: shopify.service.ts ~ line 196 ~ ShopifyService ~ priceRule',
+      JSON.stringify(priceRule),
+    );
     const {
       [`priceRule${action}`]: {
         priceRule: { id: priceRuleId, title: title1 },

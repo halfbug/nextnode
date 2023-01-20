@@ -88,9 +88,13 @@ export class DropCreatedListener {
           accessToken,
           discountTitle,
           parseInt(baseline, 10),
-          dropsProducts?.length > 100
-            ? dropsProducts.slice(0, 100).map((p: Product) => p.id)
-            : dropsProducts?.map((p: Product) => p.id) ?? [],
+          [
+            ...new Set([
+              ...(dropsProducts?.length > 100
+                ? dropsProducts.slice(0, 100).map((p: Product) => p.id)
+                : dropsProducts?.map((p: Product) => p.id) ?? []),
+            ]),
+          ],
           new Date(),
           null,
         );
@@ -129,6 +133,7 @@ export class DropCreatedListener {
         await this.kalavioService.klaviyoProfileUpdate(webdata.id, data);
       }
     } catch (err) {
+      console.log(err);
       Logger.error(err, DropCreatedListener.name);
     }
   }
