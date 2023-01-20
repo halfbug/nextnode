@@ -356,4 +356,12 @@ export class DropsGroupshopService {
     const result = await manager.aggregate(DropsGroupshop, agg).toArray();
     return result;
   }
+
+  async findOneByKlaviyoId(klaviyoId: string) {
+    return await this.DropsGroupshopRepository.findOne({
+      where: {
+        'customerDetail.klaviyoId': klaviyoId,
+      },
+    });
+  }
 }

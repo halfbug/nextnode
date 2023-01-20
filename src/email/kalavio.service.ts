@@ -89,6 +89,28 @@ export class KalavioService {
     }
   }
 
+  async getProfilesByListId(listId, nextPage) {
+    const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
+    const urlKlaviyo = `${this.configService.get(
+      'KLAVIYO_BASE_URL',
+    )}${'/lists/'}${listId}${'/profiles/?'}${nextPage}`;
+    try {
+      const options = {
+        headers: {
+          Authorization: `${'Klaviyo-API-Key '}${PRIVATE_KEY}`,
+          accept: 'application/json',
+          revision: '2022-10-17',
+        },
+      };
+      const getProfiles = await lastValueFrom(
+        this.httpService.get(urlKlaviyo, options).pipe(map((res) => res.data)),
+      );
+      return getProfiles;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   async klaviyoProfileSmsUpdate(input) {
     const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
     const customerEmail = input.email;
@@ -121,7 +143,7 @@ export class KalavioService {
     }
   }
 
-  async klaviyoProfileUpdate(ProfileId, shortLink) {
+  async klaviyoProfileUpdate(ProfileId, postData) {
     const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
     const options = {
       headers: {
@@ -131,7 +153,7 @@ export class KalavioService {
     };
     const profileUrlKlaviyo = `${this.configService.get(
       'KLAVIYO_BASE_URL',
-    )}${'/v1/person/'}${ProfileId}${'?groupshop_url='}${shortLink}${'&api_key='}${PRIVATE_KEY}`;
+    )}${'/v1/person/'}${ProfileId}${'?'}${postData}${'&api_key='}${PRIVATE_KEY}`;
     try {
       await lastValueFrom(
         this.httpService

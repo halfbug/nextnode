@@ -21,6 +21,8 @@ import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { StoreService } from 'src/shopify-store/store/store.service';
 import { OrdersReceivedEvent } from 'src/shopify-store/events/orders-received.event';
 import { StoresService } from 'src/stores/stores.service';
+import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
+import { DropCreatedEvent } from 'src/drops-groupshop/events/drop-created.event';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import * as getSymbolFromCurrency from 'currency-symbol-map';
@@ -28,6 +30,7 @@ import { TokenReceivedEvent } from 'src/shopify-store/events/token-received.even
 import { UploadImageService } from 'src/shopify-store/ImageUpload/uploadimage.service';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
 import { Public } from 'src/auth/public.decorator';
+import { DropCreatedListener } from 'src/drops-groupshop/listeners/drop-created.listener';
 @Public()
 @Controller('connect')
 export class CatController {
@@ -44,6 +47,9 @@ export class CatController {
     private ordersService: OrdersService,
     private kalavioService: KalavioService,
     private uploadImageService: UploadImageService,
+    private dropsGroupshopService: DropsGroupshopService,
+    private dropCreatedEvent: DropCreatedEvent,
+    private dropCreatedListener: DropCreatedListener,
   ) {}
   @Get('/')
   async test() {
@@ -372,5 +378,57 @@ export class CatController {
     const link = 'http://localhost:3000/native-roots-dev/deal/R1M1OTgxMjcwOQ==';
     const short = await this.kalavioService.generateShortLink(link);
     return { short };
+  }
+
+  @Get('update-klaviyo-profile')
+  async updateKlaviyoProfile(@Req() req, @Res() res) {
+    const { listId, shop } = req.query;
+
+    const storeData = await this.storesService.findOne(shop);
+    let nextPage = '';
+    if (storeData?.drops?.rewards) {
+      if (typeof listId !== 'undefined' && listId !== '') {
+        do {
+          const profiles = await this.kalavioService.getProfilesByListId(
+            listId,
+            nextPage,
+          );
+          const nextPageLink = profiles?.links?.next
+            ? profiles?.links?.next
+            : '';
+          if (nextPageLink !== '') {
+            nextPage = nextPageLink.split('profiles/?')[1];
+          } else {
+            nextPage = '';
+          }
+          // console.log('profiles', JSON.stringify(profiles));
+          profiles?.data.map(async (profile, index) => {
+            const klaviyoId = profile?.id;
+            const profilesExit =
+              await this.dropsGroupshopService.findOneByKlaviyoId(klaviyoId);
+            if (profilesExit?.id) {
+              console.log('Exits ', klaviyoId);
+            } else {
+              const webdata = {
+                id: klaviyoId,
+                first_name: profile?.attributes?.first_name,
+                last_name: profile?.attributes?.last_name,
+                email: profile?.attributes?.email,
+                phone_number: profile?.attributes?.phone_number,
+              };
+              const inputListener: any = {};
+              inputListener.webhook = webdata;
+              inputListener.shop = shop;
+              this.dropCreatedListener.addDrop(inputListener);
+            }
+          });
+        } while (nextPage !== '');
+        res.status(200).send('Success');
+      } else {
+        res.status(200).send('listId not found!');
+      }
+    } else {
+      res.status(200).send('Store rewards not found!');
+    }
   }
 }

@@ -11,11 +11,13 @@ import { UploadImageModule } from 'src/shopify-store/ImageUpload/uploadimage.mod
 import { KalavioResolver } from './kalavio.resolver';
 import { StoresModule } from 'src/stores/stores.module';
 import { CampaignsModule } from 'src/campaigns/campaigns.module';
+import { DropsGroupshopModule } from 'src/drops-groupshop/drops-groupshop.module';
 
 @Module({
   imports: [
     HttpModule,
     InventoryModule,
+    forwardRef(() => DropsGroupshopModule),
     forwardRef(() => CampaignsModule),
     UploadImageModule,
     forwardRef(() => StoresModule),
