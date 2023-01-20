@@ -8,7 +8,7 @@ import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt
 import { KalavioService } from 'src/email/kalavio.service';
 import {
   CreateDropsGroupshopInput,
-  DropCustomer,
+  DropCustomerInput,
 } from 'src/drops-groupshop/dto/create-drops-groupshop.input';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { DropCreatedEvent } from '../events/drop-created.event';
@@ -96,7 +96,7 @@ export class DropCreatedListener {
         );
         dgroupshop.discountCode = discountCode;
 
-        const dropCustomer = new DropCustomer();
+        const dropCustomer = new DropCustomerInput();
         dropCustomer.klaviyoId = webdata.id;
         dropCustomer.firstName = webdata.first_name;
         dropCustomer.lastName = webdata.last_name;

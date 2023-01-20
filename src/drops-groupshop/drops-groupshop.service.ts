@@ -5,12 +5,15 @@ import { v4 as uuid } from 'uuid';
 import DropsGroupshop from './entities/dropsgroupshop.model';
 import { getMongoManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { MilestoneInput } from 'src/groupshops/dto/create-groupshops.input';
+import { StoresService } from 'src/stores/stores.service';
 
 @Injectable()
 export class DropsGroupshopService {
   constructor(
     @InjectRepository(DropsGroupshop)
     private DropsGroupshopRepository: Repository<DropsGroupshop>,
+    private storesService: StoresService,
   ) {}
 
   async create(createDropsGroupshopInput: CreateDropsGroupshopInput) {
@@ -19,11 +22,37 @@ export class DropsGroupshopService {
       createDropsGroupshopInput,
     );
     const id = uuid();
+
+    const {
+      drops: {
+        rewards: { baseline },
+      },
+    } = await this.storesService.findById(createDropsGroupshopInput.storeId);
+
     const dropsGroupshop = await this.DropsGroupshopRepository.create({
       id,
       ...createDropsGroupshopInput,
     });
-    await this.DropsGroupshopRepository.save(dropsGroupshop);
+
+    const dgroupshop = await this.DropsGroupshopRepository.save(dropsGroupshop);
+
+    dgroupshop.milestones = [{ activatedAt: new Date(), discount: baseline }];
+    dgroupshop.members = [];
+
+    this.update(id, dgroupshop);
+  }
+
+  async findDropsGS(discountCode: string) {
+    const agg = [
+      {
+        $match: {
+          'discountCode.title': discountCode,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(DropsGroupshop, agg).toArray();
+    return gs[0];
   }
 
   findAll() {
@@ -214,10 +243,16 @@ export class DropsGroupshopService {
                                 input: {
                                   $concatArrays: [
                                     {
-                                      $ifNull: ['$popularProducts', []],
+                                      $ifNull: ['$latestProducts', []],
                                     },
                                     {
                                       $ifNull: ['$allProducts', []],
+                                    },
+                                    {
+                                      $ifNull: ['$spotlightProducts', []],
+                                    },
+                                    {
+                                      $ifNull: ['$bestSellerProducts', []],
                                     },
                                   ],
                                 },
@@ -318,8 +353,12 @@ export class DropsGroupshopService {
     return gs[0];
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} dropsGroupshop`;
+  findOne(id: string) {
+    return this.DropsGroupshopRepository.findOne({
+      where: {
+        id,
+      },
+    });
   }
 
   async update(
@@ -332,7 +371,7 @@ export class DropsGroupshopService {
     );
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} dropsGroupshop`;
   }
 

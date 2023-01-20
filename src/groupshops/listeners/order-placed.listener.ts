@@ -33,6 +33,11 @@ import { Partnergroupshop } from 'src/partners/entities/partner.modal';
 import { PMemberArrivedEvent } from 'src/partners/events/pmember-arrived.event';
 import { ChannelGroupshopService } from 'src/channel/channelgroupshop.service';
 import { UpdateChannelGroupshopInput } from 'src/channel/dto/update-channel-groupshop.input';
+import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
+import { UpdateDropsGroupshopInput } from 'src/drops-groupshop/dto/update-drops-groupshop.input';
+import { InventoryService } from 'src/inventory/inventory.service';
+import { Product } from 'src/inventory/entities/product.entity';
+import { OrdersService } from 'src/inventory/orders.service';
 
 @Injectable()
 export class OrderPlacedListener {
@@ -47,6 +52,9 @@ export class OrderPlacedListener {
     private partnerSrv: PartnerService,
     private pmemberArrived: PMemberArrivedEvent,
     private channelGSService: ChannelGroupshopService,
+    private dropsService: DropsGroupshopService,
+    private inventoryService: InventoryService,
+    private orderService: OrdersService,
   ) {}
 
   accessToken: string;
@@ -240,6 +248,24 @@ export class OrderPlacedListener {
     });
   }
 
+  setPreviousMembersRefundDrops(
+    members: MemberInput[],
+    discountCode: DiscountCodeInput,
+  ) {
+    const currentMilestone = parseFloat(discountCode.percentage);
+    console.log(
+      '🚀 ~ file: order-placed.listener.ts:256 ~ OrderPlacedListener ~ currentMilestone',
+      currentMilestone,
+    );
+    return members.map((member) => {
+      if (member.availedDiscount < currentMilestone) {
+        member = this.calculateRefund(member, currentMilestone / 100);
+      }
+
+      return member;
+    });
+  }
+
   @OnEvent('order.placed')
   async createGroupShop(event: OrderPlacedEvent) {
     try {
@@ -249,7 +275,7 @@ export class OrderPlacedListener {
       // );
       const {
         order: {
-          discountCode,
+          discountCode, // need to update here when multiple discount codes will work
           name,
           customer,
           id: orderId,
@@ -262,6 +288,13 @@ export class OrderPlacedListener {
             id: campaignId,
             salesTarget: { rewards },
             products: campaignProducts,
+          },
+          drops: {
+            rewards: { baseline, average, maximum },
+            bestSellerCollectionId,
+            latestCollectionId,
+            allProductsCollectionId,
+            spotlightDiscount,
           },
           id,
         },
@@ -291,13 +324,16 @@ export class OrderPlacedListener {
         let ugroupshop = null;
         let pgroupshop = null;
         let cgroupshop = null;
+        let dgroupshop = null;
         if (discountCode) {
           // const updateGroupshop = await this.gsService.findOne(discountCode);
           ugroupshop = new UpdateGroupshopInput();
           cgroupshop = new UpdateChannelGroupshopInput();
+          dgroupshop = new UpdateDropsGroupshopInput();
           ugroupshop = await this.gsService.findOneWithLineItems(discountCode);
           pgroupshop = await this.partnerSrv.findOne(discountCode);
           cgroupshop = await this.channelGSService.findChannelGS(discountCode);
+          dgroupshop = await this.dropsService.findDropsGS(discountCode);
         }
         if (ugroupshop) {
           console.log('🚀 ugroupshop groupshop', ugroupshop);
@@ -379,6 +415,98 @@ export class OrderPlacedListener {
             cgroupshop.members = [gsMember];
           }
           await this.channelGSService.update(cgroupshop.id, cgroupshop);
+        } else if (dgroupshop) {
+          let isExistingUser = false as boolean;
+
+          if (dgroupshop?.members?.length) {
+            const orderDetails = await this.orderService.getMembersOrderDetail(
+              dgroupshop?.members,
+            );
+            orderDetails.forEach((o: any) => {
+              if (
+                o.customer.email === customer.email ||
+                (o.customer?.phone &&
+                  customer?.phone &&
+                  o.customer.phone === customer.phone)
+              ) {
+                isExistingUser = true;
+              }
+            });
+          }
+
+          const {
+            discountCode: { title, priceRuleId },
+            createdAt,
+            expiredAt,
+            id,
+          } = dgroupshop;
+
+          gsMember.role = RoleTypeEnum.referral;
+          gsMember.availedDiscount = parseFloat(
+            dgroupshop.discountCode.percentage,
+          );
+          if (dgroupshop?.members?.length) {
+            dgroupshop.members = [...dgroupshop.members, gsMember];
+          } else {
+            dgroupshop.members = [gsMember];
+          }
+
+          // console.log(
+          //   '🚀 ~ file: order-placed.listener.ts:451 ~ OrderPlacedListener ~ createGroupShop ~ isExistingUser',
+          //   isExistingUser,
+          // );
+          // console.log(
+          //   '🚀 ~ file: order-placed.listener.ts:448 ~ OrderPlacedListener ~ createGroupShop ~ dgroupshop.members',
+          //   dgroupshop.members,
+          // );
+          if (!isExistingUser) {
+            dgroupshop.members = this.setPreviousMembersRefundDrops(
+              dgroupshop.members,
+              dgroupshop.discountCode,
+            );
+
+            const newDiscount =
+              dgroupshop.members.length === 1 ? average : maximum;
+
+            const dropsProducts =
+              await this.inventoryService.getProductsByCollectionIDs(shop, [
+                bestSellerCollectionId,
+                latestCollectionId,
+                allProductsCollectionId,
+              ]);
+
+            if (
+              !!newDiscount &&
+              newDiscount !== dgroupshop.discountCode.percentage
+            ) {
+              dgroupshop.discountCode = await this.shopifyapi.setDiscountCode(
+                shop,
+                'Update',
+                accessToken,
+                title,
+                parseInt(newDiscount),
+                dropsProducts?.length > 100
+                  ? dropsProducts.slice(0, 100).map((p: Product) => p.id)
+                  : dropsProducts?.map((p: Product) => p.id) ?? [],
+                createdAt,
+                expiredAt,
+                priceRuleId,
+              );
+              const gsMilestone = new MilestoneInput();
+              gsMilestone.activatedAt = new Date();
+              gsMilestone.discount = `${newDiscount}`;
+              dgroupshop.milestones = [...dgroupshop.milestones, gsMilestone];
+              // console.log(
+              //   '🚀 ~ file: order-placed.listener.ts:481 ~ OrderPlacedListener ~ createGroupShop ~ gsMilestone',
+              //   gsMilestone,
+              // );
+            }
+          }
+          await this.dropsService.update(dgroupshop.id, dgroupshop);
+          // console.log(
+          //   '🚀 ~ file: order-placed.listener.ts:488 ~ OrderPlacedListener ~ createGroupShop ~ dgroupshop',
+          //   dgroupshop.milestones,
+          // );
         } else {
           ownerDiscount = !!discountCode && true;
           const dealProducts = newLineItems

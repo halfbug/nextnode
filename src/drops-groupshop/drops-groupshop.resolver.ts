@@ -30,7 +30,7 @@ export class DropsGroupshopResolver {
   }
 
   @Query(() => DropsGroupshop, { name: 'dropsGroupshop' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  findOne(@Args('id', { type: () => Int }) id: string) {
     return this.dropsGroupshopService.findOne(id);
   }
 
@@ -62,7 +62,7 @@ export class DropsGroupshopResolver {
   }
 
   @Mutation(() => DropsGroupshop)
-  removeDropsGroupshop(@Args('id', { type: () => Int }) id: number) {
+  removeDropsGroupshop(@Args('id', { type: () => Int }) id: string) {
     return this.dropsGroupshopService.remove(id);
   }
 }

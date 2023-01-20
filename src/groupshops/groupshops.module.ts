@@ -15,6 +15,8 @@ import { GSUpdatePriceRuleEvent } from './events/groupshop-update-price-rule.eve
 import { PartnersModule } from 'src/partners/partners.module';
 import { ChannelModule } from 'src/channel/channel.module';
 import { StoresModule } from 'src/stores/stores.module';
+import { DropsGroupshopModule } from 'src/drops-groupshop/drops-groupshop.module';
+import { InventoryModule } from 'src/inventory/inventory.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { StoresModule } from 'src/stores/stores.module';
     forwardRef(() => PartnersModule),
     forwardRef(() => ChannelModule),
     forwardRef(() => StoresModule),
+    forwardRef(() => DropsGroupshopModule),
+    forwardRef(() => InventoryModule),
   ],
   providers: [
     GroupshopsResolver,

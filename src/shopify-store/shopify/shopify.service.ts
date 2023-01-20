@@ -257,7 +257,7 @@ export class ShopifyService {
                 productIds: products,
               },
               combinesWith: {
-                productDiscounts: title.includes('GSD') ? true : false,
+                productDiscounts: true,
               },
               customerSelection: {
                 forAllCustomers: true,
@@ -282,6 +282,9 @@ export class ShopifyService {
             value: {
               percentageValue: -percentage,
             },
+            combinesWith: {
+              productDiscounts: true,
+            },
           },
         };
       else if (products)
@@ -290,6 +293,9 @@ export class ShopifyService {
           priceRule: {
             itemEntitlements: {
               productIds: products,
+            },
+            combinesWith: {
+              productDiscounts: true,
             },
           },
         };
@@ -300,6 +306,9 @@ export class ShopifyService {
             validityPeriod: {
               start: starts,
               end: ends,
+            },
+            combinesWith: {
+              productDiscounts: true,
             },
           },
         };

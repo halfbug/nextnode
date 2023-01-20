@@ -5,10 +5,9 @@ import {
   MilestoneInput,
   OBSettingsInput,
 } from 'src/groupshops/dto/create-groupshops.input';
-import { Customer } from 'src/inventory/dto/create-order.input';
 
 @InputType()
-export class DropCustomer {
+export class DropCustomerInput {
   @Field({ nullable: true })
   klaviyoId: string;
   @Field({ nullable: true })
@@ -41,8 +40,8 @@ export class CreateDropsGroupshopInput {
   @Field(() => DiscountCodeInput, { nullable: true })
   discountCode?: DiscountCodeInput;
 
-  @Field(() => DropCustomer)
-  customerDetail: DropCustomer;
+  @Field(() => DropCustomerInput)
+  customerDetail: DropCustomerInput;
 
   @Field(() => [MemberInput], { nullable: true })
   members?: MemberInput[];

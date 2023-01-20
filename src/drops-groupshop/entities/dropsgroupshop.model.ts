@@ -9,6 +9,19 @@ import {
 import { Customer } from 'src/inventory/entities/orders.modal';
 import Store from 'src/stores/entities/store.model';
 
+export class DropCustomer {
+  @Column({ nullable: true })
+  klaviyoId: string;
+  @Column({ nullable: true })
+  firstName: string;
+  @Column({ nullable: true })
+  lastName: string;
+  @Column({ nullable: true })
+  email: string;
+  @Column({ nullable: true })
+  phone: string;
+}
+
 @Entity()
 export default class DropsGroupshop extends DefaultColumnsService {
   @Column()
@@ -29,8 +42,8 @@ export default class DropsGroupshop extends DefaultColumnsService {
   @Column(() => DiscountCode)
   discountCode: DiscountCode;
 
-  @Column()
-  customerDetail: Customer;
+  @Column(() => DropCustomer)
+  customerDetail: DropCustomer;
 
   @Column(() => Member)
   members?: Member[];
@@ -47,6 +60,6 @@ export default class DropsGroupshop extends DefaultColumnsService {
   @Column({ nullable: true })
   obSettings?: OBSettings;
 
-  @Column({ nullable: true })
-  expiredAt?: Date;
+  @Column()
+  expiredAt?: Date | null;
 }

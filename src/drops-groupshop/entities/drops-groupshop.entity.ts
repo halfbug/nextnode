@@ -9,6 +9,19 @@ import { Customer } from 'src/inventory/dto/create-order.input';
 import { Product } from 'src/inventory/entities/product.entity';
 import { Store } from 'src/stores/entities/store.entity';
 
+@ObjectType('DropCustomer')
+export class DropCustomer {
+  @Field({ nullable: true })
+  klaviyoId: string;
+  @Field({ nullable: true })
+  firstName: string;
+  @Field({ nullable: true })
+  lastName: string;
+  @Field({ nullable: true })
+  email: string;
+  @Field({ nullable: true })
+  phone: string;
+}
 @ObjectType()
 export class DropsGroupshop {
   @Field()
@@ -29,10 +42,10 @@ export class DropsGroupshop {
   @Field(() => DiscountCode)
   discountCode: DiscountCode;
 
-  @Field()
-  customerDetail: Customer;
+  @Field(() => DropCustomer)
+  customerDetail: DropCustomer;
 
-  @Field(() => Member)
+  @Field(() => [Member], { nullable: 'itemsAndList' })
   members?: Member[];
 
   @Field()

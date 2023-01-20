@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Member } from 'src/groupshops/entities/groupshop.entity';
 import { getMongoManager, Repository } from 'typeorm';
 import { CreateOrderInput, DiscountInfo } from './dto/create-order.input';
 import { UpdateFullOrderInput } from './dto/update-fullorder.input';
@@ -739,6 +740,22 @@ export class OrdersService {
           localField: 'product.id',
           foreignField: 'id',
           as: 'product',
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Orders, agg).toArray();
+    return gs;
+  }
+
+  async getMembersOrderDetail(members: Member[]) {
+    const orderIds = members.map((m) => m.orderId);
+    const agg = [
+      {
+        $match: {
+          id: {
+            $in: orderIds,
+          },
         },
       },
     ];
