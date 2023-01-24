@@ -11,6 +11,8 @@ import { GSLoadedEvent } from './events/groupshop-loaded.event';
 import { GSLoadedListener } from './listeners/groupshop-loaded.listener';
 import { PartnersModule } from 'src/partners/partners.module';
 import { BillingModule } from 'src/billing/billing.module';
+import { GsCommonService } from './gs-common.service';
+import { DropsGroupshopModule } from 'src/drops-groupshop/drops-groupshop.module';
 
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import { BillingModule } from 'src/billing/billing.module';
     forwardRef(() => GroupshopsModule),
     forwardRef(() => PartnersModule),
     forwardRef(() => BillingModule),
+    forwardRef(() => DropsGroupshopModule),
   ],
   providers: [
     VistorsService,
@@ -26,6 +29,7 @@ import { BillingModule } from 'src/billing/billing.module';
     ViewedInterceptor,
     GSLoadedEvent,
     GSLoadedListener,
+    GsCommonService,
   ],
   exports: [VistorsService, LifecycleService, GSLoadedEvent, GSLoadedListener],
 })

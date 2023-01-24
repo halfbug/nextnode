@@ -25,6 +25,7 @@ export const GS_FEES = [
 
 export const FIRST_EXPIRE_DAYS = 14;
 export const SECOND_EXPIRE_DAYS = 7;
+export const DROPS_EXPIRE_DAYS = 1;
 
 export const GS_TIER0_START_COUNT = 1; //FREE
 export const GS_TIER0_END_COUNT = 3;

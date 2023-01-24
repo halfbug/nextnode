@@ -35,7 +35,7 @@ export class DropsGroupshopResolver {
   }
 
   @Public()
-  // @UseInterceptors(ViewedInterceptor)
+  @UseInterceptors(ViewedInterceptor)
   @Query(() => DropsGroupshop, { name: 'DropGroupshop' })
   async findDropsGroupshopByCode(@Args('code') code: string) {
     const gs = await this.dropsGroupshopService.findDropGroupshopByCode(
