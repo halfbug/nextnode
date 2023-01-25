@@ -13,12 +13,14 @@ import { PartnersModule } from 'src/partners/partners.module';
 import { BillingModule } from 'src/billing/billing.module';
 import { GsCommonService } from './gs-common.service';
 import { DropsGroupshopModule } from 'src/drops-groupshop/drops-groupshop.module';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Lifecycle, Visitors]),
     UtilsModule,
     forwardRef(() => GroupshopsModule),
+    forwardRef(() => EmailModule),
     forwardRef(() => PartnersModule),
     forwardRef(() => BillingModule),
     forwardRef(() => DropsGroupshopModule),

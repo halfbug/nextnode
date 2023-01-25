@@ -89,6 +89,28 @@ export class KalavioService {
     }
   }
 
+  async getProfilesById(profileId) {
+    const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
+    const urlKlaviyo = `${this.configService.get(
+      'KLAVIYO_BASE_URL',
+    )}${'/profiles/'}${profileId}`;
+    try {
+      const options = {
+        headers: {
+          Authorization: `${'Klaviyo-API-Key '}${PRIVATE_KEY}`,
+          accept: 'application/json',
+          revision: '2022-10-17',
+        },
+      };
+      const getProfiles = await lastValueFrom(
+        this.httpService.get(urlKlaviyo, options).pipe(map((res) => res.data)),
+      );
+      return getProfiles;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   async getProfilesByListId(listId, nextPage) {
     const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
     const urlKlaviyo = `${this.configService.get(

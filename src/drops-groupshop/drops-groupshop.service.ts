@@ -395,7 +395,7 @@ export class DropsGroupshopService {
         $match: {
           $and: [
             {
-              status: 'Active',
+              status: 'active',
             },
             {
               expiredAt: {

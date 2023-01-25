@@ -12,12 +12,14 @@ import { EventType } from '../entities/lifecycle.modal';
 import { GSLoadedEvent } from '../events/groupshop-loaded.event';
 import { GsCommonService } from '../gs-common.service';
 import { LifecycleService } from '../lifecycle.service';
+import { KalavioService } from 'src/email/kalavio.service';
 import { VistorsService } from '../vistors.service';
 
 @Injectable()
 export class GSLoadedListener {
   constructor(
     private readonly vistorsrv: VistorsService,
+    private kalavioService: KalavioService,
     private readonly lifecyclesrv: LifecycleService,
     private readonly groupshopsrv: GroupshopsService,
     private readonly gsUpdatePriceRuleEvt: GSUpdatePriceRuleEvent,
@@ -50,8 +52,10 @@ export class GSLoadedListener {
     //   '🚀 ~ file: viewed.inceptor.ts ~ line 54 ~ ViewedInterceptor ~ tap ~ gsviews',
     //   gsviews,
     // );
-
     if (gsType === 'DROPS' && gsviews?.length === 0) {
+      const klaviyoId = gs?.customerDetail?.klaviyoId;
+      const shortURL = gs?.shortUrl;
+
       const gsExpireAt = addDays(new Date(), DROPS_EXPIRE_DAYS);
       const upgs = new UpdateDropsGroupshopInput();
       // upgs.id = gs.id;
@@ -70,6 +74,21 @@ export class GSLoadedListener {
       });
       //    2.3 update visitor service.
       this.vistorsrv.create(gs.id, ip);
+      // Update status on Klaviyo profile
+      if (typeof klaviyoId !== 'undefined') {
+        const currentProfile = await this.kalavioService.getProfilesById(
+          klaviyoId,
+        );
+        const latestShortUrl =
+          currentProfile.data.attributes.properties?.groupshop_url;
+        if (shortURL === latestShortUrl) {
+          const params = new URLSearchParams({
+            groupshop_status: 'active',
+          });
+          const data = params.toString();
+          await this.kalavioService.klaviyoProfileUpdate(klaviyoId, data);
+        }
+      }
     } else {
       // 1.5 groupshop should not be expired
       const isNotExpired = getDateDifference(gs.expiredAt).time > -1;
