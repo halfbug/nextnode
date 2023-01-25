@@ -271,7 +271,7 @@ export class OrderPlacedListener {
     try {
       // console.log(
       //   '🚀 ~ file: order-placed.listener.ts ~ line 18 ~ OrderPlacedListener ~ createGroupShop ~ event',
-      //   event,
+      //   JSON.stringify(event),
       // );
       const {
         order: {
@@ -295,6 +295,12 @@ export class OrderPlacedListener {
             latestCollectionId,
             allProductsCollectionId,
             spotlightDiscount,
+          } = {
+            rewards: {
+              baseline: '0',
+              average: '0',
+              maximum: '0',
+            },
           },
           id,
         },

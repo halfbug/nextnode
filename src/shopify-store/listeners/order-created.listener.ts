@@ -140,6 +140,11 @@ export class OrderCreatedListener {
         shop,
       );
       newOrderPlaced.lineItems = lineItems;
+      // console.log(
+      //   '🚀 ~ file: order-created.listener.ts:137 ~ OrderCreatedListener ~ addOrder ~ newOrderPlaced',
+      //   JSON.stringify(newOrderPlaced.store.activeCampaign),
+      // );
+
       if (
         ['Active', 'ACTIVE', 'active'].includes(
           newOrderPlaced.store.subscription.status,
