@@ -172,6 +172,8 @@ export class StoresService {
           updateStoreInput.drops.spotlightDiscount = discountCode;
         }
       } else if (
+        updateStoreInput.drops?.spotlightDiscount?.percentage &&
+        updateStoreInput.drops?.spotlightColletionId &&
         updateStoreInput.drops?.spotlightDiscount?.percentage !==
           oldStoreData?.drops?.spotlightDiscount?.percentage &&
         updateStoreInput.drops?.spotlightColletionId !==
@@ -193,8 +195,9 @@ export class StoresService {
           updateStoreInput.drops.spotlightDiscount = discountCode;
         }
       } else if (
+        updateStoreInput.drops?.spotlightDiscount?.percentage &&
         updateStoreInput.drops?.spotlightDiscount?.percentage !==
-        oldStoreData?.drops?.spotlightDiscount?.percentage
+          oldStoreData?.drops?.spotlightDiscount?.percentage
       ) {
         const discountCode = await this.shopifyapi.setAutomaticDiscountCode(
           oldStoreData.shop,
@@ -212,8 +215,9 @@ export class StoresService {
           updateStoreInput.drops.spotlightDiscount = discountCode;
         }
       } else if (
+        updateStoreInput.drops?.spotlightColletionId &&
         updateStoreInput.drops?.spotlightColletionId !==
-        oldStoreData?.drops?.spotlightColletionId
+          oldStoreData?.drops?.spotlightColletionId
       ) {
         const discountCode = await this.shopifyapi.setAutomaticDiscountCode(
           oldStoreData.shop,
