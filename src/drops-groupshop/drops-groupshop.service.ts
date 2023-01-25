@@ -115,42 +115,42 @@ export class DropsGroupshopService {
           },
         },
       },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'store.drops.spotlightColletionId',
-          foreignField: 'id',
-          as: 'spotlight',
-        },
-      },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'spotlight.parentId',
-          foreignField: 'id',
-          as: 'spotlightProducts',
-        },
-      },
-      {
-        $addFields: {
-          spotlightProducts: {
-            $filter: {
-              input: '$spotlightProducts',
-              as: 'j',
-              cond: {
-                $and: [
-                  {
-                    $ne: ['$$j.publishedAt', null],
-                  },
-                  {
-                    $eq: ['$$j.status', 'ACTIVE'],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
+      // {
+      //   $lookup: {
+      //     from: 'inventory',
+      //     localField: 'store.drops.spotlightColletionId',
+      //     foreignField: 'id',
+      //     as: 'spotlight',
+      //   },
+      // },
+      // {
+      //   $lookup: {
+      //     from: 'inventory',
+      //     localField: 'spotlight.parentId',
+      //     foreignField: 'id',
+      //     as: 'spotlightProducts',
+      //   },
+      // },
+      // {
+      //   $addFields: {
+      //     spotlightProducts: {
+      //       $filter: {
+      //         input: '$spotlightProducts',
+      //         as: 'j',
+      //         cond: {
+      //           $and: [
+      //             {
+      //               $ne: ['$$j.publishedAt', null],
+      //             },
+      //             {
+      //               $eq: ['$$j.status', 'ACTIVE'],
+      //             },
+      //           ],
+      //         },
+      //       },
+      //     },
+      //   },
+      // },
       {
         $lookup: {
           from: 'inventory',
