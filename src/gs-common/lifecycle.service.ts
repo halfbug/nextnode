@@ -21,6 +21,13 @@ export class LifecycleService {
     });
   }
 
+  findAllEvents(groupshopId: string, event: EventType) {
+    return this.lifecycleRepository.find({
+      where: { groupshopId, event },
+      order: { dateTime: -1 },
+    });
+  }
+
   // async getBillingByDate(storeId: string, sdate: any, edate: any) {
   async getCustomBilling(storeId: string) {
     const agg = [

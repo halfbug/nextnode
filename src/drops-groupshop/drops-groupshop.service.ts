@@ -327,7 +327,7 @@ export class DropsGroupshopService {
           url: 1,
           obSettings: 1,
           expiredUrl: 1,
-          expiredShortLink: 1,
+          expiredShortUrl: 1,
           expiredAt: 1,
           dealProducts: 1,
           discountCode: 1,
@@ -353,6 +353,17 @@ export class DropsGroupshopService {
     return gs[0];
   }
 
+  async updateExpireDate(
+    updateGroupshopInput: UpdateDropsGroupshopInput,
+    code: string,
+  ) {
+    const { id } = updateGroupshopInput;
+
+    delete updateGroupshopInput.id;
+    await this.DropsGroupshopRepository.update({ id }, updateGroupshopInput);
+    return await this.findDropGroupshopByCode(code);
+  }
+
   findOne(id: string) {
     return this.DropsGroupshopRepository.findOne({
       where: {
@@ -365,10 +376,13 @@ export class DropsGroupshopService {
     id: string,
     updateDropsGroupshopInput: UpdateDropsGroupshopInput,
   ) {
-    return await this.DropsGroupshopRepository.update(
+    await this.DropsGroupshopRepository.update(
       { id },
-      updateDropsGroupshopInput,
+      {
+        ...updateDropsGroupshopInput,
+      },
     );
+    return await this.findOne(id);
   }
 
   remove(id: string) {

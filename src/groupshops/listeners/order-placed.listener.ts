@@ -38,6 +38,8 @@ import { UpdateDropsGroupshopInput } from 'src/drops-groupshop/dto/update-drops-
 import { InventoryService } from 'src/inventory/inventory.service';
 import { Product } from 'src/inventory/entities/product.entity';
 import { OrdersService } from 'src/inventory/orders.service';
+import { EventType } from 'src/gs-common/entities/lifecycle.modal';
+import { LifecycleService } from 'src/gs-common/lifecycle.service';
 
 @Injectable()
 export class OrderPlacedListener {
@@ -55,6 +57,7 @@ export class OrderPlacedListener {
     private dropsService: DropsGroupshopService,
     private inventoryService: InventoryService,
     private orderService: OrdersService,
+    private readonly lifecyclesrv: LifecycleService,
   ) {}
 
   accessToken: string;
@@ -133,18 +136,19 @@ export class OrderPlacedListener {
     // console.log({ orderId });
     // console.log({ discount });
 
-    const client = await this.shopifyapi.client(this.shop, this.accessToken);
-    console.log(
-      '🚀 ~ file: order-placed.listener.ts ~ line 79 ~ OrderPlacedListener ~ shopifyRefund ~ this.accessToken',
-      this.accessToken,
-    );
-    console.log(
-      '🚀 ~ file: order-placed.listener.ts ~ line 79 ~ OrderPlacedListener ~ shopifyRefund ~ this.shop,',
-      this.shop,
-    );
-    const refund = await client.query({
-      data: {
-        query: `mutation refundCreate($input: RefundInput!) {
+    try {
+      const client = await this.shopifyapi.client(this.shop, this.accessToken);
+      console.log(
+        '🚀 ~ file: order-placed.listener.ts ~ line 79 ~ OrderPlacedListener ~ shopifyRefund ~ this.accessToken',
+        this.accessToken,
+      );
+      console.log(
+        '🚀 ~ file: order-placed.listener.ts ~ line 79 ~ OrderPlacedListener ~ shopifyRefund ~ this.shop,',
+        this.shop,
+      );
+      const refund = await client.query({
+        data: {
+          query: `mutation refundCreate($input: RefundInput!) {
           refundCreate(input: $input) {
             order {
               id
@@ -160,23 +164,26 @@ export class OrderPlacedListener {
             }
           }
         }`,
-        variables: {
-          input: {
-            orderId: orderId,
-            note: `GROUPSHOP - ${discount}% cash back for referral`,
-            notify: true,
-            transactions: {
-              amount,
-              gateway: 'exchange-credit',
-              kind: 'REFUND',
+          variables: {
+            input: {
               orderId: orderId,
+              note: `GROUPSHOP - ${discount}% cash back for referral`,
+              notify: true,
+              transactions: {
+                amount,
+                gateway: 'exchange-credit',
+                kind: 'REFUND',
+                orderId: orderId,
+              },
             },
           },
         },
-      },
-    });
-    console.log(JSON.stringify(refund));
-    console.log('.............shopifyrefund....................');
+      });
+      console.log(JSON.stringify(refund));
+      console.log('.............shopifyrefund....................');
+    } catch (err) {
+      console.log('shopifyRefund > err ', JSON.stringify(err));
+    }
   }
 
   calculateRefund(member: any, milestone: number) {
@@ -422,6 +429,7 @@ export class OrderPlacedListener {
           }
           await this.channelGSService.update(cgroupshop.id, cgroupshop);
         } else if (dgroupshop) {
+          this.groupshop = dgroupshop as Groupshops;
           let isExistingUser = false as boolean;
 
           if (dgroupshop?.members?.length) {
@@ -485,6 +493,15 @@ export class OrderPlacedListener {
               !!newDiscount &&
               newDiscount !== dgroupshop.discountCode.percentage
             ) {
+              // update expiredAt
+              const d = new Date(expiredAt);
+              d.setHours(d.getHours() + 24);
+              dgroupshop.expiredAt = d;
+              console.log(
+                '🚀 ~ file: order-placed.listener.ts:505 ~ OrderPlacedListener ~ createGroupShop ~ dgroupshop.expiredAt',
+                dgroupshop.expiredAt,
+              );
+              // update discount code
               dgroupshop.discountCode = await this.shopifyapi.setDiscountCode(
                 shop,
                 'Update',
@@ -495,9 +512,10 @@ export class OrderPlacedListener {
                   ? dropsProducts.slice(0, 100).map((p: Product) => p.id)
                   : dropsProducts?.map((p: Product) => p.id) ?? [],
                 createdAt,
-                expiredAt,
+                dgroupshop.expiredAt,
                 priceRuleId,
               );
+              // update milestone
               const gsMilestone = new MilestoneInput();
               gsMilestone.activatedAt = new Date();
               gsMilestone.discount = `${newDiscount}`;
@@ -506,6 +524,12 @@ export class OrderPlacedListener {
               //   '🚀 ~ file: order-placed.listener.ts:481 ~ OrderPlacedListener ~ createGroupShop ~ gsMilestone',
               //   gsMilestone,
               // );
+
+              this.lifecyclesrv.create({
+                groupshopId: dgroupshop.id,
+                event: EventType.expired,
+                dateTime: dgroupshop.expiredAt,
+              });
             }
           }
           await this.dropsService.update(dgroupshop.id, dgroupshop);

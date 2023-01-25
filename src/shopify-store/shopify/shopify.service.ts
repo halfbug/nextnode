@@ -43,7 +43,11 @@ export class ShopifyService {
   }
 
   async client(shop: string, accessToken: string) {
-    return new Shopify.Clients.Graphql(shop, accessToken);
+    try {
+      return new Shopify.Clients.Graphql(shop, accessToken);
+    } catch (err) {
+      console.log('err', err);
+    }
   }
 
   async restClient(shop: string, accessToken: string) {
@@ -215,13 +219,14 @@ export class ShopifyService {
     // if (percentage) {
     console.log({ title });
     // console.log({ percentage });
-    const client = await this.client(shop, accessToken);
-    let priceRule: any;
+    try {
+      const client = await this.client(shop, accessToken);
+      let priceRule: any;
 
-    if (action === 'Create')
-      priceRule = await client.query({
-        data: {
-          query: `mutation priceRuleCreate($priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {
+      if (action === 'Create')
+        priceRule = await client.query({
+          data: {
+            query: `mutation priceRuleCreate($priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {
           priceRuleCreate(priceRule: $priceRule, priceRuleDiscountCode: $priceRuleDiscountCode) {
             priceRule {
               id
@@ -245,79 +250,79 @@ export class ShopifyService {
             }
           }
         }`,
-          variables: {
-            id: id || null,
+            variables: {
+              id: id || null,
+              priceRule: {
+                title: title,
+                target: 'LINE_ITEM',
+                value: {
+                  percentageValue: -percentage,
+                },
+                itemEntitlements: {
+                  productIds: products,
+                },
+                combinesWith: {
+                  productDiscounts: true,
+                },
+                customerSelection: {
+                  forAllCustomers: true,
+                },
+                allocationMethod: 'EACH',
+                validityPeriod: {
+                  start: starts,
+                  end: ends,
+                },
+              },
+              priceRuleDiscountCode: { code: title },
+            },
+          },
+        });
+      else {
+        // console.log('inside update option');
+        let variables: any = { id };
+        if (percentage)
+          variables = {
+            id,
             priceRule: {
-              title: title,
-              target: 'LINE_ITEM',
               value: {
                 percentageValue: -percentage,
               },
+              combinesWith: {
+                productDiscounts: true,
+              },
+            },
+          };
+        else if (products)
+          variables = {
+            id,
+            priceRule: {
               itemEntitlements: {
                 productIds: products,
               },
               combinesWith: {
                 productDiscounts: true,
               },
-              customerSelection: {
-                forAllCustomers: true,
-              },
-              allocationMethod: 'EACH',
+            },
+          };
+        else
+          variables = {
+            id,
+            priceRule: {
               validityPeriod: {
                 start: starts,
                 end: ends,
               },
+              combinesWith: {
+                productDiscounts: true,
+              },
             },
-            priceRuleDiscountCode: { code: title },
-          },
-        },
-      });
-    else {
-      // console.log('inside update option');
-      let variables: any = { id };
-      if (percentage)
-        variables = {
-          id,
-          priceRule: {
-            value: {
-              percentageValue: -percentage,
-            },
-            combinesWith: {
-              productDiscounts: true,
-            },
-          },
-        };
-      else if (products)
-        variables = {
-          id,
-          priceRule: {
-            itemEntitlements: {
-              productIds: products,
-            },
-            combinesWith: {
-              productDiscounts: true,
-            },
-          },
-        };
-      else
-        variables = {
-          id,
-          priceRule: {
-            validityPeriod: {
-              start: starts,
-              end: ends,
-            },
-            combinesWith: {
-              productDiscounts: true,
-            },
-          },
-        };
+          };
 
-      // console.log({ variables });
-      console.log(JSON.stringify(variables));
-      priceRule = await client.query({
-        data: {
-          query: `mutation priceRuleUpdate($id: ID!,$priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {
+        // console.log({ variables });
+        console.log(JSON.stringify(variables));
+        priceRule = await client.query({
+          data: {
+            query: `mutation priceRuleUpdate($id: ID!,$priceRule: PriceRuleInput!, $priceRuleDiscountCode : PriceRuleDiscountCodeInput) {
           priceRuleUpdate(id: $id, priceRule: $priceRule, priceRuleDiscountCode: $priceRuleDiscountCode) {
           priceRule {
             id
@@ -341,24 +346,27 @@ export class ShopifyService {
           }
         }
       }`,
-          variables,
+            variables,
+          },
+        });
+      }
+      console.log(
+        '🚀 ~ file: shopify.service.ts ~ line 196 ~ ShopifyService ~ priceRule',
+        JSON.stringify(priceRule),
+      );
+      const {
+        [`priceRule${action}`]: {
+          priceRule: { id: priceRuleId, title: title1 },
         },
-      });
+      } = priceRule.body['data'];
+      return {
+        title: title ?? title1,
+        percentage: percentage?.toString(),
+        priceRuleId: priceRuleId,
+      };
+    } catch (err) {
+      console.log('err', err);
     }
-    console.log(
-      '🚀 ~ file: shopify.service.ts ~ line 196 ~ ShopifyService ~ priceRule',
-      JSON.stringify(priceRule),
-    );
-    const {
-      [`priceRule${action}`]: {
-        priceRule: { id: priceRuleId, title: title1 },
-      },
-    } = priceRule.body['data'];
-    return {
-      title: title ?? title1,
-      percentage: percentage?.toString(),
-      priceRuleId: priceRuleId,
-    };
   }
 
   async setAutomaticDiscountCode(

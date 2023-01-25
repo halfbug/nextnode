@@ -77,4 +77,7 @@ export class DropsGroupshop {
 
   @Field({ nullable: true })
   expiredAt?: Date;
+
+  @Field({ nullable: true, defaultValue: 0 })
+  revisedCount?: number;
 }
