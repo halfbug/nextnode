@@ -42,6 +42,56 @@ export class DropsGroupshopResolver {
     return this.dropsGroupshopService.findOne(id);
   }
 
+  async expireAtUpdate(groupshop, Dcode, eventType) {
+    const newExpiredate = addDays(new Date(), 1);
+    const updateGS = await this.dropsGroupshopService.updateExpireDate(
+      {
+        status: 'active',
+        expiredAt: newExpiredate,
+        id: groupshop.id,
+      },
+      Dcode,
+    );
+
+    // add lifcycle event for revised groupshop
+
+    this.lifecyclesrv.create({
+      groupshopId: groupshop.id,
+      event: eventType,
+      dateTime: new Date(),
+    });
+
+    // this.lifecyclesrv.create({
+    //   groupshopId: groupshop.id,
+    //   event: EventType.revised,
+    //   dateTime: new Date(),
+    // });
+
+    this.lifecyclesrv.create({
+      groupshopId: groupshop.id,
+      event: EventType.expired,
+      dateTime: newExpiredate,
+    });
+
+    const { shop, accessToken } = await this.storesService.findById(
+      updateGS?.storeId,
+    );
+
+    await this.shopifyapi.setDiscountCode(
+      shop,
+      'Update',
+      accessToken,
+      updateGS.discountCode.title,
+      null,
+      null,
+      updateGS.createdAt,
+      newExpiredate,
+      updateGS.discountCode.priceRuleId,
+    );
+
+    return updateGS;
+  }
+
   @Public()
   @UseInterceptors(ViewedInterceptor)
   @Query(() => DropsGroupshop, { name: 'DropGroupshop' })
@@ -49,52 +99,22 @@ export class DropsGroupshopResolver {
     @Args('code') code: string,
     @Args('status') status: string,
   ) {
+    let rCount = undefined;
     const Dcode = await this.crypt.decrypt(code);
     const groupshop = await this.dropsGroupshopService.findDropsGS(Dcode);
     const res = await this.lifecyclesrv.findAllEvents(
       groupshop.id,
       EventType.revised,
     );
+    if (groupshop.status === 'pending' && groupshop.expiredAt === null) {
+      await this.expireAtUpdate(groupshop, Dcode, EventType.started);
+    }
+
     if (status === 'activated') {
       const isExpired = !(getDateDifference(groupshop.expiredAt).time > -1);
       if (isExpired && res?.length < 1) {
-        const newExpiredate = addDays(new Date(), 1);
-        const updateGS = await this.dropsGroupshopService.updateExpireDate(
-          {
-            expiredAt: newExpiredate,
-            id: groupshop.id,
-          },
-          Dcode,
-        );
-
-        // add lifcycle event for revised groupshop
-        this.lifecyclesrv.create({
-          groupshopId: groupshop.id,
-          event: EventType.revised,
-          dateTime: new Date(),
-        });
-        this.lifecyclesrv.create({
-          groupshopId: groupshop.id,
-          event: EventType.expired,
-          dateTime: newExpiredate,
-        });
-
-        const { shop, accessToken } = await this.storesService.findById(
-          updateGS?.storeId,
-        );
-
-        await this.shopifyapi.setDiscountCode(
-          shop,
-          'Update',
-          accessToken,
-          updateGS.discountCode.title,
-          null,
-          null,
-          updateGS.createdAt,
-          newExpiredate,
-          updateGS.discountCode.priceRuleId,
-        );
-        return updateGS;
+        await this.expireAtUpdate(groupshop, Dcode, EventType.revised);
+        rCount = 1;
       }
     }
     const gs = await this.dropsGroupshopService.findDropGroupshopByCode(
@@ -102,7 +122,7 @@ export class DropsGroupshopResolver {
       await this.crypt.decrypt(code),
     );
     if (gs) {
-      return { ...gs, revisedCount: res.length };
+      return { ...gs, revisedCount: rCount ?? res.length };
     } else {
       throw new NotFoundException(`Not Found drops groupshop`);
     }

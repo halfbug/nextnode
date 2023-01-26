@@ -56,22 +56,22 @@ export class GSLoadedListener {
       const klaviyoId = gs?.customerDetail?.klaviyoId;
       const shortURL = gs?.shortUrl;
 
-      const gsExpireAt = addDays(new Date(), DROPS_EXPIRE_DAYS);
-      const upgs = new UpdateDropsGroupshopInput();
-      // upgs.id = gs.id;
-      upgs.expiredAt = gsExpireAt;
-      upgs.status = 'active';
-      await this.dropsService.update(gs.id, upgs);
-      //    2.2 add started at and expired at event in lifecycle collection.
-      this.lifecyclesrv.create({
-        groupshopId: gs.id,
-        event: EventType.started,
-      });
-      this.lifecyclesrv.create({
-        groupshopId: gs.id,
-        event: EventType.expired,
-        dateTime: gsExpireAt,
-      });
+      // const gsExpireAt = addDays(new Date(), DROPS_EXPIRE_DAYS);
+      // const upgs = new UpdateDropsGroupshopInput();
+      // // upgs.id = gs.id;
+      // upgs.expiredAt = gsExpireAt;
+      // upgs.status = 'active';
+      // await this.dropsService.update(gs.id, upgs);
+      // //    2.2 add started at and expired at event in lifecycle collection.
+      // this.lifecyclesrv.create({
+      //   groupshopId: gs.id,
+      //   event: EventType.started,
+      // });
+      // this.lifecyclesrv.create({
+      //   groupshopId: gs.id,
+      //   event: EventType.expired,
+      //   dateTime: gsExpireAt,
+      // });
       //    2.3 update visitor service.
       this.vistorsrv.create(gs.id, ip);
       // Update status on Klaviyo profile
