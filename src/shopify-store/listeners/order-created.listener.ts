@@ -59,7 +59,9 @@ export class OrderCreatedListener {
       //   (dc: DiscountInfo) => new DiscountInfo(dc),
       // );
       const phoneNumber =
-        whOrder.shipping_address?.phone ?? whOrder.customer?.phone;
+        whOrder.phone ??
+        whOrder.shipping_address?.phone ??
+        whOrder.customer?.phone;
       newOrder.discountInfo = whOrder.discount_codes;
       newOrder.customer = new Customer();
       if (whOrder.customer?.last_name === null) {

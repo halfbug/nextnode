@@ -418,4 +418,12 @@ export class DropsGroupshopService {
       },
     });
   }
+
+  async findByOrderId(orderId) {
+    return await this.DropsGroupshopRepository.findOne({
+      where: {
+        'members.orderId': { $regex: `${orderId}` },
+      },
+    });
+  }
 }

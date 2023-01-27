@@ -15,6 +15,9 @@ import { PartnerService } from 'src/partners/partners.service';
 import { Public } from 'src/auth/public.decorator';
 import { ChannelService } from 'src/channel/channel.service';
 import { ChannelGroupshopService } from 'src/channel/channelgroupshop.service';
+import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
+import { OrdersService } from 'src/inventory/orders.service';
+import { InventoryService } from 'src/inventory/inventory.service';
 @Public()
 @Controller('ext')
 export class ThemeAppExtensionController {
@@ -26,6 +29,9 @@ export class ThemeAppExtensionController {
     private partnerSrv: PartnerService,
     private channelService: ChannelService,
     private channelGroupshopService: ChannelGroupshopService,
+    private dropsGroupshopService: DropsGroupshopService,
+    private orderService: OrdersService,
+    private inventoryService: InventoryService,
   ) {}
   @Get('store')
   async getStoreWithActiveCampaign(@Req() req, @Res() res) {
@@ -44,6 +50,7 @@ export class ThemeAppExtensionController {
         status,
         logoImage,
         brandName,
+        drops: { bestSellerCollectionId } = { bestSellerCollectionId: '' },
       } = await this.storesService.findOneWithActiveCampaing(shop);
       // console.log(await this.storesService.findOneWithActiveCampaing(shop));
       res.send(
@@ -58,6 +65,7 @@ export class ThemeAppExtensionController {
           }`,
           settings,
           brandName,
+          bestSellerCollectionId,
         }),
       );
     } catch (err) {
@@ -208,6 +216,80 @@ export class ThemeAppExtensionController {
       );
     } catch (err) {
       res.send(JSON.stringify({ baseline: null, url: null, fname: null }));
+    } finally {
+      // res.status(HttpStatus.OK).send();
+    }
+  }
+
+  @Post('dropsMember')
+  async getDropsMemberDetails(@Req() req, @Res() res) {
+    try {
+      const { orderId } = req.body;
+
+      const {
+        members,
+        url,
+        discountCode: { percentage },
+      } = await this.dropsGroupshopService.findByOrderId(orderId);
+
+      const activeMember = members.find((member) =>
+        member.orderId.includes(orderId),
+      );
+
+      const orderDetails = await this.orderService.getMembersOrderDetail(
+        members,
+      );
+
+      const uniqueMembers = [];
+
+      orderDetails.forEach((o: any) => {
+        console.log('phone', o.customer);
+        if (
+          !uniqueMembers
+            .filter(({ email }) => ![undefined, null].includes(email))
+            .map((u) => u.email)
+            .includes(o.customer?.email) &&
+          !uniqueMembers
+            .filter(({ phone }) => ![undefined, null].includes(phone))
+            .map((u) => u.phone)
+            .includes(o.customer?.phone)
+        ) {
+          uniqueMembers.push({
+            email: o.customer?.email,
+            phone: o.customer?.phone,
+          });
+        }
+      });
+
+      res.send(
+        JSON.stringify({
+          activeMember,
+          url,
+          percentage,
+          members: uniqueMembers.length,
+        }),
+      );
+    } catch (err) {
+      console.log(err);
+      res.send(JSON.stringify({ activeMember: null, url: null }));
+    } finally {
+      // res.status(HttpStatus.OK).send();
+    }
+  }
+
+  @Post('dropsProducts')
+  async getDropsProducts(@Req() req, @Res() res) {
+    try {
+      const { shop, bestsellerCollectionId } = req.body;
+
+      const bestSellerProducts =
+        await this.inventoryService.getProductsByCollectionIDs(shop, [
+          bestsellerCollectionId,
+        ]);
+
+      res.send(JSON.stringify({ products: bestSellerProducts }));
+    } catch (err) {
+      res.send(JSON.stringify({ products: null }));
     } finally {
       // res.status(HttpStatus.OK).send();
     }
