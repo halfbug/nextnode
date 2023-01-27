@@ -9,6 +9,7 @@ import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt
 import { ViewedInterceptor } from 'src/gs-common/viewed.inceptor';
 import { addDays, getDateDifference } from 'src/utils/functions';
 import { LifecycleService } from 'src/gs-common/lifecycle.service';
+import { KalavioService } from 'src/email/kalavio.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { StoresService } from 'src/stores/stores.service';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
@@ -18,6 +19,7 @@ export class DropsGroupshopResolver {
   constructor(
     private readonly dropsGroupshopService: DropsGroupshopService,
     private readonly crypt: EncryptDecryptService,
+    private kalavioService: KalavioService,
     private readonly lifecyclesrv: LifecycleService,
     private storesService: StoresService,
     private shopifyapi: ShopifyService,
@@ -115,6 +117,23 @@ export class DropsGroupshopResolver {
       if (isExpired && res?.length < 1) {
         await this.expireAtUpdate(groupshop, Dcode, EventType.revised);
         rCount = 1;
+
+        // Update status on Klaviyo profile
+        const shortURL = groupshop.shortUrl;
+        const klaviyoId = groupshop.customerDetail.klaviyoId;
+
+        const currentProfile = await this.kalavioService.getProfilesById(
+          klaviyoId,
+        );
+        const latestShortUrl =
+          currentProfile.data.attributes.properties?.groupshop_url;
+        if (shortURL === latestShortUrl) {
+          const params = new URLSearchParams({
+            groupshop_status: 'active',
+          });
+          const data = params.toString();
+          await this.kalavioService.klaviyoProfileUpdate(klaviyoId, data);
+        }
       }
     }
     const gs = await this.dropsGroupshopService.findDropGroupshopByCode(

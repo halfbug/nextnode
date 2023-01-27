@@ -497,6 +497,13 @@ export class CatController {
           console.log('Drop recently created ', klaviyoId);
         } else {
           updatedCounter = updatedCounter + 1;
+          const dropGroupshops =
+            await this.dropsGroupshopService.getGroupshopByKlaviyoId(klaviyoId);
+          // Update status in database of old pending drop groupshop
+          dropGroupshops.map(async (dgroupshop) => {
+            dgroupshop.status = 'expired';
+            await this.dropsGroupshopService.update(dgroupshop.id, dgroupshop);
+          });
           const webdata = {
             id: klaviyoId,
             first_name: profile?.attributes?.first_name,

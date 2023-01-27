@@ -426,4 +426,18 @@ export class DropsGroupshopService {
       },
     });
   }
+
+  async getGroupshopByKlaviyoId(klaviyoId: string) {
+    const agg = [
+      {
+        $match: {
+          'customerDetail.klaviyoId': klaviyoId,
+          status: 'pending',
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const result = await manager.aggregate(DropsGroupshop, agg).toArray();
+    return result;
+  }
 }
