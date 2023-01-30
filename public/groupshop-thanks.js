@@ -895,13 +895,15 @@ async function init() {
         res = await gsPost('dropsMember', {
           orderId,
         });
+        console.log('🚀 ~ file: groupshop-thanks.js:896 ~ pollit3 ~ res', res);
         if (res.activeMember) {
           clearInterval(pollit3);
           const { activeMember: mem, url, percentage, members } = res;
 
           let cashback =
             Shopify.checkout.subtotal_price *
-            (parseFloat(store.discount) / 100 - mem.availedDiscount / 100);
+            (parseFloat(`${store.dropsLastMilestone}%`) / 100 -
+              mem.availedDiscount / 100);
 
           var amountCal = `${Math.floor(cashback)
             .toFixed(2)
@@ -949,7 +951,7 @@ async function init() {
             btn.setAttribute('href', window.GSURL),
           );
 
-          const products = await gsPost('dropsProducts', {
+          const { products } = await gsPost('dropsProducts', {
             shop,
             bestsellerCollectionId: store.bestSellerCollectionId,
           });
@@ -962,12 +964,20 @@ async function init() {
             glider.removeItem(0);
             glider.removeItem(0);
             randomIndx = Math.floor(Math.random() * (products.length - 10)) + 1;
+            console.log(
+              '🚀 ~ file: groupshop-thanks.js:967 ~ pollit3 ~ randomIndx',
+              randomIndx,
+            );
             displayProd =
               products.length > 10
                 ? products.slice(randomIndx, randomIndx + 11)
                 : products;
+            console.log(
+              '🚀 ~ file: groupshop-thanks.js:968 ~ pollit3 ~ displayProd',
+              displayProd,
+            );
 
-            displayProd.map((prod) => {
+            ([...displayProd] ?? []).map((prod) => {
               const slide = document.createElement('a');
               slide.href = window.GSURL;
               slide.target = '_blank';

@@ -50,7 +50,10 @@ export class ThemeAppExtensionController {
         status,
         logoImage,
         brandName,
-        drops: { bestSellerCollectionId } = { bestSellerCollectionId: '' },
+        drops: { bestSellerCollectionId, rewards: { maximum } } = {
+          bestSellerCollectionId: '',
+          rewards: { maximum: 0 },
+        },
       } = await this.storesService.findOneWithActiveCampaing(shop);
       // console.log(await this.storesService.findOneWithActiveCampaing(shop));
       res.send(
@@ -66,6 +69,7 @@ export class ThemeAppExtensionController {
           settings,
           brandName,
           bestSellerCollectionId,
+          dropsLastMilestone: maximum,
         }),
       );
     } catch (err) {
