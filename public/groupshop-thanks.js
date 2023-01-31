@@ -746,7 +746,9 @@ async function init() {
     injectStyleSheet('glider.min.css');
     const csymbol = getCurrencySymbol(Shopify.checkout.currency);
     if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
-      addLeftBlock(discountCode.slice(0, 3) === 'GSD' ? null : store.logoImage);
+      addLeftBlock(
+        discountCode?.slice(0, 3) === 'GSD' ? null : store.logoImage,
+      );
     }
     if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Right') {
       addRightBlock(store.brandName, false, '');
@@ -923,6 +925,7 @@ async function init() {
             rightHeadTxt = leftHeadTxt;
           }
           if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
+            document.querySelector('.cashback_mobile').innerHTML = leftHeadTxt;
             document.querySelector('.groupshop_left-block h3').innerHTML =
               leftHeadTxt;
             document.querySelector('.groupshop_left-block h3').className =
@@ -964,18 +967,10 @@ async function init() {
             glider.removeItem(0);
             glider.removeItem(0);
             randomIndx = Math.floor(Math.random() * (products.length - 10)) + 1;
-            console.log(
-              '🚀 ~ file: groupshop-thanks.js:967 ~ pollit3 ~ randomIndx',
-              randomIndx,
-            );
             displayProd =
               products.length > 10
                 ? products.slice(randomIndx, randomIndx + 11)
                 : products;
-            console.log(
-              '🚀 ~ file: groupshop-thanks.js:968 ~ pollit3 ~ displayProd',
-              displayProd,
-            );
 
             ([...displayProd] ?? []).map((prod) => {
               const slide = document.createElement('a');
