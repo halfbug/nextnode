@@ -17,6 +17,8 @@ import { ChannelModule } from 'src/channel/channel.module';
 import { StoresModule } from 'src/stores/stores.module';
 import { DropsGroupshopModule } from 'src/drops-groupshop/drops-groupshop.module';
 import { InventoryModule } from 'src/inventory/inventory.module';
+import { DropKlaviyoEvent } from 'src/shopify-store/events/drop-klaviyo.event';
+import { DropKlaviyoListener } from 'src/shopify-store/listeners/drop-klaviyo.listener';
 
 @Module({
   imports: [
@@ -38,12 +40,16 @@ import { InventoryModule } from 'src/inventory/inventory.module';
     OrderPlacedListener,
     RefAddedEvent,
     GSUpdatePriceRuleEvent,
+    DropKlaviyoEvent,
+    DropKlaviyoListener,
   ],
   exports: [
     GroupshopsService,
     RefAddedEvent,
     GSUpdatePriceRuleEvent,
     OrderPlacedListener,
+    DropKlaviyoEvent,
+    DropKlaviyoListener,
   ],
 })
 export class GroupshopsModule {}

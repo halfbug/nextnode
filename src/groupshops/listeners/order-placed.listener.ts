@@ -40,6 +40,7 @@ import { Product } from 'src/inventory/entities/product.entity';
 import { OrdersService } from 'src/inventory/orders.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { LifecycleService } from 'src/gs-common/lifecycle.service';
+import { DropKlaviyoEvent } from 'src/shopify-store/events/drop-klaviyo.event';
 
 @Injectable()
 export class OrderPlacedListener {
@@ -58,6 +59,7 @@ export class OrderPlacedListener {
     private inventoryService: InventoryService,
     private orderService: OrdersService,
     private readonly lifecyclesrv: LifecycleService,
+    private dropKlaviyoEvent: DropKlaviyoEvent,
   ) {}
 
   accessToken: string;
@@ -533,6 +535,9 @@ export class OrderPlacedListener {
             }
           }
           await this.dropsService.update(dgroupshop.id, dgroupshop);
+
+          this.dropKlaviyoEvent.webhook = dgroupshop;
+          this.dropKlaviyoEvent.emit();
           // console.log(
           //   '🚀 ~ file: order-placed.listener.ts:488 ~ OrderPlacedListener ~ createGroupShop ~ dgroupshop',
           //   dgroupshop.milestones,

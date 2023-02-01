@@ -154,6 +154,19 @@ export class OrdersService {
     return await manager.aggregate(Orders, agg).toArray();
   }
 
+  async getCustomerNameByOrderId(orderId: string) {
+    const agg = [
+      {
+        $match: {
+          id: orderId,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(Orders, agg).toArray();
+    return gs;
+  }
+
   async getOrderDetailsByOrderId(orderId: string) {
     const agg = [
       {
