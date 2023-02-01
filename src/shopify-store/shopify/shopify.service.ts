@@ -280,7 +280,23 @@ export class ShopifyService {
       else {
         // console.log('inside update option');
         let variables: any = { id };
-        if (percentage)
+        if (percentage && starts && ends)
+          variables = {
+            id,
+            priceRule: {
+              value: {
+                percentageValue: -percentage,
+              },
+              validityPeriod: {
+                start: starts,
+                end: ends,
+              },
+              combinesWith: {
+                productDiscounts: true,
+              },
+            },
+          };
+        else if (percentage)
           variables = {
             id,
             priceRule: {
@@ -365,7 +381,7 @@ export class ShopifyService {
         priceRuleId: priceRuleId,
       };
     } catch (err) {
-      console.log('err', err);
+      console.log('err', JSON.stringify(err));
     }
   }
 
