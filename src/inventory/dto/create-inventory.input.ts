@@ -86,4 +86,7 @@ export class CreateInventoryInput {
 
   @Field({ defaultValue: 0 })
   purchaseCount: number;
+
+  @Field({ defaultValue: 0 })
+  secondaryCount: number;
 }

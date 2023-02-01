@@ -111,4 +111,7 @@ export default class Inventory extends DefaultColumnsService {
 
   @Column({ default: 0 })
   purchaseCount: number;
+
+  @Column({ default: 1 })
+  secondaryCount: number;
 }

@@ -81,6 +81,9 @@ export class Inventory {
   productsCount?: number;
 
   @Field()
+  secondaryCount?: number;
+
+  @Field()
   displayName?: string;
 
   @Field()

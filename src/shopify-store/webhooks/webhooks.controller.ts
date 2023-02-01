@@ -56,6 +56,7 @@ import { v4 as uuid } from 'uuid';
 import { ProductOutofstockEvent } from 'src/inventory/events/product-outofstock.event';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
 import { DiscountCodeInput } from 'src/groupshops/dto/create-groupshops.input';
+import { generatesecondaryCount } from 'src/utils/functions';
 @Public()
 @Controller('webhooks')
 export class WebhooksController {
@@ -450,6 +451,7 @@ export class WebhooksController {
       nprod.createdAt = new Date();
       nprod.outofstock = false;
       nprod.purchaseCount = 0;
+      // nprod.secondaryCount = generatesecondaryCount();
       // nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
       nprod.description = rproduct.body_html;
       // if product is not active then it will be not purchaseable.
@@ -569,6 +571,7 @@ export class WebhooksController {
       nprod.featuredImage = rproduct?.image?.src;
       // nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
       nprod.description = rproduct.body_html;
+      // nprod.secondaryCount = generatesecondaryCount();
       // let qDifference: number;
       // const isAvailable = rproduct.variants.some(
       //   (item) => item.inventory_quantity > 0,
@@ -1022,6 +1025,18 @@ export class WebhooksController {
                 //   'webhooks.controller.ts line:961 inventoryArray',
                 //   JSON.stringify(productsArray, null, '\t'),
                 // );
+
+                const blukWrite = productsArray.map((item) => {
+                  return {
+                    updateOne: {
+                      filter: { id: item.id },
+                      update: {
+                        $set: { secondaryCount: generatesecondaryCount() },
+                      },
+                    },
+                  };
+                });
+                await this.inventryService.setPurchaseCount(blukWrite);
                 /* 4. loop to the products 
                     5. add collection to products 
       */

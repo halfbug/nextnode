@@ -152,6 +152,10 @@ export class Product {
 
   @Field({ nullable: true })
   purchaseCount?: number;
+
+  @Field({ defaultValue: 1 })
+  secondaryCount?: number;
+
   @Field({ nullable: true })
   status?: string;
 }
