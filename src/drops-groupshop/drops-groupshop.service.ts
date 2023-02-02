@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateDropsGroupshopInput } from './dto/create-drops-groupshop.input';
 import { UpdateDropsGroupshopInput } from './dto/update-drops-groupshop.input';
 import { v4 as uuid } from 'uuid';
@@ -7,12 +7,14 @@ import { getMongoManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MilestoneInput } from 'src/groupshops/dto/create-groupshops.input';
 import { StoresService } from 'src/stores/stores.service';
+import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 
 @Injectable()
 export class DropsGroupshopService {
   constructor(
     @InjectRepository(DropsGroupshop)
     private DropsGroupshopRepository: Repository<DropsGroupshop>,
+    @Inject(forwardRef(() => StoresService))
     private storesService: StoresService,
   ) {}
 
@@ -433,6 +435,77 @@ export class DropsGroupshopService {
         $match: {
           'customerDetail.klaviyoId': klaviyoId,
           status: 'pending',
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const result = await manager.aggregate(DropsGroupshop, agg).toArray();
+    return result;
+  }
+
+  async getActiveDrops(storeId: string) {
+    const agg = [
+      {
+        $match: {
+          storeId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'lifecycle',
+          let: {
+            gid: '$id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ['$groupshopId', '$$gid'],
+                    },
+                    {
+                      $eq: ['$event', EventType.revised],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'revisedList',
+        },
+      },
+      {
+        $addFields: {
+          arrayLength: {
+            $size: '$revisedList',
+          },
+        },
+      },
+      {
+        $addFields: {
+          isFullyExpired: {
+            $cond: {
+              if: {
+                $and: [
+                  {
+                    $lt: ['$expiredAt', new Date()],
+                  },
+                  {
+                    $eq: ['$arrayLength', 1],
+                  },
+                ],
+              },
+              then: true,
+              else: false,
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          discountCode: 1,
+          isFullyExpired: 1,
         },
       },
     ];

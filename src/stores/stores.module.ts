@@ -24,6 +24,7 @@ import { PartnersModule } from 'src/partners/partners.module';
 import { RetentiontoolsModule } from 'src/retentiontools/retentiontools.module';
 import { StoreUpdatePlanCron } from './store.cron';
 import { StoreUpdateTierCron } from './storeTier.cron';
+import { DropsGroupshopModule } from 'src/drops-groupshop/drops-groupshop.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { StoreUpdateTierCron } from './storeTier.cron';
     forwardRef(() => ShopifyStoreModule),
     forwardRef(() => InventoryModule),
     forwardRef(() => CampaignsModule),
+    forwardRef(() => DropsGroupshopModule),
     forwardRef(() => RetentiontoolsModule),
     GroupshopsModule,
     PartnersModule,

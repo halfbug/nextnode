@@ -215,6 +215,7 @@ export class ShopifyService {
     starts?: Date,
     ends?: Date,
     id?: string,
+    isCollection?: boolean,
   ) {
     // if (percentage) {
     console.log({ title });
@@ -259,7 +260,7 @@ export class ShopifyService {
                   percentageValue: -percentage,
                 },
                 itemEntitlements: {
-                  productIds: products,
+                  [isCollection ? 'collectionIds' : 'productIds']: products,
                 },
                 combinesWith: {
                   productDiscounts: true,
@@ -313,7 +314,7 @@ export class ShopifyService {
             id,
             priceRule: {
               itemEntitlements: {
-                productIds: products,
+                [isCollection ? 'collectionIds' : 'productIds']: products,
               },
               combinesWith: {
                 productDiscounts: true,

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getMongoManager, Like, Repository } from 'typeorm';
 import { CreateStoreInput } from './dto/create-store.input';
@@ -9,12 +9,15 @@ import { Resource } from './entities/store.entity';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { Product } from 'src/inventory/entities/product.entity';
+import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
 
 @Injectable()
 export class StoresService {
   constructor(
     @InjectRepository(Store) private storeRepository: Repository<Store>,
     private shopifyapi: ShopifyService,
+    @Inject(forwardRef(() => DropsGroupshopService))
+    private dropsService: DropsGroupshopService,
     private inventoryService: InventoryService,
   ) {}
 
@@ -154,6 +157,38 @@ export class StoresService {
       }
     } else if (updateStoreInput?.drops) {
       const oldStoreData = await this.findById(id);
+
+      if (
+        updateStoreInput.drops?.allProductsCollectionId !==
+          oldStoreData.drops?.allProductsCollectionId ||
+        updateStoreInput.drops?.latestCollectionId !==
+          oldStoreData.drops?.latestCollectionId ||
+        updateStoreInput.drops?.bestSellerCollectionId !==
+          oldStoreData.drops?.bestSellerCollectionId
+      ) {
+        const dropsGroupshops = await this.dropsService.getActiveDrops(id);
+        dropsGroupshops
+          .filter((dg) => dg.isFullyExpired === false)
+          .forEach(async (dg) => {
+            await this.shopifyapi.setDiscountCode(
+              oldStoreData.shop,
+              'Update',
+              oldStoreData.accessToken,
+              dg.discountCode.title,
+              null,
+              [
+                updateStoreInput.drops.allProductsCollectionId,
+                updateStoreInput.drops.latestCollectionId,
+                updateStoreInput.drops.bestSellerCollectionId,
+              ],
+              null,
+              null,
+              dg.discountCode.priceRuleId,
+              true,
+            );
+          });
+      }
+
       if (
         !oldStoreData?.drops?.spotlightDiscount?.percentage &&
         updateStoreInput?.drops?.spotlightDiscount?.percentage

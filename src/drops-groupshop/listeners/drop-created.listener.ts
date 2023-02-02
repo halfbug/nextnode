@@ -92,14 +92,14 @@ export class DropCreatedListener {
             discountTitle,
             parseInt(baseline, 10),
             [
-              ...new Set([
-                ...(dropsProducts?.length > 100
-                  ? dropsProducts.slice(0, 100).map((p: Product) => p.id)
-                  : dropsProducts?.map((p: Product) => p.id) ?? []),
-              ]),
+              bestSellerCollectionId,
+              latestCollectionId,
+              allProductsCollectionId,
             ],
             new Date(),
             null,
+            null,
+            true,
           );
           dgroupshop.discountCode = discountCode;
 
@@ -199,15 +199,11 @@ export class DropCreatedListener {
         accessToken,
         discountTitle,
         parseInt(baseline, 10),
-        [
-          ...new Set([
-            ...(dropsProducts?.length > 100
-              ? dropsProducts.slice(0, 100).map((p: Product) => p.id)
-              : dropsProducts?.map((p: Product) => p.id) ?? []),
-          ]),
-        ],
+        [bestSellerCollectionId, latestCollectionId, allProductsCollectionId],
         new Date(),
         null,
+        null,
+        true,
       );
       dgroupshop.discountCode = discountCode;
 

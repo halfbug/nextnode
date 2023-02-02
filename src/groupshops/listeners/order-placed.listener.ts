@@ -510,12 +510,11 @@ export class OrderPlacedListener {
                 accessToken,
                 title,
                 parseInt(newDiscount),
-                dropsProducts?.length > 100
-                  ? dropsProducts.slice(0, 100).map((p: Product) => p.id)
-                  : dropsProducts?.map((p: Product) => p.id) ?? [],
+                null,
                 createdAt,
                 dgroupshop.expiredAt,
                 priceRuleId,
+                true,
               );
               // update milestone
               const gsMilestone = new MilestoneInput();
