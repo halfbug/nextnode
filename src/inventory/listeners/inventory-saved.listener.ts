@@ -50,6 +50,7 @@ export class InventorySavedListener {
         };
       });
 
+      await this.inventoryService.getRandomPurchaseCount(StoreProducts);
       await this.inventoryService.setPurchaseCount(blukWrite);
       console.log('Product out of stock updated...');
       this.inventoryDoneEvent.shop = event.shop;

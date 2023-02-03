@@ -1020,23 +1020,14 @@ export class WebhooksController {
               const url = poll.body['data']['currentBulkOperation'].url;
               this.httpService.get(url).subscribe(async (res) => {
                 const productsArray = readJsonLines(res.data);
+                await this.inventryService.getRandomPurchaseCount(
+                  productsArray,
+                );
                 // console.log(
                 //   '\x1b[44m%s\x1b[0m',
                 //   'webhooks.controller.ts line:961 inventoryArray',
                 //   JSON.stringify(productsArray, null, '\t'),
                 // );
-
-                const blukWrite = productsArray.map((item) => {
-                  return {
-                    updateOne: {
-                      filter: { id: item.id },
-                      update: {
-                        $set: { secondaryCount: generatesecondaryCount() },
-                      },
-                    },
-                  };
-                });
-                await this.inventryService.setPurchaseCount(blukWrite);
                 /* 4. loop to the products 
                     5. add collection to products 
       */

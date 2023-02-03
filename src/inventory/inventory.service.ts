@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { generatesecondaryCount } from 'src/utils/functions';
 import { getMongoManager, Repository } from 'typeorm';
 import { CreateInventoryInput } from './dto/create-inventory.input';
 import { ProductQueryInput } from './dto/product-query.input';
@@ -689,6 +690,20 @@ export class InventoryService {
     // console.log('🚀 ~ file: InventoryService ~ findAllProducts ~ res', res);
     return res;
     // return await manager.aggregate(Inventory, agg).toArray();
+  }
+
+  async getRandomPurchaseCount(productsArray) {
+    const blukWrite = productsArray.map((item) => {
+      return {
+        updateOne: {
+          filter: { id: item.id },
+          update: {
+            $set: { secondaryCount: generatesecondaryCount() },
+          },
+        },
+      };
+    });
+    await this.setPurchaseCount(blukWrite);
   }
 
   calculateOutOfStock(variants: ProductVariant[]) {
