@@ -34,7 +34,7 @@ export class DropsGroupshopResolver {
     return this.dropsGroupshopService.create(createDropsGroupshopInput);
   }
 
-  @Query(() => [DropsGroupshop], { name: 'dropsGroupshop' })
+  @Query(() => [DropsGroupshop], { name: 'dropsGroupshops' })
   findAll() {
     return this.dropsGroupshopService.findAll();
   }

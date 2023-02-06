@@ -80,4 +80,10 @@ export class DropsGroupshop {
 
   @Field({ nullable: true, defaultValue: 0 })
   revisedCount?: number;
+
+  @Field({ nullable: true, defaultValue: 0 })
+  status?: string;
+
+  @Field({ nullable: true })
+  createdAt?: Date;
 }
