@@ -902,8 +902,16 @@ async function init() {
           clearInterval(pollit3);
           const { activeMember: mem, url, percentage, members } = res;
 
+          console.log('Shopify.checkout.discount', Shopify.checkout.discount);
+
+          console.log(
+            'Shopify.checkout.discount.amount',
+            Shopify.checkout.discount.amount,
+          );
+
           let cashback =
-            Shopify.checkout.subtotal_price *
+            (parseFloat(Shopify.checkout.subtotal_price) +
+              parseFloat(Shopify.checkout.discount.amount)) *
             (parseFloat(`${store.dropsLastMilestone}%`) / 100 -
               mem.availedDiscount / 100);
 
