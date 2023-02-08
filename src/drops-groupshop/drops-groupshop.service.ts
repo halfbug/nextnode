@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MilestoneInput } from 'src/groupshops/dto/create-groupshops.input';
 import { StoresService } from 'src/stores/stores.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
+import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 
 @Injectable()
 export class DropsGroupshopService {
@@ -16,6 +17,7 @@ export class DropsGroupshopService {
     private DropsGroupshopRepository: Repository<DropsGroupshop>,
     @Inject(forwardRef(() => StoresService))
     private storesService: StoresService,
+    private shopifyService: ShopifyService,
   ) {}
 
   async create(createDropsGroupshopInput: CreateDropsGroupshopInput) {
@@ -59,6 +61,34 @@ export class DropsGroupshopService {
 
   findAll() {
     return this.DropsGroupshopRepository.find();
+  }
+
+  async createDropDiscountCode(gs) {
+    // console.log('createDropDiscountCode ', gs);
+    const {
+      shop,
+      accessToken,
+      drops: {
+        rewards: { baseline },
+        bestSellerCollectionId,
+        latestCollectionId,
+        allProductsCollectionId,
+      },
+    } = await this.storesService.findById(gs.storeId);
+    const discountTitle = gs?.discountCode.title;
+    const discountCode = await this.shopifyService.setDiscountCode(
+      shop,
+      'Create',
+      accessToken,
+      discountTitle,
+      parseInt(baseline, 10),
+      [bestSellerCollectionId, latestCollectionId, allProductsCollectionId],
+      new Date(),
+      null,
+      null,
+      true,
+    );
+    return discountCode;
   }
 
   async findDropGroupshopByCode(discountCode: string) {
@@ -406,6 +436,33 @@ export class DropsGroupshopService {
             },
           ],
         },
+      },
+    ];
+    const manager = getMongoManager();
+    const result = await manager.aggregate(DropsGroupshop, agg).toArray();
+    return result;
+  }
+
+  async findMissingDropShortLinks() {
+    const agg = [
+      {
+        $match: {
+          $or: [
+            {
+              shortUrl: {
+                $regex: 'https://app.groupshop.co',
+              },
+            },
+            {
+              expiredShortUrl: {
+                $regex: 'https://app.groupshop.co',
+              },
+            },
+          ],
+        },
+      },
+      {
+        $limit: 10,
       },
     ];
     const manager = getMongoManager();

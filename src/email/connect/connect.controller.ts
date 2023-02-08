@@ -24,6 +24,7 @@ import { OrdersReceivedEvent } from 'src/shopify-store/events/orders-received.ev
 import { StoresService } from 'src/stores/stores.service';
 import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
 import { DropCreatedEvent } from 'src/drops-groupshop/events/drop-created.event';
+import { Cron, CronExpression } from '@nestjs/schedule';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import * as getSymbolFromCurrency from 'currency-symbol-map';
@@ -454,9 +455,10 @@ export class CatController {
     }
   }
 
+  // Drop static function for stage testing
   @Get('drop-cron')
   async dropCron(@Req() req, @Res() res) {
-    const listId = 'X6cEzP';
+    const listId = 'XHxSUT'; // Drop Development Stage Team
     const shop = 'native-root-stage.myshopify.com';
     let lastWeek: any = '';
     let counter = 0;
@@ -529,6 +531,41 @@ export class CatController {
         }
       });
     } while (nextPage !== '');
+    res.status(200).send('Success');
+  }
+
+  @Cron('*/10 * * * * FRI') // CronExpression.EVERY_WEEK)
+  @Get('update-shortlink')
+  async updateShortLink(@Req() req, @Res() res) {
+    const dropGroupshops =
+      await this.dropsGroupshopService.findMissingDropShortLinks();
+    console.log('dropGroupshops', JSON.stringify(dropGroupshops));
+    if (dropGroupshops.length > 0) {
+      dropGroupshops.forEach(async (profile, index) => {
+        const klaviyoId = profile.customerDetail.klaviyoId;
+        let shortUrl = profile.shortUrl;
+        let expiredShortUrl = profile.expiredShortUrl;
+        if (shortUrl.includes('app.groupshop.co')) {
+          shortUrl = await this.kalavioService.generateShortLink(shortUrl);
+          console.log('shortUrl ', shortUrl);
+          profile.shortUrl = shortUrl;
+        }
+        if (expiredShortUrl.includes('app.groupshop.co')) {
+          expiredShortUrl = await this.kalavioService.generateShortLink(
+            expiredShortUrl,
+          );
+          console.log('expiredShortUrl ', expiredShortUrl);
+          profile.expiredShortUrl = expiredShortUrl;
+        }
+        await this.dropsGroupshopService.update(profile.id, profile);
+        const params = new URLSearchParams({
+          groupshop_url: shortUrl,
+          reactivate_groupshop: expiredShortUrl,
+        });
+        const data = params.toString();
+        await this.kalavioService.klaviyoProfileUpdate(klaviyoId, data);
+      });
+    }
     res.status(200).send('Success');
   }
 }

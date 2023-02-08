@@ -103,6 +103,7 @@ export class DropsGroupshopResolver {
   ) {
     let rCount = undefined;
     const Dcode = await this.crypt.decrypt(code);
+    console.log('DcodeDcodeDcode', Dcode);
     const groupshop = await this.dropsGroupshopService.findDropsGS(Dcode);
     const res = await this.lifecyclesrv.findAllEvents(
       groupshop.id,
