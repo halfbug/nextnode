@@ -188,7 +188,7 @@ export class OrderPlacedListener {
     }
   }
 
-  calculateRefund(member: any, milestone: number) {
+  calculateRefund(member: any, milestone: number, service: string) {
     const netDiscount = milestone * 100 - member.availedDiscount;
     // 100 -
 
@@ -225,7 +225,9 @@ export class OrderPlacedListener {
     cashBackEvent.store = this.store;
     console.log('.......cashback..........');
     this.eventEmitter.emit('cashback.generated', cashBackEvent);
-    this.eventEmitter.emit('cashbackEmail.generated', cashBackEvent);
+    if (service === 'groupshop') {
+      this.eventEmitter.emit('cashbackEmail.generated', cashBackEvent);
+    }
 
     const refund = new RefundInput(
       RefundStatusEnum.panding,
@@ -246,11 +248,11 @@ export class OrderPlacedListener {
     const currentMilestone = parseFloat(discountCode.percentage) / 100;
     return members.map((member) => {
       if (totalMembers === 6 && member.role === RoleTypeEnum.owner) {
-        member = this.calculateRefund(member, 50 / 100);
+        member = this.calculateRefund(member, 50 / 100, 'groupshop');
       } else if (totalMembers === 10 && member.role === RoleTypeEnum.owner) {
-        member = this.calculateRefund(member, 90 / 100);
+        member = this.calculateRefund(member, 90 / 100, 'groupshop');
       } else if (member.availedDiscount / 100 < currentMilestone) {
-        member = this.calculateRefund(member, currentMilestone);
+        member = this.calculateRefund(member, currentMilestone, 'groupshop');
       }
 
       return member;
@@ -268,7 +270,7 @@ export class OrderPlacedListener {
     );
     return members.map((member) => {
       if (member.availedDiscount < currentMilestone) {
-        member = this.calculateRefund(member, currentMilestone / 100);
+        member = this.calculateRefund(member, currentMilestone / 100, 'drops');
       }
 
       return member;
