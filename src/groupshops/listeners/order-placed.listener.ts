@@ -227,6 +227,8 @@ export class OrderPlacedListener {
     this.eventEmitter.emit('cashback.generated', cashBackEvent);
     if (service === 'groupshop') {
       this.eventEmitter.emit('cashbackEmail.generated', cashBackEvent);
+    } else if (service === 'drops') {
+      this.eventEmitter.emit('cashbackDropEmail.generated', cashBackEvent);
     }
 
     const refund = new RefundInput(
