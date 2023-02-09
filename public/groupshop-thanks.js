@@ -662,8 +662,7 @@ function addLeftBlock(logo) {
             </div>
         </div>
         <div class="cashback_mobile">
-            <span>Get up to <strong>$64 cashback</strong> 
-            on your order & unlock exclusive rewards.</span>
+        <div class="image-placeholder" style="height: 50px !important;align-self: left;width: 100% !important;">&nbsp;</div>
         </div>
         <div class="slider">
         <div class="glider-contain">
