@@ -65,6 +65,15 @@ export class Drops {
   bestSellerCollectionId?: string;
 
   @Column({ nullable: true })
+  runningOutCollectionId?: string;
+
+  @Column({ nullable: true })
+  skincareCollectionId?: string;
+
+  @Column({ nullable: true })
+  hairCollectionId?: string;
+
+  @Column({ nullable: true })
   allProductsCollectionId?: string;
 
   @Column({ nullable: true })

@@ -145,6 +145,15 @@ export class DropsInput {
   bestSellerCollectionId?: string;
 
   @Field({ nullable: true })
+  runningOutCollectionId?: string;
+
+  @Field({ nullable: true })
+  skincareCollectionId?: string;
+
+  @Field({ nullable: true })
+  hairCollectionId?: string;
+
+  @Field({ nullable: true })
   allProductsCollectionId?: string;
 
   @Field({ nullable: true })

@@ -1579,4 +1579,58 @@ export class WebhooksController {
       res.status(HttpStatus.OK).send();
     }
   }
+
+  @Post('update-drops-discount-codes-collections')
+  async updateDropsDiscountCodesCollections(@Req() req, @Res() res) {
+    try {
+      const { shop } = req.query;
+
+      const {
+        id,
+        accessToken,
+        drops: {
+          latestCollectionId,
+          bestSellerCollectionId,
+          allProductsCollectionId,
+          runningOutCollectionId,
+          skincareCollectionId,
+          hairCollectionId,
+        },
+      } = await this.storesService.findOne(shop);
+
+      const dropsGroupshops = await this.dropsGroupshopService.getActiveDrops(
+        id,
+      );
+      dropsGroupshops
+        .filter((dg) => dg.isFullyExpired === false)
+        .forEach(async (dg) => {
+          await this.shopifyService.setDiscountCode(
+            shop,
+            'Update',
+            accessToken,
+            dg.discountCode.title,
+            null,
+            [
+              ...new Set([
+                latestCollectionId,
+                bestSellerCollectionId,
+                allProductsCollectionId,
+                runningOutCollectionId,
+                skincareCollectionId,
+                hairCollectionId,
+              ]),
+            ],
+            null,
+            null,
+            dg.discountCode.priceRuleId,
+            true,
+          );
+        });
+    } catch (err) {
+      console.log(JSON.stringify(err));
+      Logger.error(err, 'update-drops-discount-codes-collections');
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
 }

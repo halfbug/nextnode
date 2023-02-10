@@ -177,9 +177,14 @@ export class StoresService {
               dg.discountCode.title,
               null,
               [
-                updateStoreInput.drops.allProductsCollectionId,
-                updateStoreInput.drops.latestCollectionId,
-                updateStoreInput.drops.bestSellerCollectionId,
+                ...new Set([
+                  updateStoreInput.drops.allProductsCollectionId,
+                  updateStoreInput.drops.latestCollectionId,
+                  updateStoreInput.drops.bestSellerCollectionId,
+                  oldStoreData?.drops?.runningOutCollectionId, // added now for working purpose in future it'll be handle parfectly
+                  oldStoreData?.drops?.skincareCollectionId,
+                  oldStoreData?.drops?.hairCollectionId,
+                ]),
               ],
               null,
               null,

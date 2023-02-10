@@ -61,6 +61,15 @@ export class DropsGroupshop {
   bestSellerProducts?: Product[];
 
   @Field(() => [Product])
+  runningOutProducts?: Product[];
+
+  @Field(() => [Product])
+  skincareProducts?: Product[];
+
+  @Field(() => [Product])
+  hairProducts?: Product[];
+
+  @Field(() => [Product])
   spotlightProducts?: Product[];
 
   @Field(() => [Product])

@@ -73,6 +73,9 @@ export class DropsGroupshopService {
         bestSellerCollectionId,
         latestCollectionId,
         allProductsCollectionId,
+        runningOutCollectionId,
+        skincareCollectionId,
+        hairCollectionId,
       },
     } = await this.storesService.findById(gs.storeId);
     const discountTitle = gs?.discountCode.title;
@@ -82,7 +85,16 @@ export class DropsGroupshopService {
       accessToken,
       discountTitle,
       parseInt(baseline, 10),
-      [bestSellerCollectionId, latestCollectionId, allProductsCollectionId],
+      [
+        ...new Set([
+          bestSellerCollectionId,
+          latestCollectionId,
+          allProductsCollectionId,
+          runningOutCollectionId,
+          skincareCollectionId,
+          hairCollectionId,
+        ]),
+      ],
       new Date(),
       null,
       null,
@@ -189,6 +201,114 @@ export class DropsGroupshopService {
       //     },
       //   },
       // },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'store.drops.runningOutCollectionId',
+          foreignField: 'id',
+          as: 'runningOutCollection',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'runningOutCollection.parentId',
+          foreignField: 'id',
+          as: 'runningOutProducts',
+        },
+      },
+      {
+        $addFields: {
+          runningOutProducts: {
+            $filter: {
+              input: '$runningOutProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $ne: ['$$j.publishedAt', null],
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'store.drops.skincareCollectionId',
+          foreignField: 'id',
+          as: 'skincareCollection',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'skincareCollection.parentId',
+          foreignField: 'id',
+          as: 'skincareProducts',
+        },
+      },
+      {
+        $addFields: {
+          skincareProducts: {
+            $filter: {
+              input: '$skincareProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $ne: ['$$j.publishedAt', null],
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'store.drops.hairCollectionId',
+          foreignField: 'id',
+          as: 'hairCollection',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'hairCollection.parentId',
+          foreignField: 'id',
+          as: 'hairProducts',
+        },
+      },
+      {
+        $addFields: {
+          hairProducts: {
+            $filter: {
+              input: '$hairProducts',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $ne: ['$$j.publishedAt', null],
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
       {
         $lookup: {
           from: 'inventory',
@@ -383,6 +503,9 @@ export class DropsGroupshopService {
           ownerProducts: 1,
           isActive: 1,
           partnerCommission: 1,
+          runningOutProducts: 1,
+          skincareProducts: 1,
+          hairProducts: 1,
         },
       },
     ];
