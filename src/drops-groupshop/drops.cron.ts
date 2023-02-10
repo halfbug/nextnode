@@ -9,7 +9,7 @@ export class DropKlaviyoCron {
   constructor(
     private kalavioService: KalavioService,
     private dropsGroupshopService: DropsGroupshopService,
-    private configSevice: ConfigService,
+    private configService: ConfigService,
     private dropCreatedListener: DropCreatedListener,
   ) {}
 
@@ -45,9 +45,9 @@ export class DropKlaviyoCron {
 
   @Cron('0 05 * * FRI') // CronExpression.EVERY_WEEK)
   async WeeklyDropCreation(@Req() req, @Res() res) {
-    if (this.configSevice.get('ENV') === 'production') {
-      const listId = 'RFgiJh'; // Production drop list ID
-      const shop = 'groupshopdrops.myshopify.com';
+    if (this.configService.get('ENV') === 'production') {
+      const listId = this.configService.get('DROPLISTID');
+      const shop = this.configService.get('DROPSHOP');
       let lastWeek: any = '';
       let counter = 0;
       let updatedCounter = 0;

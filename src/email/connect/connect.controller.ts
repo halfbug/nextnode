@@ -461,8 +461,8 @@ export class CatController {
   // Drop static function for stage testing
   @Get('drop-cron')
   async dropCron(@Req() req, @Res() res) {
-    const listId = 'XHxSUT'; // Drop Development Stage Team
-    const shop = 'native-root-stage.myshopify.com';
+    const listId = this.configService.get('DROPLISTID');
+    const shop = this.configService.get('DROPSHOP');
     let lastWeek: any = '';
     let counter = 0;
     let updatedCounter = 0;
@@ -502,13 +502,6 @@ export class CatController {
           console.log('Drop recently created ', klaviyoId);
         } else {
           updatedCounter = updatedCounter + 1;
-          const dropGroupshops =
-            await this.dropsGroupshopService.getGroupshopByKlaviyoId(klaviyoId);
-          // Update status in database of old pending drop groupshop
-          dropGroupshops.map(async (dgroupshop) => {
-            dgroupshop.status = 'expired';
-            await this.dropsGroupshopService.update(dgroupshop.id, dgroupshop);
-          });
           const webdata = {
             id: klaviyoId,
             first_name: profile?.attributes?.first_name,
@@ -522,7 +515,7 @@ export class CatController {
           await this.dropCreatedListener.addCronDrop(inputListener);
         }
         // eslint-disable-next-line prettier/prettier
-         if (nextPage === '' && arrayLength === (index + 1)) {
+       if (nextPage === '' && arrayLength === (index + 1)) {
           console.log(
             `Weekly Drop Cron completed ${updatedCounter}/${counter} at ${new Date()} `,
           );
