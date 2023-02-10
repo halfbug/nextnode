@@ -33,10 +33,12 @@ import { UploadImageService } from 'src/shopify-store/ImageUpload/uploadimage.se
 import { CampaignsService } from 'src/campaigns/campaigns.service';
 import { Public } from 'src/auth/public.decorator';
 import { DropCreatedListener } from 'src/drops-groupshop/listeners/drop-created.listener';
+import { UpdateDropsGroupshopInput } from 'src/drops-groupshop/dto/update-drops-groupshop.input';
+import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 @Public()
 @Controller('connect')
 export class CatController {
-  [x: string]: any;
+  // [x: string]: any;
   constructor(
     private configService: ConfigService,
     private eventEmitter: EventEmitter2,
@@ -52,6 +54,7 @@ export class CatController {
     private dropsGroupshopService: DropsGroupshopService,
     private dropCreatedEvent: DropCreatedEvent,
     private dropCreatedListener: DropCreatedListener,
+    private readonly crypt: EncryptDecryptService,
   ) {}
   @Get('/')
   async test() {
@@ -567,5 +570,95 @@ export class CatController {
       });
     }
     res.status(200).send('Success');
+  }
+
+  @Get('setdiscountcode?')
+  async setdiscountcode(@Query('shop') shop: any, @Query('url') url: any) {
+    try {
+      let dgroupshop = new UpdateDropsGroupshopInput();
+      const discountTitle = await this.crypt.decrypt(url.split('/')[3]);
+      dgroupshop = await this.dropsGroupshopService.findOneByURL(url);
+      const {
+        id,
+        accessToken,
+        drops: {
+          rewards: { baseline },
+          bestSellerCollectionId,
+          latestCollectionId,
+          allProductsCollectionId,
+        },
+      } = await this.storesService.findOne(shop);
+      const discountCode = await this.shopifyService.setDiscountCode(
+        shop,
+        'Create',
+        accessToken,
+        discountTitle,
+        parseInt(baseline, 10),
+        [bestSellerCollectionId, latestCollectionId, allProductsCollectionId],
+        new Date(),
+        null,
+        null,
+        true,
+      );
+      dgroupshop.discountCode = discountCode;
+      await this.dropsGroupshopService.update(dgroupshop.id, dgroupshop);
+      return discountCode;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  @Get('updateAllDiscounts')
+  async updateAllDiscounts() {
+    console.log(`Update all discount`);
+    const allDrops = await this.dropsGroupshopService.findAllNullDiscounts();
+
+    allDrops.forEach(async ({ url, storeId }) => {
+      console.log(
+        '🚀 ~ file: connect.controller.ts:619 ~ CatController ~ allDrops.forEach ~ url',
+        url,
+      );
+      try {
+        let dgroupshop = new UpdateDropsGroupshopInput();
+        const discountTitle = await this.crypt.decrypt(url.split('/')[3]);
+        dgroupshop = await this.dropsGroupshopService.findOneByURL(url);
+        const {
+          id,
+          accessToken,
+          shop,
+          drops: {
+            rewards: { baseline },
+            bestSellerCollectionId,
+            latestCollectionId,
+            allProductsCollectionId,
+          },
+        } = await this.storesService.findById(storeId);
+        setTimeout(() => console.log('discount going to execute'), 8000);
+        // await new Promise(() =>
+        //   setTimeout(() => console.log('discount going to execute'), 5000),
+        // );
+        const discountCode = await this.shopifyService.setDiscountCode(
+          shop,
+          'Create',
+          accessToken,
+          discountTitle,
+          parseInt(baseline, 10),
+          [bestSellerCollectionId, latestCollectionId, allProductsCollectionId],
+          new Date(),
+          null,
+          null,
+          true,
+        );
+        dgroupshop.discountCode = discountCode;
+        console.log(
+          '🚀 ~ file: connect.controller.ts:607 ~ CatController ~ allDrops.forEach ~ discountCode',
+          discountCode,
+        );
+        await this.dropsGroupshopService.update(dgroupshop.id, dgroupshop);
+        return discountCode;
+      } catch (err) {
+        console.log(err);
+      }
+    });
   }
 }

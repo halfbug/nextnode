@@ -91,6 +91,12 @@ export class DropsGroupshopService {
     return discountCode;
   }
 
+  findAllNullDiscounts() {
+    return this.DropsGroupshopRepository.find({
+      where: { 'discountCode.title': null },
+    });
+  }
+
   async findDropGroupshopByCode(discountCode: string) {
     const agg = [
       {
@@ -400,6 +406,14 @@ export class DropsGroupshopService {
     return this.DropsGroupshopRepository.findOne({
       where: {
         id,
+      },
+    });
+  }
+
+  findOneByURL(url: string) {
+    return this.DropsGroupshopRepository.findOne({
+      where: {
+        url,
       },
     });
   }

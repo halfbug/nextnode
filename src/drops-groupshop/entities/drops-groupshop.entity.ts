@@ -39,7 +39,7 @@ export class DropsGroupshop {
   @Field(() => Int, { defaultValue: 0 })
   totalProducts: number;
 
-  @Field(() => DiscountCode)
+  @Field(() => DiscountCode, { nullable: true })
   discountCode: DiscountCode;
 
   @Field(() => DropCustomer)
