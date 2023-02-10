@@ -13,6 +13,8 @@ export class DropCustomer {
   @Column({ nullable: true })
   klaviyoId: string;
   @Column({ nullable: true })
+  fullName: string;
+  @Column({ nullable: true })
   firstName: string;
   @Column({ nullable: true })
   lastName: string;

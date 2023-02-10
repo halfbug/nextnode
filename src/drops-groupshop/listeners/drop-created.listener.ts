@@ -103,6 +103,7 @@ export class DropCreatedListener {
 
           const dropCustomer = new DropCustomerInput();
           dropCustomer.klaviyoId = webdata.id;
+          dropCustomer.fullName = webdata.full_name;
           dropCustomer.firstName = webdata.first_name;
           dropCustomer.lastName = webdata.last_name;
           dropCustomer.email = webdata.email;
@@ -186,6 +187,7 @@ export class DropCreatedListener {
 
         const dropCustomer = new DropCustomerInput();
         dropCustomer.klaviyoId = webdata.id;
+        dropCustomer.fullName = webdata.full_name;
         dropCustomer.firstName = webdata.first_name;
         dropCustomer.lastName = webdata.last_name;
         dropCustomer.email = webdata.email;

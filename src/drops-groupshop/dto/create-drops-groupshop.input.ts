@@ -11,6 +11,8 @@ export class DropCustomerInput {
   @Field({ nullable: true })
   klaviyoId: string;
   @Field({ nullable: true })
+  fullName: string;
+  @Field({ nullable: true })
   firstName: string;
   @Field({ nullable: true })
   lastName: string;
