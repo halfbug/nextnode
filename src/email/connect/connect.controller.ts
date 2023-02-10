@@ -540,36 +540,37 @@ export class CatController {
   @Cron('*/10 * * * * FRI') // CronExpression.EVERY_WEEK)
   @Get('update-shortlink')
   async updateShortLink(@Req() req, @Res() res) {
-    const dropGroupshops =
-      await this.dropsGroupshopService.findMissingDropShortLinks();
-    console.log('dropGroupshops', JSON.stringify(dropGroupshops));
-    if (dropGroupshops.length > 0) {
-      dropGroupshops.forEach(async (profile, index) => {
-        const klaviyoId = profile.customerDetail.klaviyoId;
-        let shortUrl = profile.shortUrl;
-        let expiredShortUrl = profile.expiredShortUrl;
-        if (shortUrl.includes('app.groupshop.co')) {
-          shortUrl = await this.kalavioService.generateShortLink(shortUrl);
-          console.log('shortUrl ', shortUrl);
-          profile.shortUrl = shortUrl;
-        }
-        if (expiredShortUrl.includes('app.groupshop.co')) {
-          expiredShortUrl = await this.kalavioService.generateShortLink(
-            expiredShortUrl,
-          );
-          console.log('expiredShortUrl ', expiredShortUrl);
-          profile.expiredShortUrl = expiredShortUrl;
-        }
-        await this.dropsGroupshopService.update(profile.id, profile);
-        const params = new URLSearchParams({
-          groupshop_url: shortUrl,
-          reactivate_groupshop: expiredShortUrl,
+    if (this.configService.get('ENV') === 'production') {
+      const dropGroupshops =
+        await this.dropsGroupshopService.findMissingDropShortLinks();
+      console.log('dropGroupshops', JSON.stringify(dropGroupshops));
+      if (dropGroupshops.length > 0) {
+        dropGroupshops.forEach(async (profile, index) => {
+          const klaviyoId = profile.customerDetail.klaviyoId;
+          let shortUrl = profile.shortUrl;
+          let expiredShortUrl = profile.expiredShortUrl;
+          if (shortUrl.includes('app.groupshop.co')) {
+            shortUrl = await this.kalavioService.generateShortLink(shortUrl);
+            console.log('shortUrl ', shortUrl);
+            profile.shortUrl = shortUrl;
+          }
+          if (expiredShortUrl.includes('app.groupshop.co')) {
+            expiredShortUrl = await this.kalavioService.generateShortLink(
+              expiredShortUrl,
+            );
+            console.log('expiredShortUrl ', expiredShortUrl);
+            profile.expiredShortUrl = expiredShortUrl;
+          }
+          await this.dropsGroupshopService.update(profile.id, profile);
+          const params = new URLSearchParams({
+            groupshop_url: shortUrl,
+            reactivate_groupshop: expiredShortUrl,
+          });
+          const data = params.toString();
+          await this.kalavioService.klaviyoProfileUpdate(klaviyoId, data);
         });
-        const data = params.toString();
-        await this.kalavioService.klaviyoProfileUpdate(klaviyoId, data);
-      });
+      }
     }
-    res.status(200).send('Success');
   }
 
   @Get('setdiscountcode?')
