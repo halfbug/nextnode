@@ -105,4 +105,13 @@ export class Inventory {
 
   @Field({ defaultValue: 0 })
   purchaseCount: number;
+
+  @Field(() => [String], { nullable: true })
+  tags?: string[];
+
+  @Field({ nullable: true })
+  productCategory?: string;
+
+  @Field({ nullable: true })
+  vendor?: string;
 }

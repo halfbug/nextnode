@@ -114,4 +114,13 @@ export default class Inventory extends DefaultColumnsService {
 
   @Column({ default: 1 })
   secondaryCount: number;
+
+  @Column({ nullable: true })
+  tags?: string[];
+
+  @Column({ nullable: true })
+  productCategory?: string;
+
+  @Column({ nullable: true })
+  vendor?: string;
 }

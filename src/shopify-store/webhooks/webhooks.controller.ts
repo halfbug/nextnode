@@ -566,6 +566,12 @@ export class WebhooksController {
       nprod.createdAtShopify = rproduct?.created_at;
       nprod.publishedAt = rproduct?.published_at;
       nprod.title = rproduct?.title;
+      nprod.tags =
+        typeof rproduct?.tags === 'string'
+          ? rproduct?.tags.split(', ')
+          : (nprod.tags = rproduct?.tags);
+      nprod.vendor = rproduct?.vendor;
+      nprod.productCategory = rproduct?.productType;
       nprod.status = rproduct?.status?.toUpperCase();
       nprod.price = rproduct?.variants[0]?.price; //
       nprod.featuredImage = rproduct?.image?.src;
@@ -1427,6 +1433,189 @@ export class WebhooksController {
     } catch (err) {
       console.log(JSON.stringify(err));
       Logger.error(err, 'bulkProducts');
+    }
+  }
+
+  @Get('productImport')
+  async productImport(@Query('shopName') shopName: any) {
+    try {
+      // http://localhost:5000/webhooks/productImport?shopName=native-roots-dev.myshopify.com
+      const { shop, accessToken } = await this.storesService.findOne(shopName);
+      const client = await this.shopifyService.client(shop, accessToken);
+      const qres = await client.query({
+        data: {
+          query: `mutation {
+          bulkOperationRunQuery(
+            query:"""
+            {
+              products(first: 2000, reverse: true)  {
+                    edges {
+                      node {
+                        id
+                        title
+                        tags
+                        productType
+                        vendor
+                        status
+                        description
+                        options{
+                          id
+                          name
+                          name
+                          position
+                          values
+                        }
+                        featuredImage{
+                          src
+                        }
+                        images(first:20, reverse: true){
+                          edges{
+                            node{
+                              src
+                              id
+                            }
+                          }
+                        }
+                        priceRangeV2{
+                          maxVariantPrice{
+                            amount
+                            currencyCode
+                            
+                          }
+                          minVariantPrice{
+                            amount
+                            currencyCode
+                          }
+                        }
+                        totalVariants
+                        totalInventory
+                        status
+                        publishedAt
+                        onlineStoreUrl
+                        createdAtShopify : createdAt
+                        collections(first: 1000, reverse: true){
+                          edges{
+                            node{
+                              id
+                              title
+                              description
+                              productsCount
+                              sortOrder
+                            }
+                          }
+                        }
+                        variants(first: 1000, reverse: true)  {
+                          edges {
+                            node {
+                              id
+                              title
+                              displayName
+                              inventoryQuantity
+                              inventoryPolicy
+                              inventoryItem{
+                                sku
+                                tracked
+                             }
+                              price
+                              selectedOptions{
+                                name
+                                value
+                              }
+                              shopifyCreatedAt :createdAt
+                              image{
+                                src
+                                
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+            """
+          ) {
+            bulkOperation {
+              id
+              status
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }`,
+        },
+      });
+      // console.log(event);
+      // console.log(JSON.stringify(qres));
+      // console.log(qres.body['data']['bulkOperationRunQuery']['bulkOperation']);
+      // const dopoll = true;
+      if (
+        qres.body['data']['bulkOperationRunQuery']['bulkOperation'][
+          'status'
+        ] === 'CREATED'
+      ) {
+        const pollit = setInterval(async () => {
+          const poll = await client.query({
+            data: {
+              query: `query {
+            currentBulkOperation {
+              id
+              status
+              errorCode
+              createdAt
+              completedAt
+              objectCount
+              fileSize
+              url
+              partialDataUrl
+            }
+          }`,
+            },
+          });
+
+          console.log(poll.body['data']['currentBulkOperation']);
+          if (
+            poll.body['data']['currentBulkOperation']['status'] === 'COMPLETED'
+          ) {
+            clearInterval(pollit);
+
+            // fire inventory received event
+            const url = poll.body['data']['currentBulkOperation'].url;
+            this.httpService.get(url).subscribe(async (res) => {
+              const inventoryArray = readJsonLines(res.data);
+              console.log(
+                '🚀 ~ file: webhooks.controller.ts:1579 ~ this.httpService.get ~ inventoryArray',
+                inventoryArray,
+              );
+              const blukWrite = inventoryArray
+                .filter((item) => item.id.split('/')[3] === 'Product')
+                .map((item) => {
+                  return {
+                    updateOne: {
+                      filter: { id: item.id },
+                      update: {
+                        $set: {
+                          tags: item.tags,
+                          productCategory: item.productType,
+                          vendor: item.vendor,
+                        },
+                      },
+                    },
+                  };
+                });
+              await this.inventryService.setPurchaseCount(blukWrite);
+              // async () => await this.inventryService.insertMany(inventArr);
+              // console.log('color: #26bfa5;', '------------------------------');
+            });
+          }
+        }, 3000);
+      } else console.log(JSON.stringify(qres.body['data']));
+      return JSON.stringify(JSON.stringify(qres.body['data']));
+    } catch (err) {
+      console.log(JSON.stringify(err));
+      Logger.error(err, 'productImport');
     }
   }
 

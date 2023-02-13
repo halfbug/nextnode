@@ -29,6 +29,9 @@ export class TokenReceivedListener {
                       node {
                         id
                         title
+                        tags
+                        productType
+                        vendor
                         status
                         description
                         options{

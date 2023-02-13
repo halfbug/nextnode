@@ -158,4 +158,13 @@ export class Product {
 
   @Field({ nullable: true })
   status?: string;
+
+  @Field(() => [String], { nullable: true })
+  tags?: string[];
+
+  @Field({ nullable: true })
+  productCategory?: string;
+
+  @Field({ nullable: true })
+  vendor?: string;
 }

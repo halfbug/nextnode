@@ -43,6 +43,11 @@ export class InventoryReceivedListener {
       // add record type
       inventory.recordType = inventory.id.split('/')[3];
 
+      if (inventory.productType) {
+        inventory.productCategory = inventory.productType;
+        delete inventory.productType;
+      }
+
       //add inventory management details
       if (inventory.recordType === 'ProductVariant')
         inventory.inventoryManagement = inventory?.inventoryItem?.tracked

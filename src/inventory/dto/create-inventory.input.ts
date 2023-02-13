@@ -89,4 +89,13 @@ export class CreateInventoryInput {
 
   @Field({ defaultValue: 0 })
   secondaryCount: number;
+
+  @Field(() => [String], { nullable: true })
+  tags?: string[];
+
+  @Field({ nullable: true })
+  productCategory?: string;
+
+  @Field({ nullable: true })
+  vendor?: string;
 }
