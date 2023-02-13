@@ -113,6 +113,16 @@ export class ShopifyStoreController {
     // console.log('response', brandName, shop, id, photo, maxReward);
     return { brandName, shop, id, photo, maxReward };
   }
+  @Get('medrops')
+  async mydrops(@Query('name') name: any) {
+    const { brandName, shop, id, settings, drops } =
+      await this.storesService.findOneByName(name);
+    const photo = settings?.general
+      ? settings?.general?.imageUrl.split('/')[4]
+      : '';
+    const maxReward = drops.rewards.maximum;
+    return { brandName, shop, id, photo, maxReward };
+  }
   @Get('mepartner')
   async whoamii(@Query('name') name: any) {
     const {
