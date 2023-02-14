@@ -412,6 +412,15 @@ export class DropsGroupshopService {
                                     {
                                       $ifNull: ['$bestSellerProducts', []],
                                     },
+                                    {
+                                      $ifNull: ['$hairProducts', []],
+                                    },
+                                    {
+                                      $ifNull: ['$skincareProducts', []],
+                                    },
+                                    {
+                                      $ifNull: ['$runningOutProducts', []],
+                                    },
                                   ],
                                 },
                                 as: 'j',
