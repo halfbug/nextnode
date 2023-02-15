@@ -53,6 +53,7 @@
 .glider-slide img {
 	width: 90% !important;
 	height: 60% !important;
+	object-fit: cover;
 }
 .glider::-webkit-scrollbar {
 	opacity: 0;
