@@ -46,9 +46,62 @@ export class DropsGroupshopResolver {
 
   async expireAtUpdate(groupshop, Dcode, eventType) {
     const newExpiredate = addDays(new Date(), 1);
+
+    let updatedDiscountCode = groupshop.discountCode;
+
+    const {
+      shop,
+      accessToken,
+      drops: {
+        rewards: { baseline },
+        bestSellerCollectionId,
+        latestCollectionId,
+        allProductsCollectionId,
+        runningOutCollectionId,
+        skincareCollectionId,
+        hairCollectionId,
+      },
+    } = await this.storesService.findById(groupshop?.storeId);
+
+    if (eventType === EventType.started) {
+      updatedDiscountCode = await this.shopifyapi.setDiscountCode(
+        shop,
+        'Create',
+        accessToken,
+        groupshop.discountCode.title,
+        parseInt(baseline, 10),
+        [
+          ...new Set([
+            bestSellerCollectionId,
+            latestCollectionId,
+            allProductsCollectionId,
+            runningOutCollectionId,
+            skincareCollectionId,
+            hairCollectionId,
+          ]),
+        ],
+        new Date(),
+        newExpiredate,
+        null,
+        true,
+      );
+    } else {
+      await this.shopifyapi.setDiscountCode(
+        shop,
+        'Update',
+        accessToken,
+        groupshop.discountCode.title,
+        null,
+        null,
+        groupshop.createdAt,
+        newExpiredate,
+        groupshop.discountCode.priceRuleId,
+      );
+    }
     const updateGS = await this.dropsGroupshopService.updateExpireDate(
       {
         status: 'active',
+        discountCode: updatedDiscountCode ?? groupshop.discountCode,
         expiredAt: newExpiredate,
         id: groupshop.id,
       },
@@ -75,22 +128,6 @@ export class DropsGroupshopResolver {
       dateTime: newExpiredate,
     });
 
-    const { shop, accessToken } = await this.storesService.findById(
-      updateGS?.storeId,
-    );
-
-    await this.shopifyapi.setDiscountCode(
-      shop,
-      'Update',
-      accessToken,
-      updateGS.discountCode.title,
-      null,
-      null,
-      updateGS.createdAt,
-      newExpiredate,
-      updateGS.discountCode.priceRuleId,
-    );
-
     return updateGS;
   }
 
@@ -110,6 +147,7 @@ export class DropsGroupshopResolver {
       EventType.revised,
     );
     if (groupshop.status === 'pending' && groupshop.expiredAt === null) {
+      // executes on first view
       await this.expireAtUpdate(groupshop, Dcode, EventType.started);
     }
 
@@ -127,7 +165,7 @@ export class DropsGroupshopResolver {
           klaviyoId,
         );
         const latestShortUrl =
-          currentProfile.data.attributes.properties?.groupshop_url;
+          currentProfile?.data.attributes.properties?.groupshop_url;
         if (shortURL === latestShortUrl) {
           const params = new URLSearchParams({
             groupshop_status: 'active',

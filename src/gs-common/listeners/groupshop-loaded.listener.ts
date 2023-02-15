@@ -57,10 +57,10 @@ export class GSLoadedListener {
       const shortURL = gs?.shortUrl;
 
       // Request to create Discount code on shopify
-      const discountCode = await this.dropsService.createDropDiscountCode(gs);
-      const upgs = new UpdateDropsGroupshopInput();
-      upgs.discountCode = discountCode;
-      await this.dropsService.update(gs.id, upgs);
+      // const discountCode = await this.dropsService.createDropDiscountCode(gs);
+      // const upgs = new UpdateDropsGroupshopInput();
+      // upgs.discountCode = discountCode;
+      // await this.dropsService.update(gs.id, upgs);
 
       // const gsExpireAt = addDays(new Date(), DROPS_EXPIRE_DAYS);
       // const upgs = new UpdateDropsGroupshopInput();
@@ -86,7 +86,7 @@ export class GSLoadedListener {
           klaviyoId,
         );
         const latestShortUrl =
-          currentProfile.data.attributes.properties?.groupshop_url;
+          currentProfile?.data.attributes.properties?.groupshop_url;
         if (shortURL === latestShortUrl) {
           const params = new URLSearchParams({
             groupshop_status: 'active',

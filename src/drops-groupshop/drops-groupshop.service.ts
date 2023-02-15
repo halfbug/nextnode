@@ -651,6 +651,12 @@ export class DropsGroupshopService {
       {
         $match: {
           storeId,
+          discountCode: {
+            $ne: null,
+          },
+          status: {
+            $ne: 'pending',
+          },
         },
       },
       {
