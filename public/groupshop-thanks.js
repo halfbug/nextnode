@@ -692,10 +692,16 @@ function addLeftBlock(logo) {
         </div>
         <div class="bottom">
             <div class="left">
-                <span><a id="gs_link" target="_blank" href="#">Get Cashback</a></span> <img src="${window.BURL}/public/images/arrow.svg">
+                <span><a id="gs_link" target="_blank" href="#">Get Cashback</a></span> <img src="${
+                  window.BURL
+                }/public/images/arrow.svg">
             </div>
             <div class="right">
-                <span>Powered by</span> <img src="${window.BURL}/public/images/groupshop.svg">
+                <span>Powered by</span> ${
+                  isDrops
+                    ? `<img src="${window.BURL}/public/images/groupshop.svg">`
+                    : `<img src="https://d1o2v5h7slksjm.cloudfront.net/ms-logo-svg.svg">`
+                }
             </div>
         
     </div>
