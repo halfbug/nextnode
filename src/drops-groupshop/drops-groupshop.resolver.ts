@@ -4,7 +4,7 @@ import { DropsGroupshop } from './entities/drops-groupshop.entity';
 import { CreateDropsGroupshopInput } from './dto/create-drops-groupshop.input';
 import { UpdateDropsGroupshopInput } from './dto/update-drops-groupshop.input';
 import { Public } from 'src/auth/public.decorator';
-import { NotFoundException, UseInterceptors } from '@nestjs/common';
+import { Logger, NotFoundException, UseInterceptors } from '@nestjs/common';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import { ViewedInterceptor } from 'src/gs-common/viewed.inceptor';
 import { addDays, getDateDifference } from 'src/utils/functions';
@@ -146,10 +146,10 @@ export class DropsGroupshopResolver {
       groupshop.id,
       EventType.revised,
     );
-    if (groupshop.status === 'pending' && groupshop.expiredAt === null) {
-      // executes on first view
-      await this.expireAtUpdate(groupshop, Dcode, EventType.started);
-    }
+    // if (groupshop.status === 'pending' && groupshop.expiredAt === null) {
+    //   // executes on first view
+    //   await this.expireAtUpdate(groupshop, Dcode, EventType.started);
+    // }
 
     if (status === 'activated') {
       const isExpired = !(getDateDifference(groupshop.expiredAt).time > -1);
@@ -201,5 +201,24 @@ export class DropsGroupshopResolver {
   @Mutation(() => DropsGroupshop)
   removeDropsGroupshop(@Args('id', { type: () => String }) id: string) {
     return this.dropsGroupshopService.remove(id);
+  }
+
+  @Public()
+  @Mutation(() => DropsGroupshop)
+  async createOnBoardingDiscountCode(@Args('gid') gid: string) {
+    try {
+      const dgroupshop = await this.dropsGroupshopService.findOne(gid);
+
+      const updateDropsGroupshop = await this.expireAtUpdate(
+        dgroupshop,
+        dgroupshop.discountCode.title,
+        EventType.started,
+      );
+
+      return updateDropsGroupshop;
+    } catch (err) {
+      console.log(err);
+      Logger.error(err, 'createOnBoardingDiscountCode');
+    }
   }
 }

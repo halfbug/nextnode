@@ -590,7 +590,7 @@ export class DropsGroupshopService {
 
     delete updateGroupshopInput.id;
     await this.DropsGroupshopRepository.update({ id }, updateGroupshopInput);
-    return await this.findDropGroupshopByCode(code);
+    return await this.findDropsGS(code);
   }
 
   findOne(id: string) {
