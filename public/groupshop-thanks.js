@@ -604,6 +604,12 @@ const isGroupshop =
     discountCode.slice(0, 3) === 'GSD')
     ? false
     : true;
+const isDrops = discountCode.slice(0, 3) === 'GSD' ? true : false;
+const storeName = isDrops ? 'Groupshop' : 'Microstore';
+const logoName = isDrops ? 'gslogo.png' : 'gslogo2.png';
+const purpleHeadName = isDrops
+  ? 'purple-head-mobile.jpg'
+  : 'purple-head-mobile2.jpg';
 console.log('🚀  groupshop-thanks isGroupshop', isGroupshop);
 
 async function fetchStore(shop) {
@@ -651,7 +657,7 @@ function addLeftBlock(logo) {
           <div class="top">
             <div class="logoBox">
               ${logoDiv}
-                <div style="width: 52px;margin-left: -10px;z-index: 10;"><img class="logo" src="https://d1o2v5h7slksjm.cloudfront.net/gslogo.png"></div>
+                <div style="width: 52px;margin-left: -10px;z-index: 10;"><img class="logo" src="https://d1o2v5h7slksjm.cloudfront.net/${logoName}"></div>
             </div>
             <div class="cashback groupshop_left-block">
                 <h3><div class="image-placeholder" style="height: 50px !important;align-self: left;width: 120px !important;">&nbsp;</div>
@@ -703,14 +709,14 @@ function addRightBlock(brandName, isLoaded, cashback) {
   if (isLoaded) {
     document.querySelector(
       '.groupshop_right-block',
-    ).innerHTML = `<div class="cashback gs_content_right">Get up to ${cashback} cashback on your order! 🎉</div>  <div class="cashbackTxt"> Get cashback on this order and unlock exclusive discounts with Groupshop. </div> <div class="cashbackBtn"> <div class="buttonSmry"> <a target="_blank" id="gs_link" >Get Your Cashback</a></div></div>`;
+    ).innerHTML = `<div class="cashback gs_content_right">Get up to ${cashback} cashback on your order! 🎉</div>  <div class="cashbackTxt"> Get cashback on this order and unlock exclusive discounts with ${storeName}. </div> <div class="cashbackBtn"> <div class="buttonSmry"> <a target="_blank" id="gs_link" >Get Your Cashback</a></div></div>`;
   } else {
     const rightBlock = document.createElement('div');
     rightBlock.style = 'display: flex; justify-content: center;';
 
     rightBlock.innerHTML = `<div class="summaryContainer">
         <div class="image">
-            <img src="${window.BURL}/public/images/purple-head-mobile.jpg" alt="headtag" />
+            <img src="${window.BURL}/public/images/${purpleHeadName}" alt="headtag" />
         </div>
         <div class="groupshop_right-block">
         <div class="cashback gs_content_right">
@@ -1052,7 +1058,7 @@ async function init() {
           leftHeadTxt = `
           Invite your friends to shop
          
-           ${fname}'s Groupshop
+           ${fname}'s Microstore
          
          and give them ${baseline} off
        `;
