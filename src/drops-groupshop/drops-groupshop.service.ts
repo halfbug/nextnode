@@ -59,6 +59,65 @@ export class DropsGroupshopService {
     return gs[0];
   }
 
+  async findDropsLifetimeCashback(klaviyoId: string) {
+    const agg = [
+      {
+        $match: {
+          'customerDetail.klaviyoId': klaviyoId,
+        },
+      },
+      {
+        $addFields: {
+          lifetime_referral_count: {
+            $subtract: [
+              {
+                $size: '$members',
+              },
+              1,
+            ],
+          },
+          refundItems: {
+            $reduce: {
+              input: '$members.refund',
+              initialValue: [],
+              in: {
+                $concatArrays: ['$$value', '$$this'],
+              },
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          lifetime_referral_count: {
+            $gt: 0,
+          },
+        },
+      },
+      {
+        $addFields: {
+          refund: {
+            $sum: '$refundItems.amount',
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          lifetime_referral_count: {
+            $sum: '$lifetime_referral_count',
+          },
+          lifetime_gs_cashback: {
+            $sum: '$refund',
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(DropsGroupshop, agg).toArray();
+    return gs;
+  }
+
   findAll() {
     return this.DropsGroupshopRepository.find();
   }

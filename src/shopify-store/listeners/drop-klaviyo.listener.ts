@@ -24,6 +24,49 @@ export class DropKlaviyoListener {
     private inventryService: InventoryService,
   ) {}
 
+  pendingCashback(lineItems: any[], discountPercentage: number) {
+    const totalPrice = lineItems?.reduce(
+      (priceSum: number, { price, quantity }) =>
+        priceSum + quantity * parseFloat(price),
+      0,
+    );
+    const netPrice = ((100 - discountPercentage) / 100) * totalPrice;
+    return Math.floor(totalPrice - netPrice);
+  }
+
+  async getCurrentCashback(members, storeId) {
+    const storeData = await this.storesService.findById(storeId);
+    const maxDiscount = storeData?.drops?.rewards
+      ? +storeData?.drops?.rewards?.maximum
+      : 0;
+    let pendingCashback = 0;
+    let refundCashback = 0;
+    members.forEach((member, key) => {
+      if (key <= 2) {
+        const refundAmount = member?.refund?.reduce(
+          (priceSum: number, { amount }) => priceSum + parseFloat(amount),
+          0,
+        );
+        if (typeof refundAmount !== 'undefined') {
+          refundCashback += refundAmount;
+        }
+        const availedDiscount = member.availedDiscount;
+        if (maxDiscount > 0 && maxDiscount !== availedDiscount) {
+          const discountPercentage = maxDiscount - availedDiscount;
+          const pendingAmount = this.pendingCashback(
+            member.lineItems,
+            discountPercentage,
+          );
+          pendingCashback += pendingAmount;
+        }
+      }
+    });
+    return {
+      refundCashback: refundCashback,
+      pendingCashback: pendingCashback,
+    };
+  }
+
   @OnEvent('drop.klaviyo')
   async dropKlaviyo(event: DropKlaviyoEvent | { webhook: any }) {
     try {
@@ -38,7 +81,7 @@ export class DropKlaviyoListener {
       );
       let current_milestone_discount;
       const latestShortUrl =
-        currentProfile.data.attributes.properties?.groupshop_url;
+        currentProfile?.data.attributes.properties?.groupshop_url;
       if (shortURL === latestShortUrl) {
         const memberLength = webdata.members?.length;
         if (memberLength === 0) {
@@ -52,10 +95,24 @@ export class DropKlaviyoListener {
             ? webdata.milestones[2].discount
             : '';
         }
-        const params = new URLSearchParams({
+
+        const lifetimeRevenue =
+          await this.dropsGroupshopService.findDropsLifetimeCashback(klaviyoId);
+
+        const obj = {
           current_milestone_discount: current_milestone_discount,
-        });
-        const data = params.toString();
+          lifetime_referral_count: !!lifetimeRevenue[0]
+            ? lifetimeRevenue[0].lifetime_referral_count
+            : '',
+          lifetime_gs_cashback: !!lifetimeRevenue[0]
+            ? lifetimeRevenue[0].lifetime_gs_cashback
+            : '',
+        };
+        const data = Object.keys(obj)
+          .map((key) => {
+            return `${key}=${encodeURIComponent(obj[key])}`;
+          })
+          .join('&');
         await this.kalavioService.klaviyoProfileUpdate(klaviyoId, data);
       }
 
@@ -77,11 +134,21 @@ export class DropKlaviyoListener {
           await this.ordersService.getCustomerNameByOrderId(orderid_referral2);
         cust_referral2_name = cust_referral2[0].customer.firstName;
       }
+
+      const calculateRevenue = await this.getCurrentCashback(
+        webdata.members,
+        webdata.storeId,
+      );
       const mdata = {
         current_gs_referral1: cust_referral1_name,
         current_gs_referral2: cust_referral2_name,
         referral_count: webdata.members.length - 1,
+        current_gs_cashback: calculateRevenue.refundCashback,
+        current_gs_pending_cashback: calculateRevenue.pendingCashback,
       };
+
+      console.log('Drop Groupshop Order Trigger', JSON.stringify(mdata));
+
       const body = {
         event: 'Drop Groupshop Order Trigger',
         customer_properties: {
