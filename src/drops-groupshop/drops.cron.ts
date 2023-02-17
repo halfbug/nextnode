@@ -87,8 +87,11 @@ export class DropKlaviyoCron {
             console.log('Drop recently created ', klaviyoId);
           } else {
             updatedCounter = updatedCounter + 1;
+            const fullname =
+              profile?.attributes?.properties?.['Full Name'] ?? null;
             const webdata = {
               id: klaviyoId,
+              fullname: fullname,
               first_name: profile?.attributes?.first_name,
               last_name: profile?.attributes?.last_name,
               email: profile?.attributes?.email,
