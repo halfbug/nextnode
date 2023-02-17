@@ -129,12 +129,7 @@ export class DropsGroupshopService {
       accessToken,
       drops: {
         rewards: { baseline },
-        bestSellerCollectionId,
-        latestCollectionId,
-        allProductsCollectionId,
-        runningOutCollectionId,
-        skincareCollectionId,
-        hairCollectionId,
+        collections,
       },
     } = await this.storesService.findById(gs.storeId);
     const discountTitle = gs?.discountCode.title;
@@ -144,16 +139,7 @@ export class DropsGroupshopService {
       accessToken,
       discountTitle,
       parseInt(baseline, 10),
-      [
-        ...new Set([
-          bestSellerCollectionId,
-          latestCollectionId,
-          allProductsCollectionId,
-          runningOutCollectionId,
-          skincareCollectionId,
-          hairCollectionId,
-        ]),
-      ],
+      [...new Set(collections.map((c) => c.shopifyId))],
       new Date(),
       null,
       null,

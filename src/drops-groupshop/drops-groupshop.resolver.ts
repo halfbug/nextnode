@@ -54,12 +54,7 @@ export class DropsGroupshopResolver {
       accessToken,
       drops: {
         rewards: { baseline },
-        bestSellerCollectionId,
-        latestCollectionId,
-        allProductsCollectionId,
-        runningOutCollectionId,
-        skincareCollectionId,
-        hairCollectionId,
+        collections,
       },
     } = await this.storesService.findById(groupshop?.storeId);
 
@@ -70,16 +65,7 @@ export class DropsGroupshopResolver {
         accessToken,
         groupshop.discountCode.title,
         parseInt(baseline, 10),
-        [
-          ...new Set([
-            bestSellerCollectionId,
-            latestCollectionId,
-            allProductsCollectionId,
-            runningOutCollectionId,
-            skincareCollectionId,
-            hairCollectionId,
-          ]),
-        ],
+        [...new Set(collections.map((c) => c.shopifyId))],
         new Date(),
         newExpiredate,
         null,

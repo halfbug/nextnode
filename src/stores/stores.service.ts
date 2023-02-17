@@ -10,6 +10,8 @@ import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { Product } from 'src/inventory/entities/product.entity';
 import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const _ = require('lodash');
 
 @Injectable()
 export class StoresService {
@@ -135,148 +137,70 @@ export class StoresService {
   }
 
   async update(id: string, updateStoreInput: UpdateStoreInput) {
-    if (updateStoreInput?.settings?.layout?.bannerDesign) {
-      const bannerDesi = updateStoreInput?.settings?.layout?.bannerDesign;
-      if (bannerDesi === '002') {
-        updateStoreInput.settings.layout.bannerColor = '#F2F2F1';
-      } else if (bannerDesi === '003') {
-        updateStoreInput.settings.layout.bannerColor = '#000000';
-      } else if (bannerDesi === '004') {
-        updateStoreInput.settings.layout.bannerColor = '#FFFFFF';
-      } else if (bannerDesi === '101') {
-        updateStoreInput.settings.layout.bannerColor = '#FFFFFF';
-      } else if (bannerDesi === '102') {
-        updateStoreInput.settings.layout.bannerColor = '#171717';
-      } else if (bannerDesi === '103') {
-        updateStoreInput.settings.layout.bannerColor = '#D3DEDC';
-      } else if (bannerDesi === '104') {
-        updateStoreInput.settings.layout.bannerColor =
-          updateStoreInput?.settings?.layout?.bannerCustomColor;
-      } else {
-        updateStoreInput.settings.layout.bannerColor = '#EEFF5C';
+    try {
+      if (updateStoreInput?.settings?.layout?.bannerDesign) {
+        const bannerDesi = updateStoreInput?.settings?.layout?.bannerDesign;
+        if (bannerDesi === '002') {
+          updateStoreInput.settings.layout.bannerColor = '#F2F2F1';
+        } else if (bannerDesi === '003') {
+          updateStoreInput.settings.layout.bannerColor = '#000000';
+        } else if (bannerDesi === '004') {
+          updateStoreInput.settings.layout.bannerColor = '#FFFFFF';
+        } else if (bannerDesi === '101') {
+          updateStoreInput.settings.layout.bannerColor = '#FFFFFF';
+        } else if (bannerDesi === '102') {
+          updateStoreInput.settings.layout.bannerColor = '#171717';
+        } else if (bannerDesi === '103') {
+          updateStoreInput.settings.layout.bannerColor = '#D3DEDC';
+        } else if (bannerDesi === '104') {
+          updateStoreInput.settings.layout.bannerColor =
+            updateStoreInput?.settings?.layout?.bannerCustomColor;
+        } else {
+          updateStoreInput.settings.layout.bannerColor = '#EEFF5C';
+        }
+      } else if (updateStoreInput?.drops) {
+        const oldStoreData = await this.findById(id);
+
+        if (
+          _.differenceWith(
+            updateStoreInput.drops?.collections,
+            oldStoreData.drops?.collections,
+            _.isEqual,
+          ).length ||
+          _.differenceWith(
+            oldStoreData.drops?.collections,
+            updateStoreInput.drops?.collections,
+            _.isEqual,
+          ).length
+        ) {
+          const dropsGroupshops = await this.dropsService.getActiveDrops(id);
+          dropsGroupshops
+            .filter((dg) => dg.isFullyExpired === false)
+            .forEach(async (dg) => {
+              await this.shopifyapi.setDiscountCode(
+                oldStoreData.shop,
+                'Update',
+                oldStoreData.accessToken,
+                dg.discountCode.title,
+                null,
+                [
+                  ...new Set(
+                    updateStoreInput.drops?.collections.map((c) => c.shopifyId),
+                  ),
+                ],
+                null,
+                null,
+                dg.discountCode.priceRuleId,
+                true,
+              );
+            });
+        }
       }
-    } else if (updateStoreInput?.drops) {
-      const oldStoreData = await this.findById(id);
-
-      // if (
-      //   updateStoreInput.drops?.allProductsCollectionId !==
-      //     oldStoreData.drops?.allProductsCollectionId ||
-      //   updateStoreInput.drops?.latestCollectionId !==
-      //     oldStoreData.drops?.latestCollectionId ||
-      //   updateStoreInput.drops?.bestSellerCollectionId !==
-      //     oldStoreData.drops?.bestSellerCollectionId
-      // ) {
-      //   const dropsGroupshops = await this.dropsService.getActiveDrops(id);
-      //   dropsGroupshops
-      //     .filter((dg) => dg.isFullyExpired === false)
-      //     .forEach(async (dg) => {
-      //       await this.shopifyapi.setDiscountCode(
-      //         oldStoreData.shop,
-      //         'Update',
-      //         oldStoreData.accessToken,
-      //         dg.discountCode.title,
-      //         null,
-      //         [
-      //           ...new Set([
-      //             updateStoreInput.drops.allProductsCollectionId,
-      //             updateStoreInput.drops.latestCollectionId,
-      //             updateStoreInput.drops.bestSellerCollectionId,
-      //             oldStoreData?.drops?.runningOutCollectionId, // added now for working purpose in future it'll be handle parfectly
-      //             oldStoreData?.drops?.skincareCollectionId,
-      //             oldStoreData?.drops?.hairCollectionId,
-      //           ]),
-      //         ],
-      //         null,
-      //         null,
-      //         dg.discountCode.priceRuleId,
-      //         true,
-      //       );
-      //     });
-      // }
-
-      // if (
-      //   !oldStoreData?.drops?.spotlightDiscount?.percentage &&
-      //   updateStoreInput?.drops?.spotlightDiscount?.percentage
-      // ) {
-      //   const discountCode = await this.shopifyapi.setAutomaticDiscountCode(
-      //     oldStoreData.shop,
-      //     'Create',
-      //     oldStoreData.accessToken,
-      //     StoresService.formatSpotlightDiscountTitle(oldStoreData._id),
-      //     parseInt(updateStoreInput.drops.spotlightDiscount.percentage, 10),
-      //     [updateStoreInput.drops.spotlightColletionId],
-      //     null,
-      //     new Date(),
-      //   );
-      //   if (discountCode) {
-      //     updateStoreInput.drops.spotlightDiscount = discountCode;
-      //   }
-      // } else if (
-      //   updateStoreInput.drops?.spotlightDiscount?.percentage &&
-      //   updateStoreInput.drops?.spotlightColletionId &&
-      //   updateStoreInput.drops?.spotlightDiscount?.percentage !==
-      //     oldStoreData?.drops?.spotlightDiscount?.percentage &&
-      //   updateStoreInput.drops?.spotlightColletionId !==
-      //     oldStoreData?.drops?.spotlightColletionId
-      // ) {
-      //   const discountCode = await this.shopifyapi.setAutomaticDiscountCode(
-      //     oldStoreData.shop,
-      //     'Update',
-      //     oldStoreData.accessToken,
-      //     StoresService.formatSpotlightDiscountTitle(oldStoreData._id),
-      //     parseInt(updateStoreInput.drops.spotlightDiscount.percentage, 10), // percentage update parseInt(percentage, 10)
-      //     [updateStoreInput.drops.spotlightColletionId], // new collection id
-      //     [oldStoreData.drops.spotlightColletionId], // old collection id
-      //     null,
-      //     null,
-      //     oldStoreData.drops.spotlightDiscount.priceRuleId, // id is neccesarry for update
-      //   );
-      //   if (discountCode) {
-      //     updateStoreInput.drops.spotlightDiscount = discountCode;
-      //   }
-      // } else if (
-      //   updateStoreInput.drops?.spotlightDiscount?.percentage &&
-      //   updateStoreInput.drops?.spotlightDiscount?.percentage !==
-      //     oldStoreData?.drops?.spotlightDiscount?.percentage
-      // ) {
-      //   const discountCode = await this.shopifyapi.setAutomaticDiscountCode(
-      //     oldStoreData.shop,
-      //     'Update',
-      //     oldStoreData.accessToken,
-      //     StoresService.formatSpotlightDiscountTitle(oldStoreData._id),
-      //     parseInt(updateStoreInput.drops.spotlightDiscount.percentage, 10), // percentage update parseInt(percentage, 10)
-      //     null, // new collection id
-      //     null, // old collection id
-      //     null,
-      //     null,
-      //     oldStoreData.drops.spotlightDiscount.priceRuleId, // id is neccesarry for update
-      //   );
-      //   if (discountCode) {
-      //     updateStoreInput.drops.spotlightDiscount = discountCode;
-      //   }
-      // } else if (
-      //   updateStoreInput.drops?.spotlightColletionId &&
-      //   updateStoreInput.drops?.spotlightColletionId !==
-      //     oldStoreData?.drops?.spotlightColletionId
-      // ) {
-      //   const discountCode = await this.shopifyapi.setAutomaticDiscountCode(
-      //     oldStoreData.shop,
-      //     'Update',
-      //     oldStoreData.accessToken,
-      //     StoresService.formatSpotlightDiscountTitle(oldStoreData._id),
-      //     null, // percentage update parseInt(percentage, 10)
-      //     [updateStoreInput.drops?.spotlightColletionId], // new collection id
-      //     [oldStoreData.drops?.spotlightColletionId], // old collection id
-      //     null,
-      //     null,
-      //     oldStoreData.drops.spotlightDiscount.priceRuleId, // id is neccesarry for update
-      //   );
-      //   if (discountCode) {
-      //     updateStoreInput.drops.spotlightDiscount = discountCode;
-      //   }
-      // }
+      await this.storeRepository.update({ id }, updateStoreInput);
+    } catch (err) {
+      console.log('Bulk update Discount codes', err);
+      Logger.error('Bulk update Discount codes', err);
     }
-    await this.storeRepository.update({ id }, updateStoreInput);
     return await this.findOneById(id);
   }
 

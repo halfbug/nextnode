@@ -1777,14 +1777,7 @@ export class WebhooksController {
       const {
         id,
         accessToken,
-        drops: {
-          latestCollectionId,
-          bestSellerCollectionId,
-          allProductsCollectionId,
-          runningOutCollectionId,
-          skincareCollectionId,
-          hairCollectionId,
-        },
+        drops: { collections },
       } = await this.storesService.findOne(shop);
 
       const dropsGroupshops = await this.dropsGroupshopService.getActiveDrops(
@@ -1799,16 +1792,7 @@ export class WebhooksController {
             accessToken,
             dg.discountCode.title,
             null,
-            [
-              ...new Set([
-                latestCollectionId,
-                bestSellerCollectionId,
-                allProductsCollectionId,
-                runningOutCollectionId,
-                skincareCollectionId,
-                hairCollectionId,
-              ]),
-            ],
+            [...new Set(collections.map((c) => c.shopifyId))],
             null,
             null,
             dg.discountCode.priceRuleId,
