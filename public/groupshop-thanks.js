@@ -701,7 +701,7 @@ function addLeftBlock(logo) {
                 <span>Powered by</span> ${
                   isDrops
                     ? `<img src="${window.BURL}/public/images/groupshop.svg">`
-                    : `<img src="https://d1o2v5h7slksjm.cloudfront.net/ms-logo-svg.svg">`
+                    : `<img src="https://d1o2v5h7slksjm.cloudfront.net/ms-white-crop.jpg">`
                 }
             </div>
         
