@@ -604,7 +604,8 @@ const isGroupshop =
     discountCode.slice(0, 3) === 'GSD')
     ? false
     : true;
-const isDrops = discountCode.slice(0, 3) === 'GSD' ? true : false;
+const isDrops =
+  discountCode && discountCode.slice(0, 3) === 'GSD' ? true : false;
 const storeName = isDrops ? 'Groupshop' : 'Microstore';
 const logoName = isDrops ? 'gslogo.png' : 'gslogo2.png';
 const purpleHeadName = isDrops
