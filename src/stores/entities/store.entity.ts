@@ -82,6 +82,14 @@ export class DiscoveryTools {
   @Field(() => [MatchingBrandName], { nullable: 'itemsAndList' })
   matchingBrandName?: MatchingBrandName[];
 }
+@ObjectType('Collections')
+export class Collections {
+  @Field({ nullable: true })
+  shopifyId?: string;
+
+  @Field({ nullable: true })
+  name?: string;
+}
 @ObjectType('Drops')
 export class Drops {
   @Field({ nullable: true })
@@ -95,6 +103,9 @@ export class Drops {
 
   @Field({ nullable: true })
   spotlightDiscount?: DiscountCode;
+
+  @Field(() => [Collections], { nullable: 'itemsAndList' })
+  collections?: Collections[];
 
   @Field({ nullable: true })
   latestCollectionId?: string;

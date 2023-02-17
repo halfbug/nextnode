@@ -45,6 +45,13 @@ export class DiscoveryTools {
   @Column(() => MatchingBrandName)
   matchingBrandName?: MatchingBrandName[];
 }
+export class Collections {
+  @Column({ nullable: true })
+  shopifyId?: string;
+
+  @Column({ nullable: true })
+  name?: string;
+}
 export class Drops {
   @Column({ nullable: true })
   status?: string;
@@ -57,6 +64,9 @@ export class Drops {
 
   @Column({ nullable: true })
   spotlightDiscount?: DiscountCode;
+
+  @Column(() => Collections)
+  collections?: Collections[];
 
   @Column({ nullable: true })
   latestCollectionId?: string;

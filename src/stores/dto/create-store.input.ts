@@ -124,6 +124,14 @@ export class DiscoveryToolsInput {
   @Field(() => [MatchingBrandNameInput], { nullable: 'itemsAndList' })
   matchingBrandName?: MatchingBrandNameInput[];
 }
+@InputType()
+export class CollectionsInputs {
+  @Field({ nullable: true })
+  shopifyId?: string;
+
+  @Field({ nullable: true })
+  name?: string;
+}
 @InputType('DropsInput')
 export class DropsInput {
   @Field({ nullable: true })
@@ -137,6 +145,9 @@ export class DropsInput {
 
   @Field({ nullable: true })
   spotlightDiscount?: DiscountCodeInput;
+
+  @Field(() => [CollectionsInputs], { nullable: 'itemsAndList' })
+  collections?: CollectionsInputs[];
 
   @Field({ nullable: true })
   latestCollectionId?: string;
