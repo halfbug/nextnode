@@ -160,6 +160,8 @@ a:active {
 
 .thankyouContainer > .bottom > .right > img {
   margin-left: 10px;
+  width: 80px;
+  object-fit: contain;
 }
 .summaryContainer {
   width: 100%;
