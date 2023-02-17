@@ -41,7 +41,7 @@ export class AuthService {
     const shopName = shop.split('.')[0];
     // {"app_subscription":{"admin_graphql_api_id":"gid://shopify/AppSubscription/26070876326",
     // "name":"Explore (free for 30 days) + Cashback charge","status":"DECLINED",
-    // "admin_graphql_api_shop_id":"gid://shopify/Shop/53108211878","created_at":"2022-11-29T07:10:38-05:00","updated_at":"2022-11-29T07:10:49-05:00","capped_amount":"2000.0","currency":"USD"}} 
+    // "admin_graphql_api_shop_id":"gid://shopify/Shop/53108211878","created_at":"2022-11-29T07:10:38-05:00","updated_at":"2022-11-29T07:10:49-05:00","capped_amount":"2000.0","currency":"USD"}}
     if (
       subscription &&
       ['PENDING', 'Pending'].includes(subscription.status) &&

@@ -177,96 +177,24 @@ export class DropsGroupshopService {
       {
         $lookup: {
           from: 'inventory',
-          localField: 'store.drops.bestSellerCollectionId',
+          localField: 'store.drops.collections.shopifyId',
           foreignField: 'id',
-          as: 'bestSeller',
+          as: 'collections',
         },
       },
       {
         $lookup: {
           from: 'inventory',
-          localField: 'bestSeller.parentId',
+          localField: 'collections.parentId',
           foreignField: 'id',
-          as: 'bestSellerProducts',
+          as: 'products',
         },
       },
       {
         $addFields: {
-          bestSellerProducts: {
+          products: {
             $filter: {
-              input: '$bestSellerProducts',
-              as: 'j',
-              cond: {
-                $and: [
-                  {
-                    $ne: ['$$j.publishedAt', null],
-                  },
-                  {
-                    $eq: ['$$j.status', 'ACTIVE'],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
-      // {
-      //   $lookup: {
-      //     from: 'inventory',
-      //     localField: 'store.drops.spotlightColletionId',
-      //     foreignField: 'id',
-      //     as: 'spotlight',
-      //   },
-      // },
-      // {
-      //   $lookup: {
-      //     from: 'inventory',
-      //     localField: 'spotlight.parentId',
-      //     foreignField: 'id',
-      //     as: 'spotlightProducts',
-      //   },
-      // },
-      // {
-      //   $addFields: {
-      //     spotlightProducts: {
-      //       $filter: {
-      //         input: '$spotlightProducts',
-      //         as: 'j',
-      //         cond: {
-      //           $and: [
-      //             {
-      //               $ne: ['$$j.publishedAt', null],
-      //             },
-      //             {
-      //               $eq: ['$$j.status', 'ACTIVE'],
-      //             },
-      //           ],
-      //         },
-      //       },
-      //     },
-      //   },
-      // },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'store.drops.runningOutCollectionId',
-          foreignField: 'id',
-          as: 'runningOutCollection',
-        },
-      },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'runningOutCollection.parentId',
-          foreignField: 'id',
-          as: 'runningOutProducts',
-        },
-      },
-      {
-        $addFields: {
-          runningOutProducts: {
-            $filter: {
-              input: '$runningOutProducts',
+              input: '$products',
               as: 'j',
               cond: {
                 $and: [
@@ -283,34 +211,29 @@ export class DropsGroupshopService {
         },
       },
       {
-        $lookup: {
-          from: 'inventory',
-          localField: 'store.drops.skincareCollectionId',
-          foreignField: 'id',
-          as: 'skincareCollection',
-        },
-      },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'skincareCollection.parentId',
-          foreignField: 'id',
-          as: 'skincareProducts',
-        },
-      },
-      {
         $addFields: {
-          skincareProducts: {
-            $filter: {
-              input: '$skincareProducts',
-              as: 'j',
-              cond: {
-                $and: [
+          productObj: {
+            $map: {
+              input: '$products',
+              as: 'col',
+              in: {
+                $mergeObjects: [
+                  '$$col',
                   {
-                    $ne: ['$$j.publishedAt', null],
-                  },
-                  {
-                    $eq: ['$$j.status', 'ACTIVE'],
+                    collection: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$collections',
+                            as: 'j',
+                            cond: {
+                              $eq: ['$$col.id', '$$j.parentId'],
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
                   },
                 ],
               },
@@ -319,106 +242,24 @@ export class DropsGroupshopService {
         },
       },
       {
-        $lookup: {
-          from: 'inventory',
-          localField: 'store.drops.hairCollectionId',
-          foreignField: 'id',
-          as: 'hairCollection',
-        },
-      },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'hairCollection.parentId',
-          foreignField: 'id',
-          as: 'hairProducts',
-        },
-      },
-      {
         $addFields: {
-          hairProducts: {
-            $filter: {
-              input: '$hairProducts',
-              as: 'j',
-              cond: {
-                $and: [
+          sections: {
+            $map: {
+              input: '$store.drops.collections',
+              as: 'col',
+              in: {
+                $mergeObjects: [
+                  '$$col',
                   {
-                    $ne: ['$$j.publishedAt', null],
-                  },
-                  {
-                    $eq: ['$$j.status', 'ACTIVE'],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'store.drops.latestCollectionId',
-          foreignField: 'id',
-          as: 'latestCollection',
-        },
-      },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'latestCollection.parentId',
-          foreignField: 'id',
-          as: 'latestProducts',
-        },
-      },
-      {
-        $addFields: {
-          latestProducts: {
-            $filter: {
-              input: '$latestProducts',
-              as: 'j',
-              cond: {
-                $and: [
-                  {
-                    $ne: ['$$j.publishedAt', null],
-                  },
-                  {
-                    $eq: ['$$j.status', 'ACTIVE'],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'store.drops.allProductsCollectionId',
-          foreignField: 'id',
-          as: 'allProducts',
-        },
-      },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'allProducts.parentId',
-          foreignField: 'id',
-          as: 'allProducts',
-        },
-      },
-      {
-        $addFields: {
-          allProducts: {
-            $filter: {
-              input: '$allProducts',
-              as: 'j',
-              cond: {
-                $and: [
-                  {
-                    $ne: ['$$j.publishedAt', null],
-                  },
-                  {
-                    $eq: ['$$j.status', 'ACTIVE'],
+                    products: {
+                      $filter: {
+                        input: '$productObj',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$col.shopifyId', '$$j.collection.id'],
+                        },
+                      },
+                    },
                   },
                 ],
               },
@@ -446,25 +287,7 @@ export class DropsGroupshopService {
                                 input: {
                                   $concatArrays: [
                                     {
-                                      $ifNull: ['$latestProducts', []],
-                                    },
-                                    {
-                                      $ifNull: ['$allProducts', []],
-                                    },
-                                    {
-                                      $ifNull: ['$spotlightProducts', []],
-                                    },
-                                    {
-                                      $ifNull: ['$bestSellerProducts', []],
-                                    },
-                                    {
-                                      $ifNull: ['$hairProducts', []],
-                                    },
-                                    {
-                                      $ifNull: ['$skincareProducts', []],
-                                    },
-                                    {
-                                      $ifNull: ['$runningOutProducts', []],
+                                      $ifNull: ['$products', []],
                                     },
                                   ],
                                 },
@@ -527,10 +350,6 @@ export class DropsGroupshopService {
       },
       {
         $project: {
-          bestSellerProducts: 1,
-          spotlightProducts: 1,
-          allProducts: 1,
-          latestProducts: 1,
           createdAt: 1,
           customerDetail: 1,
           storeId: 1,
@@ -548,18 +367,13 @@ export class DropsGroupshopService {
           id: 1,
           updatedAt: 1,
           store: 1,
-          popularProducts: 1,
-          campaign: 1,
           partnerRewards: 1,
           partnerDetails: 1,
           memberDetails: 1,
           refferalProducts: 1,
-          ownerProducts: 1,
           isActive: 1,
           partnerCommission: 1,
-          runningOutProducts: 1,
-          skincareProducts: 1,
-          hairProducts: 1,
+          sections: 1,
         },
       },
     ];

@@ -24,6 +24,15 @@ export class DropCustomer {
   @Field({ nullable: true })
   phone: string;
 }
+@ObjectType('Sections')
+export class Sections {
+  @Field({ nullable: true })
+  name?: string;
+  @Field({ nullable: true })
+  shopifyId?: string;
+  @Field(() => [Product], { nullable: true })
+  products?: Product[];
+}
 @ObjectType()
 export class DropsGroupshop {
   @Field()
@@ -97,4 +106,7 @@ export class DropsGroupshop {
 
   @Field({ nullable: true })
   createdAt?: Date;
+
+  @Field(() => [Sections], { nullable: true })
+  sections?: Sections[];
 }
