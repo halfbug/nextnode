@@ -70,7 +70,7 @@ export class DropKlaviyoListener {
   @OnEvent('drop.klaviyo')
   async dropKlaviyo(event: DropKlaviyoEvent | { webhook: any }) {
     try {
-      console.log('drop.klaviyo  ', JSON.stringify(event));
+      // console.log('drop.klaviyo  ', JSON.stringify(event));
       const webdata = event.webhook;
       const shortURL = webdata.shortUrl;
       const klaviyoId = webdata.customerDetail.klaviyoId;

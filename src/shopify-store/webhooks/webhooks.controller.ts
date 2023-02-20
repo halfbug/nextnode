@@ -551,7 +551,7 @@ export class WebhooksController {
       const rproduct = req.body;
       console.log(
         '🚀 ~ file: webhooks.controller.ts:522 ~ productUpdate ~ rproduct',
-        rproduct,
+        JSON.stringify(rproduct),
       );
       this.productMedia.productId = rproduct.admin_graphql_api_id;
       this.productMedia.shopName = shop;
