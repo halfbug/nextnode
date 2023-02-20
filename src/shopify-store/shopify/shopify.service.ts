@@ -169,6 +169,45 @@ export class ShopifyService {
     return Shopify.Auth.getOfflineSessionId(shop);
   }
 
+  async createBulkOperation(client, id) {
+    return await client.query({
+      data: {
+        query: `mutation {
+      bulkOperationRunQuery(
+        query:"""
+        {
+          collection(id: "${id}") {
+                  title
+                  id
+                  productsCount
+                  products(first:10000, reverse: true, sortKey:CREATED){
+                    edges{
+                      node{
+                        title
+                        id
+                        status
+                        createdAt
+                      }
+                    }
+                  }
+                }
+            }
+        """
+      ) {
+        bulkOperation {
+          id
+          status
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,
+      },
+    });
+  }
+
   async registerHook(shop, accessToken, path, topic) {
     try {
       const host = this.configService.get('HOST') + path;
