@@ -52,6 +52,7 @@ export class ThemeAppExtensionController {
         brandName,
         drops: { collections: [, { shopifyId }], rewards: { maximum } } = {
           rewards: { maximum: 0 },
+          collections: [, { shopifyId: null }],
         },
       } = await this.storesService.findOneWithActiveCampaing(shop);
       // console.log(await this.storesService.findOneWithActiveCampaing(shop));
