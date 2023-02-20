@@ -183,13 +183,106 @@ export class DropsGroupshopService {
         },
       },
       {
+        $addFields: {
+          sections: {
+            $map: {
+              input: '$store.drops.collections',
+              as: 'col',
+              in: {
+                $mergeObjects: [
+                  '$$col',
+                  {
+                    products: {
+                      $filter: {
+                        input: '$collections',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$col.shopifyId', '$$j.id'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
         $lookup: {
           from: 'inventory',
-          localField: 'collections.parentId',
+          localField: 'sections.products.parentId',
           foreignField: 'id',
           as: 'products',
         },
       },
+      {
+        $addFields: {
+          sections: {
+            // sections: {
+            $map: {
+              input: '$sections',
+              as: 'me',
+              in: {
+                $mergeObjects: [
+                  '$$me',
+                  {
+                    products: {
+                      $map: {
+                        input: '$$me.products',
+                        in: {
+                          $arrayElemAt: [
+                            {
+                              $filter: {
+                                input: '$products',
+                                as: 'j',
+                                cond: {
+                                  $eq: ['$$this.parentId', '$$j.id'],
+                                },
+                              },
+                            },
+                            0,
+                          ],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+          // },
+        },
+      },
+      // {
+      //   $addFields: {
+      //     sections: {
+      //       $map: {
+      //         input: "$store.drops.collections",
+      //         as: "col",
+      //         in: {
+      //           $mergeObjects: [
+      //             "$$col",
+      //             {
+      //               products: {
+      //                 $filter: {
+      //                   input: "$productObj",
+      //                   as: "j",
+      //                   cond: {
+      //                     $eq: [
+      //                       "$$col.shopifyId",
+      //                       "$$j.collection.id",
+      //                     ],
+      //                   },
+      //                 },
+      //               },
+      //             },
+      //           ],
+      //         },
+      //       },
+      //     },
+      //   },
+      // }
       {
         $addFields: {
           products: {
@@ -203,63 +296,6 @@ export class DropsGroupshopService {
                   },
                   {
                     $eq: ['$$j.status', 'ACTIVE'],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
-      {
-        $addFields: {
-          productObj: {
-            $map: {
-              input: '$products',
-              as: 'col',
-              in: {
-                $mergeObjects: [
-                  '$$col',
-                  {
-                    collection: {
-                      $arrayElemAt: [
-                        {
-                          $filter: {
-                            input: '$collections',
-                            as: 'j',
-                            cond: {
-                              $eq: ['$$col.id', '$$j.parentId'],
-                            },
-                          },
-                        },
-                        0,
-                      ],
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
-      {
-        $addFields: {
-          sections: {
-            $map: {
-              input: '$store.drops.collections',
-              as: 'col',
-              in: {
-                $mergeObjects: [
-                  '$$col',
-                  {
-                    products: {
-                      $filter: {
-                        input: '$productObj',
-                        as: 'j',
-                        cond: {
-                          $eq: ['$$col.shopifyId', '$$j.collection.id'],
-                        },
-                      },
-                    },
                   },
                 ],
               },
@@ -355,6 +391,9 @@ export class DropsGroupshopService {
           storeId: 1,
           totalProducts: 1,
           shortUrl: 1,
+          products: 1,
+          productObj: 1,
+          collections: 1,
           url: 1,
           obSettings: 1,
           expiredUrl: 1,
