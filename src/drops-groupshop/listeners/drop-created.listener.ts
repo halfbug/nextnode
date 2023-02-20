@@ -44,9 +44,6 @@ export class DropCreatedListener {
           drops: {
             status,
             rewards: { baseline },
-            bestSellerCollectionId,
-            latestCollectionId,
-            allProductsCollectionId,
           },
         } = await this.storesService.findOne(shop);
         if (status === 'Active') {
@@ -77,23 +74,6 @@ export class DropCreatedListener {
           dgroupshop.shortUrl = shortLink;
           dgroupshop.expiredUrl = expiredFulllink;
           dgroupshop.expiredShortUrl = expiredShortLink;
-
-          // const discountCode = await this.shopifyService.setDiscountCode(
-          //   shop,
-          //   'Create',
-          //   accessToken,
-          //   discountTitle,
-          //   parseInt(baseline, 10),
-          //   [
-          //     bestSellerCollectionId,
-          //     latestCollectionId,
-          //     allProductsCollectionId,
-          //   ],
-          //   new Date(),
-          //   null,
-          //   null,
-          //   true,
-          // );
 
           dgroupshop.discountCode = {
             title: discountTitle,

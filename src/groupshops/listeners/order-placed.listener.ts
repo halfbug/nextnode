@@ -302,13 +302,7 @@ export class OrderPlacedListener {
             salesTarget: { rewards },
             products: campaignProducts,
           },
-          drops: {
-            rewards: { baseline, average, maximum },
-            bestSellerCollectionId,
-            latestCollectionId,
-            allProductsCollectionId,
-            spotlightDiscount,
-          } = {
+          drops: { rewards: { baseline, average, maximum } } = {
             rewards: {
               baseline: '0',
               average: '0',
@@ -487,13 +481,6 @@ export class OrderPlacedListener {
 
             const newDiscount =
               dgroupshop.members.length === 1 ? average : maximum;
-
-            const dropsProducts =
-              await this.inventoryService.getProductsByCollectionIDs(shop, [
-                bestSellerCollectionId,
-                latestCollectionId,
-                allProductsCollectionId,
-              ]);
 
             if (
               !!newDiscount &&

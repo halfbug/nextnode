@@ -50,8 +50,7 @@ export class ThemeAppExtensionController {
         status,
         logoImage,
         brandName,
-        drops: { bestSellerCollectionId, rewards: { maximum } } = {
-          bestSellerCollectionId: '',
+        drops: { collections: [, { shopifyId }], rewards: { maximum } } = {
           rewards: { maximum: 0 },
         },
       } = await this.storesService.findOneWithActiveCampaing(shop);
@@ -68,7 +67,7 @@ export class ThemeAppExtensionController {
           }`,
           settings,
           brandName,
-          bestSellerCollectionId,
+          shopifyId,
           dropsLastMilestone: maximum,
         }),
       );

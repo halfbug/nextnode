@@ -976,7 +976,7 @@ async function init() {
 
           const { products } = await gsPost('dropsProducts', {
             shop,
-            bestsellerCollectionId: store.bestSellerCollectionId,
+            bestsellerCollectionId: store.shopifyId,
           });
           if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
             // var glider = Glider(this);
