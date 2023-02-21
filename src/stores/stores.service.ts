@@ -174,26 +174,49 @@ export class StoresService {
           ).length
         ) {
           const dropsGroupshops = await this.dropsService.getActiveDrops(id);
-          dropsGroupshops
-            .filter((dg) => dg.isFullyExpired === false)
-            .forEach(async (dg) => {
-              await this.shopifyapi.setDiscountCode(
-                oldStoreData.shop,
-                'Update',
-                oldStoreData.accessToken,
-                dg.discountCode.title,
-                null,
-                [
-                  ...new Set(
-                    updateStoreInput.drops?.collections.map((c) => c.shopifyId),
-                  ),
-                ],
-                null,
-                null,
-                dg.discountCode.priceRuleId,
-                true,
-              );
-            });
+          // dropsGroupshops
+          //   .filter((dg) => dg.isFullyExpired === false)
+          //   .forEach(async (dg) => {
+          //     await this.shopifyapi.setDiscountCode(
+          //       oldStoreData.shop,
+          //       'Update',
+          //       oldStoreData.accessToken,
+          //       dg.discountCode.title,
+          //       null,
+          //       [
+          //         ...new Set(
+          //           updateStoreInput.drops?.collections.map((c) => c.shopifyId),
+          //         ),
+          //       ],
+          //       null,
+          //       null,
+          //       dg.discountCode.priceRuleId,
+          //       true,
+          //     );
+          //   });
+
+          const arr = dropsGroupshops.filter(
+            (dg) => dg.isFullyExpired === false,
+          );
+
+          for (const dg of arr) {
+            await this.shopifyapi.setDiscountCode(
+              oldStoreData.shop,
+              'Update',
+              oldStoreData.accessToken,
+              dg.discountCode.title,
+              null,
+              [
+                ...new Set(
+                  updateStoreInput.drops?.collections.map((c) => c.shopifyId),
+                ),
+              ],
+              null,
+              null,
+              dg.discountCode.priceRuleId,
+              true,
+            );
+          }
         }
       }
       await this.storeRepository.update({ id }, updateStoreInput);
