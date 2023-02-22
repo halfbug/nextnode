@@ -218,93 +218,6 @@ export class DropsGroupshopService {
       },
       {
         $addFields: {
-          sections: {
-            // sections: {
-            $map: {
-              input: '$sections',
-              as: 'me',
-              in: {
-                $mergeObjects: [
-                  '$$me',
-                  {
-                    products: {
-                      $map: {
-                        input: '$$me.products',
-                        in: {
-                          $arrayElemAt: [
-                            {
-                              $filter: {
-                                input: '$products',
-                                as: 'j',
-                                cond: {
-                                  $eq: ['$$this.parentId', '$$j.id'],
-                                },
-                              },
-                            },
-                            0,
-                          ],
-                        },
-                      },
-                    },
-                  },
-                ],
-              },
-            },
-          },
-          // },
-        },
-      },
-      // {
-      //   $addFields: {
-      //     sections: {
-      //       $map: {
-      //         input: "$store.drops.collections",
-      //         as: "col",
-      //         in: {
-      //           $mergeObjects: [
-      //             "$$col",
-      //             {
-      //               products: {
-      //                 $filter: {
-      //                   input: "$productObj",
-      //                   as: "j",
-      //                   cond: {
-      //                     $eq: [
-      //                       "$$col.shopifyId",
-      //                       "$$j.collection.id",
-      //                     ],
-      //                   },
-      //                 },
-      //               },
-      //             },
-      //           ],
-      //         },
-      //       },
-      //     },
-      //   },
-      // }
-      {
-        $addFields: {
-          products: {
-            $filter: {
-              input: '$products',
-              as: 'j',
-              cond: {
-                $and: [
-                  {
-                    $ne: ['$$j.publishedAt', null],
-                  },
-                  {
-                    $eq: ['$$j.status', 'ACTIVE'],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
-      {
-        $addFields: {
           members: {
             $map: {
               input: '$members',
@@ -330,6 +243,66 @@ export class DropsGroupshopService {
                                 as: 'j',
                                 cond: {
                                   $eq: ['$$this.product.id', '$$j.id'],
+                                },
+                              },
+                            },
+                            0,
+                          ],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          products: {
+            $filter: {
+              input: '$products',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $ne: ['$$j.publishedAt', null],
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          sections: {
+            $map: {
+              input: '$sections',
+              as: 'me',
+              in: {
+                $mergeObjects: [
+                  '$$me',
+                  {
+                    products: {
+                      $map: {
+                        input: '$$me.products',
+                        in: {
+                          $arrayElemAt: [
+                            {
+                              $filter: {
+                                input: '$products',
+                                as: 'j',
+                                cond: {
+                                  if: {
+                                    $eq: ['$$this.parentId', '$$j.id'],
+                                  },
+                                  then: ['$$this'],
+                                  else: [],
                                 },
                               },
                             },
