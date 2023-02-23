@@ -268,4 +268,51 @@ export class KalavioService {
     const result = await manager.aggregate(Groupshops, agg).toArray();
     return result;
   }
+
+  async enableSmsConsent(phone_number, profileId) {
+    const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
+    const urlKlaviyo = `${this.configService.get(
+      'KLAVIYO_BASE_URL',
+    )}${'/profile-subscription-bulk-create-jobs/'}`;
+    const options = {
+      headers: {
+        Authorization: `${'Klaviyo-API-Key '}${PRIVATE_KEY}`,
+        Accept: 'application/json',
+        'content-type': 'application/json',
+        revision: '2023-01-24',
+      },
+    };
+    console.log(urlKlaviyo);
+    const body = JSON.stringify({
+      data: {
+        type: 'profile-subscription-bulk-create-job',
+        attributes: {
+          list_id: 'VvVPfz', // SMS Subscribers klaviyo list Id
+          custom_source: 'Marketing Event',
+          subscriptions: [
+            {
+              channels: {
+                sms: ['MARKETING'],
+              },
+              phone_number: phone_number,
+              profile_id: profileId,
+            },
+          ],
+        },
+      },
+    });
+    try {
+      const res = this.httpService
+        .post(urlKlaviyo, body, options)
+        .subscribe(async (res) => {
+          // console.log(res);
+        });
+      return res;
+    } catch (err) {
+      console.log({ err });
+      console.log(JSON.stringify(err));
+      Logger.error(err, KalavioService.name);
+      return false;
+    }
+  }
 }

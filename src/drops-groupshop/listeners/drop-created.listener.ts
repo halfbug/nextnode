@@ -114,6 +114,12 @@ export class DropCreatedListener {
             })
             .join('&');
           await this.kalavioService.klaviyoProfileUpdate(webdata.id, data);
+          if (webdata.phone_number !== '' || webdata.phone_number !== null) {
+            await this.kalavioService.enableSmsConsent(
+              webdata.phone_number,
+              webdata.id,
+            );
+          }
         }
       }
     } catch (err) {
