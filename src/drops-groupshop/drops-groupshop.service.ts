@@ -161,6 +161,7 @@ export class DropsGroupshopService {
           'discountCode.title': discountCode,
         },
       },
+
       {
         $lookup: {
           from: 'store',
@@ -289,25 +290,30 @@ export class DropsGroupshopService {
                   '$$me',
                   {
                     products: {
-                      $map: {
-                        input: '$$me.products',
-                        in: {
-                          $arrayElemAt: [
-                            {
-                              $filter: {
-                                input: '$products',
-                                as: 'j',
-                                cond: {
-                                  if: {
-                                    $eq: ['$$this.parentId', '$$j.id'],
+                      $filter: {
+                        input: {
+                          $map: {
+                            input: '$$me.products',
+                            as: 'mep',
+                            in: {
+                              $arrayElemAt: [
+                                {
+                                  $filter: {
+                                    input: '$products',
+                                    as: 'j',
+                                    cond: {
+                                      $eq: ['$$mep.parentId', '$$j.id'],
+                                    },
                                   },
-                                  then: ['$$this'],
-                                  else: [],
                                 },
-                              },
+                                0,
+                              ],
                             },
-                            0,
-                          ],
+                          },
+                        },
+                        as: 'd',
+                        cond: {
+                          $ne: ['$$d', null],
                         },
                       },
                     },
