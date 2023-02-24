@@ -142,6 +142,9 @@ export class OrderCreatedListener {
         shop,
       );
       newOrderPlaced.lineItems = lineItems;
+      newOrderPlaced.gsId = whOrder.note_attributes.length
+        ? whOrder.note_attributes[0]?.value
+        : null;
       // console.log(
       //   '🚀 ~ file: order-created.listener.ts:137 ~ OrderCreatedListener ~ addOrder ~ newOrderPlaced',
       //   JSON.stringify(newOrderPlaced.store.activeCampaign),

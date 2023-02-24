@@ -312,6 +312,7 @@ export class OrderPlacedListener {
           id,
         },
         lineItems,
+        gsId,
       } = event;
       console.log('totalProductPrice : ' + totalProductPrice);
       this.accessToken = accessToken;
@@ -347,6 +348,8 @@ export class OrderPlacedListener {
           pgroupshop = await this.partnerSrv.findOne(discountCode);
           cgroupshop = await this.channelGSService.findChannelGS(discountCode);
           dgroupshop = await this.dropsService.findDropsGS(discountCode);
+        } else {
+          dgroupshop = await this.dropsService.findOne(gsId);
         }
         if (ugroupshop) {
           console.log('🚀 ugroupshop groupshop', ugroupshop);

@@ -19,4 +19,5 @@ export class OrderPlacedEvent {
   klaviyo: KlaviyoProfile;
   store: Store;
   lineItems: any[];
+  gsId: string;
 }
