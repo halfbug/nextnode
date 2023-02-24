@@ -127,6 +127,9 @@ export class Drops {
 
   @Field({ nullable: true })
   rewards?: PartnerRewards;
+
+  @Field({ nullable: true })
+  lastSync?: Date;
 }
 
 @ObjectType('Store')

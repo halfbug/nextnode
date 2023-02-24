@@ -88,6 +88,9 @@ export class Drops {
 
   @Column({ nullable: true })
   rewards?: PartnerRewards;
+
+  @Column({ nullable: true, default: null })
+  lastSync?: Date;
 }
 
 @Entity()

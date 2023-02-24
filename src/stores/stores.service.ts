@@ -217,6 +217,7 @@ export class StoresService {
               true,
             );
           }
+          updateStoreInput.drops.lastSync = new Date();
         }
       }
       await this.storeRepository.update({ id }, updateStoreInput);

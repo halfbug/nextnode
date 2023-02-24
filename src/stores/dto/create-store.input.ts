@@ -169,6 +169,9 @@ export class DropsInput {
 
   @Field({ nullable: true })
   rewards?: PartnerRewardsInput;
+
+  @Field({ nullable: true })
+  lastSync?: Date;
 }
 @InputType()
 export class CreateStoreInput {
