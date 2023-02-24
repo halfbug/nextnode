@@ -50,9 +50,9 @@ export class ThemeAppExtensionController {
         status,
         logoImage,
         brandName,
-        drops: { collections: [, { shopifyId }], rewards: { maximum } } = {
+        drops: { collections, rewards: { maximum } } = {
           rewards: { maximum: 0 },
-          collections: [, { shopifyId: null }],
+          collections: [],
         },
       } = await this.storesService.findOneWithActiveCampaing(shop);
       // console.log(await this.storesService.findOneWithActiveCampaing(shop));
@@ -68,7 +68,8 @@ export class ThemeAppExtensionController {
           }`,
           settings,
           brandName,
-          shopifyId,
+          shopifyId: collections.filter((c) => c.name === 'Bestsellers')[0] // Static Bestseller name for idetify collection.
+            .shopifyId,
           dropsLastMilestone: maximum,
         }),
       );
