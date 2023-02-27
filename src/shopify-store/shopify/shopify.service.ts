@@ -422,6 +422,7 @@ export class ShopifyService {
       };
     } catch (err) {
       console.log('err', JSON.stringify(err));
+      Logger.error(err, 'setDiscountCode');
     }
   }
 
