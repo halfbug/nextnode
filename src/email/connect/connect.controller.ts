@@ -471,7 +471,14 @@ export class CatController {
     const month = ('0' + (d.getMonth() + 1)).slice(-2);
     const day = ('0' + d.getDate()).slice(-2);
     lastWeek = Date.parse(`${year}${'-'}${month}${'-'}${day}`);
+
+    const td = new Date(new Date().setDate(new Date().getDate()));
+    const tyear = td.getFullYear();
+    const tmonth = ('0' + (td.getMonth() + 1)).slice(-2);
+    const tday = ('0' + td.getDate()).slice(-2);
+    const today = Date.parse(`${tyear}${'-'}${tmonth}${'-'}${tday}`);
     let nextPage = '';
+
     Logger.log(
       `Weekly Drop Cron start for the listId : ${listId} at ${new Date()}`,
       'WeeklyDropCron',
@@ -489,21 +496,29 @@ export class CatController {
         nextPage = '';
       }
       // console.log('profiles', JSON.stringify(profiles));
-      profiles?.data.map(async (profile, index) => {
+      let indexCounter = 0;
+      for (const profile of profiles?.data) {
         const arrayLength = profiles.data.length;
         counter = counter + 1;
+        indexCounter = indexCounter + 1;
         const klaviyoId = profile?.id;
         const createdAt = profile.attributes.properties?.groupshop_created_at;
         const drop_source = profile.attributes.properties?.groupshop_source
           ? profile.attributes.properties?.groupshop_source
           : '';
 
-        if (drop_source === 'API' && createdAt > lastWeek) {
+        if (
+          (drop_source === 'API' && createdAt > lastWeek) ||
+          (drop_source === 'CRON' && createdAt === today)
+        ) {
           console.log('Drop recently created ', klaviyoId);
         } else {
           updatedCounter = updatedCounter + 1;
+          const fullname =
+            profile?.attributes?.properties?.['Full Name'] ?? null;
           const webdata = {
             id: klaviyoId,
+            fullname: fullname,
             first_name: profile?.attributes?.first_name,
             last_name: profile?.attributes?.last_name,
             email: profile?.attributes?.email,
@@ -515,7 +530,7 @@ export class CatController {
           await this.dropCreatedListener.addCronDrop(inputListener);
         }
         // eslint-disable-next-line prettier/prettier
-       if (nextPage === '' && arrayLength === (index + 1)) {
+         if (nextPage === '' && arrayLength === (indexCounter + 1)) {
           console.log(
             `Weekly Drop Cron completed ${updatedCounter}/${counter} at ${new Date()} `,
           );
@@ -525,7 +540,7 @@ export class CatController {
             true,
           );
         }
-      });
+      }
     } while (nextPage !== '');
     res.status(200).send('Success');
   }

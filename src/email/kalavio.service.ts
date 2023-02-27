@@ -129,6 +129,7 @@ export class KalavioService {
       );
       return getProfiles;
     } catch (err) {
+      Logger.error(err, KalavioService.name);
       console.error(err);
     }
   }
