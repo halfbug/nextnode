@@ -121,6 +121,9 @@ export class Drops {
   @Field({ nullable: true })
   spotlightDiscount?: DiscountCode;
 
+  @Field({ nullable: true })
+  vaultDiscount?: DiscountCode;
+
   @Field(() => [Collections], { nullable: 'itemsAndList' })
   collections?: Collections[];
 

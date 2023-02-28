@@ -91,6 +91,9 @@ export class Drops {
   allProductsCollectionId?: string;
 
   @Column({ nullable: true })
+  vaultDiscount?: DiscountCode;
+
+  @Column({ nullable: true })
   rewards?: PartnerRewards;
 
   @Column({ nullable: true, default: null })

@@ -147,6 +147,9 @@ export class DropsInput {
   @Field({ nullable: true })
   spotlightDiscount?: DiscountCodeInput;
 
+  @Field({ nullable: true })
+  vaultDiscount?: DiscountCodeInput;
+
   @Field(() => [CollectionsInputs], { nullable: 'itemsAndList' })
   collections?: CollectionsInputs[];
 
