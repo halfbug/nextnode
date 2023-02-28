@@ -407,9 +407,10 @@ export class ShopifyService {
         });
       }
       console.log(
-        '🚀 ~ file: shopify.service.ts ~ line 196 ~ ShopifyService ~ priceRule',
+        '🚀 ~ file: shopify.service.ts ~ line 410 ~ ShopifyService ~ priceRule',
         JSON.stringify(priceRule),
       );
+      Logger.log(JSON.stringify(priceRule), 'setDiscountCode', true);
       const {
         [`priceRule${action}`]: {
           priceRule: { id: priceRuleId, title: title1 },
@@ -423,6 +424,11 @@ export class ShopifyService {
     } catch (err) {
       console.log('err', JSON.stringify(err));
       Logger.error(err, 'setDiscountCode');
+      return {
+        title: title ?? null,
+        percentage: percentage?.toString() ?? null,
+        priceRuleId: null,
+      };
     }
   }
 
