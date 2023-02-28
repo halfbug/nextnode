@@ -1797,22 +1797,6 @@ export class WebhooksController {
       const dropsGroupshops = await this.dropsGroupshopService.getActiveDrops(
         id,
       );
-      // dropsGroupshops
-      //   .filter((dg) => dg.isFullyExpired === false)
-      //   .forEach(async (dg) => {
-      //     await this.shopifyService.setDiscountCode(
-      //       shop,
-      //       'Update',
-      //       accessToken,
-      //       dg.discountCode.title,
-      //       null,
-      //       [...new Set(collections.map((c) => c.shopifyId))],
-      //       null,
-      //       null,
-      //       dg.discountCode.priceRuleId,
-      //       true,
-      //     );
-      //   });
 
       const arr = dropsGroupshops.filter((dg) => dg.isFullyExpired === false);
 

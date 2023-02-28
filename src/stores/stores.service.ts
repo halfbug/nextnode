@@ -5,11 +5,12 @@ import { CreateStoreInput } from './dto/create-store.input';
 import { UpdateStoreInput } from './dto/update-store.input';
 import Store from './entities/store.model';
 import { v4 as uuid } from 'uuid';
-import { Resource } from './entities/store.entity';
+import { CodeUpdateStatusTypeEnum, Resource } from './entities/store.entity';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { Product } from 'src/inventory/entities/product.entity';
 import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
+import { DropsCollectionUpdatedEvent } from 'src/drops-groupshop/events/drops-collection-update.event';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash');
 
@@ -20,6 +21,7 @@ export class StoresService {
     private shopifyapi: ShopifyService,
     @Inject(forwardRef(() => DropsGroupshopService))
     private dropsService: DropsGroupshopService,
+    private dropsCollectionUpdatedEvent: DropsCollectionUpdatedEvent,
     private inventoryService: InventoryService,
   ) {}
 
@@ -174,57 +176,33 @@ export class StoresService {
           ).length
         ) {
           const dropsGroupshops = await this.dropsService.getActiveDrops(id);
-          // dropsGroupshops
-          //   .filter((dg) => dg.isFullyExpired === false)
-          //   .forEach(async (dg) => {
-          //     await this.shopifyapi.setDiscountCode(
-          //       oldStoreData.shop,
-          //       'Update',
-          //       oldStoreData.accessToken,
-          //       dg.discountCode.title,
-          //       null,
-          //       [
-          //         ...new Set(
-          //           updateStoreInput.drops?.collections.map((c) => c.shopifyId),
-          //         ),
-          //       ],
-          //       null,
-          //       null,
-          //       dg.discountCode.priceRuleId,
-          //       true,
-          //     );
-          //   });
-
           const arr = dropsGroupshops.filter(
             (dg) => dg.isFullyExpired === false,
           );
 
-          for (const dg of arr) {
-            await this.shopifyapi.setDiscountCode(
-              oldStoreData.shop,
-              'Update',
-              oldStoreData.accessToken,
-              dg.discountCode.title,
-              null,
-              [
-                ...new Set(
-                  updateStoreInput.drops?.collections.map((c) => c.shopifyId),
-                ),
-              ],
-              null,
-              null,
-              dg.discountCode.priceRuleId,
-              true,
-            );
-          }
-          updateStoreInput.drops.lastSync = new Date();
+          this.dropsCollectionUpdatedEvent.shop = oldStoreData.shop;
+          this.dropsCollectionUpdatedEvent.accessToken =
+            oldStoreData.accessToken;
+          this.dropsCollectionUpdatedEvent.collections =
+            updateStoreInput.drops?.collections;
+          this.dropsCollectionUpdatedEvent.dropsGroupshops = arr;
+          this.dropsCollectionUpdatedEvent.storeId = id;
+          this.dropsCollectionUpdatedEvent.emit();
+
+          updateStoreInput.drops.codeUpdateStatus =
+            CodeUpdateStatusTypeEnum.inprogress;
         }
       }
       await this.storeRepository.update({ id }, updateStoreInput);
     } catch (err) {
-      console.log('Bulk update Discount codes', err);
-      Logger.error('Bulk update Discount codes', err);
+      console.log(err, StoresService.name);
+      Logger.error(err, StoresService.name);
     }
+    return await this.findOneById(id);
+  }
+
+  async updateStore(id: string, updateStoreInput: UpdateStoreInput) {
+    await this.storeRepository.update({ id }, updateStoreInput);
     return await this.findOneById(id);
   }
 
@@ -869,5 +847,12 @@ export class StoresService {
     //   'gid://shopify/DiscountAutomaticNode/1396298088614', // id is neccesarry for update
     // );
     return discountCode;
+  }
+
+  async getUpdateDiscountStatus(storeId: string) {
+    const {
+      drops: { codeUpdateStatus, lastSync },
+    } = await this.findById(storeId);
+    return { codeUpdateStatus, lastSync };
   }
 }

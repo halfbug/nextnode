@@ -11,6 +11,7 @@ import {
   BillingTierEnum,
   Resource,
 } from '../entities/store.entity';
+import { CodeUpdateStatusTypeEnum } from '../entities/store.entity';
 // import { Settings } from '../entities/settings.entity';
 
 @InputType()
@@ -172,6 +173,9 @@ export class DropsInput {
 
   @Field({ nullable: true })
   lastSync?: Date;
+
+  @Field(() => CodeUpdateStatusTypeEnum)
+  codeUpdateStatus?: CodeUpdateStatusTypeEnum;
 }
 @InputType()
 export class CreateStoreInput {

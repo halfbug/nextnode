@@ -14,6 +14,8 @@ import { DropKlaviyoCron } from './drops.cron';
 import { KalavioService } from 'src/email/kalavio.service';
 import { DropCreatedEvent } from './events/drop-created.event';
 import { DropCreatedListener } from './listeners/drop-created.listener';
+import { DropsCollectionUpdatedEvent } from './events/drops-collection-update.event';
+import { DropsCollectionUpdatedListener } from './listeners/drops-collection-update.listener';
 
 @Module({
   imports: [
@@ -33,7 +35,15 @@ import { DropCreatedListener } from './listeners/drop-created.listener';
     KalavioService,
     DropCreatedEvent,
     DropCreatedListener,
+    DropsCollectionUpdatedEvent,
+    DropsCollectionUpdatedListener,
   ],
-  exports: [DropsGroupshopService, DropCreatedEvent, DropCreatedListener],
+  exports: [
+    DropsGroupshopService,
+    DropCreatedEvent,
+    DropCreatedListener,
+    DropsCollectionUpdatedEvent,
+    DropsCollectionUpdatedListener,
+  ],
 })
 export class DropsGroupshopModule {}

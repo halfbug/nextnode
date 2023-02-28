@@ -34,12 +34,29 @@ export enum BillingTierEnum {
   TIER6,
   TIER7,
 }
+export enum CodeUpdateStatusTypeEnum {
+  none,
+  inprogress,
+  completed,
+}
+registerEnumType(CodeUpdateStatusTypeEnum, {
+  name: 'CodeUpdateStatusTypeEnum',
+});
 registerEnumType(BillingPlanEnum, {
   name: 'BillingPlanEnum',
 });
 registerEnumType(BillingTierEnum, {
   name: 'BillingTierEnum',
 });
+
+@ObjectType()
+export class getUpdateDiscountStatus {
+  @Field({ nullable: true })
+  lastSync?: Date;
+
+  @Field(() => CodeUpdateStatusTypeEnum)
+  codeUpdateStatus?: CodeUpdateStatusTypeEnum;
+}
 
 @InputType('ResourceInput')
 @ObjectType('Resource')
@@ -130,6 +147,9 @@ export class Drops {
 
   @Field({ nullable: true })
   lastSync?: Date;
+
+  @Field(() => CodeUpdateStatusTypeEnum)
+  codeUpdateStatus?: CodeUpdateStatusTypeEnum;
 }
 
 @ObjectType('Store')

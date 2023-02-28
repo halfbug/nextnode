@@ -3,7 +3,11 @@ import { DefaultColumnsService } from 'src/utils/default-columns/default-columns
 import { Settings } from './settings.model';
 import SocialLinks from 'src/campaigns/entities/social-link.model';
 import Campaign from 'src/campaigns/entities/campaign.model';
-import { BillingPlanEnum, BillingTierEnum } from './store.entity';
+import {
+  BillingPlanEnum,
+  BillingTierEnum,
+  CodeUpdateStatusTypeEnum,
+} from './store.entity';
 import {
   DiscountCode,
   PartnerRewards,
@@ -91,6 +95,9 @@ export class Drops {
 
   @Column({ nullable: true, default: null })
   lastSync?: Date;
+
+  @Column('enum', { default: CodeUpdateStatusTypeEnum.none })
+  codeUpdateStatus?: CodeUpdateStatusTypeEnum;
 }
 
 @Entity()
