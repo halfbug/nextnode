@@ -35,6 +35,8 @@ import { Public } from 'src/auth/public.decorator';
 import { DropCreatedListener } from 'src/drops-groupshop/listeners/drop-created.listener';
 import { UpdateDropsGroupshopInput } from 'src/drops-groupshop/dto/update-drops-groupshop.input';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
+import { LifecycleService } from 'src/gs-common/lifecycle.service';
+import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 @Public()
 @Controller('connect')
 export class CatController {
@@ -48,6 +50,7 @@ export class CatController {
     private storeService: StoreService,
     private readonly storesService: StoresService,
     private campaignsService: CampaignsService,
+    private readonly lifecyclesrv: LifecycleService,
     private ordersService: OrdersService,
     private kalavioService: KalavioService,
     private uploadImageService: UploadImageService,
@@ -514,6 +517,20 @@ export class CatController {
           console.log('Drop recently created ', klaviyoId);
         } else {
           updatedCounter = updatedCounter + 1;
+          const dropGroupshops =
+            await this.dropsGroupshopService.getGroupshopByKlaviyoId(klaviyoId);
+          // Update status in database of old pending drop groupshop
+          dropGroupshops.map(async (dgroupshop) => {
+            dgroupshop.expiredAt = new Date();
+
+            this.lifecyclesrv.create({
+              groupshopId: dgroupshop.id,
+              event: EventType.revised,
+              dateTime: new Date(),
+            });
+
+            await this.dropsGroupshopService.update(dgroupshop.id, dgroupshop);
+          });
           const fullname =
             profile?.attributes?.properties?.['Full Name'] ?? null;
           const webdata = {

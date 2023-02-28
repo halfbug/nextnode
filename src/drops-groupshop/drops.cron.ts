@@ -4,11 +4,14 @@ import { ConfigService } from '@nestjs/config';
 import { KalavioService } from 'src/email/kalavio.service';
 import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
 import { DropCreatedListener } from 'src/drops-groupshop/listeners/drop-created.listener';
+import { LifecycleService } from 'src/gs-common/lifecycle.service';
+import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 @Injectable()
 export class DropKlaviyoCron {
   constructor(
     private kalavioService: KalavioService,
     private dropsGroupshopService: DropsGroupshopService,
+    private readonly lifecyclesrv: LifecycleService,
     private configService: ConfigService,
     private dropCreatedListener: DropCreatedListener,
   ) {}
@@ -99,6 +102,26 @@ export class DropKlaviyoCron {
             console.log('Drop recently created ', klaviyoId);
           } else {
             updatedCounter = updatedCounter + 1;
+            const dropGroupshops =
+              await this.dropsGroupshopService.getGroupshopByKlaviyoId(
+                klaviyoId,
+              );
+            // Update status in database of old pending drop groupshop
+            dropGroupshops.map(async (dgroupshop) => {
+              dgroupshop.status = 'expired';
+              dgroupshop.expiredAt = new Date();
+
+              this.lifecyclesrv.create({
+                groupshopId: dgroupshop.id,
+                event: EventType.revised,
+                dateTime: new Date(),
+              });
+
+              await this.dropsGroupshopService.update(
+                dgroupshop.id,
+                dgroupshop,
+              );
+            });
             const fullname =
               profile?.attributes?.properties?.['Full Name'] ?? null;
             const webdata = {

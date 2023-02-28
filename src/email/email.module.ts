@@ -12,6 +12,7 @@ import { KalavioResolver } from './kalavio.resolver';
 import { StoresModule } from 'src/stores/stores.module';
 import { CampaignsModule } from 'src/campaigns/campaigns.module';
 import { DropsGroupshopModule } from 'src/drops-groupshop/drops-groupshop.module';
+import { GsCommonModule } from 'src/gs-common/gs-common.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { DropsGroupshopModule } from 'src/drops-groupshop/drops-groupshop.module
     InventoryModule,
     forwardRef(() => DropsGroupshopModule),
     forwardRef(() => CampaignsModule),
+    forwardRef(() => GsCommonModule),
     UploadImageModule,
     forwardRef(() => StoresModule),
   ],
