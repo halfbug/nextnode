@@ -68,8 +68,9 @@ export class ThemeAppExtensionController {
           }`,
           settings,
           brandName,
-          shopifyId: collections.filter((c) => c.name === 'Bestsellers')[0] // Static Bestseller name for idetify collection.
-            .shopifyId,
+          shopifyId:
+            collections.filter((c) => c.name === 'Bestsellers')?.[0]
+              ?.shopifyId ?? '', // Static Bestseller name for idetify collection.
           dropsLastMilestone: maximum,
         }),
       );

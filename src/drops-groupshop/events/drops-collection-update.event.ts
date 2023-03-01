@@ -1,7 +1,7 @@
 import { EventBase } from 'src/utils/event.base';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Injectable } from '@nestjs/common';
-import { Collections } from '../../stores/entities/store.entity';
+import { Collections, Drops } from '../../stores/entities/store.entity';
 
 @Injectable()
 export class DropsCollectionUpdatedEvent extends EventBase {
@@ -11,6 +11,7 @@ export class DropsCollectionUpdatedEvent extends EventBase {
   public collections: Collections[];
   public dropsGroupshops: any;
   public storeId: string;
+  public drops: any;
   emit() {
     this.eventEmitter.emit('dropsCollection.updated', this);
   }

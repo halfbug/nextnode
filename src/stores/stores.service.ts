@@ -187,6 +187,7 @@ export class StoresService {
             updateStoreInput.drops?.collections;
           this.dropsCollectionUpdatedEvent.dropsGroupshops = arr;
           this.dropsCollectionUpdatedEvent.storeId = id;
+          this.dropsCollectionUpdatedEvent.drops = updateStoreInput?.drops;
           this.dropsCollectionUpdatedEvent.emit();
 
           updateStoreInput.drops.codeUpdateStatus =

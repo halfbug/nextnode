@@ -20,6 +20,7 @@ export class DropsCollectionUpdatedListener {
     accessToken,
     collections,
     storeId,
+    drops,
   }: DropsCollectionUpdatedEvent) {
     try {
       for (const dg of dropsGroupshops) {
@@ -36,8 +37,6 @@ export class DropsCollectionUpdatedListener {
           true,
         );
       }
-
-      const { drops } = await this.storesService.findOneById(storeId);
 
       const updateStoreInput = new UpdateStoreInput();
       updateStoreInput.drops = {
