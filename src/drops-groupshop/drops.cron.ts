@@ -54,6 +54,7 @@ export class DropKlaviyoCron {
       let lastWeek: any = '';
       let counter = 0;
       let updatedCounter = 0;
+      let lastWeekCounter = 0;
       const d = new Date(new Date().setDate(new Date().getDate() - 7));
       const year = d.getFullYear();
       const month = ('0' + (d.getMonth() + 1)).slice(-2);
@@ -99,6 +100,7 @@ export class DropKlaviyoCron {
             (drop_source === 'API' && createdAt > lastWeek) ||
             (drop_source === 'CRON' && createdAt === today)
           ) {
+            lastWeekCounter = lastWeekCounter + 1;
             console.log('Drop recently created ', klaviyoId);
           } else {
             updatedCounter = updatedCounter + 1;
@@ -144,6 +146,11 @@ export class DropKlaviyoCron {
             );
             Logger.log(
               `Weekly Drop Cron completed ${updatedCounter}/${counter} at ${new Date()} `,
+              'WeeklyDropCron',
+              true,
+            );
+            Logger.log(
+              `Weekly Drop created last week ${lastWeekCounter}/${counter} at ${new Date()} `,
               'WeeklyDropCron',
               true,
             );
