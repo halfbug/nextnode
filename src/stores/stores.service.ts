@@ -177,7 +177,11 @@ export class StoresService {
         ) {
           const dropsGroupshops = await this.dropsService.getActiveDrops(id);
           const arr = dropsGroupshops.filter(
-            (dg) => dg.isFullyExpired === false,
+            (dg) =>
+              dg.isFullyExpired === false &&
+              dg.discountCode !== null &&
+              dg.discountCode.title !== null &&
+              dg.discountCode.priceRuleId !== null,
           );
 
           this.dropsCollectionUpdatedEvent.shop = oldStoreData.shop;
@@ -188,7 +192,9 @@ export class StoresService {
           this.dropsCollectionUpdatedEvent.dropsGroupshops = arr;
           this.dropsCollectionUpdatedEvent.storeId = id;
           this.dropsCollectionUpdatedEvent.drops = updateStoreInput?.drops;
-          this.dropsCollectionUpdatedEvent.emit();
+          if (arr.length) {
+            this.dropsCollectionUpdatedEvent.emit();
+          }
 
           updateStoreInput.drops.codeUpdateStatus =
             CodeUpdateStatusTypeEnum.inprogress;
