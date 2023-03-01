@@ -414,7 +414,7 @@ export class ShopifyService {
         '🚀 ~ file: shopify.service.ts ~ line 410 ~ ShopifyService ~ priceRule',
         JSON.stringify(priceRule),
       );
-      if (priceRule.body['data'].priceRuleUserErrors.length)
+      if (priceRule.body['data'].priceRuleCreate.priceRuleUserErrors.length)
         Logger.log(JSON.stringify(priceRule), 'setDiscountCodeError', true);
       const {
         [`priceRule${action}`]: {
