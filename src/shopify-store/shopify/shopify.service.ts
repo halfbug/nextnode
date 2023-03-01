@@ -299,7 +299,9 @@ export class ShopifyService {
                   percentageValue: -percentage,
                 },
                 itemEntitlements: {
-                  [isCollection ? 'collectionIds' : 'productIds']: products,
+                  [isCollection ? 'collectionIds' : 'productIds']: [
+                    ...new Set(products),
+                  ],
                 },
                 combinesWith: {
                   productDiscounts: true,
@@ -353,7 +355,9 @@ export class ShopifyService {
             id,
             priceRule: {
               itemEntitlements: {
-                [isCollection ? 'collectionIds' : 'productIds']: products,
+                [isCollection ? 'collectionIds' : 'productIds']: [
+                  ...new Set(products),
+                ],
               },
               combinesWith: {
                 productDiscounts: true,
@@ -410,7 +414,8 @@ export class ShopifyService {
         '🚀 ~ file: shopify.service.ts ~ line 410 ~ ShopifyService ~ priceRule',
         JSON.stringify(priceRule),
       );
-      Logger.log(JSON.stringify(priceRule), 'setDiscountCode', true);
+      if (priceRule.body['data'].priceRuleUserErrors.length)
+        Logger.log(JSON.stringify(priceRule), 'setDiscountCodeError', true);
       const {
         [`priceRule${action}`]: {
           priceRule: { id: priceRuleId, title: title1 },
