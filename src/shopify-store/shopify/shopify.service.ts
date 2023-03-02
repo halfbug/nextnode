@@ -434,7 +434,7 @@ export class ShopifyService {
       return {
         title: title ?? null,
         percentage: percentage?.toString() ?? null,
-        priceRuleId: null,
+        priceRuleId: id ?? null,
       };
     }
   }
