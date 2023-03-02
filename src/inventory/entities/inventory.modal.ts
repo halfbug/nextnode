@@ -123,4 +123,7 @@ export default class Inventory extends DefaultColumnsService {
 
   @Column({ nullable: true })
   vendor?: string;
+
+  @Column({ nullable: true })
+  type?: string;
 }

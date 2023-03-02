@@ -17,6 +17,8 @@ import { ProductMediaObject } from './events/product-media.event';
 import { StoresModule } from 'src/stores/stores.module';
 import { InventoryDoneEvent } from './events/inventory-done.event';
 import { ProductOutofstockEvent } from './events/product-outofstock.event';
+import { UpdateSmartCollectionEvent } from './events/update-smart-collection.event';
+import { UpdateSmartCollectionListner } from './listeners/update-smart-collection.listner';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { ProductOutofstockEvent } from './events/product-outofstock.event';
     ProductMediaObject,
     InventoryDoneEvent,
     ProductOutofstockEvent,
+    UpdateSmartCollectionEvent,
+    UpdateSmartCollectionListner,
   ],
   exports: [
     InventoryService,
@@ -45,6 +49,7 @@ import { ProductOutofstockEvent } from './events/product-outofstock.event';
     ProductMediaObject,
     InventoryDoneEvent,
     ProductOutofstockEvent,
+    UpdateSmartCollectionEvent,
   ],
 })
 export class InventoryModule {}

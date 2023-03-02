@@ -37,6 +37,12 @@ export class InventoryReceivedListener {
         inventory.parentId = inventory.__parentId;
         delete inventory.__parentId;
       }
+
+      if (inventory.ruleSet) {
+        inventory.type = 'smart';
+      } else {
+        inventory.type = 'custom';
+      }
       // add shop to inventory
       inventory.shop = shop;
 

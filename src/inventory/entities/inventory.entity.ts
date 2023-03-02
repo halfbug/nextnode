@@ -114,4 +114,7 @@ export class Inventory {
 
   @Field({ nullable: true })
   vendor?: string;
+
+  @Field({ nullable: true })
+  type?: string;
 }

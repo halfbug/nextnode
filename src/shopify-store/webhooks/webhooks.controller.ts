@@ -56,7 +56,7 @@ import { v4 as uuid } from 'uuid';
 import { ProductOutofstockEvent } from 'src/inventory/events/product-outofstock.event';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
 import { DiscountCodeInput } from 'src/groupshops/dto/create-groupshops.input';
-import { generatesecondaryCount } from 'src/utils/functions';
+import { UpdateSmartCollectionEvent } from 'src/inventory/events/update-smart-collection.event';
 @Public()
 @Controller('webhooks')
 export class WebhooksController {
@@ -78,6 +78,7 @@ export class WebhooksController {
     public campaignStock: ProductOutofstockEvent,
     private lifecyclesrv: LifecycleService,
     private campaignService: CampaignsService,
+    private updateSmartCollection: UpdateSmartCollectionEvent,
   ) {}
   async refreshSingleProduct(shop, accessToken, id, shopName) {
     try {
@@ -509,6 +510,9 @@ export class WebhooksController {
 
         this.inventryService.create(vprod);
       });
+      this.updateSmartCollection.productId = rproduct?.admin_graphql_api_id;
+      this.updateSmartCollection.shop = shop;
+      this.updateSmartCollection.emit();
     } catch (err) {
       console.log(JSON.stringify(err));
       Logger.error(err, 'product-created');
@@ -640,9 +644,11 @@ export class WebhooksController {
         vprod.shop = shop;
         // image
         vprod.src = img.src;
-
         this.inventryService.create(vprod);
       });
+      this.updateSmartCollection.productId = rproduct?.admin_graphql_api_id;
+      this.updateSmartCollection.shop = shop;
+      this.updateSmartCollection.emit();
 
       nprod.outofstock =
         nprod.status !== 'ACTIVE'
@@ -933,6 +939,12 @@ export class WebhooksController {
       // 1. receive collection webhook
       const { shop: shopName } = req.query;
       const rcollection = req.body;
+      let collectionType;
+      if ('rules' in rcollection && rcollection.rules.length) {
+        collectionType = 'smart';
+      } else {
+        collectionType = 'custom';
+      }
       console.log(
         'WebhooksController ~ collection-update ~ ',
         JSON.stringify(rcollection),
@@ -1057,6 +1069,7 @@ export class WebhooksController {
                     //   /<\/?[^>]+(>|$)/g,
                     //   '',
                     // ),
+                    type: collectionType,
                     description: rcollection.body_html,
                     productsCount: productsArray.length,
                     sortOrder: rcollection.sort_order.toUpperCase(),

@@ -98,4 +98,7 @@ export class CreateInventoryInput {
 
   @Field({ nullable: true })
   vendor?: string;
+
+  @Field({ nullable: true })
+  type?: string;
 }

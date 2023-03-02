@@ -77,6 +77,11 @@ export class TokenReceivedListener {
                               description
                               productsCount
                               sortOrder
+                              ruleSet {
+                                rules {
+                                  condition
+                                }
+                              }
                             }
                           }
                         }
