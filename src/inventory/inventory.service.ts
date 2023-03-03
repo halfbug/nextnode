@@ -44,21 +44,21 @@ export class InventoryService {
   async update(updateInvenotryInput: UpdateInventoryInput) {
     const { id } = updateInvenotryInput;
     // await this.remove(id);
-    return await this.inventoryRepository.update({ id }, updateInvenotryInput);
+    // return await this.inventoryRepository.update({ id }, updateInvenotryInput);
     // return await this.inventoryRepository.save(updateInvenotryInput);
-    // const manager = getMongoManager();
-    // try {
-    //   return await manager.updateOne(
-    //     Inventory,
-    //     { id },
-    //     { $set: { ...updateInvenotryInput } },
-    //     {
-    //       upsert: true,
-    //     },
-    //   );
-    // } catch (err) {
-    //   console.log(err);
-    // }
+    const manager = getMongoManager();
+    try {
+      return await manager.updateOne(
+        Inventory,
+        { id },
+        { $set: { ...updateInvenotryInput } },
+        {
+          upsert: true,
+        },
+      );
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async updateInventory(id: string, dif: number, field: string) {
@@ -122,6 +122,18 @@ export class InventoryService {
             { recordType: 'ProductImage' },
             { recordType: 'ProductVideo' },
           ],
+        },
+      ],
+    });
+  }
+
+  async removeProductCollections(id: string) {
+    console.log(id, 'removevariants');
+    return await this.inventoryManager.deleteMany(Inventory, {
+      $and: [
+        { parentId: id },
+        {
+          recordType: 'Collection',
         },
       ],
     });
@@ -721,5 +733,18 @@ export class InventoryService {
         : false;
       return isProductOutofStock && isVariantOutoStock;
     }, true);
+  }
+
+  async updateProductCount(colId: string, count: number) {
+    const manager = getMongoManager();
+    try {
+      return await manager.updateMany(
+        Inventory,
+        { id: colId },
+        { $set: { productsCount: count } },
+      );
+    } catch (err) {
+      console.log(err);
+    }
   }
 }

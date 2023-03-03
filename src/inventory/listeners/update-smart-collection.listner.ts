@@ -113,8 +113,16 @@ export class UpdateSmartCollectionListner {
               shop,
               recordType: 'Collection',
             }));
-            await this.inventoryService.remove(event.productId);
+            await this.inventoryService.removeProductCollections(
+              event.productId,
+            );
             await this.inventoryService.insertMany(collectionObjs);
+            for (const col of collectionArray) {
+              await this.inventoryService.updateProductCount(
+                col.id,
+                col.productsCount,
+              );
+            }
           });
         }
       }, 4000);
