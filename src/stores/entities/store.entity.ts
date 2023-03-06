@@ -153,6 +153,9 @@ export class Drops {
 
   @Field(() => CodeUpdateStatusTypeEnum)
   codeUpdateStatus?: CodeUpdateStatusTypeEnum;
+
+  @Field({ nullable: true, defaultValue: 0 })
+  dropsCount?: number;
 }
 
 @ObjectType('Store')

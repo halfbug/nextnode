@@ -101,6 +101,9 @@ export class Drops {
 
   @Column('enum', { default: CodeUpdateStatusTypeEnum.none })
   codeUpdateStatus?: CodeUpdateStatusTypeEnum;
+
+  @Column({ default: 0, nullable: true })
+  dropsCount?: number;
 }
 
 @Entity()

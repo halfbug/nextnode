@@ -43,6 +43,7 @@ export class DropsCollectionUpdatedListener {
         ...drops,
         lastSync: new Date(),
         codeUpdateStatus: CodeUpdateStatusTypeEnum.completed,
+        dropsCount: dropsGroupshops.length,
       };
 
       await this.storesService.updateStore(storeId, updateStoreInput);

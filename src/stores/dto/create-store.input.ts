@@ -179,6 +179,9 @@ export class DropsInput {
 
   @Field(() => CodeUpdateStatusTypeEnum)
   codeUpdateStatus?: CodeUpdateStatusTypeEnum;
+
+  @Field({ nullable: true, defaultValue: 0 })
+  dropsCount?: number;
 }
 @InputType()
 export class CreateStoreInput {

@@ -194,10 +194,9 @@ export class StoresService {
           this.dropsCollectionUpdatedEvent.drops = updateStoreInput?.drops;
           if (arr.length) {
             this.dropsCollectionUpdatedEvent.emit();
+            updateStoreInput.drops.codeUpdateStatus =
+              CodeUpdateStatusTypeEnum.inprogress;
           }
-
-          updateStoreInput.drops.codeUpdateStatus =
-            CodeUpdateStatusTypeEnum.inprogress;
         }
       }
       await this.storeRepository.update({ id }, updateStoreInput);
@@ -858,8 +857,8 @@ export class StoresService {
 
   async getUpdateDiscountStatus(storeId: string) {
     const {
-      drops: { codeUpdateStatus, lastSync },
+      drops: { codeUpdateStatus, lastSync, dropsCount },
     } = await this.findById(storeId);
-    return { codeUpdateStatus, lastSync };
+    return { codeUpdateStatus, lastSync, dropsCount };
   }
 }
