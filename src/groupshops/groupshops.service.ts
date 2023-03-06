@@ -1178,6 +1178,11 @@ export class GroupshopsService {
     }
     return gs;
   }
+  async updateGS(updateGroupshopInput: UpdateGroupshopInput) {
+    const { id } = updateGroupshopInput;
+    delete updateGroupshopInput.id;
+    return await this.groupshopRepository.update({ id }, updateGroupshopInput);
+  }
 
   async updateExpireDate(
     updateGroupshopInput: UpdateGroupshopInput,

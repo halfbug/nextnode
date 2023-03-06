@@ -56,6 +56,15 @@ import { v4 as uuid } from 'uuid';
 import { ProductOutofstockEvent } from 'src/inventory/events/product-outofstock.event';
 import { CampaignsService } from 'src/campaigns/campaigns.service';
 import { DiscountCodeInput } from 'src/groupshops/dto/create-groupshops.input';
+import { generatesecondaryCount } from 'src/utils/functions';
+import { getMongoManager } from 'typeorm';
+import { Groupshops } from 'src/groupshops/entities/groupshop.modal';
+import { DiscountCode } from 'src/groupshops/entities/groupshop.entity';
+import { UpdateGroupshopInput } from 'src/groupshops/dto/update-groupshops.input';
+import { OrderPlacedListener } from 'src/groupshops/listeners/order-placed.listener';
+import { GroupshopsService } from 'src/groupshops/groupshops.service';
+import { lastValueFrom, map } from 'rxjs';
+
 import { UpdateSmartCollectionEvent } from 'src/inventory/events/update-smart-collection.event';
 @Public()
 @Controller('webhooks')
@@ -78,6 +87,7 @@ export class WebhooksController {
     public campaignStock: ProductOutofstockEvent,
     private lifecyclesrv: LifecycleService,
     private campaignService: CampaignsService,
+    private gsService: GroupshopsService,
     private updateSmartCollection: UpdateSmartCollectionEvent,
   ) {}
   async refreshSingleProduct(shop, accessToken, id, shopName) {
@@ -1830,6 +1840,220 @@ export class WebhooksController {
     } catch (err) {
       console.log(JSON.stringify(err));
       Logger.error(err, 'update-drops-discount-codes-collections');
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
+
+  @Post('update-reg-gs-discount-codes')
+  async updateGSDiscountCodes(@Res() res) {
+    try {
+      let ugroupshop = new UpdateGroupshopInput();
+
+      const agg = [
+        {
+          $match: {
+            $or: [
+              // {
+              //   discountCode: {
+              //     $exists: false,
+              //   },
+              // },
+              {
+                'discountCode.priceRuleId': {
+                  $eq: null,
+                },
+              },
+            ],
+          },
+        },
+        // {
+        //   $match: {
+        //     // id: '86443673-74f8-4a30-82fe-d5473577a250',
+        //     storeId: '99e5de65-0f74-4c15-8ae3-04d183df49d7',
+        //   },
+        // },
+        // {
+        //   $match: {
+        //     id: { $eq: '2a1fcd18-112f-4bb1-945f-30f2cd4e9681' },
+        //   },
+        // },
+
+        {
+          $lookup: {
+            from: 'store',
+            localField: 'storeId',
+            foreignField: 'id',
+            as: 'store',
+          },
+        },
+        {
+          $unwind: {
+            path: '$store',
+          },
+        },
+        {
+          $lookup: {
+            from: 'campaign',
+            localField: 'campaignId',
+            foreignField: 'id',
+            as: 'campaign',
+          },
+        },
+        {
+          $unwind: {
+            path: '$campaign',
+          },
+        },
+        {
+          $addFields: {
+            dealIds: '$dealProducts.productId',
+          },
+        },
+        {
+          $addFields: {
+            allProducts: {
+              $concatArrays: [
+                {
+                  $ifNull: ['$dealIds', []],
+                },
+                {
+                  $ifNull: ['$campaign.products', []],
+                },
+              ],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'inventory',
+            localField: 'allProducts',
+            foreignField: 'id',
+            as: 'prddetail',
+          },
+        },
+        {
+          $addFields: {
+            allProducts: {
+              $filter: {
+                input: '$prddetail',
+                as: 'd',
+                cond: {
+                  $ne: ['$$d.status', 'DELETED'],
+                },
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            allProducts: '$allProducts.id',
+          },
+        },
+        {
+          $limit: 2,
+        },
+      ];
+      const manager = getMongoManager();
+      const gs = await manager.aggregate(Groupshops, agg).toArray();
+      // console.log(gs[0]);
+      let text: any = '';
+
+      for (const grpshp of gs) {
+        const {
+          allProducts,
+          store: { accessToken, shop },
+          campaign: {
+            salesTarget: { rewards },
+          },
+          createdAt,
+          url,
+          id,
+        } = grpshp;
+
+        let title = '';
+        const percentage =
+          grpshp.discountCode && grpshp.discountCode.percentage
+            ? grpshp.discountCode.percentage
+            : rewards[0].discount;
+        const code = url.split('/')[3];
+        const expires = OrderPlacedListener.addDays(new Date(createdAt), 14);
+        const filteredAllPrd = allProducts.filter(
+          (item) => item !== 'gid://shopify/Product/null',
+        );
+        if (grpshp.discountCode && grpshp.discountCode.title) {
+          // priceruleId null
+          text = `have discount code ${JSON.stringify(grpshp.discountCode)}`;
+          title = grpshp.discountCode.title;
+        } else {
+          // title decrypt
+          text = `no discount code ${JSON.stringify(grpshp)}`;
+          const Dcode = await this.crypt.decrypt(code);
+          title = Dcode;
+        }
+        const options = {
+          headers: {
+            'X-Shopify-Access-Token': `${accessToken}`,
+          },
+        };
+        ugroupshop = { ...grpshp, id: grpshp.id };
+        console.log('🚀updateGSDiscountCode code, title id', code, title, id);
+        // const dsRes = await lastValueFrom(
+        //   this.httpService
+        //     .get(
+        //       `https://${shop}/admin/api/2021-10/discount_codes/lookup.json?code=${title}`,
+        //       options,
+        //     )
+        //     .pipe(map((res) => res.data)),
+        // );
+        // console.log(
+        //   '🚀 ~ file: webhooks.controller.ts:1954 ~ updateGSDiscountCodes ~ dsRes:',
+        //   dsRes,
+        // );
+        // if (dsRes && dsRes.discount_code) {
+        //   console.log('exists');
+        //   const obj = {
+        //     title,
+        //     percentage,
+        //     priceRuleId: `gid://shopify/PriceRule/${dsRes.discount_code.price_rule_id}`,
+        //   };
+        //   // ugroupshop.discountCode.priceRuleId = `gid://shopify/PriceRule/${dsRes.discount_code.price_rule_id}`;
+        //   ugroupshop.discountCode = { ...obj };
+        // } else {
+        ugroupshop.discountCode = await this.shopifyService.setDiscountCode(
+          shop,
+          'Create',
+          accessToken,
+          title,
+          parseInt(percentage),
+          filteredAllPrd,
+          new Date(createdAt),
+          expires,
+        );
+        // }
+        console.log(
+          '🚀updateGSDiscountCode code, expires, title id',
+          code,
+          expires,
+          title,
+          id,
+        );
+        delete ugroupshop['allProducts'];
+        delete ugroupshop['dealIds'];
+        delete ugroupshop['campaign'];
+        delete ugroupshop['store'];
+        delete ugroupshop['prddetail'];
+        // console.log(
+        //   '🚀 webhooks updateGSDiscountCodes:',
+        //   JSON.stringify(ugroupshop),
+        // );
+        await this.gsService.updateGS(ugroupshop);
+      }
+
+      res.send(ugroupshop);
+    } catch (err) {
+      console.log(JSON.stringify(err));
+      Logger.error(err, 'update-reg-gs-discount-codes');
     } finally {
       res.status(HttpStatus.OK).send();
     }
