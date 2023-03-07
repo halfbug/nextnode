@@ -102,6 +102,34 @@ export class DiscoveryTools {
   @Field(() => [MatchingBrandName], { nullable: 'itemsAndList' })
   matchingBrandName?: MatchingBrandName[];
 }
+
+@ObjectType('Klaviyo')
+export class Klaviyo {
+  @Field({ nullable: true })
+  publicKey?: string;
+
+  @Field({ nullable: true })
+  privateKey?: string;
+
+  @Field({ nullable: true })
+  listId?: string;
+
+  @Field({ nullable: true })
+  subscriberListId?: string;
+
+  @Field({ nullable: true })
+  signup1?: string;
+
+  @Field({ nullable: true })
+  signup2?: string;
+
+  @Field({ nullable: true })
+  signup3?: string;
+
+  @Field({ nullable: true })
+  signup4?: string;
+}
+
 @ObjectType('Collections')
 export class Collections {
   @Field({ nullable: true })
@@ -159,6 +187,9 @@ export class Drops {
 
   @Field({ nullable: true, defaultValue: 0 })
   dropsCount?: number;
+
+  @Field({ nullable: true })
+  klaviyo?: Klaviyo;
 }
 
 @ObjectType('Store')

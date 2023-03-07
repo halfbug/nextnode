@@ -407,6 +407,7 @@ export class CatController {
           const profiles = await this.kalavioService.getProfilesByListId(
             listId,
             nextPage,
+            storeData.drops.klaviyo.privateKey,
           );
           const nextPageLink = profiles?.links?.next
             ? profiles?.links?.next
@@ -464,101 +465,121 @@ export class CatController {
   // Drop static function for stage testing
   @Get('drop-cron')
   async dropCron(@Req() req, @Res() res) {
-    const listId = this.configService.get('DROPLISTID');
-    const shop = this.configService.get('DROPSHOP');
-    let lastWeek: any = '';
-    let counter = 0;
-    let updatedCounter = 0;
-    const d = new Date(new Date().setDate(new Date().getDate() - 7));
-    const year = d.getFullYear();
-    const month = ('0' + (d.getMonth() + 1)).slice(-2);
-    const day = ('0' + d.getDate()).slice(-2);
-    lastWeek = Date.parse(`${year}${'-'}${month}${'-'}${day}`);
+    const storeData = await this.storesService.findDropStore();
+    for (const stores of storeData) {
+      const listId = stores.drops.klaviyo.listId;
+      const shop = stores.shop;
+      const privateKey = stores.drops.klaviyo.privateKey;
+      let lastWeek: any = '';
+      let counter = 0;
+      let updatedCounter = 0;
+      let lastWeekCounter = 0;
+      const d = new Date(new Date().setDate(new Date().getDate() - 7));
+      const year = d.getFullYear();
+      const month = ('0' + (d.getMonth() + 1)).slice(-2);
+      const day = ('0' + d.getDate()).slice(-2);
+      lastWeek = Date.parse(`${year}${'-'}${month}${'-'}${day}`);
 
-    const td = new Date(new Date().setDate(new Date().getDate()));
-    const tyear = td.getFullYear();
-    const tmonth = ('0' + (td.getMonth() + 1)).slice(-2);
-    const tday = ('0' + td.getDate()).slice(-2);
-    const today = Date.parse(`${tyear}${'-'}${tmonth}${'-'}${tday}`);
-    let nextPage = '';
+      const td = new Date(new Date().setDate(new Date().getDate()));
+      const tyear = td.getFullYear();
+      const tmonth = ('0' + (td.getMonth() + 1)).slice(-2);
+      const tday = ('0' + td.getDate()).slice(-2);
+      const today = Date.parse(`${tyear}${'-'}${tmonth}${'-'}${tday}`);
+      let nextPage = '';
 
-    Logger.log(
-      `Weekly Drop Cron start for the listId : ${listId} at ${new Date()}`,
-      'WeeklyDropCron',
-      true,
-    );
-    do {
-      const profiles = await this.kalavioService.getProfilesByListId(
-        listId,
-        nextPage,
+      Logger.log(
+        `Weekly Drop Cron start for the listId : ${listId} at ${new Date()}`,
+        'WeeklyDropCron',
+        true,
       );
-      const nextPageLink = profiles?.links?.next ? profiles?.links?.next : '';
-      if (nextPageLink !== '') {
-        nextPage = nextPageLink.split('profiles/?')[1];
-      } else {
-        nextPage = '';
-      }
-      // console.log('profiles', JSON.stringify(profiles));
-      let indexCounter = 0;
-      for (const profile of profiles?.data) {
-        const arrayLength = profiles.data.length;
-        counter = counter + 1;
-        indexCounter = indexCounter + 1;
-        const klaviyoId = profile?.id;
-        const createdAt = profile.attributes.properties?.groupshop_created_at;
-        const drop_source = profile.attributes.properties?.groupshop_source
-          ? profile.attributes.properties?.groupshop_source
-          : '';
-
-        if (
-          (drop_source === 'API' && createdAt > lastWeek) ||
-          (drop_source === 'CRON' && createdAt === today)
-        ) {
-          console.log('Drop recently created ', klaviyoId);
+      do {
+        const profiles = await this.kalavioService.getProfilesByListId(
+          listId,
+          nextPage,
+          privateKey,
+        );
+        const nextPageLink = profiles?.links?.next ? profiles?.links?.next : '';
+        if (nextPageLink !== '') {
+          nextPage = nextPageLink.split('profiles/?')[1];
         } else {
-          updatedCounter = updatedCounter + 1;
-          const dropGroupshops =
-            await this.dropsGroupshopService.getGroupshopByKlaviyoId(klaviyoId);
-          // Update status in database of old pending drop groupshop
-          dropGroupshops.map(async (dgroupshop) => {
-            dgroupshop.expiredAt = new Date();
+          nextPage = '';
+        }
+        // console.log('profiles', JSON.stringify(profiles));
+        let indexCounter = 0;
+        for (const profile of profiles?.data) {
+          const arrayLength = profiles.data.length;
+          counter = counter + 1;
+          indexCounter = indexCounter + 1;
+          const klaviyoId = profile?.id;
+          const createdAt = Date.parse(
+            profile.attributes.properties?.groupshop_created_at,
+          );
+          const drop_source = profile.attributes.properties?.groupshop_source
+            ? profile.attributes.properties?.groupshop_source
+            : '';
+          console.log(drop_source + ' ---' + createdAt + ' ---' + today);
+          if (
+            (drop_source === 'API' && createdAt > lastWeek) ||
+            (drop_source === 'CRON' && createdAt === today)
+          ) {
+            lastWeekCounter = lastWeekCounter + 1;
+            console.log('Drop recently created ', klaviyoId);
+          } else {
+            updatedCounter = updatedCounter + 1;
+            const dropGroupshops =
+              await this.dropsGroupshopService.getGroupshopByKlaviyoId(
+                klaviyoId,
+              );
+            // Update status in database of old pending drop groupshop
+            dropGroupshops.map(async (dgroupshop) => {
+              dgroupshop.status = 'expired';
+              dgroupshop.expiredAt = new Date();
 
-            this.lifecyclesrv.create({
-              groupshopId: dgroupshop.id,
-              event: EventType.revised,
-              dateTime: new Date(),
+              this.lifecyclesrv.create({
+                groupshopId: dgroupshop.id,
+                event: EventType.revised,
+                dateTime: new Date(),
+              });
+
+              await this.dropsGroupshopService.update(
+                dgroupshop.id,
+                dgroupshop,
+              );
             });
-
-            await this.dropsGroupshopService.update(dgroupshop.id, dgroupshop);
-          });
-          const fullname =
-            profile?.attributes?.properties?.['Full Name'] ?? null;
-          const webdata = {
-            id: klaviyoId,
-            fullname: fullname,
-            first_name: profile?.attributes?.first_name,
-            last_name: profile?.attributes?.last_name,
-            email: profile?.attributes?.email,
-            phone_number: profile?.attributes?.phone_number,
-          };
-          const inputListener: any = {};
-          inputListener.webhook = webdata;
-          inputListener.shop = shop;
-          await this.dropCreatedListener.addCronDrop(inputListener);
+            const fullname =
+              profile?.attributes?.properties?.['Full Name'] ?? null;
+            const webdata = {
+              id: klaviyoId,
+              fullname: fullname,
+              first_name: profile?.attributes?.first_name,
+              last_name: profile?.attributes?.last_name,
+              email: profile?.attributes?.email,
+              phone_number: profile?.attributes?.phone_number,
+            };
+            const inputListener: any = {};
+            inputListener.webhook = webdata;
+            inputListener.shop = shop;
+            await this.dropCreatedListener.addCronDrop(inputListener);
+          }
+          // eslint-disable-next-line prettier/prettier
+           if (nextPage === '' && arrayLength === indexCounter) {
+            console.log(
+              `Weekly Drop Cron completed ${updatedCounter}/${counter} at ${new Date()} `,
+            );
+            Logger.log(
+              `Weekly Drop Cron completed ${updatedCounter}/${counter} at ${new Date()} `,
+              'WeeklyDropCron',
+              true,
+            );
+            Logger.log(
+              `Weekly Drop created last week ${lastWeekCounter}/${counter} at ${new Date()} `,
+              'WeeklyDropCron',
+              true,
+            );
+          }
         }
-        // eslint-disable-next-line prettier/prettier
-         if (nextPage === '' && arrayLength === (indexCounter + 1)) {
-          console.log(
-            `Weekly Drop Cron completed ${updatedCounter}/${counter} at ${new Date()} `,
-          );
-          Logger.log(
-            `Weekly Drop Cron completed ${updatedCounter}/${counter} at ${new Date()} `,
-            'WeeklyDropCron',
-            true,
-          );
-        }
-      }
-    } while (nextPage !== '');
+      } while (nextPage !== '');
+    }
     res.status(200).send('Success');
   }
 
@@ -592,7 +613,11 @@ export class CatController {
             reactivate_groupshop: expiredShortUrl,
           });
           const data = params.toString();
-          await this.kalavioService.klaviyoProfileUpdate(klaviyoId, data);
+          await this.kalavioService.klaviyoProfileUpdate(
+            klaviyoId,
+            data,
+            profile.storeId,
+          );
         });
       }
     }

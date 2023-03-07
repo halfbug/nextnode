@@ -53,6 +53,7 @@ export class ThemeAppExtensionController {
         drops: { collections, rewards: { maximum } } = {
           rewards: { maximum: 0 },
           collections: [],
+          klaviyo: {},
         },
       } = await this.storesService.findOneWithActiveCampaing(shop);
       // console.log(await this.storesService.findOneWithActiveCampaing(shop));

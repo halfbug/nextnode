@@ -126,7 +126,6 @@ export class DropsGroupshopResolver {
   ) {
     let rCount = undefined;
     const Dcode = await this.crypt.decrypt(code);
-    console.log('DcodeDcodeDcode', Dcode);
     const groupshop = await this.dropsGroupshopService.findDropsGS(Dcode);
     const res = await this.lifecyclesrv.findAllEvents(
       groupshop.id,
@@ -149,6 +148,7 @@ export class DropsGroupshopResolver {
 
         const currentProfile = await this.kalavioService.getProfilesById(
           klaviyoId,
+          groupshop.storeId,
         );
         const latestShortUrl =
           currentProfile?.data.attributes.properties?.groupshop_url;
@@ -157,7 +157,11 @@ export class DropsGroupshopResolver {
             groupshop_status: 'active',
           });
           const data = params.toString();
-          await this.kalavioService.klaviyoProfileUpdate(klaviyoId, data);
+          await this.kalavioService.klaviyoProfileUpdate(
+            klaviyoId,
+            data,
+            groupshop.storeId,
+          );
         }
       }
     }

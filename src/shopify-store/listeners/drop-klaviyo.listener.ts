@@ -78,6 +78,7 @@ export class DropKlaviyoListener {
       // Update latest milestone discount that is active on the klaviyo profile
       const currentProfile = await this.kalavioService.getProfilesById(
         klaviyoId,
+        webdata.storeId,
       );
       let current_milestone_discount;
       const latestShortUrl =
@@ -113,7 +114,11 @@ export class DropKlaviyoListener {
             return `${key}=${encodeURIComponent(obj[key])}`;
           })
           .join('&');
-        await this.kalavioService.klaviyoProfileUpdate(klaviyoId, data);
+        await this.kalavioService.klaviyoProfileUpdate(
+          klaviyoId,
+          data,
+          webdata.storeId,
+        );
       }
 
       // Drop Groupshop Order Trigger on Klaviyo

@@ -113,11 +113,12 @@ export class DropCreatedListener {
               return `${key}=${encodeURIComponent(obj[key])}`;
             })
             .join('&');
-          await this.kalavioService.klaviyoProfileUpdate(webdata.id, data);
+          await this.kalavioService.klaviyoProfileUpdate(webdata.id, data, id);
           if (webdata.phone_number !== '' || webdata.phone_number !== null) {
             await this.kalavioService.enableSmsConsent(
               webdata.phone_number,
               webdata.id,
+              id,
             );
           }
         }
@@ -202,7 +203,7 @@ export class DropCreatedListener {
             return `${key}=${encodeURIComponent(obj[key])}`;
           })
           .join('&');
-        await this.kalavioService.klaviyoProfileUpdate(webdata.id, data);
+        await this.kalavioService.klaviyoProfileUpdate(webdata.id, data, id);
       }
     } catch (err) {
       console.log(err);

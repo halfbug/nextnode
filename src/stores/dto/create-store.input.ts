@@ -133,6 +133,34 @@ export class CollectionsInputs {
   @Field({ nullable: true })
   name?: string;
 }
+
+@InputType()
+export class KlaviyoInputs {
+  @Field({ nullable: true })
+  publicKey?: string;
+
+  @Field({ nullable: true })
+  privateKey?: string;
+
+  @Field({ nullable: true })
+  listId?: string;
+
+  @Field({ nullable: true })
+  subscriberListId?: string;
+
+  @Field({ nullable: true })
+  signup1?: string;
+
+  @Field({ nullable: true })
+  signup2?: string;
+
+  @Field({ nullable: true })
+  signup3?: string;
+
+  @Field({ nullable: true })
+  signup4?: string;
+}
+
 @InputType('DropsInput')
 export class DropsInput {
   @Field({ nullable: true })
@@ -182,6 +210,9 @@ export class DropsInput {
 
   @Field({ nullable: true, defaultValue: 0 })
   dropsCount?: number;
+
+  @Field({ nullable: true })
+  klaviyo?: KlaviyoInputs;
 }
 @InputType()
 export class CreateStoreInput {

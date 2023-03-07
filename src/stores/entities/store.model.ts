@@ -56,6 +56,33 @@ export class Collections {
   @Column({ nullable: true })
   name?: string;
 }
+
+export class Klaviyo {
+  @Column({ nullable: true })
+  publicKey?: string;
+
+  @Column({ nullable: true })
+  privateKey?: string;
+
+  @Column({ nullable: true })
+  listId?: string;
+
+  @Column({ nullable: true })
+  subscriberListId?: string;
+
+  @Column({ nullable: true })
+  signup1?: string;
+
+  @Column({ nullable: true })
+  signup2?: string;
+
+  @Column({ nullable: true })
+  signup3?: string;
+
+  @Column({ nullable: true })
+  signup4?: string;
+}
+
 export class Drops {
   @Column({ nullable: true })
   status?: string;
@@ -104,6 +131,9 @@ export class Drops {
 
   @Column({ default: 0, nullable: true })
   dropsCount?: number;
+
+  @Column({ nullable: true })
+  klaviyo?: Klaviyo;
 }
 
 @Entity()

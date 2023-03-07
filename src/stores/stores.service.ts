@@ -130,6 +130,31 @@ export class StoresService {
     }
   }
 
+  async findOneKlaviyoByName(shop: string) {
+    const result = await this.storeRepository.findOne({
+      where: {
+        shop: shop,
+      },
+    });
+    return result;
+  }
+
+  async findDropStore() {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          'drops.klaviyo.publicKey': {
+            $ne: null,
+          },
+          'drops.status': 'Active',
+        },
+      },
+    ];
+    const res = await manager.aggregate(Store, agg).toArray();
+    return res;
+  }
+
   async findOneById(id: string) {
     return await this.storeRepository.findOne({
       where: {

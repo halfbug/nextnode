@@ -12,3 +12,9 @@ export class SignUp {
   @Field({ nullable: true })
   email: string;
 }
+
+@ObjectType()
+export class KlaviyoList {
+  @Field({ nullable: true })
+  listId: string;
+}

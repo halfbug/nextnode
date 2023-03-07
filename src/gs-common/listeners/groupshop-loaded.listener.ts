@@ -84,6 +84,7 @@ export class GSLoadedListener {
       if (typeof klaviyoId !== 'undefined') {
         const currentProfile = await this.kalavioService.getProfilesById(
           klaviyoId,
+          gs.storeId,
         );
         const latestShortUrl =
           currentProfile?.data.attributes.properties?.groupshop_url;
@@ -92,7 +93,11 @@ export class GSLoadedListener {
             groupshop_status: 'active',
           });
           const data = params.toString();
-          await this.kalavioService.klaviyoProfileUpdate(klaviyoId, data);
+          await this.kalavioService.klaviyoProfileUpdate(
+            klaviyoId,
+            data,
+            gs.storeId,
+          );
         }
       }
     } else {
