@@ -56,6 +56,9 @@ export class getUpdateDiscountStatus {
 
   @Field(() => CodeUpdateStatusTypeEnum)
   codeUpdateStatus?: CodeUpdateStatusTypeEnum;
+
+  @Field({ nullable: true, defaultValue: 0 })
+  dropsCount?: number;
 }
 
 @InputType('ResourceInput')
