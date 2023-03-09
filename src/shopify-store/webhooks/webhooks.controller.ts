@@ -520,9 +520,9 @@ export class WebhooksController {
 
         this.inventryService.create(vprod);
       });
-      this.updateSmartCollection.productId = rproduct?.admin_graphql_api_id;
-      this.updateSmartCollection.shop = shop;
-      this.updateSmartCollection.emit();
+      // this.updateSmartCollection.productId = rproduct?.admin_graphql_api_id;
+      // this.updateSmartCollection.shop = shop;
+      // this.updateSmartCollection.emit();
     } catch (err) {
       console.log(JSON.stringify(err));
       Logger.error(err, 'product-created');
@@ -656,9 +656,9 @@ export class WebhooksController {
         vprod.src = img.src;
         this.inventryService.create(vprod);
       });
-      this.updateSmartCollection.productId = rproduct?.admin_graphql_api_id;
-      this.updateSmartCollection.shop = shop;
-      this.updateSmartCollection.emit();
+      // this.updateSmartCollection.productId = rproduct?.admin_graphql_api_id;
+      // this.updateSmartCollection.shop = shop;
+      // this.updateSmartCollection.emit();
 
       nprod.outofstock =
         nprod.status !== 'ACTIVE'
@@ -981,7 +981,7 @@ export class WebhooksController {
                       title
                       id
                       productsCount
-                      products(first:10000, reverse: true, sortKey:CREATED){
+                      products(first:10000,sortKey:COLLECTION_DEFAULT){
                         edges{
                           node{
                             title
