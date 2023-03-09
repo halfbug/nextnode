@@ -126,4 +126,7 @@ export default class Inventory extends DefaultColumnsService {
 
   @Column({ nullable: true })
   type?: string;
+
+  @Column({ nullable: true })
+  compareAtPrice?: string;
 }

@@ -44,6 +44,7 @@ export class InventorySavedListener {
                 outofstock: this.inventoryService.calculateOutOfStock(
                   item.variants as ProductVariant[],
                 ),
+                compareAtPrice: item.variants[0].compareAtPrice,
               },
             },
           },

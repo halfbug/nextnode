@@ -55,10 +55,12 @@ export class InventoryReceivedListener {
       }
 
       //add inventory management details
-      if (inventory.recordType === 'ProductVariant')
+      if (inventory.recordType === 'ProductVariant') {
         inventory.inventoryManagement = inventory?.inventoryItem?.tracked
           ? 'shopify'
           : null;
+        inventory.compareAtPrice = inventory?.compareAtPrice ?? null;
+      }
 
       delete inventory.inventoryItem;
       inventory.createdAt = new Date();

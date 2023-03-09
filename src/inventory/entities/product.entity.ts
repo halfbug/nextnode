@@ -79,6 +79,9 @@ export class ProductVariant {
 
   @Field({ nullable: true })
   inventoryManagement?: string;
+
+  @Field({ nullable: true })
+  compareAtPrice?: string;
 }
 
 @InputType('ProductInput')
@@ -167,4 +170,7 @@ export class Product {
 
   @Field({ nullable: true })
   vendor?: string;
+
+  @Field({ nullable: true })
+  compareAtPrice?: string;
 }

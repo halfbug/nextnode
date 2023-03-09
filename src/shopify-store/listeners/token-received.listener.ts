@@ -93,6 +93,7 @@ export class TokenReceivedListener {
                               displayName
                               inventoryQuantity
                               price
+                              compareAtPrice
                               selectedOptions{
                                 name
                                 value

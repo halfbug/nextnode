@@ -101,4 +101,7 @@ export class CreateInventoryInput {
 
   @Field({ nullable: true })
   type?: string;
+
+  @Field({ nullable: true })
+  compareAtPrice?: string;
 }

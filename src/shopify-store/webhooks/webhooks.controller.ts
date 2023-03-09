@@ -490,6 +490,7 @@ export class WebhooksController {
         vprod.inventoryManagement = variant?.inventory_management;
         vprod.inventoryPolicy = variant?.inventory_policy;
         vprod.price = variant.price;
+        vprod.compareAtPrice = variant?.compare_at_price;
         vprod.createdAt = new Date();
         vprod.inventoryQuantity = variant?.inventory_quantity;
         const img = new ProductImage();
@@ -588,6 +589,7 @@ export class WebhooksController {
       nprod.productCategory = rproduct?.productType;
       nprod.status = rproduct?.status?.toUpperCase();
       nprod.price = rproduct?.variants[0]?.price; //
+      nprod.compareAtPrice = rproduct?.variants[0]?.compare_at_price;
       nprod.featuredImage = rproduct?.image?.src;
       // nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
       nprod.description = rproduct.body_html;
@@ -1303,6 +1305,7 @@ export class WebhooksController {
                                 tracked
                              }
                               price
+                              compareAtPrice
                               selectedOptions{
                                 name
                                 value
@@ -1554,6 +1557,7 @@ export class WebhooksController {
                                 tracked
                              }
                               price
+                              compareAtPrice
                               selectedOptions{
                                 name
                                 value
@@ -1637,6 +1641,7 @@ export class WebhooksController {
                           tags: item.tags,
                           productCategory: item.productType,
                           vendor: item.vendor,
+                          compareAtPrice: item?.compareAtPrice ?? null,
                         },
                       },
                     },

@@ -117,4 +117,7 @@ export class Inventory {
 
   @Field({ nullable: true })
   type?: string;
+
+  @Field({ nullable: true })
+  compareAtPrice?: string;
 }
