@@ -102,6 +102,7 @@ export class DropKlaviyoListener {
 
         const obj = {
           current_milestone_discount: current_milestone_discount,
+          groupshop_status: 'active',
           lifetime_referral_count: !!lifetimeRevenue[0]
             ? lifetimeRevenue[0].lifetime_referral_count
             : '',
