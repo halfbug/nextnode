@@ -517,9 +517,16 @@ export class CatController {
           const drop_source = profile.attributes.properties?.groupshop_source
             ? profile.attributes.properties?.groupshop_source
             : '';
-          console.log(drop_source + ' ---' + createdAt + ' ---' + today);
+
+          const groupshop_status = profile.attributes.properties
+            ?.groupshop_status
+            ? profile.attributes.properties?.groupshop_status
+            : '';
+
           if (
-            (drop_source === 'API' && createdAt > lastWeek) ||
+            (drop_source === 'API' &&
+              createdAt > lastWeek &&
+              groupshop_status !== 'expired') ||
             (drop_source === 'CRON' && createdAt === today)
           ) {
             lastWeekCounter = lastWeekCounter + 1;
