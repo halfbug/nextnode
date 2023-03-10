@@ -1830,9 +1830,7 @@ export class WebhooksController {
         id,
       );
 
-      const arr = dropsGroupshops.filter((dg) => dg.isFullyExpired === false);
-
-      for (const dg of arr) {
+      for (const dg of dropsGroupshops) {
         await this.shopifyService.setDiscountCode(
           shop,
           'Update',

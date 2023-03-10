@@ -546,7 +546,7 @@ export class DropsGroupshopService {
     return result;
   }
 
-  async getActiveDrops(storeId: string) {
+  async getActiveDropsNonFullyExpired(storeId: string) {
     const agg = [
       {
         $match: {
@@ -615,6 +615,28 @@ export class DropsGroupshopService {
         $project: {
           discountCode: 1,
           isFullyExpired: 1,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const result = await manager.aggregate(DropsGroupshop, agg).toArray();
+    return result;
+  }
+
+  async getActiveDrops(storeId: string) {
+    const agg = [
+      {
+        $match: {
+          storeId,
+          discountCode: {
+            $ne: null,
+          },
+          status: 'active',
+        },
+      },
+      {
+        $project: {
+          discountCode: 1,
         },
       },
     ];

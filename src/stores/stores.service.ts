@@ -203,7 +203,6 @@ export class StoresService {
           const dropsGroupshops = await this.dropsService.getActiveDrops(id);
           const arr = dropsGroupshops.filter(
             (dg) =>
-              dg.isFullyExpired === false &&
               dg.discountCode !== null &&
               dg.discountCode.title !== null &&
               dg.discountCode.priceRuleId !== null,
