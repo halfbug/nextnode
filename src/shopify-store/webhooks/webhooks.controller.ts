@@ -66,6 +66,10 @@ import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { lastValueFrom, map } from 'rxjs';
 
 import { UpdateSmartCollectionEvent } from 'src/inventory/events/update-smart-collection.event';
+import {
+  SPOTLIGHT_SECTION_TITLE,
+  VAULT_SECTION_TITLE,
+} from 'src/utils/constant';
 @Public()
 @Controller('webhooks')
 export class WebhooksController {
@@ -1835,7 +1839,17 @@ export class WebhooksController {
           accessToken,
           dg.discountCode.title,
           null,
-          [...new Set(collections.map((c) => c.shopifyId))],
+          [
+            ...new Set(
+              collections
+                .filter(
+                  (c) =>
+                    c.name !== VAULT_SECTION_TITLE &&
+                    c.name !== SPOTLIGHT_SECTION_TITLE,
+                )
+                .map((c) => c.shopifyId),
+            ),
+          ],
           null,
           null,
           dg.discountCode.priceRuleId,

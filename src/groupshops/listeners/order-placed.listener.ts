@@ -188,19 +188,28 @@ export class OrderPlacedListener {
     }
   }
 
-  calculateRefund(member: any, milestone: number, service: string) {
+  async calculateRefund(member: any, milestone: number, service: string) {
     const netDiscount = milestone * 100 - member.availedDiscount;
     // 100 -
 
+    let lineitems;
+
+    if (service === 'drops') {
+      lineitems = await this.dropsService.getNonVaultSpotlightLineitems(
+        this.shop,
+        member.lineItems,
+      );
+    }
+
     const refundAmount = this.totalPricePercent(
-      member.lineItems,
+      service === 'drops' ? lineitems : member.lineItems,
       netDiscount,
       member.role,
     );
-    const revenuePrice = this.totalRevenue(member.lineItems, netDiscount);
+    // const revenuePrice = this.totalRevenue(member.lineItems, netDiscount);
 
     // cashback - gsfees
-    const percentageGiven = (100 - GS_CHARGE_CASHBACK) / 100;
+    // const percentageGiven = (100 - GS_CHARGE_CASHBACK) / 100;
     const cashBackUsageCharge = GS_CHARGE_CASHBACK / 100; //convert percentage in amount
     const cashBackUsageChargeAmount = refundAmount * cashBackUsageCharge;
     console.log(
@@ -212,71 +221,79 @@ export class OrderPlacedListener {
       '🚀 ~ file: order-placed.listener.ts ~ line 116  calculateRefund ~ refundAmount',
       refundAmount,
     );
-    this.shopifyRefund(shopifyAmount.toString(), member.orderId, netDiscount);
-    // after shopify refund we emit cashBack event n go to billing listner
-    const cashBackEvent = new CashBackEvent();
-    cashBackEvent.cashbackAmount = shopifyAmount;
-    cashBackEvent.cashbackCharge = cashBackUsageChargeAmount;
-    cashBackEvent.groupshop = this.groupshop;
-    // cashBackEvent.revenue = revenuePrice;
-    cashBackEvent.revenue = 0;
-    cashBackEvent.orderId = member.orderId;
-    cashBackEvent.netDiscount = netDiscount;
-    cashBackEvent.store = this.store;
-    console.log('.......cashback..........');
-    this.eventEmitter.emit('cashback.generated', cashBackEvent);
-    if (service === 'groupshop') {
-      this.eventEmitter.emit('cashbackEmail.generated', cashBackEvent);
-    } else if (service === 'drops') {
-      this.eventEmitter.emit('cashbackDropEmail.generated', cashBackEvent);
+    if (refundAmount) {
+      this.shopifyRefund(shopifyAmount.toString(), member.orderId, netDiscount);
+      const cashBackEvent = new CashBackEvent();
+      cashBackEvent.cashbackAmount = shopifyAmount;
+      cashBackEvent.cashbackCharge = cashBackUsageChargeAmount;
+      cashBackEvent.groupshop = this.groupshop;
+      // cashBackEvent.revenue = revenuePrice;
+      cashBackEvent.revenue = 0;
+      cashBackEvent.orderId = member.orderId;
+      cashBackEvent.netDiscount = netDiscount;
+      cashBackEvent.store = this.store;
+      console.log('.......cashback..........');
+      this.eventEmitter.emit('cashback.generated', cashBackEvent);
+      if (service === 'groupshop') {
+        this.eventEmitter.emit('cashbackEmail.generated', cashBackEvent);
+      } else if (service === 'drops') {
+        this.eventEmitter.emit('cashbackDropEmail.generated', cashBackEvent);
+      }
+
+      const refund = new RefundInput(
+        RefundStatusEnum.panding,
+        new Date(),
+        netDiscount,
+        refundAmount,
+      );
+
+      member.refund = [...(member.refund ?? []), refund];
+      member.availedDiscount += netDiscount;
     }
-
-    const refund = new RefundInput(
-      RefundStatusEnum.panding,
-      new Date(),
-      netDiscount,
-      refundAmount,
-    );
-
-    member.refund = [...(member.refund ?? []), refund];
-    member.availedDiscount += netDiscount;
+    // after shopify refund we emit cashBack event n go to billing listner
     return member;
   }
-  setPreviousMembersRefund(
+  async setPreviousMembersRefund(
     members: MemberInput[],
     discountCode: DiscountCodeInput,
   ) {
     const totalMembers = members.length;
     const currentMilestone = parseFloat(discountCode.percentage) / 100;
-    return members.map((member) => {
+    const temp: any[] = [];
+    for (let member of members) {
       if (totalMembers === 6 && member.role === RoleTypeEnum.owner) {
-        member = this.calculateRefund(member, 50 / 100, 'groupshop');
+        member = await this.calculateRefund(member, 50 / 100, 'groupshop');
       } else if (totalMembers === 10 && member.role === RoleTypeEnum.owner) {
-        member = this.calculateRefund(member, 90 / 100, 'groupshop');
+        member = await this.calculateRefund(member, 90 / 100, 'groupshop');
       } else if (member.availedDiscount / 100 < currentMilestone) {
-        member = this.calculateRefund(member, currentMilestone, 'groupshop');
+        member = await this.calculateRefund(
+          member,
+          currentMilestone,
+          'groupshop',
+        );
       }
-
-      return member;
-    });
+    }
+    return temp;
   }
 
-  setPreviousMembersRefundDrops(
+  async setPreviousMembersRefundDrops(
     members: MemberInput[],
     discountCode: DiscountCodeInput,
   ) {
     const currentMilestone = parseFloat(discountCode.percentage);
-    console.log(
-      '🚀 ~ file: order-placed.listener.ts:256 ~ OrderPlacedListener ~ currentMilestone',
-      currentMilestone,
-    );
-    return members.map((member) => {
+    const temp: any[] = [];
+    for (let member of members) {
       if (member.availedDiscount < currentMilestone) {
-        member = this.calculateRefund(member, currentMilestone / 100, 'drops');
+        member = await this.calculateRefund(
+          member,
+          currentMilestone / 100,
+          'drops',
+        );
       }
 
-      return member;
-    });
+      temp.push(member);
+    }
+    return temp;
   }
 
   @OnEvent('order.placed')
@@ -477,7 +494,7 @@ export class OrderPlacedListener {
           //   dgroupshop.members,
           // );
           if (!isExistingUser) {
-            dgroupshop.members = this.setPreviousMembersRefundDrops(
+            dgroupshop.members = await this.setPreviousMembersRefundDrops(
               dgroupshop.members,
               dgroupshop.discountCode,
             );

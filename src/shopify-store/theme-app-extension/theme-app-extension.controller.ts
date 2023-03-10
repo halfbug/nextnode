@@ -18,6 +18,7 @@ import { ChannelGroupshopService } from 'src/channel/channelgroupshop.service';
 import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
 import { OrdersService } from 'src/inventory/orders.service';
 import { InventoryService } from 'src/inventory/inventory.service';
+import { BESTSELLER_SECTION_TITLE } from 'src/utils/constant';
 @Public()
 @Controller('ext')
 export class ThemeAppExtensionController {
@@ -70,7 +71,7 @@ export class ThemeAppExtensionController {
           settings,
           brandName,
           shopifyId:
-            collections.filter((c) => c.name === 'Bestsellers')?.[0]
+            collections.filter((c) => c.name === BESTSELLER_SECTION_TITLE)?.[0]
               ?.shopifyId ?? '', // Static Bestseller name for idetify collection.
           dropsLastMilestone: maximum,
         }),

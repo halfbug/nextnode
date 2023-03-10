@@ -13,6 +13,10 @@ import { KalavioService } from 'src/email/kalavio.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { StoresService } from 'src/stores/stores.service';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
+import {
+  SPOTLIGHT_SECTION_TITLE,
+  VAULT_SECTION_TITLE,
+} from 'src/utils/constant';
 
 @Resolver(() => DropsGroupshop)
 export class DropsGroupshopResolver {
@@ -65,7 +69,17 @@ export class DropsGroupshopResolver {
         accessToken,
         groupshop.discountCode.title,
         parseInt(baseline, 10),
-        [...new Set(collections.map((c) => c.shopifyId))],
+        [
+          ...new Set(
+            collections
+              .filter(
+                (c) =>
+                  c.name !== VAULT_SECTION_TITLE &&
+                  c.name !== SPOTLIGHT_SECTION_TITLE,
+              )
+              .map((c) => c.shopifyId),
+          ),
+        ],
         new Date(),
         newExpiredate,
         null,
