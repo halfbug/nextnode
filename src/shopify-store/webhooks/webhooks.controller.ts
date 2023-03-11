@@ -638,6 +638,7 @@ export class WebhooksController {
 
         vprod.image = img;
         vprod.price = variant?.price;
+        vprod.compareAtPrice = variant?.compare_at_price;
         vprod.inventoryQuantity = variant?.inventory_quantity;
         // const seOptions = [];
         // console.log(seOptions, 'seOptions');
