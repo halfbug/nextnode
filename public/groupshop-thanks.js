@@ -597,15 +597,21 @@ var totalOrderAmount = lineItems.reduce((priceSum, { price, quantity }) => {
   thisPrice = priceSum + quantity * parseFloat(price);
   return thisPrice;
 }, 0);
-const isGroupshop =
+let isGroupshop = false;
+let isDrops = false;
+if (
   discountCode &&
-  (discountCode.slice(0, 3) === 'GSP' ||
-    discountCode.slice(0, 3) === 'GSC' ||
-    discountCode.slice(0, 3) === 'GSD')
-    ? false
-    : true;
-const isDrops =
-  discountCode && discountCode.slice(0, 3) === 'GSD' ? true : false;
+  (discountCode.slice(0, 3) === 'GSP' || discountCode.slice(0, 3) === 'GSC')
+) {
+  isGroupshop = false;
+} else if (
+  (discountCode && discountCode.slice(0, 3) === 'GS') ||
+  !discountCode
+) {
+  isGroupshop = true;
+} else if (discountCode || discountCode.slice(0, 3) === 'GSD') {
+  isDrops = true;
+}
 const storeName = isDrops ? 'Groupshop' : 'Microstore';
 const logoName = isDrops ? 'gslogo.png' : 'gslogo2.png';
 const purpleHeadName = isDrops
@@ -903,7 +909,7 @@ async function init() {
           document.querySelector('.summaryContainer').remove();
         }
       }, 1000);
-    } else if (discountCode.slice(0, 3) === 'GSD') {
+    } else if (isDrops) {
       const pollit3 = setInterval(async () => {
         indx3++;
         res = await gsPost('dropsMember', {
