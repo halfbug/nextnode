@@ -11,7 +11,6 @@ import { InventoryService } from 'src/inventory/inventory.service';
 import { Product } from 'src/inventory/entities/product.entity';
 import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
 import { DropsCollectionUpdatedEvent } from 'src/drops-groupshop/events/drops-collection-update.event';
-// import { KalavioService } from 'src/email/kalavio.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash');
 
@@ -22,8 +21,6 @@ export class StoresService {
     private shopifyapi: ShopifyService,
     @Inject(forwardRef(() => DropsGroupshopService))
     private dropsService: DropsGroupshopService,
-    // @Inject(forwardRef(() => KalavioService))
-    // private klaviyoService: KalavioService,
     private dropsCollectionUpdatedEvent: DropsCollectionUpdatedEvent,
     private inventoryService: InventoryService,
   ) {}
@@ -168,14 +165,6 @@ export class StoresService {
 
   async update(id: string, updateStoreInput: UpdateStoreInput) {
     try {
-      // create klaviyo domain for this store brandname
-      // const { brandName, installationStep } = await this.findById(
-      //   updateStoreInput.id,
-      // );
-      // if (brandName && installationStep !== null) {
-      //   this.klaviyoService.createDomainByBrandName(updateStoreInput.id);
-      // }
-
       if (updateStoreInput?.settings?.layout?.bannerDesign) {
         const bannerDesi = updateStoreInput?.settings?.layout?.bannerDesign;
         if (bannerDesi === '002') {

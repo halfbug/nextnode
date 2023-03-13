@@ -582,13 +582,8 @@ export class OrderPlacedListener {
           const exipredFulllink = `${this.configSevice.get(
             'FRONT',
           )}${cryptURL}/status&activated`;
-          const fomatBrandName = this.store.brandName
-            .replace(/ /g, '-')
-            .toLowerCase();
-
           const shortLink = await this.kalavioService.generateShortLink(
             fulllink,
-            fomatBrandName,
           );
           const exipredShortLink = await this.kalavioService.generateShortLink(
             exipredFulllink,

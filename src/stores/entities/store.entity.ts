@@ -291,7 +291,4 @@ export class Store {
 
   @Field(() => Drops, { nullable: true })
   drops?: Drops;
-
-  @Field({ nullable: true })
-  shortUrlDomain?: string;
 }

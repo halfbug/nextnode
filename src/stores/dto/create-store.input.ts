@@ -298,7 +298,4 @@ export class CreateStoreInput {
 
   @Field({ nullable: true })
   drops?: DropsInput;
-
-  @Field({ nullable: true })
-  shortUrlDomain?: string;
 }

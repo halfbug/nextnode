@@ -215,6 +215,4 @@ export default class Store extends DefaultColumnsService {
 
   @Column({ nullable: true })
   drops: Drops;
-  @Column({ nullable: true })
-  shortUrlDomain?: string;
 }
