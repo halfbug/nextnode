@@ -12,9 +12,10 @@ import * as qrcode from 'qrcode';
 @Injectable()
 export class KalavioService {
   constructor(
+    // @Inject(forwardRef(() => StoresService))
+    private storesService: StoresService,
     private configService: ConfigService,
     private httpService: HttpService,
-    private storesService: StoresService,
   ) {}
 
   sendKlaviyoEmail(body) {
@@ -198,7 +199,7 @@ export class KalavioService {
     }
   }
 
-  async generateShortLink(link: string) {
+  async generateShortLink(link: string, brandName?: string) {
     const URL = '/links/public';
     const apiUrl = `${this.configService.get('SHORT_LINK_BASE_URL')}${URL}`;
     const options = {
@@ -210,7 +211,7 @@ export class KalavioService {
     };
     const body = JSON.stringify({
       allowDuplicates: true,
-      domain: 'group.shop',
+      domain: brandName ? `${brandName}.group.shop` : 'group.shop',
       originalURL: link,
       title: 'GroupShop',
     });
@@ -419,6 +420,42 @@ export class KalavioService {
         Logger.error(err, KalavioService.name);
         return false;
       }
+    }
+  }
+  async createDomainByBrandName(storeId) {
+    try {
+      const { brandName } = await this.storesService.findById(storeId);
+      const fomatBrandName = brandName.replace(/ /g, '-').toLowerCase();
+
+      const urlKlaviyo = `https://api.short.io/domains/`;
+      const body = JSON.stringify({
+        hideReferer: false,
+        httpsLinks: true,
+        hostname: `${fomatBrandName}.group.shop`,
+      });
+      console.log(
+        '🚀 ~ file: webhooks.controller.ts:2080 ~ stores.map ~ body:',
+        body,
+      );
+      const options = {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'sk_REri48MOke1HiKny',
+        },
+      };
+      const res = await lastValueFrom(
+        this.httpService
+          .post(urlKlaviyo, body, options)
+          .pipe(map((res) => res.data)),
+      );
+      console.log(
+        '🚀 ~ file: webhooks.controller.ts:2091 ~ stores.map ~ response:',
+        res,
+      );
+      // await this.storesService.update(id, { id, klaviyoDomain: createdAt }),
+    } catch (err) {
+      console.log('err=', JSON.stringify(err));
     }
   }
 }

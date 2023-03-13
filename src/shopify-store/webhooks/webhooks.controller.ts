@@ -2076,4 +2076,56 @@ export class WebhooksController {
       res.status(HttpStatus.OK).send();
     }
   }
+  @Post('create-klaviyo-domains')
+  async createDomainByBrnadName(@Res() res) {
+    try {
+      // get all stores,  create domain
+      const response: any = '';
+      const stores = await this.storesService.findActiveAll();
+      const PRIVATE_KEY = this.configSevice.get('KLAVIYO_PRIVATE_KEY');
+      let domainName = '';
+      stores.map(async ({ id, brandName, createdAt, shortUrlDomain }) => {
+        if (!shortUrlDomain) {
+          // test on YnR
+          const fomatBrandName = brandName.replace(/ /g, '-').toLowerCase();
+          console.log(`${fomatBrandName}.group.shop`);
+          domainName = `${fomatBrandName}.group.shop`;
+
+          const urlKlaviyo = `https://api.short.io/domains/`;
+          const body = JSON.stringify({
+            hideReferer: false,
+            httpsLinks: true,
+            hostname: domainName,
+          });
+          console.log(
+            '🚀 ~ file: webhooks.controller.ts:2080 ~ stores.map ~ body:',
+            body,
+          );
+          const options = {
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+              Authorization: 'sk_REri48MOke1HiKny',
+            },
+          };
+          const res = await lastValueFrom(
+            this.httpService
+              .post(urlKlaviyo, body, options)
+              .pipe(map((res) => res.data)),
+          );
+          console.log(
+            '🚀 ~ file: webhooks.controller.ts:2091 ~ stores.map ~ response:',
+            res,
+          );
+          await this.storesService.update(id, {
+            id,
+            shortUrlDomain: `${domainName}`,
+          });
+        }
+      });
+      res.send(JSON.stringify(domainName));
+    } catch (err) {
+      console.log('err=', JSON.stringify(err));
+    }
+  }
 }
