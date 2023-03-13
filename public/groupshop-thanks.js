@@ -606,10 +606,13 @@ if (
   isGroupshop = false;
 } else if (
   (discountCode && discountCode.slice(0, 3) === 'GS') ||
-  !discountCode
+  Shopify.checkout.discount === null
 ) {
   isGroupshop = true;
-} else if (discountCode || discountCode.slice(0, 3) === 'GSD') {
+} else if (
+  (Shopify.checkout.discount && Shopify.checkout.discount.code === null) ||
+  discountCode.slice(0, 3) === 'GSD'
+) {
   isDrops = true;
 }
 const storeName = isDrops ? 'Groupshop' : 'Microstore';
