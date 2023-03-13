@@ -130,6 +130,9 @@ export class OrderCreatedListener {
                 .value,
           }));
           newItem.shopifyCreatedAt = whOrder.created_at;
+          newItem.refferalId = whOrder.note_attributes.length
+            ? whOrder.note_attributes[0]?.value
+            : null;
           return await this.orderService.create(newItem);
           // return newItem;
         }),

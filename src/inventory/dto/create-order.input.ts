@@ -102,4 +102,6 @@ export class CreateOrderInput {
   financialStatus?: string;
   @Field(() => [RefundInfo])
   refundDetail: RefundInfo[];
+  @Field({ nullable: true })
+  refferalId?: string;
 }

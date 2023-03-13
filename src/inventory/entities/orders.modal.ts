@@ -92,4 +92,6 @@ export default class Orders extends DefaultColumnsService {
   financialStatus?: string;
   @Column(() => RefundInfo)
   refundDetail: RefundInfo[];
+  @Column({ nullable: true })
+  refferalId?: string;
 }
