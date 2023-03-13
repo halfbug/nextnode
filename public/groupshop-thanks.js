@@ -767,9 +767,7 @@ async function init() {
     injectStyleSheet('glider.min.css');
     const csymbol = getCurrencySymbol(Shopify.checkout.currency);
     if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
-      addLeftBlock(
-        discountCode?.slice(0, 3) === 'GSD' ? null : store.logoImage,
-      );
+      addLeftBlock(isDrops ? null : store.logoImage);
     }
     if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Right') {
       addRightBlock(store.brandName, false, '');
