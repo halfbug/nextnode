@@ -7,7 +7,7 @@
 	"license": "UNLICENSED",
 	"scripts": {
 		"prebuild": "rimraf dist",
-		"build": "nest build",
+		"build": "nest build --ignore sqlite3",
 		"format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
 		"start": "nest start",
 		"start:dev": "nest start --watch",
@@ -59,7 +59,6 @@
 		"reflect-metadata": "^0.1.13",
 		"rimraf": "^3.0.2",
 		"rxjs": "^7.2.0",
-		"sqlite3": "^5.1.5",
 		"typeorm": "^0.2.38",
 		"uuid": "^8.3.2"
 	},
