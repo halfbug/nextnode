@@ -803,7 +803,7 @@ async function init() {
           var rightHeadTxt = '';
           let cashback = 0;
           var amountCal = 0;
-          if (+amountCal > 0 && members < 3 && Shopify.checkout.discount) {
+          if (members < 3 && Shopify.checkout.discount) {
             const lineitems = Shopify.checkout.line_items;
             console.log(
               '🚀 ~ file: groupshop-thanks.js:808 ~ pollit3 ~ lineitems:',
@@ -813,7 +813,7 @@ async function init() {
             // to remove from total
             const SVamount = lineitems
               .filter((l) => l.compare_at_price !== null)
-              .reduce((acc, { line_price }) => acc + line_price, 0);
+              .reduce((acc, { line_price }) => acc + +line_price, 0);
             console.log(
               '🚀 ~ file: groupshop-thanks.js:817 ~ pollit3 ~ SVamount:',
               SVamount,
