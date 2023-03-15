@@ -799,24 +799,37 @@ async function init() {
 
           console.log('Shopify.checkout.discount', Shopify.checkout.discount);
 
-          console.log(
-            'Shopify.checkout.discount.amount',
-            Shopify.checkout.discount.amount,
-          );
-
-          let cashback =
-            (parseFloat(Shopify.checkout.subtotal_price) +
-              parseFloat(Shopify.checkout.discount.amount)) *
-            (parseFloat(`${store.dropsLastMilestone}%`) / 100 -
-              mem.availedDiscount / 100);
-
-          var amountCal = `${Math.floor(cashback)
-            .toFixed(2)
-            .toString()
-            .replace('.00', '')}`;
           var leftHeadTxt = '';
           var rightHeadTxt = '';
-          if (+amountCal > 0 && members < 3) {
+          let cashback = 0;
+          var amountCal = 0;
+          if (+amountCal > 0 && members < 3 && Shopify.checkout.discount) {
+            const lineitems = Shopify.checkout.line_items;
+            console.log(
+              '🚀 ~ file: groupshop-thanks.js:808 ~ pollit3 ~ lineitems:',
+              lineitems,
+            );
+            // spotlight and vault products total
+            // to remove from total
+            const SVamount = lineitems
+              .filter((l) => l.compare_at_price !== null)
+              .reduce((acc, { line_price }) => acc + line_price, 0);
+            console.log(
+              '🚀 ~ file: groupshop-thanks.js:817 ~ pollit3 ~ SVamount:',
+              SVamount,
+            );
+            cashback =
+              (parseFloat(Shopify.checkout.subtotal_price) +
+                parseFloat(Shopify.checkout.discount.amount) -
+                SVamount) *
+              (parseFloat(`${store.dropsLastMilestone}%`) / 100 -
+                mem.availedDiscount / 100);
+
+            amountCal = `${Math.floor(cashback)
+              .toFixed(2)
+              .toString()
+              .replace('.00', '')}`;
+
             leftHeadTxt = `
          Get up to     
          <strong>${csymbol}${amountCal} cashback</strong>
