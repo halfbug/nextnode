@@ -1040,8 +1040,8 @@ async function init() {
               glider.refresh(true);
             }
           }
-          document.querySelector('.groupshop_left-block').remove();
-          document.querySelector('.summaryContainer').remove();
+          // document.querySelector('.groupshop_left-block').remove();
+          // document.querySelector('.summaryContainer').remove();
         }
       }, 1000);
     }
