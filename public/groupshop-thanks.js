@@ -652,7 +652,7 @@ function injectStyleSheet(url) {
 
   document.head.appendChild(style);
 }
-function addLeftBlock(logo) {
+function addLeftBlock(logo, logoName = 'gslogo2.png') {
   const logoDiv = logo
     ? `<div style="width: 52px;z-index: 20;"><img class="logo" height="" src="${logo}"></div>`
     : '';
@@ -716,7 +716,13 @@ function addLeftBlock(logo) {
   target.after(leftBlock);
 }
 
-function addRightBlock(brandName, isLoaded, cashback) {
+function addRightBlock(
+  brandName,
+  isLoaded,
+  cashback,
+  storeName = 'Microstore',
+  purpleHeadName = 'purple-head-mobile2.jpg',
+) {
   if (isLoaded) {
     document.querySelector(
       '.groupshop_right-block',
@@ -762,7 +768,7 @@ async function init() {
     injectStyleSheet('glider.min.css');
     const csymbol = getCurrencySymbol(Shopify.checkout.currency);
     if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
-      addLeftBlock(isDrops ? null : store.logoImage);
+      addLeftBlock(null);
     }
     if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Right') {
       addRightBlock(store.brandName, false, '');
@@ -803,6 +809,10 @@ async function init() {
           var rightHeadTxt = '';
           let cashback = 0;
           var amountCal = 0;
+          if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
+            document.querySelector('.groupshop_left-block').remove();
+            addLeftBlock(null, 'gslogo.png');
+          }
           if (members < 3 && Shopify.checkout.discount) {
             const lineitems = Shopify.checkout.line_items;
             console.log(
@@ -848,7 +858,13 @@ async function init() {
               'active';
           }
           if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Right') {
-            addRightBlock(store.brandName, true, `${csymbol}${amountCal}`);
+            addRightBlock(
+              store.brandName,
+              true,
+              `${csymbol}${amountCal}`,
+              'Groupshop',
+              'purple-head-mobile.jpg',
+            );
             // document.querySelector('.gs_content').innerHTML = leftHeadTxt;
             document.querySelector('.gs_content_right').innerHTML =
               rightHeadTxt;
@@ -927,6 +943,10 @@ async function init() {
             orderId,
             wurl: window.location.href,
           });
+          if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
+            document.querySelector('.groupshop_left-block').remove();
+            addLeftBlock(store.logoImage);
+          }
           if (res.activeMember) {
             const { activeMember: mem, url, percentage, members } = res;
 
@@ -1040,8 +1060,8 @@ async function init() {
               glider.refresh(true);
             }
           }
-          document.querySelector('.groupshop_left-block').remove();
-          document.querySelector('.summaryContainer').remove();
+          // document.querySelector('.groupshop_left-block').remove();
+          // document.querySelector('.summaryContainer').remove();
         }
       }, 1000);
     }
