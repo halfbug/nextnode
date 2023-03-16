@@ -29,6 +29,30 @@ window.GSURL = window.FURL;
 
 */
 
+!(function (f, b, e, v, n, t, s) {
+  if (f.fbq) return;
+  n = f.fbq = function () {
+    n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+  };
+  if (!f._fbq) f._fbq = n;
+  n.push = n;
+  n.loaded = !0;
+  n.version = '2.0';
+  n.queue = [];
+  t = b.createElement(e);
+  t.async = !0;
+  t.src = v;
+  s = b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t, s);
+})(
+  window,
+  document,
+  'script',
+  'https://connect.facebook.net/en_US/fbevents.js',
+);
+
+fbq('init', '3371804206430685');
+
 // eslint-disable-next-line @typescript-eslint/no-this-alias
 // @ts-ignore
 !(function (e) {
@@ -592,7 +616,7 @@ var discountCode = Shopify.checkout.discount
   : null;
 var lineItems = Shopify.checkout.line_items;
 
-console.log('🚀 ~ checkout', Shopify.checkout);
+console.log('🚀 ~ checkout', Shopify);
 var totalOrderAmount = lineItems.reduce((priceSum, { price, quantity }) => {
   thisPrice = priceSum + quantity * parseFloat(price);
   return thisPrice;
@@ -793,6 +817,35 @@ async function init() {
           orderId,
         });
         console.log('🚀 ~ file: groupshop-thanks.js:896 ~ pollit3 ~ res', res);
+        const lineitems = Shopify.checkout.line_items;
+        const cartDetails = [];
+        lineitems.forEach((item, index) => {
+          const productId = item.id;
+          const discountPrice =
+            item?.discount_allocations.length > 0
+              ? item?.discount_allocations[0]?.amount
+              : 0;
+          cartDetails.push({
+            id: productId,
+            title: item.title,
+            price: (item.price - discountPrice).toFixed(2),
+            qty: item.quantity,
+            variants: item.variant_title,
+          });
+        });
+        const totalPrice = lineitems?.reduce(
+          (priceSum, { line_price, quantity }) =>
+            priceSum + quantity * parseFloat(line_price),
+          0,
+        );
+        fbq('track', 'Purchase', {
+          contents: cartDetails,
+          currency: store?.currencyCode,
+          eventref: res?.id,
+          value:
+            totalPrice -
+            (Shopify.checkout.discount ? Shopify.checkout.discount.amount : 0),
+        });
         if (res.activeMember) {
           clearInterval(pollit3);
           const { activeMember: mem, url, percentage, members } = res;
@@ -804,7 +857,6 @@ async function init() {
           let cashback = 0;
           var amountCal = 0;
           if (members < 3 && Shopify.checkout.discount) {
-            const lineitems = Shopify.checkout.line_items;
             console.log(
               '🚀 ~ file: groupshop-thanks.js:808 ~ pollit3 ~ lineitems:',
               lineitems,

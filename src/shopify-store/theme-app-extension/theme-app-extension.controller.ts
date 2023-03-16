@@ -235,6 +235,7 @@ export class ThemeAppExtensionController {
       const { orderId } = req.body;
 
       const {
+        id,
         members,
         url,
         discountCode: { percentage },
@@ -271,6 +272,7 @@ export class ThemeAppExtensionController {
 
       res.send(
         JSON.stringify({
+          id,
           activeMember,
           url,
           percentage,
