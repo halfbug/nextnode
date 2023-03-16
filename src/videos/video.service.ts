@@ -55,7 +55,8 @@ export class VideoService {
     return allvideoData;
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} video`;
+  async remove(id: string) {
+    await this.VideoRepository.delete(id);
+    return { status: 'video deleted successfully' };
   }
 }

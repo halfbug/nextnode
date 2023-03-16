@@ -112,4 +112,25 @@ export class UploadImageService {
 
     // return await this.uploadS3(file.buffer, S3bucket, originalname);
   }
+
+  async deleteVideo(file) {
+    const s3 = this.s3Provider.getS3();
+    const S3bucket = this.s3Provider.getBucketNameVideo();
+    s3.deleteObject(
+      {
+        Bucket: S3bucket,
+        Key: file,
+      },
+      function (err) {
+        if (err) {
+          console.log(err);
+          Logger.error(
+            'Error in file delete from S3',
+            err,
+            UploadImageService.name,
+          );
+        }
+      },
+    );
+  }
 }

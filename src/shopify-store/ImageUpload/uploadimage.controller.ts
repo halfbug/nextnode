@@ -7,6 +7,7 @@ import {
   Res,
   Get,
   Req,
+  Delete,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiResponse } from '@nestjs/swagger';
@@ -109,6 +110,24 @@ export class UploadImageController {
       return response
         .status(500)
         .json(`Failed to get video from S3: ${error.message}`);
+    }
+  }
+
+  @Public()
+  @Delete('video')
+  @ApiResponse({ status: HttpStatus.CREATED, type: ImageResponseDTO })
+  async removeVideoUrl(@Req() req, @Res() response) {
+    const { key } = req.query;
+    try {
+      const data = await this.uploadImageService.deleteVideo(key);
+      return response.status(200).json({
+        message: `s3 url removed`,
+        data,
+      });
+    } catch (error) {
+      return response
+        .status(500)
+        .json(`Failed to remove video from S3: ${error.message}`);
     }
   }
 }
