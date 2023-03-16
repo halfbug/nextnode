@@ -1169,8 +1169,8 @@ async function init() {
         }
       }, 1000);
     } else if (
-      discountCode.slice(0, 3) === 'GSC' ||
-      discountCode.slice(0, 3) === 'GSP'
+      discountCode &&
+      (discountCode.slice(0, 3) === 'GSC' || discountCode.slice(0, 3) === 'GSP')
     ) {
       const pollit2 = setInterval(async () => {
         indx2++;
