@@ -604,7 +604,7 @@ if (
   (discountCode.slice(0, 3) === 'GSP' || discountCode.slice(0, 3) === 'GSC')
 ) {
   isGroupshop = false;
-} else if (discountCode && discountCode.slice(0, 3) === 'GS') {
+} else if (discountCode && discountCode.slice(0, 2) === 'GS') {
   isGroupshop = true;
 } else {
   isDrops = true;
