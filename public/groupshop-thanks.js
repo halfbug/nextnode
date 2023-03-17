@@ -628,12 +628,13 @@ if (
   (discountCode.slice(0, 3) === 'GSP' || discountCode.slice(0, 3) === 'GSC')
 ) {
   isGroupshop = false;
+} else if (!discountCode || discountCode.slice(0, 3) === 'GSD') {
+  isDrops = true;
 } else if (discountCode && discountCode.slice(0, 2) === 'GS') {
   isGroupshop = true;
-} else {
-  isDrops = true;
 }
-
+console.log('isDrops', isDrops);
+console.log('isGroupshop', isGroupshop);
 const storeName = isDrops ? 'Groupshop' : 'Microstore';
 const logoName = isDrops ? 'gslogo.png' : 'gslogo2.png';
 const purpleHeadName = isDrops
@@ -981,6 +982,15 @@ async function init() {
           });
           if (res.activeMember) {
             const { activeMember: mem, url, percentage, members } = res;
+            isDrops = false;
+            document.querySelector(
+              '.logoBox',
+            ).innerHTML = `<div style="width: 52px;z-index: 20;"><img class="logo" height="" src="${store.logoImage}"></div>
+              <div style="width: 52px;margin-left: -10px;z-index: 10;"><img class="logo" src="https://d1o2v5h7slksjm.cloudfront.net/gslogo2.png"></div>`;
+            document.querySelector(
+              '.right',
+            ).innerHTML = `<span>Powered by</span> 
+                  <img class="img-ms" src="https://d1o2v5h7slksjm.cloudfront.net/ms-white-crop.jpg">`;
 
             let cashback = 0;
             if (mem.role === 0) {
@@ -1010,6 +1020,8 @@ async function init() {
             }
             if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
               document.querySelector('.groupshop_left-block h3').innerHTML =
+                leftHeadTxt;
+              document.querySelector('.cashback_mobile').innerHTML =
                 leftHeadTxt;
               document.querySelector('.groupshop_left-block h3').className =
                 'active';
@@ -1136,6 +1148,7 @@ async function init() {
             rightHeadTxt = leftHeadTxt;
           }
           if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
+            document.querySelector('.cashback_mobile').innerHTML = leftHeadTxt;
             document.querySelector('.groupshop_left-block h3').innerHTML =
               leftHeadTxt;
             document.querySelector('.groupshop_left-block h3').className =

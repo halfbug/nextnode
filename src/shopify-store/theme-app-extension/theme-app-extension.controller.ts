@@ -280,7 +280,7 @@ export class ThemeAppExtensionController {
         }),
       );
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       res.send(JSON.stringify({ activeMember: null, url: null }));
     } finally {
       // res.status(HttpStatus.OK).send();
