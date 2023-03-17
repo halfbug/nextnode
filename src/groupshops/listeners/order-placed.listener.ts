@@ -272,6 +272,7 @@ export class OrderPlacedListener {
           'groupshop',
         );
       }
+      temp.push(member);
     }
     return temp;
   }
@@ -394,7 +395,7 @@ export class OrderPlacedListener {
 
           ugroupshop.dealProducts = dealProducts;
           ugroupshop.totalProducts = totalCampaignProducts.length;
-          ugroupshop.members = this.setPreviousMembersRefund(
+          ugroupshop.members = await this.setPreviousMembersRefund(
             ugroupshop.members,
             ugroupshop.discountCode,
           );
