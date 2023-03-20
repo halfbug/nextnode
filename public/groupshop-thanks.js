@@ -752,7 +752,7 @@ function addRightBlock(brandName, isLoaded, cashback) {
 
     rightBlock.innerHTML = `<div class="summaryContainer">
         <div class="image">
-            <img src="${window.BURL}/public/images/${purpleHeadName}" alt="headtag" />
+            <img id="purpleHeadName" src="${window.BURL}/public/images/${purpleHeadName}" alt="headtag" />
         </div>
         <div class="groupshop_right-block">
         <div class="cashback gs_content_right">
@@ -1032,6 +1032,9 @@ async function init() {
               document.querySelector('.gs_content_right').innerHTML =
                 rightHeadTxt;
             }
+            document.getElementById(
+              'purpleHeadName',
+            ).src = `${window.BURL}/public/images/purple-head-mobile2.jpg`;
 
             window.GSURL = window.FURL + url;
             console.log(
