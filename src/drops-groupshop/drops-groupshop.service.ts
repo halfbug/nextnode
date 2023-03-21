@@ -574,7 +574,7 @@ export class DropsGroupshopService {
                       $eq: ['$groupshopId', '$$gid'],
                     },
                     {
-                      $eq: ['$event', EventType.revised],
+                      $eq: ['$event', EventType.ended],
                     },
                   ],
                 },
@@ -612,9 +612,13 @@ export class DropsGroupshopService {
         },
       },
       {
+        $match: {
+          isFullyExpired: false,
+        },
+      },
+      {
         $project: {
           discountCode: 1,
-          isFullyExpired: 1,
         },
       },
     ];

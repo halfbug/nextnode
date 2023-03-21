@@ -22,6 +22,7 @@ export enum EventType {
   planReset1 = 'planReset1',
   partnerTierSwitch = 'partnerTierSwitch',
   partnerRecurringCharged = 'partnerRecurringCharged',
+  ended = 'ended',
 }
 
 @Entity()

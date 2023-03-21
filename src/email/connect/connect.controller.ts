@@ -544,7 +544,7 @@ export class CatController {
 
               this.lifecyclesrv.create({
                 groupshopId: dgroupshop.id,
-                event: EventType.revised,
+                event: EventType.ended,
                 dateTime: new Date(),
               });
 

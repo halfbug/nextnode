@@ -97,6 +97,12 @@ export class DropsGroupshopResolver {
         newExpiredate,
         groupshop.discountCode.priceRuleId,
       );
+
+      this.lifecyclesrv.create({
+        groupshopId: groupshop.id,
+        event: EventType.ended,
+        dateTime: newExpiredate,
+      });
     }
     const updateGS = await this.dropsGroupshopService.updateExpireDate(
       {
@@ -115,12 +121,6 @@ export class DropsGroupshopResolver {
       event: eventType,
       dateTime: new Date(),
     });
-
-    // this.lifecyclesrv.create({
-    //   groupshopId: groupshop.id,
-    //   event: EventType.revised,
-    //   dateTime: new Date(),
-    // });
 
     this.lifecyclesrv.create({
       groupshopId: groupshop.id,
@@ -143,7 +143,7 @@ export class DropsGroupshopResolver {
     const groupshop = await this.dropsGroupshopService.findDropsGS(Dcode);
     const res = await this.lifecyclesrv.findAllEvents(
       groupshop.id,
-      EventType.revised,
+      EventType.ended,
     );
     // if (groupshop.status === 'pending' && groupshop.expiredAt === null) {
     //   // executes on first view

@@ -543,6 +543,14 @@ export class OrderPlacedListener {
                 event: EventType.expired,
                 dateTime: dgroupshop.expiredAt,
               });
+
+              if (newDiscount === maximum) {
+                this.lifecyclesrv.create({
+                  groupshopId: dgroupshop.id,
+                  event: EventType.ended,
+                  dateTime: dgroupshop.expiredAt,
+                });
+              }
             }
           }
           await this.dropsService.update(dgroupshop.id, dgroupshop);
