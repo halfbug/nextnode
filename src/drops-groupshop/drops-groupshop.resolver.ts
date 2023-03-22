@@ -150,7 +150,7 @@ export class DropsGroupshopResolver {
     //   await this.expireAtUpdate(groupshop, Dcode, EventType.started);
     // }
 
-    if (status === 'activated') {
+    if (status === 'activated' && groupshop.expiredAt) {
       const isExpired = !(getDateDifference(groupshop.expiredAt).time > -1);
       if (isExpired && res?.length < 1) {
         await this.expireAtUpdate(groupshop, Dcode, EventType.revised);
