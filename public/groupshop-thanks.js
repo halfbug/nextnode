@@ -953,7 +953,8 @@ async function init() {
                 productPrice,
               );
               slide.innerHTML = `<img src="${
-                prod.featuredImage
+                prod.featuredImage ??
+                'https://d1o2v5h7slksjm.cloudfront.net/noImage.png'
               }"alt="img"><span class="discount">${percentage}% OFF</span><h4>${prod.title.slice(
                 0,
                 15,
