@@ -25,6 +25,7 @@ import { PMemberService } from 'src/partners/pmember.service';
 import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt.service';
 import { AuthService } from 'src/auth/auth.service';
 import { Public } from 'src/auth/public.decorator';
+import { ChannelGroupshopService } from 'src/channel/channelgroupshop.service';
 @Public()
 @Controller()
 export class ShopifyStoreController {
@@ -44,6 +45,7 @@ export class ShopifyStoreController {
     private httpService: HttpService,
     private partnerGSSrv: PartnerService,
     private partnerMember: PMemberService,
+    private channelService: ChannelGroupshopService,
     private readonly crypt: EncryptDecryptService,
     private readonly authService: AuthService,
   ) {}
@@ -135,6 +137,24 @@ export class ShopifyStoreController {
       ? store?.settings?.general?.imageUrl.split('/')[4]
       : campaign.settings?.general?.imageUrl.split('/')[4];
     const maxReward = baseline;
+    const id = store?.id;
+    const brandName = store?.brandName;
+    return { brandName, shop, id, photo, maxReward };
+  }
+  @Get('meChannelMeta')
+  async whoamiic(@Query('code') code: any) {
+    const {
+      discountCode: { percentage },
+      store,
+      campaign,
+      shop,
+    } = await this.channelService.findChannelGroupshopByCode(
+      this.crypt.decrypt(code),
+    );
+    const photo = store?.settings?.general
+      ? store?.settings?.general?.imageUrl.split('/')[4]
+      : campaign.settings?.general?.imageUrl.split('/')[4];
+    const maxReward = percentage;
     const id = store?.id;
     const brandName = store?.brandName;
     return { brandName, shop, id, photo, maxReward };

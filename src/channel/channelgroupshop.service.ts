@@ -17,7 +17,7 @@ import { addDays } from 'src/utils/functions';
 export class ChannelGroupshopService {
   constructor(
     @InjectRepository(ChannelGroupshop)
-    private channelGroupshopRepository: Repository<ChannelGroupshop>,
+    public channelGroupshopRepository: Repository<ChannelGroupshop>,
     private channelService: ChannelService,
     private crypt: EncryptDecryptService,
     private configSevice: ConfigService,
