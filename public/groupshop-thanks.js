@@ -4,8 +4,9 @@
 // @ts-nocheck
 console.log('v2 Script Local');
 console.log('v2 Script Triggered');
+// console.log('from local');
 // Define App Url
-// window.BURL = 'https://61dc-124-253-35-214.ngrok.io';
+// window.BURL = 'https://72e7-39-50-207-107.ngrok.io';
 // window.FURL = 'http://localhost:3000';
 window.BURL = 'https://api-stage.groupshop.co';
 window.FURL = 'http://front-stage.groupshop.co';
@@ -623,27 +624,35 @@ var totalOrderAmount = lineItems.reduce((priceSum, { price, quantity }) => {
 }, 0);
 let isGroupshop = false;
 let isDrops = false;
+let purpleHeadName = '';
 if (
   discountCode &&
   (discountCode.slice(0, 3) === 'GSP' || discountCode.slice(0, 3) === 'GSC')
 ) {
   isGroupshop = false;
+  purpleHeadName = 'purple-head-mobile2.jpg';
 } else if (
   !discountCode ||
   discountCode.slice(0, 3) === 'GSD' ||
   (discountCode && discountCode.slice(0, 2) !== 'GS')
 ) {
   isDrops = true;
+  // purpleHeadName = 'purple-head-mobile.jpg';
 } else if (discountCode && discountCode.slice(0, 2) === 'GS') {
   isGroupshop = true;
+  purpleHeadName = 'purple-head-mobile2.jpg';
 }
+// else if (!discountCode && discountCode.slice(0, 3) !== 'GSD') {
+//   isGroupshop = true;
+//   purpleHeadName = 'purple-head-mobile.jpg';
+// }
 console.log('isDrops', isDrops);
 console.log('isGroupshop', isGroupshop);
 const storeName = isDrops ? 'Groupshop' : 'Microstore';
 const logoName = isDrops ? 'gslogo.png' : 'gslogo2.png';
-const purpleHeadName = isDrops
-  ? 'purple-head-mobile.jpg'
-  : 'purple-head-mobile2.jpg';
+// const purpleHeadName = isDrops
+//   ? 'purple-head-mobile.jpg'
+//   : 'purple-head-mobile2.jpg';
 console.log('🚀  groupshop-thanks isGroupshop', isGroupshop);
 
 async function fetchStore(shop) {
@@ -745,19 +754,43 @@ function addLeftBlock(logo) {
   target.after(leftBlock);
 }
 
-function addRightBlock(brandName, isLoaded, cashback) {
+function addRightBlock(
+  brandName,
+  isLoaded,
+  cashback,
+  purpleHD = 'purple-head-mobile2.jpg',
+) {
   if (isLoaded) {
     document.querySelector(
       '.groupshop_right-block',
     ).innerHTML = `<div class="cashback gs_content_right">Get up to ${cashback} cashback on your order! 🎉</div>  <div class="cashbackTxt"> Get cashback on this order and unlock exclusive discounts with ${storeName}. </div> <div class="cashbackBtn"> <div class="buttonSmry"> <a target="_blank" id="gs_link" >Get Your Cashback</a></div></div>`;
+    const isImageExist = document.querySelector('#purpleHeadName');
+    console.log(
+      '🚀 ~ file: groupshop-thanks.js:768 ~ isImageExist:',
+      isImageExist,
+    );
+    if (!isImageExist) {
+      const rightBlock = document.createElement('div');
+      rightBlock.style = 'display: flex; justify-content: center;';
+      const imgrightBlock = document.createElement('img');
+      imgrightBlock.id = 'purpleHeadName';
+      const bannerDiv = document.getElementById('bannerDiv');
+      bannerDiv.appendChild(imgrightBlock);
+      document.getElementById(
+        'purpleHeadName',
+      ).src = `${window.BURL}/public/images/${purpleHD}`;
+      // var target = document.querySelector('.order-summary__sections');
+      // target.append(rightBlock);
+    }
   } else {
     const rightBlock = document.createElement('div');
     rightBlock.style = 'display: flex; justify-content: center;';
+    // <img id="purpleHeadName" src="${window.BURL}/public/images/${purpleHeadName}" alt="headtag" />
 
     rightBlock.innerHTML = `<div class="summaryContainer">
         <div class="image">
-            <img id="purpleHeadName" src="${window.BURL}/public/images/${purpleHeadName}" alt="headtag" />
-        </div>
+            <div id="bannerDiv" class="image-placeholder" style="height: 30px !important;align-self: center; width: 400px !important;">&nbsp;</div>
+            </div>
         <div class="groupshop_right-block">
         <div class="cashback gs_content_right">
         <div class="image-placeholder" style="height: 30px !important;align-self: center; width: 205px !important;">&nbsp;</div>
@@ -905,7 +938,12 @@ async function init() {
               'active';
           }
           if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Right') {
-            addRightBlock(store.brandName, true, `${csymbol}${amountCal}`);
+            addRightBlock(
+              store.brandName,
+              true,
+              `${csymbol}${amountCal}`,
+              'purple-head-mobile.jpg',
+            );
             // document.querySelector('.gs_content').innerHTML = leftHeadTxt;
             document.querySelector('.gs_content_right').innerHTML =
               rightHeadTxt;
