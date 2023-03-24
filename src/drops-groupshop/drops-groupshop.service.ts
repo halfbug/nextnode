@@ -670,4 +670,10 @@ export class DropsGroupshopService {
     const VSProductIds = await this.getVaultSpotlightProducts(shop);
     return lineitems.filter((l) => !VSProductIds.includes(l.product.id));
   }
+
+  async getLastMilestoneDrops(storeId: string) {
+    return this.DropsGroupshopRepository.find({
+      where: { storeId, milestones: { $size: 3 } },
+    });
+  }
 }

@@ -2076,4 +2076,35 @@ export class WebhooksController {
       res.status(HttpStatus.OK).send();
     }
   }
+
+  @Post('add-drops-ended-event')
+  async addDropsEndedEvent(@Req() req, @Res() res) {
+    try {
+      const { shop } = req.query;
+
+      const { id } = await this.storesService.findOne(shop);
+
+      const dropsGroupshops =
+        await this.dropsGroupshopService.getLastMilestoneDrops(id);
+
+      dropsGroupshops.forEach((element) => {
+        this.lifecyclesrv.create({
+          groupshopId: element.id,
+          event: EventType.ended,
+          dateTime: new Date(),
+        });
+      });
+
+      console.log(
+        '🚀 ~ file: webhooks.controller.ts:2105 ~ addDropsEndedEvent ~ dropsGroupshops:',
+        dropsGroupshops,
+      );
+      res.send(JSON.stringify(dropsGroupshops));
+    } catch (err) {
+      console.log(JSON.stringify(err));
+      Logger.error(err, 'add-drops-ended-event');
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
 }
