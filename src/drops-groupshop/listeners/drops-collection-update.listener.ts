@@ -27,6 +27,11 @@ export class DropsCollectionUpdatedListener {
     drops,
   }: DropsCollectionUpdatedEvent) {
     try {
+      Logger.log(
+        'Discount Code Bulk Update Started.....',
+        DropsCollectionUpdatedListener.name,
+        true,
+      );
       for (const dg of dropsGroupshops) {
         await this.shopifyapi.setDiscountCode(
           shop,
@@ -51,6 +56,11 @@ export class DropsCollectionUpdatedListener {
           true,
         );
       }
+      Logger.log(
+        'Discount Code Bulk Update Completed.....',
+        DropsCollectionUpdatedListener.name,
+        true,
+      );
 
       const updateStoreInput = new UpdateStoreInput();
       updateStoreInput.drops = {
