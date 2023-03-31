@@ -43,7 +43,9 @@ import Channel from './channel/entities/channel.model';
 import ChannelGroupshop from './channel/entities/channelgroupshop.model';
 import { AppLogger } from './applogger/entities/applogger.entity';
 import { DropsGroupshopModule } from './drops-groupshop/drops-groupshop.module';
+import { DropsCategoryModule } from './drops-category/drops-category.module';
 import DropsGroupshop from './drops-groupshop/entities/dropsgroupshop.model';
+import DropsCategory from './drops-category/entities/drops-category.model';
 
 @Module({
   imports: [
@@ -91,6 +93,7 @@ import DropsGroupshop from './drops-groupshop/entities/dropsgroupshop.model';
             ChannelGroupshop,
             AppLogger,
             DropsGroupshop,
+            DropsCategory,
           ],
         };
       },
@@ -121,6 +124,7 @@ import DropsGroupshop from './drops-groupshop/entities/dropsgroupshop.model';
     AuthModule,
     AppLoggerModule,
     DropsGroupshopModule,
+    DropsCategoryModule,
   ],
 })
 export class AppModule {}
