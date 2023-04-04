@@ -19,6 +19,7 @@ import {
   SPOTLIGHT_SECTION_TITLE,
   VAULT_SECTION_TITLE,
 } from 'src/utils/constant';
+import { DropsCategory } from 'src/drops-category/entities/drops-category.entity';
 
 @Resolver(() => DropsGroupshop)
 export class DropsGroupshopResolver {
@@ -194,6 +195,12 @@ export class DropsGroupshopResolver {
     } else {
       throw new NotFoundException(`Not Found drops groupshop`);
     }
+  }
+
+  @Public()
+  @Query(() => DropsCategory, { name: 'collectionByCategory' })
+  async getCollectionByCategory(@Args('categoryId') categoryId: string) {
+    return await this.dropsGroupshopService.findProductsByCategory(categoryId);
   }
 
   @Public()

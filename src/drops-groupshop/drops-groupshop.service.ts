@@ -17,11 +17,13 @@ import {
   VAULT_SECTION_TITLE,
 } from 'src/utils/constant';
 import { OrderLineItems } from 'src/inventory/entities/orders.entity';
+import DropsCategory from 'src/drops-category/entities/drops-category.model';
 
 @Injectable()
 export class DropsGroupshopService {
   constructor(
     @InjectRepository(DropsGroupshop)
+    @InjectRepository(DropsCategory)
     private DropsGroupshopRepository: Repository<DropsGroupshop>,
     @Inject(forwardRef(() => StoresService))
     private storesService: StoresService,
@@ -268,7 +270,6 @@ export class DropsGroupshopService {
           'discountCode.title': discountCode,
         },
       },
-
       {
         $lookup: {
           from: 'store',
@@ -284,8 +285,53 @@ export class DropsGroupshopService {
       },
       {
         $lookup: {
+          from: 'drops_category',
+          localField: 'store.id',
+          foreignField: 'storeId',
+          as: 'categories',
+        },
+      },
+      {
+        $addFields: {
+          firstCategory: {
+            $filter: {
+              input: '$categories',
+              as: 'cat',
+              cond: {
+                $and: [
+                  {
+                    $eq: ['$$cat.parentId', null],
+                  },
+                  {
+                    $eq: ['$$cat.status', 'active'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          firstCategory: {
+            $arrayElemAt: [
+              '$firstCategory',
+              {
+                $indexOfArray: [
+                  '$firstCategory.sortOrder',
+                  {
+                    $min: '$firstCategory.sortOrder',
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      },
+      {
+        $lookup: {
           from: 'inventory',
-          localField: 'store.drops.collections.shopifyId',
+          localField: 'firstCategory.collections.shopifyId',
           foreignField: 'id',
           as: 'collections',
         },
@@ -294,7 +340,7 @@ export class DropsGroupshopService {
         $addFields: {
           sections: {
             $map: {
-              input: '$store.drops.collections',
+              input: '$firstCategory.collections',
               as: 'col',
               in: {
                 $mergeObjects: [
@@ -310,6 +356,55 @@ export class DropsGroupshopService {
                       },
                     },
                   },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          categories: {
+            $map: {
+              input: '$categories',
+              as: 'cat',
+              in: {
+                $mergeObjects: [
+                  '$$cat',
+                  {
+                    subCategories: {
+                      $filter: {
+                        input: '$categories',
+                        as: 'sub',
+                        cond: {
+                          $and: [
+                            {
+                              $ne: ['$$sub.status', 'draft'],
+                            },
+                            {
+                              $eq: ['$$cat.categoryId', '$$sub.parentId'],
+                            },
+                          ],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          categories: {
+            $filter: {
+              input: '$categories',
+              as: 'cat',
+              cond: {
+                $and: [
+                  { $eq: ['$$cat.status', 'active'] },
+                  { $eq: ['$$cat.parentId', null] },
                 ],
               },
             },
@@ -499,11 +594,138 @@ export class DropsGroupshopService {
           isActive: 1,
           partnerCommission: 1,
           sections: 1,
+          firstCategory: 1,
+          categories: 1,
         },
       },
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(DropsGroupshop, agg).toArray();
+    return gs[0];
+  }
+
+  async findProductsByCategory(categoryId: string) {
+    const agg = [
+      {
+        $match: {
+          categoryId: categoryId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'collections.shopifyId',
+          foreignField: 'id',
+          as: 'result',
+        },
+      },
+      {
+        $addFields: {
+          sections: {
+            $map: {
+              input: '$collections',
+              as: 'col',
+              in: {
+                $mergeObjects: [
+                  '$$col',
+                  {
+                    products: {
+                      $filter: {
+                        input: '$result',
+                        as: 'j',
+                        cond: {
+                          $eq: ['$$col.shopifyId', '$$j.id'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'sections.products.parentId',
+          foreignField: 'id',
+          as: 'products',
+        },
+      },
+      {
+        $addFields: {
+          products: {
+            $filter: {
+              input: '$products',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $ne: ['$$j.publishedAt', null],
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          sections: {
+            $map: {
+              input: '$sections',
+              as: 'me',
+              in: {
+                $mergeObjects: [
+                  '$$me',
+                  {
+                    products: {
+                      $filter: {
+                        input: {
+                          $map: {
+                            input: '$$me.products',
+                            as: 'mep',
+                            in: {
+                              $arrayElemAt: [
+                                {
+                                  $filter: {
+                                    input: '$products',
+                                    as: 'j',
+                                    cond: {
+                                      $eq: ['$$mep.parentId', '$$j.id'],
+                                    },
+                                  },
+                                },
+                                0,
+                              ],
+                            },
+                          },
+                        },
+                        as: 'd',
+                        cond: {
+                          $ne: ['$$d', null],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(DropsCategory, agg).toArray();
+    console.log(
+      '🚀 ~ file: drops-groupshop.service.ts:598 ~ DropsGroupshopService ~ findProductsByCategory ~ gs:',
+      JSON.stringify(gs),
+      categoryId,
+    );
     return gs[0];
   }
 

@@ -30,9 +30,62 @@ export class Sections {
   name?: string;
   @Field({ nullable: true })
   shopifyId?: string;
+  @Field({ nullable: true })
+  sortOrder?: number;
+  @Field({ nullable: true })
+  type?: string;
   @Field(() => [Product], { nullable: true })
   products?: Product[];
 }
+
+@ObjectType('CategoryCollection')
+export class CategoryCollection {
+  @Field({ nullable: true })
+  shopifyId: string;
+  @Field({ nullable: true })
+  name: string;
+  @Field({ nullable: true })
+  type: string;
+  @Field({ nullable: true })
+  sortOrder: number;
+}
+
+@ObjectType('SubCategories')
+export class SubCategories {
+  @Field({ nullable: true })
+  title: string;
+
+  @Field({ nullable: true })
+  categoryId: string;
+
+  @Field({ nullable: true })
+  sortOrder: number;
+
+  @Field(() => [CategoryCollection], { nullable: true })
+  collections: CategoryCollection[];
+}
+
+@ObjectType('Category')
+export class Category {
+  @Field({ nullable: true })
+  title: string;
+
+  @Field({ nullable: true })
+  categoryId: string;
+
+  @Field({ nullable: true })
+  parentId: string;
+
+  @Field({ nullable: true })
+  sortOrder: number;
+
+  @Field(() => [CategoryCollection], { nullable: true })
+  collections: CategoryCollection[];
+
+  @Field(() => [SubCategories], { nullable: true })
+  subCategories?: SubCategories[];
+}
+
 @ObjectType()
 export class DropsGroupshop {
   @Field()
@@ -109,4 +162,10 @@ export class DropsGroupshop {
 
   @Field(() => [Sections], { nullable: true })
   sections?: Sections[];
+
+  @Field(() => Category, { nullable: true })
+  firstCategory?: Category;
+
+  @Field(() => [Category], { nullable: true })
+  categories?: Category;
 }
