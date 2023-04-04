@@ -41,6 +41,7 @@ export class DropsCategoryResolver {
     return this.dropsCategoryService.update(
       updateDropsCategoryInput.id,
       updateDropsCategoryInput.categoryData,
+      updateDropsCategoryInput.isCollectionUpdate,
     );
   }
 

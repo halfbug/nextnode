@@ -31,6 +31,7 @@ export class DropsCategoryService {
   async update(
     id: string,
     updateDropsCategoryInput: CreateDropsCategoryInput[],
+    isCollectionUpdate: boolean,
   ) {
     const blukWrite = updateDropsCategoryInput.map((item) => {
       return {

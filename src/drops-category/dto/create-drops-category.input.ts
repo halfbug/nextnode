@@ -47,4 +47,7 @@ export class CreateDropsCategoryForFront {
 
   @Field(() => [CreateDropsCategoryInput])
   categoryData?: CreateDropsCategoryInput[];
+
+  @Field({ defaultValue: false, nullable: true })
+  isCollectionUpdate?: boolean;
 }
