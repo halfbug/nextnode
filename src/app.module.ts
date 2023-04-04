@@ -43,8 +43,12 @@ import Channel from './channel/entities/channel.model';
 import ChannelGroupshop from './channel/entities/channelgroupshop.model';
 import { AppLogger } from './applogger/entities/applogger.entity';
 import { DropsGroupshopModule } from './drops-groupshop/drops-groupshop.module';
-import { DropsCategoryModule } from './drops-category/drops-category.module';
+import { AdminRolesModule } from './admin-roles/admin-roles.module';
+import { AdminPermissionsModule } from './admin-permissions/admin-permissions.module';
 import DropsGroupshop from './drops-groupshop/entities/dropsgroupshop.model';
+import AdminUserRole from './admin-roles/entities/admin-role.model';
+import AdminPermission from './admin-permissions/entities/admin-permission.model';
+import { DropsCategoryModule } from './drops-category/drops-category.module';
 import DropsCategory from './drops-category/entities/drops-category.model';
 
 @Module({
@@ -89,6 +93,8 @@ import DropsCategory from './drops-category/entities/drops-category.model';
             Partnermember,
             Video,
             AdminUser,
+            AdminUserRole,
+            AdminPermission,
             Channel,
             ChannelGroupshop,
             AppLogger,
@@ -124,6 +130,8 @@ import DropsCategory from './drops-category/entities/drops-category.model';
     AuthModule,
     AppLoggerModule,
     DropsGroupshopModule,
+    AdminRolesModule,
+    AdminPermissionsModule,
     DropsCategoryModule,
   ],
 })

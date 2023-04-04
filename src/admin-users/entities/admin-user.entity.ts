@@ -22,4 +22,13 @@ export class AdminUser {
 
   @Field({ defaultValue: 'Active', nullable: true })
   status: string;
+
+  @Field({ nullable: true })
+  userRole: string;
+
+  @Field({ defaultValue: new Date() })
+  createdAt: Date;
+
+  @Field({ defaultValue: new Date() })
+  updatedAt?: Date;
 }
