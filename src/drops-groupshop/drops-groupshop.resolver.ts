@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { DropsGroupshopService } from './drops-groupshop.service';
 import { DropsGroupshop } from './entities/drops-groupshop.entity';
 import { CreateDropsGroupshopInput } from './dto/create-drops-groupshop.input';
@@ -13,6 +13,8 @@ import { KalavioService } from 'src/email/kalavio.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { StoresService } from 'src/stores/stores.service';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
+import { GridArgs } from './dto/paginationArgs.input';
+import { DropsPage } from './entities/drops-paginate.entity';
 import {
   SPOTLIGHT_SECTION_TITLE,
   VAULT_SECTION_TITLE,
@@ -43,6 +45,10 @@ export class DropsGroupshopResolver {
     return this.dropsGroupshopService.findAll();
   }
 
+  @Query(() => DropsPage, { name: 'getDrops' })
+  getDrops(@Args('gridArgs') gridArgs: GridArgs) {
+    return this.dropsGroupshopService.getdrops(gridArgs);
+  }
   @Query(() => DropsGroupshop, { name: 'dropsGroupshop' })
   findOne(@Args('id', { type: () => String }) id: string) {
     return this.dropsGroupshopService.findOne(id);

@@ -5,10 +5,11 @@ import { v4 as uuid } from 'uuid';
 import DropsGroupshop from './entities/dropsgroupshop.model';
 import { getMongoManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MilestoneInput } from 'src/groupshops/dto/create-groupshops.input';
 import { StoresService } from 'src/stores/stores.service';
 import { EventType } from 'src/gs-common/entities/lifecycle.modal';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
+import { FilterOption } from './dto/paginationArgs.input';
+import { PaginationService } from 'src/utils/pagination.service';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { Product } from 'src/inventory/entities/product.entity';
 import {
@@ -25,6 +26,7 @@ export class DropsGroupshopService {
     @Inject(forwardRef(() => StoresService))
     private storesService: StoresService,
     private shopifyService: ShopifyService,
+    private paginateService: PaginationService,
     private inventoryService: InventoryService,
   ) {}
 
@@ -130,6 +132,93 @@ export class DropsGroupshopService {
     return this.DropsGroupshopRepository.find();
   }
 
+  async getdrops({ pagination, filters, sorting }) {
+    const { skip, take } = pagination;
+
+    let criteria = {};
+    let agg: any[] = [
+      {
+        $skip: skip,
+      },
+      {
+        $limit: take,
+      },
+    ];
+
+    if (sorting.length) {
+      agg = [
+        {
+          $sort: {
+            [sorting[0].field]: sorting[0].sort === 'asc' ? 1 : -1,
+          },
+        },
+        ...agg,
+      ];
+    }
+    if (filters.length) {
+      switch (filters[0].operatorValue) {
+        case FilterOption.CONTAINS:
+          criteria = {
+            $regex: `(?i)${filters[0].value}`,
+          };
+          break;
+        case FilterOption.STARTS_WITH:
+          criteria = {
+            $regex: `^(?i)${filters[0].value}`,
+          };
+          break;
+        case FilterOption.ENDS_WITH:
+          criteria = {
+            $regex: `${filters[0].value}$`,
+          };
+          break;
+        case FilterOption.EQUALS:
+          criteria = {
+            $regex: `^${filters[0].value}$`,
+          };
+          break;
+        case FilterOption.IS_EMPTY:
+          criteria = {
+            $eq: '',
+          };
+          break;
+        case FilterOption.IS_NOT_EMPTY:
+          criteria = {
+            $ne: '',
+          };
+          break;
+        case FilterOption.IS_ANY_OF:
+          criteria = { $in: filters[0].value };
+          break;
+        default:
+          break;
+      }
+      agg = [
+        {
+          $match: {
+            [filters[0].columnField]: criteria,
+          },
+        },
+        ...agg,
+      ];
+    }
+
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(DropsGroupshop, agg).toArray();
+    const result = gs;
+    agg.pop();
+    agg.pop();
+    agg.push({
+      $count: 'total',
+    });
+    const gscount = await manager.aggregate(DropsGroupshop, agg).toArray();
+    const total = gscount[0].total;
+
+    return {
+      result,
+      pageInfo: this.paginateService.paginate(result, total, take, skip),
+    };
+  }
   async createDropDiscountCode(gs) {
     // console.log('createDropDiscountCode ', gs);
     const {
