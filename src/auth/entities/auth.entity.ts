@@ -31,7 +31,7 @@ export class User {
   @Field({ nullable: true })
   locale?: string;
   @Field({ nullable: true })
-  userRole: string;
+  userRole?: string;
   @Field({ nullable: true })
   collaborator?: boolean;
   @Field({ nullable: true })
