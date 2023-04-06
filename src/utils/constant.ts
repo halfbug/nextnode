@@ -136,6 +136,6 @@ export const dummyProduct = (): Product => {
 };
 const GS_CHARGE_PARTNER_COMISSION = 10;
 // find totalcount < PARTNER_Billing.gsNum
-export const BESTSELLER_SECTION_TITLE = 'Bestsellers';
+export const BESTSELLER_SECTION_TITLE = 'bestsellers';
 export const VAULT_SECTION_TITLE = 'The Vault';
 export const SPOTLIGHT_SECTION_TITLE = 'Today’s Spotlight';

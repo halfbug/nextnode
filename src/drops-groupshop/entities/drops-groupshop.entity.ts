@@ -168,4 +168,7 @@ export class DropsGroupshop {
 
   @Field(() => [Category], { nullable: true })
   categories?: Category;
+
+  @Field(() => [Product], { nullable: true })
+  cartSuggested?: Product;
 }

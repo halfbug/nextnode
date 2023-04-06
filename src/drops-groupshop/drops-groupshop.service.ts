@@ -284,6 +284,39 @@ export class DropsGroupshopService {
         },
       },
       {
+        $addFields: {
+          bestseller: {
+            $arrayElemAt: [
+              {
+                $filter: {
+                  input: '$store.drops.collections',
+                  cond: {
+                    $eq: ['$$this.name', 'bestsellers'],
+                  },
+                },
+              },
+              0,
+            ],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'bestseller.shopifyId',
+          foreignField: 'id',
+          as: 'bestseller',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'bestseller.parentId',
+          foreignField: 'id',
+          as: 'cartSuggested',
+        },
+      },
+      {
         $lookup: {
           from: 'drops_category',
           localField: 'store.id',
@@ -403,8 +436,12 @@ export class DropsGroupshopService {
               as: 'cat',
               cond: {
                 $and: [
-                  { $eq: ['$$cat.status', 'active'] },
-                  { $eq: ['$$cat.parentId', null] },
+                  {
+                    $eq: ['$$cat.status', 'active'],
+                  },
+                  {
+                    $eq: ['$$cat.parentId', null],
+                  },
                 ],
               },
             },
@@ -580,6 +617,7 @@ export class DropsGroupshopService {
           expiredUrl: 1,
           expiredShortUrl: 1,
           expiredAt: 1,
+          cartSuggested: 1,
           dealProducts: 1,
           discountCode: 1,
           members: 1,
