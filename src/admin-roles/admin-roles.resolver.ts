@@ -27,9 +27,11 @@ export class AdminRolesResolver {
     return this.adminRolesService.findOne(id);
   }
 
-  @Query(() => AdminRole, { name: 'findRoleByName' })
-  findRoleByName(@Args('userRole', { type: () => String }) userRole: string) {
-    return this.adminRolesService.findRoleByName(userRole);
+  @Query(() => AdminRole, { name: 'findUserPermissions' })
+  async findUserPermissions(
+    @Args('userRole', { type: () => String }) userRole: string,
+  ) {
+    return await this.adminRolesService.findUserPermissions(userRole);
   }
 
   @Mutation(() => AdminRole)

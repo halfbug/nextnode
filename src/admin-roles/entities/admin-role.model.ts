@@ -8,6 +8,15 @@ export class Permission {
   category: string;
 }
 
+export class generalPermission {
+  @Column({ nullable: true })
+  title: string;
+  @Column({ nullable: true })
+  route: string;
+  @Column({ nullable: true })
+  category: string;
+}
+
 @Entity()
 export default class AdminUserRole extends DefaultColumnsService {
   @Column()
@@ -15,4 +24,7 @@ export default class AdminUserRole extends DefaultColumnsService {
 
   @Column(() => Permission)
   permission?: Permission[];
+
+  @Column(() => generalPermission)
+  generalPermission?: generalPermission[];
 }

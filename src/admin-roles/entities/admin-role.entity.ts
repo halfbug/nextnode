@@ -8,6 +8,16 @@ export class Permission {
   category: string;
 }
 
+@ObjectType('generalPermission')
+export class generalPermission {
+  @Field({ nullable: true })
+  title: string;
+  @Field({ nullable: true })
+  route: string;
+  @Field({ nullable: true })
+  category: string;
+}
+
 @ObjectType()
 export class AdminRole {
   @Field(() => ID)
@@ -18,6 +28,9 @@ export class AdminRole {
 
   @Field(() => [Permission], { nullable: 'itemsAndList' })
   permission?: Permission[];
+
+  @Field(() => [generalPermission], { nullable: 'itemsAndList' })
+  generalPermission?: generalPermission[];
 
   @Field({ defaultValue: new Date() })
   createdAt: Date;

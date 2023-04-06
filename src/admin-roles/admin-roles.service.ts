@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 import { validateOrReject } from 'class-validator';
-import { Repository } from 'typeorm';
+import { Repository, getMongoManager } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import AdminUserRole from './entities/admin-role.model';
 import {
@@ -51,12 +51,33 @@ export class AdminRolesService {
     return this.adminUserRoleRepository.findOne({ id });
   }
 
-  findRoleByName(userRole: string) {
-    return this.adminUserRoleRepository.findOne({
-      where: {
-        roleName: userRole,
+  async findUserPermissions(userRole: string) {
+    const agg = [
+      {
+        $match: {
+          roleName: userRole,
+        },
       },
-    });
+      {
+        $lookup: {
+          from: 'admin_permission',
+          pipeline: [
+            {
+              $match: {
+                _id: {
+                  $ne: null,
+                },
+              },
+            },
+          ],
+          as: 'generalPermission',
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(AdminUserRole, agg).toArray();
+    console.log('gs', gs[0]);
+    return gs[0];
   }
 
   async update(id: string, updateAdminRoleInput: UpdateAdminRoleInput) {
