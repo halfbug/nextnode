@@ -1,5 +1,6 @@
 import { ObjectType, Field, Int, ID, registerEnumType } from '@nestjs/graphql';
 import { Sections } from 'src/drops-groupshop/entities/drops-groupshop.entity';
+import { CodeUpdateStatusTypeEnum } from 'src/stores/entities/store.entity';
 
 export enum CollectionType {
   VAULT = 'vault',
@@ -58,4 +59,10 @@ export class DropsCategory {
 
   @Field(() => [Sections], { nullable: true })
   sections?: Sections[];
+}
+
+@ObjectType()
+export class CodeUpdateStatusType {
+  @Field(() => CodeUpdateStatusTypeEnum)
+  codeUpdateStatus?: CodeUpdateStatusTypeEnum;
 }

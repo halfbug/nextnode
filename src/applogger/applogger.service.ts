@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan, MoreThan, Repository } from 'typeorm';
+import { LessThan, MoreThan, Repository, getMongoManager } from 'typeorm';
 import { CreateAppLoggerInput } from './dto/create-applogger.input';
 import { UpdateAppLoggerInput } from './dto/update-applogger.input';
 import { AppLogger } from './entities/applogger.entity';
@@ -34,6 +34,28 @@ export class AppLoggerService {
 
   findOne(id: string) {
     return this.errorLogRepository.findOne({ id });
+  }
+
+  async findLatestLog(context: string, storeId: string) {
+    const agg = [
+      {
+        $match: {
+          context,
+          message: RegExp(storeId, 'i'),
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $limit: 1,
+      },
+    ];
+    const manager = getMongoManager();
+    const res = await manager.aggregate(AppLogger, agg).toArray();
+    return res[0];
   }
 
   update(id: string, updateAppLoggerInput: UpdateAppLoggerInput) {

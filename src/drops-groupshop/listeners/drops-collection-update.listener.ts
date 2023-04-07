@@ -4,10 +4,6 @@ import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { UpdateStoreInput } from 'src/stores/dto/update-store.input';
 import { CodeUpdateStatusTypeEnum } from 'src/stores/entities/store.entity';
 import { StoresService } from 'src/stores/stores.service';
-import {
-  SPOTLIGHT_SECTION_TITLE,
-  VAULT_SECTION_TITLE,
-} from 'src/utils/constant';
 import { DropsCollectionUpdatedEvent } from '../events/drops-collection-update.event';
 
 @Injectable()
@@ -33,27 +29,21 @@ export class DropsCollectionUpdatedListener {
         true,
       );
       for (const dg of dropsGroupshops) {
-        await this.shopifyapi.setDiscountCode(
+        const discountCode = await this.shopifyapi.setDiscountCode(
           shop,
           'Update',
           accessToken,
           dg.discountCode.title,
           null,
-          [
-            ...new Set(
-              collections
-                .filter(
-                  (c) =>
-                    c.name !== VAULT_SECTION_TITLE &&
-                    c.name !== SPOTLIGHT_SECTION_TITLE,
-                )
-                .map((c) => c.shopifyId),
-            ),
-          ],
+          [...new Set(collections)],
           null,
           null,
           dg.discountCode.priceRuleId,
           true,
+        );
+        console.log(
+          '🚀 ~ file: drops-collection-update.listener.ts:44 ~ DropsCollectionUpdatedListener ~ discountCode:',
+          discountCode,
         );
       }
       Logger.log(

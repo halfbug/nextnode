@@ -20,6 +20,7 @@ import {
   VAULT_SECTION_TITLE,
 } from 'src/utils/constant';
 import { DropsCategory } from 'src/drops-category/entities/drops-category.entity';
+import { DropsCategoryService } from 'src/drops-category/drops-category.service';
 
 @Resolver(() => DropsGroupshop)
 export class DropsGroupshopResolver {
@@ -30,6 +31,7 @@ export class DropsGroupshopResolver {
     private readonly lifecyclesrv: LifecycleService,
     private storesService: StoresService,
     private shopifyapi: ShopifyService,
+    private dropsCategoryService: DropsCategoryService,
   ) {}
 
   @Public()
@@ -65,28 +67,20 @@ export class DropsGroupshopResolver {
       accessToken,
       drops: {
         rewards: { baseline },
-        collections,
       },
     } = await this.storesService.findById(groupshop?.storeId);
 
     if (eventType === EventType.started) {
+      const collections = await this.dropsCategoryService.getNonSVCollectionIDs(
+        groupshop?.storeId,
+      );
       updatedDiscountCode = await this.shopifyapi.setDiscountCode(
         shop,
         'Create',
         accessToken,
         groupshop.discountCode.title,
         parseInt(baseline, 10),
-        [
-          ...new Set(
-            collections
-              .filter(
-                (c) =>
-                  c.name !== VAULT_SECTION_TITLE &&
-                  c.name !== SPOTLIGHT_SECTION_TITLE,
-              )
-              .map((c) => c.shopifyId),
-          ),
-        ],
+        [...new Set(collections)],
         new Date(),
         newExpiredate,
         null,

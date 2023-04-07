@@ -12,12 +12,9 @@ import { FilterOption } from './dto/paginationArgs.input';
 import { PaginationService } from 'src/utils/pagination.service';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { Product } from 'src/inventory/entities/product.entity';
-import {
-  SPOTLIGHT_SECTION_TITLE,
-  VAULT_SECTION_TITLE,
-} from 'src/utils/constant';
 import { OrderLineItems } from 'src/inventory/entities/orders.entity';
 import DropsCategory from 'src/drops-category/entities/drops-category.model';
+import { DropsCategoryService } from 'src/drops-category/drops-category.service';
 
 @Injectable()
 export class DropsGroupshopService {
@@ -30,6 +27,7 @@ export class DropsGroupshopService {
     private shopifyService: ShopifyService,
     private paginateService: PaginationService,
     private inventoryService: InventoryService,
+    private dropsCategoryService: DropsCategoryService,
   ) {}
 
   async create(createDropsGroupshopInput: CreateDropsGroupshopInput) {
@@ -228,27 +226,19 @@ export class DropsGroupshopService {
       accessToken,
       drops: {
         rewards: { baseline },
-        collections,
       },
     } = await this.storesService.findById(gs.storeId);
     const discountTitle = gs?.discountCode.title;
+    const collections = await this.dropsCategoryService.getNonSVCollectionIDs(
+      gs.storeId,
+    );
     const discountCode = await this.shopifyService.setDiscountCode(
       shop,
       'Create',
       accessToken,
       discountTitle,
       parseInt(baseline, 10),
-      [
-        ...new Set(
-          collections
-            .filter(
-              (c) =>
-                c.name !== VAULT_SECTION_TITLE &&
-                c.name !== SPOTLIGHT_SECTION_TITLE,
-            )
-            .map((c) => c.shopifyId),
-        ),
-      ],
+      [...new Set(collections)],
       new Date(),
       null,
       null,
@@ -759,11 +749,6 @@ export class DropsGroupshopService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(DropsCategory, agg).toArray();
-    console.log(
-      '🚀 ~ file: drops-groupshop.service.ts:598 ~ DropsGroupshopService ~ findProductsByCategory ~ gs:',
-      JSON.stringify(gs),
-      categoryId,
-    );
     return gs[0];
   }
 
@@ -999,18 +984,11 @@ export class DropsGroupshopService {
   }
 
   async getVaultSpotlightProducts(shop: string) {
-    const {
-      drops: { collections },
-    } = await this.storesService.findOne(shop);
+    const { id } = await this.storesService.findOne(shop);
+    const collections = await this.dropsCategoryService.getSVCollectionIDs(id);
     return await (
       await this.inventoryService.getProductsByCollectionIDs(shop, [
-        ...collections
-          .filter(
-            (c) =>
-              c.name === VAULT_SECTION_TITLE ||
-              c.name === SPOTLIGHT_SECTION_TITLE,
-          )
-          .map((c) => c.shopifyId),
+        ...new Set(collections),
       ])
     ).map((p: Product) => p.id);
   }

@@ -66,10 +66,7 @@ import { GroupshopsService } from 'src/groupshops/groupshops.service';
 import { lastValueFrom, map } from 'rxjs';
 
 import { UpdateSmartCollectionEvent } from 'src/inventory/events/update-smart-collection.event';
-import {
-  SPOTLIGHT_SECTION_TITLE,
-  VAULT_SECTION_TITLE,
-} from 'src/utils/constant';
+import { DropsCategoryService } from 'src/drops-category/drops-category.service';
 @Public()
 @Controller('webhooks')
 export class WebhooksController {
@@ -93,6 +90,7 @@ export class WebhooksController {
     private campaignService: CampaignsService,
     private gsService: GroupshopsService,
     private updateSmartCollection: UpdateSmartCollectionEvent,
+    private dropsCategoryService: DropsCategoryService,
   ) {}
   async refreshSingleProduct(shop, accessToken, id, shopName) {
     try {
@@ -1821,34 +1819,22 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
 
-      const {
-        id,
-        accessToken,
-        drops: { collections },
-      } = await this.storesService.findOne(shop);
+      const { id, accessToken } = await this.storesService.findOne(shop);
 
       const dropsGroupshops = await this.dropsGroupshopService.getActiveDrops(
         id,
       );
 
       for (const dg of dropsGroupshops) {
+        const collections =
+          await this.dropsCategoryService.getNonSVCollectionIDs(id);
         await this.shopifyService.setDiscountCode(
           shop,
           'Update',
           accessToken,
           dg.discountCode.title,
           null,
-          [
-            ...new Set(
-              collections
-                .filter(
-                  (c) =>
-                    c.name !== VAULT_SECTION_TITLE &&
-                    c.name !== SPOTLIGHT_SECTION_TITLE,
-                )
-                .map((c) => c.shopifyId),
-            ),
-          ],
+          [...new Set(collections)],
           null,
           null,
           dg.discountCode.priceRuleId,

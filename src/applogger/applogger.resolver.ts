@@ -39,4 +39,12 @@ export class AppLoggerResolver {
   removeAppLogger(@Args('id', { type: () => String }) id: string) {
     return this.apploggerService.remove(id);
   }
+
+  @Query(() => AppLogger)
+  async findLatestLog(
+    @Args('storeId', { type: () => String }) storeId: string,
+    @Args('context', { type: () => String }) context: string,
+  ) {
+    return await this.apploggerService.findLatestLog(context, storeId);
+  }
 }

@@ -17,6 +17,7 @@ import { DropCreatedListener } from './listeners/drop-created.listener';
 import { UtilsModule } from 'src/utils/utils.module';
 import { DropsCollectionUpdatedEvent } from './events/drops-collection-update.event';
 import { DropsCollectionUpdatedListener } from './listeners/drops-collection-update.listener';
+import { DropsCategoryModule } from 'src/drops-category/drops-category.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { DropsCollectionUpdatedListener } from './listeners/drops-collection-upd
     forwardRef(() => EmailModule),
     forwardRef(() => GsCommonModule),
     forwardRef(() => InventoryModule),
+    forwardRef(() => DropsCategoryModule),
   ],
   providers: [
     DropsGroupshopResolver,

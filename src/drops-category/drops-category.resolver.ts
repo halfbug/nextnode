@@ -1,6 +1,9 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { DropsCategoryService } from './drops-category.service';
-import { DropsCategory } from './entities/drops-category.entity';
+import {
+  CodeUpdateStatusType,
+  DropsCategory,
+} from './entities/drops-category.entity';
 import {
   CreateDropsCategoryForFront,
   CreateDropsCategoryInput,
@@ -41,12 +44,21 @@ export class DropsCategoryResolver {
     return this.dropsCategoryService.update(
       updateDropsCategoryInput.id,
       updateDropsCategoryInput.categoryData,
-      updateDropsCategoryInput.isCollectionUpdate,
+      updateDropsCategoryInput.collectionUpdateMsg,
     );
   }
 
   @Mutation(() => DropsCategory)
-  removeDropsCategory(@Args('id', { type: () => [String] }) id: [string]) {
-    return this.dropsCategoryService.remove(id);
+  removeDropsCategory(
+    @Args('id', { type: () => [String] }) id: [string],
+    @Args('collectionUpdateMsg', { type: () => String })
+    collectionUpdateMsg: string,
+  ) {
+    return this.dropsCategoryService.remove(id, collectionUpdateMsg);
+  }
+
+  @Mutation(() => CodeUpdateStatusType)
+  syncDiscountCodes(@Args('storeId', { type: () => String }) storeId: string) {
+    return this.dropsCategoryService.syncDiscountCodes(storeId);
   }
 }

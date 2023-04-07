@@ -31,6 +31,7 @@ import { DropsGroupshopModule } from 'src/drops-groupshop/drops-groupshop.module
 import { GsCommonModule } from 'src/gs-common/gs-common.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { ChannelModule } from 'src/channel/channel.module';
+import { DropsCategoryModule } from 'src/drops-category/drops-category.module';
 @Global()
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { ChannelModule } from 'src/channel/channel.module';
     forwardRef(() => GsCommonModule),
     forwardRef(() => AuthModule),
     forwardRef(() => ChannelModule),
+    forwardRef(() => DropsCategoryModule),
     UploadImageModule,
     BillingModule,
   ],

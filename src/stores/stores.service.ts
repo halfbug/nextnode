@@ -185,43 +185,6 @@ export class StoresService {
         } else {
           updateStoreInput.settings.layout.bannerColor = '#EEFF5C';
         }
-      } else if (updateStoreInput?.drops) {
-        const oldStoreData = await this.findById(id);
-
-        if (
-          _.differenceWith(
-            updateStoreInput.drops?.collections,
-            oldStoreData.drops?.collections,
-            _.isEqual,
-          ).length ||
-          _.differenceWith(
-            oldStoreData.drops?.collections,
-            updateStoreInput.drops?.collections,
-            _.isEqual,
-          ).length
-        ) {
-          const dropsGroupshops = await this.dropsService.getActiveDrops(id);
-          const arr = dropsGroupshops.filter(
-            (dg) =>
-              dg.discountCode !== null &&
-              dg.discountCode.title !== null &&
-              dg.discountCode.priceRuleId !== null,
-          );
-
-          this.dropsCollectionUpdatedEvent.shop = oldStoreData.shop;
-          this.dropsCollectionUpdatedEvent.accessToken =
-            oldStoreData.accessToken;
-          this.dropsCollectionUpdatedEvent.collections =
-            updateStoreInput.drops?.collections;
-          this.dropsCollectionUpdatedEvent.dropsGroupshops = arr;
-          this.dropsCollectionUpdatedEvent.storeId = id;
-          this.dropsCollectionUpdatedEvent.drops = updateStoreInput?.drops;
-          if (arr.length) {
-            this.dropsCollectionUpdatedEvent.emit();
-            updateStoreInput.drops.codeUpdateStatus =
-              CodeUpdateStatusTypeEnum.inprogress;
-          }
-        }
       }
       await this.storeRepository.update({ id }, updateStoreInput);
     } catch (err) {
