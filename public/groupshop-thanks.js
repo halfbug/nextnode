@@ -789,7 +789,7 @@ function addRightBlock(
 
     rightBlock.innerHTML = `<div class="summaryContainer">
         <div class="image">
-            <div id="bannerDiv" class="image-placeholder" style="height: 30px !important;align-self: center; width: 400px !important;">&nbsp;</div>
+            <div id="bannerDiv" class="image-placeholder" style="height: 30px !important;align-self: center;"> </div>
             </div>
         <div class="groupshop_right-block">
         <div class="cashback gs_content_right">
