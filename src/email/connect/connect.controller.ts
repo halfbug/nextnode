@@ -526,7 +526,7 @@ export class CatController {
           if (
             (drop_source === 'API' &&
               createdAt > lastWeek &&
-              groupshop_status !== 'expired') ||
+              groupshop_status === 'pending') ||
             (drop_source === 'CRON' && createdAt === today)
           ) {
             lastWeekCounter = lastWeekCounter + 1;
@@ -538,21 +538,23 @@ export class CatController {
                 klaviyoId,
               );
             // Update status in database of old pending drop groupshop
-            dropGroupshops.map(async (dgroupshop) => {
-              dgroupshop.status = 'expired';
-              dgroupshop.expiredAt = new Date();
+            if (groupshop_status !== 'active') {
+              dropGroupshops.map(async (dgroupshop) => {
+                dgroupshop.status = 'expired';
+                dgroupshop.expiredAt = new Date();
 
-              this.lifecyclesrv.create({
-                groupshopId: dgroupshop.id,
-                event: EventType.ended,
-                dateTime: new Date(),
+                this.lifecyclesrv.create({
+                  groupshopId: dgroupshop.id,
+                  event: EventType.ended,
+                  dateTime: new Date(),
+                });
+
+                await this.dropsGroupshopService.update(
+                  dgroupshop.id,
+                  dgroupshop,
+                );
               });
-
-              await this.dropsGroupshopService.update(
-                dgroupshop.id,
-                dgroupshop,
-              );
-            });
+            }
             const fullname =
               profile?.attributes?.properties?.['Full Name'] ?? null;
             const webdata = {
