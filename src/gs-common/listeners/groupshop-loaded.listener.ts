@@ -80,26 +80,6 @@ export class GSLoadedListener {
       // });
       //    2.3 update visitor service.
       this.vistorsrv.create(gs.id, ip);
-      // Update status on Klaviyo profile
-      if (typeof klaviyoId !== 'undefined') {
-        const currentProfile = await this.kalavioService.getProfilesById(
-          klaviyoId,
-          gs.storeId,
-        );
-        const latestShortUrl =
-          currentProfile?.data.attributes.properties?.groupshop_url;
-        if (shortURL === latestShortUrl) {
-          const params = new URLSearchParams({
-            groupshop_status: 'active',
-          });
-          const data = params.toString();
-          await this.kalavioService.klaviyoProfileUpdate(
-            klaviyoId,
-            data,
-            gs.storeId,
-          );
-        }
-      }
     } else {
       // 1.5 groupshop should not be expired
       const isNotExpired = getDateDifference(gs.expiredAt).time > -1;

@@ -219,6 +219,28 @@ export class DropsGroupshopResolver {
   async createOnBoardingDiscountCode(@Args('gid') gid: string) {
     try {
       const dgroupshop = await this.dropsGroupshopService.findOne(gid);
+      const klaviyoId = dgroupshop?.customerDetail?.klaviyoId;
+      const shortURL = dgroupshop?.shortUrl;
+      // Update status on Klaviyo profile
+      if (typeof klaviyoId !== 'undefined') {
+        const currentProfile = await this.kalavioService.getProfilesById(
+          klaviyoId,
+          dgroupshop.storeId,
+        );
+        const latestShortUrl =
+          currentProfile?.data.attributes.properties?.groupshop_url;
+        if (shortURL === latestShortUrl) {
+          const params = new URLSearchParams({
+            groupshop_status: 'active',
+          });
+          const data = params.toString();
+          await this.kalavioService.klaviyoProfileUpdate(
+            klaviyoId,
+            data,
+            dgroupshop.storeId,
+          );
+        }
+      }
 
       const updateDropsGroupshop = await this.expireAtUpdate(
         dgroupshop,
