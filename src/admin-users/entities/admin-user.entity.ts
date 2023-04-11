@@ -1,4 +1,14 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { AdminRole } from 'src/admin-roles/entities/admin-role.entity';
+
+@ObjectType('userAdminRole')
+export class userAdminRole {
+  @Field({ nullable: true })
+  id: string;
+
+  @Field({ nullable: true })
+  roleName: string;
+}
 
 @ObjectType('AdminUser')
 export class AdminUser {
@@ -23,8 +33,8 @@ export class AdminUser {
   @Field({ defaultValue: 'Active', nullable: true })
   status: string;
 
-  @Field({ nullable: true })
-  userRole: string;
+  @Field(() => userAdminRole, { nullable: true })
+  userRole?: userAdminRole;
 
   @Field({ defaultValue: new Date() })
   createdAt: Date;

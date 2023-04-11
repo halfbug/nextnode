@@ -16,8 +16,8 @@ export class AdminUsersResolver {
   }
 
   @Query(() => [AdminUser], { name: 'getAdminUsers' })
-  findAll() {
-    return this.adminUsersService.findAll();
+  async findAll() {
+    return await this.adminUsersService.findAll();
   }
 
   @Query(() => AdminUser, { name: 'getAdminUser' })

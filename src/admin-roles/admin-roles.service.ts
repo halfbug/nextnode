@@ -55,7 +55,7 @@ export class AdminRolesService {
     const agg = [
       {
         $match: {
-          roleName: userRole,
+          id: userRole,
         },
       },
       {
@@ -76,7 +76,6 @@ export class AdminRolesService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(AdminUserRole, agg).toArray();
-    console.log('gs', gs[0]);
     return gs[0];
   }
 

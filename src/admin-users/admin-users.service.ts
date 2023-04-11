@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { CreateAdminUserInput } from './dto/create-admin-user.input';
 import { UpdateAdminUserInput } from './dto/update-admin-user.input';
 import AdminUser from './entities/admin-user.model';
+import { Repository, getMongoManager } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { validate, validateOrReject, isEmail } from 'class-validator';
 import * as bcrypt from 'bcrypt';
@@ -43,7 +43,30 @@ export class AdminUsersService {
   }
 
   findAll() {
-    return this.adminUserRepository.find();
+    const agg = [
+      {
+        $match: {
+          email: {
+            $ne: null,
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'admin_user_role',
+          localField: 'userRole',
+          foreignField: 'id',
+          as: 'userRole',
+        },
+      },
+      {
+        $unwind: {
+          path: '$userRole',
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    return manager.aggregate(AdminUser, agg).toArray();
   }
 
   findOne(fieldname: string, value: any) {
