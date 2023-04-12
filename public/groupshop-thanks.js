@@ -1320,6 +1320,7 @@ async function init() {
          
          and give them ${baseline} off
        `;
+          document.querySelector('.cashback_mobile').innerHTML = leftHeadTxt;
           document.querySelector('.groupshop_left-block h3').innerHTML =
             leftHeadTxt;
           document.querySelector('.groupshop_left-block h3').className =
