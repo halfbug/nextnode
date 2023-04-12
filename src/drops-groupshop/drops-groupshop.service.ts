@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { CreateDropsGroupshopInput } from './dto/create-drops-groupshop.input';
 import { UpdateDropsGroupshopInput } from './dto/update-drops-groupshop.input';
 import { v4 as uuid } from 'uuid';
@@ -133,91 +133,117 @@ export class DropsGroupshopService {
   }
 
   async getdrops({ pagination, filters, sorting }) {
-    const { skip, take } = pagination;
+    try {
+      const { skip, take } = pagination;
 
-    let criteria = {};
-    let agg: any[] = [
-      {
-        $skip: skip,
-      },
-      {
-        $limit: take,
-      },
-    ];
-
-    if (sorting.length) {
-      agg = [
+      let criteria = {};
+      let agg: any[] = [
         {
-          $sort: {
-            [sorting[0].field]: sorting[0].sort === 'asc' ? 1 : -1,
+          $skip: skip,
+        },
+        {
+          $limit: take,
+        },
+      ];
+      const dateField = {
+        $addFields: {
+          strDate: {
+            $dateToString: {
+              format: '%m/%d/%Y',
+              date: '$createdAt',
+            },
           },
         },
-        ...agg,
-      ];
-    }
-    if (filters.length) {
-      switch (filters[0].operatorValue) {
-        case FilterOption.CONTAINS:
-          criteria = {
-            $regex: `(?i)${filters[0].value}`,
-          };
-          break;
-        case FilterOption.STARTS_WITH:
-          criteria = {
-            $regex: `^(?i)${filters[0].value}`,
-          };
-          break;
-        case FilterOption.ENDS_WITH:
-          criteria = {
-            $regex: `${filters[0].value}$`,
-          };
-          break;
-        case FilterOption.EQUALS:
-          criteria = {
-            $regex: `^${filters[0].value}$`,
-          };
-          break;
-        case FilterOption.IS_EMPTY:
-          criteria = {
-            $eq: '',
-          };
-          break;
-        case FilterOption.IS_NOT_EMPTY:
-          criteria = {
-            $ne: '',
-          };
-          break;
-        case FilterOption.IS_ANY_OF:
-          criteria = { $in: filters[0].value };
-          break;
-        default:
-          break;
+      };
+      if (filters[0].columnField === 'createdAt') {
+        filters[0].columnField = 'strDate';
       }
-      agg = [
-        {
-          $match: {
-            [filters[0].columnField]: criteria,
+
+      if (sorting.length) {
+        agg = [
+          {
+            $sort: {
+              [sorting[0].field]: sorting[0].sort === 'asc' ? 1 : -1,
+            },
           },
-        },
-        ...agg,
-      ];
+          ...agg,
+        ];
+      }
+      if (filters.length) {
+        switch (filters[0].operatorValue) {
+          case FilterOption.CONTAINS:
+            criteria = {
+              $regex: `(?i)${filters[0].value}`,
+            };
+            break;
+          case FilterOption.STARTS_WITH:
+            criteria = {
+              $regex: `^(?i)${filters[0].value}`,
+            };
+            break;
+          case FilterOption.ENDS_WITH:
+            criteria = {
+              $regex: `${filters[0].value}$`,
+            };
+            break;
+          case FilterOption.EQUALS:
+            criteria = {
+              $regex: `^${filters[0].value}$`,
+            };
+            break;
+          case FilterOption.IS_EMPTY:
+            criteria = {
+              $eq: '',
+            };
+            break;
+          case FilterOption.IS_NOT_EMPTY:
+            criteria = {
+              $ne: '',
+            };
+            break;
+          case FilterOption.IS_ANY_OF:
+            criteria = { $in: filters[0].value };
+            break;
+          default:
+            break;
+        }
+        agg = [
+          dateField,
+          {
+            $match: {
+              [filters[0].columnField]: criteria,
+            },
+          },
+          ...agg,
+        ];
+      }
+
+      const manager = getMongoManager();
+      const gs = await manager.aggregate(DropsGroupshop, agg).toArray();
+      console.log(
+        '🚀 ~ file: drops-groupshop.service.ts:221 ~ DropsGroupshopService ~ getdrops ~ agg:',
+        JSON.stringify(agg),
+      );
+      const result = gs;
+      agg.pop();
+      agg.pop();
+      agg.push({
+        $count: 'total',
+      });
+      const gscount = await manager.aggregate(DropsGroupshop, agg).toArray();
+      const total = gscount[0]?.total;
+
+      return {
+        result,
+        pageInfo: this.paginateService.paginate(result, total, take, skip),
+      };
+    } catch (err) {
+      console.log(
+        '🚀 ~ file: drops-groupshop.service.ts:227 ~ DropsGroupshopService ~ getdrops ~ err:',
+        err,
+      );
+      Logger.error(err, DropsCategoryService.name);
     }
-
-    const manager = getMongoManager();
-    const gs = await manager.aggregate(DropsGroupshop, agg).toArray();
-    const result = gs;
-    agg.pop();
-    agg.pop();
-    agg.push({
-      $count: 'total',
-    });
-    const gscount = await manager.aggregate(DropsGroupshop, agg).toArray();
-    const total = gscount[0].total;
-
-    return {
-      result,
-      pageInfo: this.paginateService.paginate(result, total, take, skip),
-    };
   }
   async createDropDiscountCode(gs) {
     // console.log('createDropDiscountCode ', gs);
