@@ -155,9 +155,6 @@ export class DropsGroupshopService {
           },
         },
       };
-      if (filters[0].columnField === 'createdAt') {
-        filters[0].columnField = 'strDate';
-      }
 
       if (sorting.length) {
         agg = [
@@ -170,6 +167,9 @@ export class DropsGroupshopService {
         ];
       }
       if (filters.length) {
+        if (filters[0].columnField === 'createdAt') {
+          filters[0].columnField = 'strDate';
+        }
         switch (filters[0].operatorValue) {
           case FilterOption.CONTAINS:
             criteria = {
