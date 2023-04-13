@@ -160,6 +160,17 @@ export class KlaviyoInputs {
   @Field({ nullable: true })
   signup4?: string;
 }
+@InputType()
+export class CartRewardsInput {
+  @Field({ nullable: true })
+  id?: string;
+
+  @Field({ nullable: true })
+  rewardTitle?: string;
+
+  @Field({ nullable: true })
+  rewardValue?: string;
+}
 
 @InputType('DropsInput')
 export class DropsInput {
@@ -213,6 +224,9 @@ export class DropsInput {
 
   @Field({ nullable: true })
   klaviyo?: KlaviyoInputs;
+
+  @Field(() => [CartRewardsInput], { nullable: 'itemsAndList' })
+  cartRewards?: CartRewardsInput[];
 }
 @InputType()
 export class CreateStoreInput {

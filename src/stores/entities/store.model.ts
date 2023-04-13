@@ -56,6 +56,16 @@ export class Collections {
   @Column({ nullable: true })
   name?: string;
 }
+export class CartRewards {
+  @Column({ nullable: true })
+  id?: string;
+
+  @Column({ nullable: true })
+  rewardTitle?: string;
+
+  @Column({ nullable: true })
+  rewardValue?: string;
+}
 
 export class Klaviyo {
   @Column({ nullable: true })
@@ -134,6 +144,9 @@ export class Drops {
 
   @Column({ nullable: true })
   klaviyo?: Klaviyo;
+
+  @Column(() => CartRewards)
+  cartRewards?: CartRewards[];
 }
 
 @Entity()

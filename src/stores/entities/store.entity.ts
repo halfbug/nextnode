@@ -138,6 +138,17 @@ export class Collections {
   @Field({ nullable: true })
   name?: string;
 }
+@ObjectType('CartRewards')
+export class CartRewards {
+  @Field({ nullable: true })
+  id?: string;
+
+  @Field({ nullable: true })
+  rewardTitle?: string;
+
+  @Field({ nullable: true })
+  rewardValue?: string;
+}
 @ObjectType('Drops')
 export class Drops {
   @Field({ nullable: true })
@@ -190,6 +201,9 @@ export class Drops {
 
   @Field({ nullable: true })
   klaviyo?: Klaviyo;
+
+  @Field(() => [CartRewards], { nullable: 'itemsAndList' })
+  cartRewards?: CartRewards;
 }
 
 @ObjectType('Store')
