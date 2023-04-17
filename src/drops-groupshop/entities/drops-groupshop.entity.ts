@@ -158,6 +158,9 @@ export class DropsGroupshop {
   status?: string;
 
   @Field({ nullable: true })
+  groupshopSource?: string;
+
+  @Field({ nullable: true })
   createdAt?: Date;
 
   @Field(() => [Sections], { nullable: true })

@@ -91,6 +91,7 @@ export class DropCreatedListener {
 
           dgroupshop.customerDetail = dropCustomer;
           dgroupshop.status = 'pending';
+          dgroupshop.groupshopSource = 'API';
           dgroupshop.expiredAt = null;
           await this.dropsGroupshopService.create(dgroupshop);
           let today = '';
@@ -182,6 +183,7 @@ export class DropCreatedListener {
 
         dgroupshop.customerDetail = dropCustomer;
         dgroupshop.status = 'pending';
+        dgroupshop.groupshopSource = 'CRON';
         dgroupshop.expiredAt = null;
         await this.dropsGroupshopService.create(dgroupshop);
         let today = '';

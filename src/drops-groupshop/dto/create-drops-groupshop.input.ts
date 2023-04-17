@@ -58,5 +58,8 @@ export class CreateDropsGroupshopInput {
   status?: string;
 
   @Field({ nullable: true })
+  groupshopSource?: string;
+
+  @Field({ nullable: true })
   expiredAt?: Date;
 }

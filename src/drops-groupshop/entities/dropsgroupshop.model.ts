@@ -62,6 +62,9 @@ export default class DropsGroupshop extends DefaultColumnsService {
   @Column({ nullable: true })
   obSettings?: OBSettings;
 
+  @Column({ nullable: true })
+  groupshopSource: string;
+
   @Column()
   expiredAt?: Date | null;
 }
