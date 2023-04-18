@@ -49,7 +49,9 @@ import DropsGroupshop from './drops-groupshop/entities/dropsgroupshop.model';
 import AdminUserRole from './admin-roles/entities/admin-role.model';
 import AdminPermission from './admin-permissions/entities/admin-permission.model';
 import { DropsCategoryModule } from './drops-category/drops-category.module';
+import { AdminActivityLogsModule } from './admin-activity-logs/admin-activity-logs.module';
 import DropsCategory from './drops-category/entities/drops-category.model';
+import AdminActivityLogs from './admin-activity-logs/entities/admin-activity-log.model';
 
 @Module({
   imports: [
@@ -95,6 +97,7 @@ import DropsCategory from './drops-category/entities/drops-category.model';
             AdminUser,
             AdminUserRole,
             AdminPermission,
+            AdminActivityLogs,
             Channel,
             ChannelGroupshop,
             AppLogger,
@@ -133,6 +136,7 @@ import DropsCategory from './drops-category/entities/drops-category.model';
     AdminRolesModule,
     AdminPermissionsModule,
     DropsCategoryModule,
+    AdminActivityLogsModule,
   ],
 })
 export class AppModule {}
