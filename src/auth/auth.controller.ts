@@ -22,6 +22,7 @@ import { v4 as uuid } from 'uuid';
 import { AuthEntity, User } from './entities/auth.entity';
 import { randomInt } from 'crypto';
 import { AdminUsersService } from 'src/admin-users/admin-users.service';
+import { AdminRolesService } from 'src/admin-roles/admin-roles.service';
 // import { AuthDecorator } from 'src/auth/auth.decorator';
 // import { UpdateAuthDto } from './dto/update-auth.dto';
 
@@ -34,6 +35,7 @@ export class AuthController {
     private configService: ConfigService,
     private storesService: StoresService,
     private userService: AdminUsersService,
+    private adminRoleService: AdminRolesService,
   ) {}
 
   @Get()
@@ -161,12 +163,21 @@ export class AuthController {
           '🚀 ~ file: auth.controller.ts ~ line 102 ~ AuthController ~ verify ~ tokenData',
           tokenData,
         );
+        let userRoleName: any;
+        if (tokenData.user.userRole) {
+          userRoleName = await this.adminRoleService.findOne(
+            tokenData.user.userRole,
+          );
+        }
         // const resData = await this.authService.verifyToken(tokenData);
         // console.log(
         //   '🚀 ~ file: auth.controller.ts ~ line 106 ~ AuthController ~ verify ~ resData',
         //   resData,
         // );
-        res.send({ ...tokenData.user });
+        res.send({
+          ...tokenData.user,
+          jobtitle: userRoleName ? userRoleName.roleName : '',
+        });
       } catch (error) {
         console.log(
           '🚀 ~ file: auth.controller.ts ~ line 112 ~ AuthController ~ verify ~ error',
