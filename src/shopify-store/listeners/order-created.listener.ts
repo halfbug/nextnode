@@ -15,6 +15,7 @@ import { OrderPlacedEvent } from '../events/order-placed.envent';
 import { StoresService } from 'src/stores/stores.service';
 import { UpdateInventoryInput } from 'src/inventory/dto/update-inventory.input';
 import { InventoryService } from 'src/inventory/inventory.service';
+import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
 
 @Injectable()
 export class OrderCreatedListener {
@@ -25,6 +26,7 @@ export class OrderCreatedListener {
     private configSevice: ConfigService,
     private storesService: StoresService,
     private inventryService: InventoryService,
+    private dropsService: DropsGroupshopService,
   ) {}
 
   private shop: string;
@@ -159,6 +161,56 @@ export class OrderCreatedListener {
         )
       )
         this.eventEmitter.emit('order.placed', newOrderPlaced);
+    } catch (err) {
+      Logger.error(err, OrderCreatedListener.name);
+    }
+  }
+
+  @OnEvent('order.created')
+  async setCartRewardsTags(event: OrderCreatedEvent) {
+    try {
+      const { shop, webhook } = event;
+      const whOrder = webhook;
+      const {
+        accessToken,
+        drops: { cartRewards },
+      } = await this.storesService.findOne(shop);
+
+      const refferalId = whOrder.note_attributes.length
+        ? whOrder.note_attributes[0]?.value
+        : null;
+      const dgroupshop = await this.dropsService.findOne(refferalId);
+
+      if (dgroupshop && cartRewards.length) {
+        const subTotal = +whOrder.current_subtotal_price;
+
+        const cartRewardsArr = [];
+        for (let i = 1; i <= cartRewards.length; i++) {
+          const arrObject = new Float32Array(
+            cartRewards.map((cr) => +cr.rewardValue),
+          );
+          const subCR = arrObject.subarray(0, i);
+          cartRewardsArr.push(
+            subCR.reduce((acc, rewardValue) => acc + rewardValue, 0),
+          );
+        }
+
+        const tags = [];
+        cartRewardsArr.forEach((cr, index) => {
+          if (subTotal >= cr) {
+            tags.push(cartRewards[index].rewardTitle);
+          }
+        });
+
+        if (tags.length) {
+          await this.shopifyapi.addTagsToOrder(
+            shop,
+            accessToken,
+            tags,
+            whOrder.admin_graphql_api_id,
+          );
+        }
+      }
     } catch (err) {
       Logger.error(err, OrderCreatedListener.name);
     }

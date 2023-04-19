@@ -620,6 +620,55 @@ export class ShopifyService {
     }
   }
 
+  async addTagsToOrder(
+    shop: string,
+    accessToken: string,
+    tags: string[],
+    id: string,
+  ) {
+    // console.log({ tags });
+    try {
+      const client = await this.client(shop, accessToken);
+
+      const res = await client.query({
+        data: {
+          query: `mutation updateOrderMetafields($input: OrderInput!) {
+            orderUpdate(input: $input) {
+              order {
+                id
+                tags
+              }
+              userErrors {
+                message
+                field
+              }
+            }
+          }
+          `,
+          variables: {
+            input: {
+              tags,
+              id,
+            },
+          },
+        },
+      });
+      // console.log('res', JSON.stringify(res));
+      // const {
+      //   [`orderUpdate`]: {
+      //     order: { id: orderId, tags: updatedTags },
+      //     userErrors,
+      //   },
+      // } = res.body['data'];
+      // console.log('orderId', orderId);
+      // console.log('updatedTags', updatedTags);
+      // console.log('userErrors', userErrors);
+    } catch (err) {
+      console.log('err', JSON.stringify(err));
+      Logger.error(err, 'addTagsToOrder');
+    }
+  }
+
   // updateDiscountCode(shop: shop, accessToken: string, variables: any) {
   //   priceRule = await client.query({
   //     data: {
