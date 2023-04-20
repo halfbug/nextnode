@@ -184,23 +184,9 @@ export class OrderCreatedListener {
       if (dgroupshop && cartRewards.length) {
         const subTotal = +whOrder.current_subtotal_price;
 
-        const cartRewardsArr = [];
-        for (let i = 1; i <= cartRewards.length; i++) {
-          const arrObject = new Float32Array(
-            cartRewards.map((cr) => +cr.rewardValue),
-          );
-          const subCR = arrObject.subarray(0, i);
-          cartRewardsArr.push(
-            subCR.reduce((acc, rewardValue) => acc + rewardValue, 0),
-          );
-        }
-
-        const tags = [];
-        cartRewardsArr.forEach((cr, index) => {
-          if (subTotal >= cr) {
-            tags.push(cartRewards[index].rewardTitle);
-          }
-        });
+        const tags: string[] = cartRewards
+          .filter((cr) => subTotal >= +cr?.rewardValue)
+          .map((cr) => cr.rewardTitle);
 
         if (tags.length) {
           await this.shopifyapi.addTagsToOrder(
