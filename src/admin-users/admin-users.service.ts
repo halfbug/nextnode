@@ -126,7 +126,8 @@ export class AdminUsersService {
     return adminUser;
   }
 
-  remove(id: string) {
-    return this.adminUserRepository.delete({ id });
+  async remove(id: string) {
+    await this.adminUserRepository.delete({ id });
+    return { status: 'User deleted successfully' };
   }
 }
