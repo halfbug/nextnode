@@ -89,7 +89,8 @@ export class AdminRolesService {
     return adminUser;
   }
 
-  remove(id: string) {
-    return this.adminUserRoleRepository.delete({ id });
+  async remove(id: string) {
+    await this.adminUserRoleRepository.delete({ id });
+    return { roleName: 'Admin role deleted successfully' };
   }
 }
