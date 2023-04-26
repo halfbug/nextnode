@@ -112,6 +112,11 @@ export class AdminUsersService {
       // Invalid credentials
       return false;
     }
+    const lastLoginUpdate = {
+      id: realUser.id,
+      lastLogin: new Date(),
+    };
+    await this.update(lastLoginUpdate.id, lastLoginUpdate);
     // return the user
     return realUser;
   }

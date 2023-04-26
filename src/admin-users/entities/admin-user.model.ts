@@ -23,6 +23,9 @@ export default class AdminUser extends DefaultColumnsService {
   status: string;
 
   @Column({ nullable: true })
+  lastLogin?: Date;
+
+  @Column({ nullable: true })
   userRole: string;
 
   @BeforeInsert() async hashPassword() {

@@ -36,6 +36,9 @@ export class AdminUser {
   @Field(() => userAdminRole, { nullable: true })
   userRole?: userAdminRole;
 
+  @Field({ nullable: true })
+  lastLogin?: Date;
+
   @Field({ defaultValue: new Date() })
   createdAt: Date;
 
