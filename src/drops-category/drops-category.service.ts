@@ -121,7 +121,7 @@ export class DropsCategoryService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(DropsCategory, agg).toArray();
-    return gs[0].ids;
+    return gs[0]?.ids;
   }
 
   async getSVCollectionIDs(storeId: string): Promise<[string]> {

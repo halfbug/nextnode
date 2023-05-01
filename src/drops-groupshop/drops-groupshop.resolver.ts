@@ -74,18 +74,20 @@ export class DropsGroupshopResolver {
       const collections = await this.dropsCategoryService.getNonSVCollectionIDs(
         groupshop?.storeId,
       );
-      updatedDiscountCode = await this.shopifyapi.setDiscountCode(
-        shop,
-        'Create',
-        accessToken,
-        groupshop.discountCode.title,
-        parseInt(baseline, 10),
-        [...new Set(collections)],
-        new Date(),
-        newExpiredate,
-        null,
-        true,
-      );
+      if (collections.length) {
+        updatedDiscountCode = await this.shopifyapi.setDiscountCode(
+          shop,
+          'Create',
+          accessToken,
+          groupshop.discountCode.title,
+          parseInt(baseline, 10),
+          [...new Set(collections)],
+          new Date(),
+          newExpiredate,
+          null,
+          true,
+        );
+      }
     } else {
       await this.shopifyapi.setDiscountCode(
         shop,
