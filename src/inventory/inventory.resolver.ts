@@ -55,6 +55,11 @@ export class InventoryResolver {
     return this.inventoryService.findOne(shop, recordType);
   }
 
+  @Query(() => [Inventory], { name: 'findById' })
+  findById(@Args('id') id: string) {
+    return this.inventoryService.findById(id);
+  }
+
   @Query(() => [Product], { name: 'findAllProducts' })
   async findAllProducts(@Args('shop') shop: string) {
     const res = await this.inventoryService.findAllProducts(shop);

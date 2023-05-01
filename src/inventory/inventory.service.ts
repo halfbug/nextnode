@@ -747,4 +747,20 @@ export class InventoryService {
       console.log(err);
     }
   }
+
+  async findById(id: string) {
+    const manager = getMongoManager();
+    try {
+      const agg = [
+        {
+          $match: {
+            id: id,
+          },
+        },
+      ];
+      return await manager.aggregate(Inventory, agg).toArray();
+    } catch (err) {
+      console.log(err);
+    }
+  }
 }
