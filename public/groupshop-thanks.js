@@ -824,7 +824,7 @@ async function init() {
     injectStyleSheet('glider.min.css');
     const csymbol = getCurrencySymbol(Shopify.checkout.currency);
     // get vault + spotlight product ids
-    const SVIDs = await gsPost('dropsSVIDs', { shop: Shopify.shop });
+    const { ids: SVIDs } = await gsPost('dropsSVIDs', { shop: Shopify.shop });
     console.log('🚀 ~ file: groupshop-thanks.js:828 ~ init ~ SVIDs:', SVIDs);
     if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
       addLeftBlock(isDrops ? null : store.logoImage);
