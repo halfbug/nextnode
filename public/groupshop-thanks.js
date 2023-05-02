@@ -823,6 +823,9 @@ async function init() {
     injectStyleSheet('gsthanks.css');
     injectStyleSheet('glider.min.css');
     const csymbol = getCurrencySymbol(Shopify.checkout.currency);
+    // get vault + spotlight product ids
+    const SVIDs = await gsPost('dropsSVIDs', { shop: Shopify.shop });
+    console.log('🚀 ~ file: groupshop-thanks.js:828 ~ init ~ SVIDs:', SVIDs);
     if (bannerSummaryPage === 'Both' || bannerSummaryPage === 'Left') {
       addLeftBlock(isDrops ? null : store.logoImage);
     }
@@ -902,7 +905,9 @@ async function init() {
             // spotlight and vault products total
             // to remove from total
             const SVamount = lineitems
-              .filter((l) => l.compare_at_price !== null)
+              .filter((l) =>
+                SVIDs.includes(`gid://shopify/Product/${l.product_id}`),
+              )
               .reduce((acc, { line_price }) => acc + +line_price, 0);
             console.log(
               '🚀 ~ file: groupshop-thanks.js:817 ~ pollit3 ~ SVamount:',
@@ -988,7 +993,7 @@ async function init() {
               slide.href = window.GSURL;
               slide.target = '_blank';
               slide.className = 'gscard';
-              const pp = +prod?.price;
+              const pp = +prod?.compareAtPrice ?? +prod?.price;
               const productPrice = +pp.toFixed(2).toString().replace('.00', '');
               console.log(
                 '🚀 ~ file: groupshop-thanks.js ~ line 654 ~ displayProd.map ~ productPrice',

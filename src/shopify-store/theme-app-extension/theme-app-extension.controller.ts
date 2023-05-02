@@ -304,4 +304,21 @@ export class ThemeAppExtensionController {
       // res.status(HttpStatus.OK).send();
     }
   }
+
+  @Post('dropsSVIDs')
+  async getdropsSVIDs(@Req() req, @Res() res) {
+    try {
+      const { shop } = req.body;
+
+      const ids = await this.dropsGroupshopService.getVaultSpotlightProducts(
+        shop,
+      );
+
+      res.send(JSON.stringify({ ids }));
+    } catch (err) {
+      res.send(JSON.stringify({ ids: null }));
+    } finally {
+      // res.status(HttpStatus.OK).send();
+    }
+  }
 }
