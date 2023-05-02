@@ -993,7 +993,7 @@ async function init() {
               slide.href = window.GSURL;
               slide.target = '_blank';
               slide.className = 'gscard';
-              const pp = +prod?.compareAtPrice ?? +prod?.price;
+              const pp = +(prod?.compareAtPrice ?? prod?.price);
               const productPrice = +pp.toFixed(2).toString().replace('.00', '');
               console.log(
                 '🚀 ~ file: groupshop-thanks.js ~ line 654 ~ displayProd.map ~ productPrice',
