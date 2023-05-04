@@ -35,4 +35,7 @@ export class CreateAdminUserInput {
 
   @Field({ defaultValue: new Date() })
   updatedAt?: Date;
+
+  @Field(() => [String], { nullable: true })
+  favouriteStore?: [string];
 }

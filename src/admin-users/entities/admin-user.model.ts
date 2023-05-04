@@ -28,6 +28,9 @@ export default class AdminUser extends DefaultColumnsService {
   @Column({ nullable: true })
   userRole: string;
 
+  @Column({ nullable: true })
+  favouriteStore?: string[];
+
   @BeforeInsert() async hashPassword() {
     console.log(this.password);
     this.password = await bcrypt.hash(this.password, 10);
