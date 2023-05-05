@@ -312,4 +312,10 @@ export class CreateStoreInput {
 
   @Field({ nullable: true })
   drops?: DropsInput;
+
+  @Field({ nullable: true })
+  userId?: string;
+
+  @Field({ nullable: true })
+  activity?: string;
 }

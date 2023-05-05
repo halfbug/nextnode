@@ -186,6 +186,53 @@ export class StoresService {
           updateStoreInput.settings.layout.bannerColor = '#EEFF5C';
         }
       }
+      const oldValue = await this.findById(updateStoreInput.id);
+      if (updateStoreInput?.activity === 'Cart Rewards Management') {
+        let operation;
+        if (
+          updateStoreInput.drops.cartRewards.length >
+          oldValue?.drops?.cartRewards.length
+        ) {
+          operation = 'CREATE';
+        } else if (
+          updateStoreInput.drops.cartRewards.length <
+          oldValue?.drops?.cartRewards.length
+        ) {
+          operation = 'REMOVE';
+        } else {
+          operation = 'UPDATE';
+        }
+
+        Logger.log(
+          '/drops',
+          'Cart Rewards Management',
+          false,
+          operation,
+          operation === 'CREATE'
+            ? Object.values({
+                result:
+                  updateStoreInput.drops.cartRewards[
+                    updateStoreInput.drops.cartRewards.length - 1
+                  ],
+              })
+            : updateStoreInput.drops.cartRewards,
+          updateStoreInput.userId,
+          oldValue?.drops?.cartRewards,
+          updateStoreInput.id,
+        );
+      } else {
+        Logger.log(
+          '/drops',
+          'Drops Milestone Management',
+          false,
+          'UPDATE',
+          updateStoreInput,
+          updateStoreInput.userId,
+          oldValue,
+          updateStoreInput.id,
+        );
+      }
+
       await this.storeRepository.update({ id }, updateStoreInput);
     } catch (err) {
       console.log(err, StoresService.name);
@@ -421,9 +468,48 @@ export class StoresService {
   }
 
   async updateDiscoveryTool(storeId: any, updateDiscoveryTool: any) {
+    const oldValue = await this.findById(updateDiscoveryTool.id);
+    let newVaue = updateDiscoveryTool?.discoveryTool;
+    let operation = 'CREATE';
+    if (
+      oldValue?.discoveryTool?.matchingBrandName.length ===
+      updateDiscoveryTool.discoveryTool.matchingBrandName.length
+    ) {
+      operation = 'UPDATE';
+      newVaue = {
+        status: updateDiscoveryTool?.discoveryTool.status,
+      };
+    } else if (
+      updateDiscoveryTool.discoveryTool.matchingBrandName.length >
+      oldValue?.discoveryTool?.matchingBrandName.length
+    ) {
+      operation = 'CREATE';
+      newVaue = {
+        status: updateDiscoveryTool?.discoveryTool.status,
+        discoveryTool:
+          updateDiscoveryTool?.discoveryTool.matchingBrandName[
+            updateDiscoveryTool?.discoveryTool.matchingBrandName.length - 1
+          ],
+      };
+    } else {
+      operation = 'REMOVE';
+      newVaue = updateDiscoveryTool?.discoveryTool;
+    }
+
     await this.storeRepository.update(
       { id: updateDiscoveryTool.id },
       updateDiscoveryTool,
+    );
+    console.log(operation);
+    Logger.log(
+      '/discoverytools',
+      updateDiscoveryTool.activity,
+      false,
+      operation,
+      newVaue,
+      updateDiscoveryTool.userId,
+      oldValue?.discoveryTool,
+      updateDiscoveryTool.id,
     );
     return await this.findOneById(updateDiscoveryTool.id);
   }

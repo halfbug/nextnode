@@ -21,6 +21,9 @@ export class Video {
   orderId: number;
 
   @Field({ nullable: true })
+  userId?: string;
+
+  @Field({ nullable: true })
   createdAt: string;
 
   @Field({ nullable: true })

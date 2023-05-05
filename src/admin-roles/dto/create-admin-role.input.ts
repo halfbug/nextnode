@@ -14,7 +14,6 @@ export class PermissionInput {
 export class CreateAdminRoleInput {
   @Field({ nullable: true })
   @IsNotEmpty()
-  @MinLength(3)
   roleName: string;
 
   @Field(() => [PermissionInput], { nullable: 'itemsAndList' })

@@ -50,4 +50,10 @@ export class CreateDropsCategoryForFront {
 
   @Field({ defaultValue: '', nullable: true })
   collectionUpdateMsg?: string;
+
+  @Field({ nullable: true })
+  userId?: string;
+
+  @Field({ nullable: true })
+  activity?: string;
 }

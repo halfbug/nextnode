@@ -3,6 +3,9 @@ import { DefaultColumnsService } from 'src/utils/default-columns/default-columns
 
 export class fieldDetails {
   @Column({ nullable: true })
+  parentTitle?: string;
+
+  @Column({ nullable: true })
   fieldName?: string;
 
   @Column({ nullable: true })
@@ -24,7 +27,13 @@ export default class AdminActivityLogs extends DefaultColumnsService {
   route: string;
 
   @Column()
-  userId: string;
+  context: string;
+
+  @Column()
+  userId?: string;
+
+  @Column()
+  storeId?: string;
 
   @Column(() => fieldDetails)
   changes?: fieldDetails[];

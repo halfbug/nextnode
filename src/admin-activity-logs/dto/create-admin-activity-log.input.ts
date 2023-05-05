@@ -3,6 +3,9 @@ import { InputType, Int, Field } from '@nestjs/graphql';
 @InputType()
 export class fieldDetails {
   @Field({ nullable: true })
+  parentTitle?: string;
+
+  @Field({ nullable: true })
   fieldName?: string;
 
   @Field({ nullable: true })
@@ -15,7 +18,7 @@ export class fieldDetails {
 @InputType()
 export class CreateAdminActivityLogInput {
   @Field()
-  id: string;
+  id?: string;
 
   @Field()
   operation: string;
@@ -24,13 +27,19 @@ export class CreateAdminActivityLogInput {
   route: string;
 
   @Field()
-  userId: string;
+  context: string;
+
+  @Field({ nullable: true })
+  storeId?: string;
+
+  @Field()
+  userId?: string;
 
   @Field(() => fieldDetails)
   changes?: fieldDetails[];
 
   @Field({ defaultValue: new Date() })
-  createdAt: Date;
+  createdAt?: Date;
 
   @Field({ defaultValue: new Date() })
   updatedAt?: Date;

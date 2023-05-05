@@ -29,8 +29,12 @@ export class DropsCategoryService {
     return `This action returns all dropsCategory`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} dropsCategory`;
+  async findOne(id: string) {
+    return await this.DropsCategoryRepository.find({
+      where: {
+        categoryId: id,
+      },
+    });
   }
 
   async findByStoreId(storeId: string) {
@@ -43,10 +47,55 @@ export class DropsCategoryService {
     id: string,
     updateDropsCategoryInput: CreateDropsCategoryInput[],
     collectionUpdateMsg: string,
+    userId?: string,
+    activity?: string,
   ) {
     if (collectionUpdateMsg !== '') {
       Logger.log(collectionUpdateMsg, 'DROPS_COLLECTION_UPDATED', true);
     }
+
+    let dropCategory;
+    let operation;
+    if (activity === 'Update Sorting Order') {
+      operation = 'UPDATE';
+      dropCategory = await this.findByStoreId(id);
+    } else {
+      dropCategory = await this.findOne(updateDropsCategoryInput[0].categoryId);
+      operation =
+        activity === 'Drops Navigation Management'
+          ? dropCategory.length > 0
+            ? 'UPDATE'
+            : 'CREATE'
+          : dropCategory[0].collections.length !==
+            updateDropsCategoryInput[0].collections.length
+          ? 'CREATE'
+          : 'UPDATE';
+    }
+
+    if (collectionUpdateMsg.includes('remove') === true) {
+      Logger.log(
+        '/drops',
+        activity,
+        false,
+        'REMOVE',
+        updateDropsCategoryInput,
+        userId,
+        dropCategory,
+        id,
+      );
+    } else {
+      Logger.log(
+        '/drops',
+        activity,
+        false,
+        operation,
+        updateDropsCategoryInput,
+        userId,
+        dropCategory,
+        id,
+      );
+    }
+
     const blukWrite = updateDropsCategoryInput.map((item) => {
       return {
         updateOne: {
@@ -59,14 +108,31 @@ export class DropsCategoryService {
         },
       };
     });
+
     const manager = getMongoManager();
     await manager.bulkWrite(DropsCategory, blukWrite);
     const temp = await this.findByStoreId(id);
     return temp;
   }
 
-  async remove(categoryId: [string], collectionUpdateMsg: string) {
+  async remove(
+    categoryId: [string],
+    collectionUpdateMsg: string,
+    userId: string,
+    storeId: string,
+  ) {
     const manager = getMongoManager();
+    const dropCategory = await this.findOne(categoryId[0]);
+    Logger.log(
+      '/drops',
+      'Drops Navigation Management',
+      false,
+      'REMOVE',
+      'newValue',
+      userId,
+      dropCategory,
+      storeId,
+    );
     Logger.log(collectionUpdateMsg, 'DROPS_COLLECTION_UPDATED', true);
     return await manager.deleteMany(DropsCategory, {
       categoryId: { $in: categoryId },

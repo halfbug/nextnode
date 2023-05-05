@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getMongoManager, Repository } from 'typeorm';
 import { CreateVideoInput } from './dto/create-video.input';
@@ -13,6 +13,16 @@ export class VideoService {
   ) {}
   create(createVideoInput: CreateVideoInput): Promise<Video> {
     const store = this.VideoRepository.create({ ...createVideoInput });
+    Logger.log(
+      '/store/videoupload',
+      'Video Management',
+      false,
+      'CREATE',
+      { ...createVideoInput },
+      createVideoInput.userId,
+      'oldValue',
+      createVideoInput.storeId,
+    );
     return this.VideoRepository.save(store);
   }
 
@@ -21,13 +31,16 @@ export class VideoService {
     return allvideoData;
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} video`;
+  async findOne(id: string) {
+    return await this.VideoRepository.findOne({
+      _id: ObjectId(id),
+    });
   }
 
   async update(updateVideoInput: UpdateVideoInput) {
-    const { selectedIds, storeId } = updateVideoInput;
+    const { selectedIds, storeId, userId } = updateVideoInput;
     try {
+      const findVideos = await this.findAll(storeId);
       const manager = getMongoManager();
       await manager.updateMany(
         Video,
@@ -39,14 +52,29 @@ export class VideoService {
           },
         },
       );
-
+      const newValues = [];
       for (let i = 0; i < selectedIds.length; i++) {
         await manager.updateOne(
           Video,
           { _id: ObjectId(selectedIds[i]) },
           { $set: { status: 'Active', orderId: i + 1 } },
         );
+        newValues.push({
+          id: selectedIds[i],
+          status: 'Active',
+          orderId: i + 1,
+        });
       }
+      Logger.log(
+        '/store/videoupload',
+        'Video Management',
+        false,
+        'UPDATE',
+        newValues,
+        userId,
+        findVideos,
+        storeId,
+      );
     } catch (er) {
       console.log(er);
     }
@@ -56,6 +84,17 @@ export class VideoService {
   }
 
   async remove(id: string) {
+    const oldValue = await this.findOne(id);
+    Logger.log(
+      '/store/videoupload',
+      'Video Management',
+      false,
+      'REMOVE',
+      'newValue',
+      oldValue.userId,
+      oldValue,
+      id,
+    );
     await this.VideoRepository.delete(id);
     return { status: 'video deleted successfully' };
   }

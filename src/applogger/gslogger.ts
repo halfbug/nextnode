@@ -3,13 +3,26 @@ import { ConsoleLogger } from '@nestjs/common';
 import { CreateAppLoggerInput } from './dto/create-applogger.input';
 import { LogEventTypeEnum } from './entities/applogger.entity';
 import { AppLoggerService } from './applogger.service';
+import { AdminActivityLogsService } from 'src/admin-activity-logs/admin-activity-logs.service';
 
 @Injectable()
 export class Gslogger extends ConsoleLogger {
-  constructor(private readonly apploggerService: AppLoggerService) {
+  constructor(
+    private readonly apploggerService: AppLoggerService,
+    private readonly adminActivityLogsService: AdminActivityLogsService,
+  ) {
     super();
   }
-  log(message: any, context?: string, save2db?: boolean): void {
+  log(
+    message: any,
+    context?: string,
+    save2db?: boolean,
+    operation?: string,
+    mfields?: any,
+    userId?: string,
+    oldValue?: any,
+    storeId?: string,
+  ): void {
     super.log(message, context);
     if (save2db) {
       const elog = new CreateAppLoggerInput();
@@ -17,6 +30,17 @@ export class Gslogger extends ConsoleLogger {
       elog.message = message;
       elog.level = 'log';
       this.apploggerService.create(elog);
+    }
+    if (mfields) {
+      this.adminActivityLogsService.createAdminActivity(
+        message,
+        context,
+        operation,
+        mfields,
+        userId,
+        oldValue,
+        storeId,
+      );
     }
     // console.log({ message });
   }
@@ -39,5 +63,10 @@ export class Gslogger extends ConsoleLogger {
   }
   debug(message: any, context?: string) {
     super.debug(message, context);
+  }
+  activity(message: string, route: string, context?: any) {
+    super.log(message, context);
+    console.log('message', JSON.stringify(message));
+    console.log('context', JSON.stringify(context));
   }
 }

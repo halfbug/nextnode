@@ -27,7 +27,7 @@ export class DropsCategoryResolver {
   }
 
   @Query(() => DropsCategory, { name: 'dropsCategory' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  findOne(@Args('id', { type: () => String }) id: string) {
     return this.dropsCategoryService.findOne(id);
   }
 
@@ -45,6 +45,8 @@ export class DropsCategoryResolver {
       updateDropsCategoryInput.id,
       updateDropsCategoryInput.categoryData,
       updateDropsCategoryInput.collectionUpdateMsg,
+      updateDropsCategoryInput?.userId,
+      updateDropsCategoryInput?.activity,
     );
   }
 
@@ -53,8 +55,17 @@ export class DropsCategoryResolver {
     @Args('id', { type: () => [String] }) id: [string],
     @Args('collectionUpdateMsg', { type: () => String })
     collectionUpdateMsg: string,
+    @Args('userId', { type: () => String })
+    userId: string,
+    @Args('storeId', { type: () => String })
+    storeId: string,
   ) {
-    return this.dropsCategoryService.remove(id, collectionUpdateMsg);
+    return this.dropsCategoryService.remove(
+      id,
+      collectionUpdateMsg,
+      userId,
+      storeId,
+    );
   }
 
   @Mutation(() => CodeUpdateStatusType)
