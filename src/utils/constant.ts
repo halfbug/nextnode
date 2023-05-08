@@ -139,3 +139,9 @@ const GS_CHARGE_PARTNER_COMISSION = 10;
 export const BESTSELLER_SECTION_TITLE = 'bestsellers';
 export const VAULT_SECTION_TITLE = 'The Vault';
 export const SPOTLIGHT_SECTION_TITLE = 'Today’s Spotlight';
+
+export const RecordType = {
+  Collection: 'Collection',
+  Product: 'Product',
+  ProductImage: 'ProductImage',
+};

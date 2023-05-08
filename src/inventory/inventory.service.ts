@@ -139,6 +139,18 @@ export class InventoryService {
     });
   }
 
+  async removeEntity(id: string, recordType) {
+    console.log(id, 'removevariants');
+    return await this.inventoryManager.deleteMany(Inventory, {
+      $and: [
+        { id: id },
+        {
+          recordType: recordType,
+        },
+      ],
+    });
+  }
+
   async removeShop(shop: string) {
     return await this.inventoryRepository.delete({ shop });
   }

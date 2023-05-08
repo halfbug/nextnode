@@ -67,6 +67,7 @@ import { lastValueFrom, map } from 'rxjs';
 
 import { UpdateSmartCollectionEvent } from 'src/inventory/events/update-smart-collection.event';
 import { DropsCategoryService } from 'src/drops-category/drops-category.service';
+import { RecordType } from 'src/utils/constant';
 @Public()
 @Controller('webhooks')
 export class WebhooksController {
@@ -967,7 +968,10 @@ export class WebhooksController {
       );
 
       // 2. delete all previous products collection
-      await this.inventryService.remove(rcollection.admin_graphql_api_id);
+      await this.inventryService.removeEntity(
+        rcollection.admin_graphql_api_id,
+        RecordType.Collection,
+      );
 
       // 3. get collection detail from shopify IF its a published collection
       if (rcollection.published_at) {
