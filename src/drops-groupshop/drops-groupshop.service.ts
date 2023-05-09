@@ -218,6 +218,23 @@ export class DropsGroupshopService {
         ];
       }
 
+      agg = [
+        {
+          $lookup: {
+            from: 'store',
+            localField: 'storeId',
+            foreignField: 'id',
+            as: 'store',
+          },
+        },
+        {
+          $unwind: {
+            path: '$store',
+          },
+        },
+        ...agg,
+      ];
+
       const manager = getMongoManager();
       const gs = await manager.aggregate(DropsGroupshop, agg).toArray();
       console.log(
@@ -232,7 +249,6 @@ export class DropsGroupshopService {
       });
       const gscount = await manager.aggregate(DropsGroupshop, agg).toArray();
       const total = gscount[0]?.total;
-
       return {
         result,
         pageInfo: this.paginateService.paginate(result, total, take, skip),
