@@ -3,6 +3,8 @@ import { AppLoggerService } from './applogger.service';
 import { AppLogger } from './entities/applogger.entity';
 import { CreateAppLoggerInput } from './dto/create-applogger.input';
 import { UpdateAppLoggerInput } from './dto/update-applogger.input';
+import { GridArgs } from 'src/drops-groupshop/dto/paginationArgs.input';
+import { AppLoggerPage } from './entities/applogger-paginate.entity';
 
 @Resolver(() => AppLogger)
 export class AppLoggerResolver {
@@ -15,9 +17,9 @@ export class AppLoggerResolver {
     return this.apploggerService.create(createAppLoggerInput);
   }
 
-  @Query(() => [AppLogger], { name: 'apploggers' })
-  findAll() {
-    return this.apploggerService.findAll();
+  @Query(() => AppLoggerPage, { name: 'apploggers' })
+  apploggers(@Args('gridArgs') gridArgs: GridArgs) {
+    return this.apploggerService.getLogs(gridArgs);
   }
 
   @Query(() => AppLogger, { name: 'applogger' })
