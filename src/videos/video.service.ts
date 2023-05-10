@@ -13,12 +13,14 @@ export class VideoService {
   ) {}
   create(createVideoInput: CreateVideoInput): Promise<Video> {
     const store = this.VideoRepository.create({ ...createVideoInput });
+    const videoInput = [];
+    videoInput.push({ ...createVideoInput });
     Logger.log(
       '/store/videoupload',
       'Video Management',
       false,
       'CREATE',
-      { ...createVideoInput },
+      videoInput,
       createVideoInput.userId,
       'oldValue',
       createVideoInput.storeId,
@@ -85,6 +87,8 @@ export class VideoService {
 
   async remove(id: string) {
     const oldValue = await this.findOne(id);
+    const videoInput = [];
+    videoInput.push(oldValue);
     Logger.log(
       '/store/videoupload',
       'Video Management',
@@ -92,8 +96,8 @@ export class VideoService {
       'REMOVE',
       'newValue',
       oldValue.userId,
-      oldValue,
-      id,
+      videoInput,
+      oldValue.storeId,
     );
     await this.VideoRepository.delete(id);
     return { status: 'video deleted successfully' };

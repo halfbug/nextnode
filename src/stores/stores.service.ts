@@ -469,6 +469,7 @@ export class StoresService {
 
   async updateDiscoveryTool(storeId: any, updateDiscoveryTool: any) {
     const oldValue = await this.findById(updateDiscoveryTool.id);
+    const activityLog = [];
     let newVaue = updateDiscoveryTool?.discoveryTool;
     let operation = 'CREATE';
     if (
@@ -484,13 +485,17 @@ export class StoresService {
       oldValue?.discoveryTool?.matchingBrandName.length
     ) {
       operation = 'CREATE';
-      newVaue = {
+      activityLog.push({
         status: updateDiscoveryTool?.discoveryTool.status,
-        discoveryTool:
+        id: updateDiscoveryTool?.discoveryTool.matchingBrandName[
+          updateDiscoveryTool?.discoveryTool.matchingBrandName.length - 1
+        ]['id'],
+        brandName:
           updateDiscoveryTool?.discoveryTool.matchingBrandName[
             updateDiscoveryTool?.discoveryTool.matchingBrandName.length - 1
-          ],
-      };
+          ]['brandName'],
+      });
+      newVaue = activityLog;
     } else {
       operation = 'REMOVE';
       newVaue = updateDiscoveryTool?.discoveryTool;
@@ -500,7 +505,7 @@ export class StoresService {
       { id: updateDiscoveryTool.id },
       updateDiscoveryTool,
     );
-    console.log(operation);
+
     Logger.log(
       '/discoverytools',
       updateDiscoveryTool.activity,

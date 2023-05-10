@@ -218,6 +218,7 @@ export class AuthController {
           last_name: registerdUser.lastName ?? '',
           email: registerdUser.email,
           userRole: registerdUser.userRole,
+          userId: registerdUser.id,
         },
         isGSAdminUser: true,
         expires: new Date(new Date().setDate(new Date().getDate() + 3)), // expires 3d

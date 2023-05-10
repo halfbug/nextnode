@@ -46,9 +46,35 @@ export class AdminActivityLogsService {
     return this.adminActivityLogsRepository.find();
   }
 
+  async dropsActivity(route: string, storeId: string) {
+    const agg = [
+      {
+        $match: {
+          route: route,
+          storeId: storeId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'admin_user',
+          localField: 'userId',
+          foreignField: 'id',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: {
+          path: '$user',
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(AdminActivityLogs, agg).toArray();
+    return gs;
+  }
   async compareDropsArrays(oldValue: any, newValue: any) {
     const activityLog = [];
-    Object.keys(newValue).map((key) => {
+    Object.keys(newValue)?.map((key) => {
       if (key !== 'userId' && key !== 'activity') {
         if (
           newValue[key] !== oldValue[key] &&
@@ -74,7 +100,7 @@ export class AdminActivityLogsService {
   }
 
   innerDropsArrays(newObject: any, oldValue: any, activityLog: any, title) {
-    Object.keys(newObject).map((ikey) => {
+    Object.keys(newObject)?.map((ikey) => {
       if (newObject[ikey] !== null) {
         if (
           newObject[ikey] !== oldValue[ikey] &&
@@ -156,7 +182,7 @@ export class AdminActivityLogsService {
         });
       }
     });
-    return activityLog[0];
+    return activityLog;
   }
 
   async removeCompareArrays(oldValue: any, newValue: any, context: string) {
@@ -165,7 +191,7 @@ export class AdminActivityLogsService {
       context === 'Drops Navigation Management' ||
       context === 'Manage Section Content'
     ) {
-      Object.keys(oldValue).map((key) => {
+      Object.keys(oldValue)?.map((key) => {
         if (key !== 'userId' && key !== 'activity' && key !== '_id') {
           activityLog.push(oldValue[key]);
           if (typeof oldValue[key] === 'object') {
@@ -187,7 +213,7 @@ export class AdminActivityLogsService {
   }
 
   innerRemoveCompareArrays(oldValue: any, newValue: any, activityLog: any) {
-    Object.keys(oldValue).map((ikey) => {
+    Object.keys(oldValue)?.map((ikey) => {
       if (oldValue[ikey] !== null) {
         if (
           typeof oldValue[ikey] === 'object' &&
