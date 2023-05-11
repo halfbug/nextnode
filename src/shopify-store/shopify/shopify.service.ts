@@ -322,7 +322,25 @@ export class ShopifyService {
       else {
         // console.log('inside update option');
         let variables: any = { id };
-        if (percentage && starts && ends)
+        if (products && starts && ends)
+          variables = {
+            id,
+            priceRule: {
+              itemEntitlements: {
+                [isCollection ? 'collectionIds' : 'productIds']: [
+                  ...new Set(products),
+                ],
+              },
+              validityPeriod: {
+                start: starts,
+                end: ends,
+              },
+              combinesWith: {
+                productDiscounts: true,
+              },
+            },
+          };
+        else if (percentage && starts && ends)
           variables = {
             id,
             priceRule: {

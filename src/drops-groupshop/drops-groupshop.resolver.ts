@@ -70,10 +70,10 @@ export class DropsGroupshopResolver {
       },
     } = await this.storesService.findById(groupshop?.storeId);
 
+    const collections = await this.dropsCategoryService.getNonSVCollectionIDs(
+      groupshop?.storeId,
+    );
     if (eventType === EventType.started) {
-      const collections = await this.dropsCategoryService.getNonSVCollectionIDs(
-        groupshop?.storeId,
-      );
       if (collections.length) {
         updatedDiscountCode = await this.shopifyapi.setDiscountCode(
           shop,
@@ -95,10 +95,11 @@ export class DropsGroupshopResolver {
         accessToken,
         groupshop.discountCode.title,
         null,
-        null,
+        [...new Set(collections)],
         groupshop.createdAt,
         newExpiredate,
         groupshop.discountCode.priceRuleId,
+        true,
       );
 
       this.lifecyclesrv.create({

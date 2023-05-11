@@ -191,12 +191,12 @@ export class StoresService {
         let operation;
         if (
           updateStoreInput.drops.cartRewards.length >
-          oldValue?.drops?.cartRewards.length
+          oldValue?.drops?.cartRewards?.length
         ) {
           operation = 'CREATE';
         } else if (
           updateStoreInput.drops.cartRewards.length <
-          oldValue?.drops?.cartRewards.length
+          oldValue?.drops?.cartRewards?.length
         ) {
           operation = 'REMOVE';
         } else {
