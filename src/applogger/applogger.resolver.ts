@@ -42,6 +42,11 @@ export class AppLoggerResolver {
     return this.apploggerService.remove(id);
   }
 
+  @Mutation(() => AppLogger)
+  removeAppLoggerByLevel(@Args('level', { type: () => String }) level: string) {
+    return this.apploggerService.removeByLevel(level);
+  }
+
   @Query(() => AppLogger)
   async findLatestLog(
     @Args('storeId', { type: () => String }) storeId: string,

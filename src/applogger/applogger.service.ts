@@ -139,7 +139,7 @@ export class AppLoggerService {
         $count: 'total',
       });
       const gscount = await manager.aggregate(AppLogger, agg).toArray();
-      const total = gscount[0]?.total;
+      const total = gscount[0]?.total ?? 0;
       return {
         result,
         pageInfo: this.paginateService.paginate(result, total, take, skip),
@@ -177,6 +177,11 @@ export class AppLoggerService {
 
   update(id: string, updateAppLoggerInput: UpdateAppLoggerInput) {
     return `This action updates a #${id} applogger`;
+  }
+
+  async removeByLevel(level: any) {
+    await this.errorLogRepository.delete({ level });
+    return { message: `${level} data removed successfully` };
   }
 
   remove(id: string) {
