@@ -8,10 +8,14 @@ import { TotalProducts } from './entities/totalProducts.entity';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Public } from 'src/auth/public.decorator';
+import { StoresService } from 'src/stores/stores.service';
 @UseGuards(AuthGuard)
 @Resolver(() => Inventory)
 export class InventoryResolver {
-  constructor(private readonly inventoryService: InventoryService) {}
+  constructor(
+    private readonly inventoryService: InventoryService,
+    private readonly storeService: StoresService,
+  ) {}
 
   @Query(() => TotalProducts, { name: 'TotalProducts' })
   findStoreTotalProducts(@Args('shop') shop: string) {
@@ -63,6 +67,17 @@ export class InventoryResolver {
   @Query(() => [Product], { name: 'findAllProducts' })
   async findAllProducts(@Args('shop') shop: string) {
     const res = await this.inventoryService.findAllProducts(shop);
+    // console.log(
+    //   '🚀 ~ file: inventory.resolver.ts ~ line 57 ~ InventoryResolver ~ res',
+    //   res,
+    // );
+    return res;
+  }
+
+  @Query(() => [Inventory], { name: 'syncCollection' })
+  async syncCollection(@Args('storeId') storeId: string) {
+    const store = this.storeService.findById(storeId);
+    const res = await this.inventoryService.runSyncCollectionCron(store);
     // console.log(
     //   '🚀 ~ file: inventory.resolver.ts ~ line 57 ~ InventoryResolver ~ res',
     //   res,

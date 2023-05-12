@@ -7,6 +7,8 @@ import {
   Query,
   Req,
   Res,
+  forwardRef,
+  Inject,
 } from '@nestjs/common';
 import { CreateInventoryInput } from 'src/inventory/dto/create-inventory.input';
 import {
@@ -68,6 +70,7 @@ import { lastValueFrom, map } from 'rxjs';
 import { UpdateSmartCollectionEvent } from 'src/inventory/events/update-smart-collection.event';
 import { DropsCategoryService } from 'src/drops-category/drops-category.service';
 import { RecordType } from 'src/utils/constant';
+import { AppLoggerService } from 'src/applogger/applogger.service';
 @Public()
 @Controller('webhooks')
 export class WebhooksController {
@@ -90,6 +93,7 @@ export class WebhooksController {
     private lifecyclesrv: LifecycleService,
     private campaignService: CampaignsService,
     private gsService: GroupshopsService,
+    private appLoggerService: AppLoggerService,
     private updateSmartCollection: UpdateSmartCollectionEvent,
     private dropsCategoryService: DropsCategoryService,
   ) {}
@@ -291,6 +295,10 @@ export class WebhooksController {
           // 'PRODUCTS_UPDATE',
           '/webhooks/' + path,
           topic,
+        );
+        console.log(
+          '🚀 ~ file: webhooks.controller.ts:295 ~ stores.map ~ rhook:',
+          rhook,
         );
         const id =
           rhook['result']['data']['webhookSubscriptionUpdate'][
@@ -949,18 +957,77 @@ export class WebhooksController {
     }
   }
 
+  @Post('bulk-finish?')
+  async bulkFinish(@Req() req, @Res() res) {
+    try {
+      const { shop } = req.query;
+      const bulkData = req.body;
+
+      const { accessToken, id } = await this.storesService.findOne(shop);
+
+      const client = await this.shopifyService.client(shop, accessToken);
+
+      console.log(
+        'WebhooksController ~ bulk-finish',
+        JSON.stringify(bulkData),
+        shop,
+      );
+
+      const log = await this.appLoggerService.findLatestByCotext(
+        'COLLECTIONTOUPDATBULK',
+      );
+
+      const bulkOperationId = log.message?.split('-')[1]?.trim();
+
+      await client
+        .query({
+          data: {
+            query: `query {
+            node(id: "${bulkOperationId}") {
+              ... on BulkOperation {
+                url
+                partialDataUrl
+              }
+            }
+          }`,
+          },
+        })
+        .then((res) => {
+          const url = res.body['data']['node'].url;
+          this.httpService.get(url).subscribe(async (res) => {
+            const checkCollection = res.data?.length
+              ? readJsonLines(res.data)
+              : [];
+            if (
+              checkCollection.length &&
+              checkCollection[0].productsCount > 0
+            ) {
+              this.inventryService.getProducts(checkCollection, id, shop);
+            } else {
+              console.log('No products found');
+            }
+          });
+        });
+    } catch (err) {
+      console.log(JSON.stringify(err));
+      Logger.error(err, 'bulk-finish');
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
+
   @Post('collection-update?')
   async collectionUpdate(@Req() req, @Res() res) {
     try {
       // 1. receive collection webhook
       const { shop: shopName } = req.query;
       const rcollection = req.body;
-      let collectionType;
-      if ('rules' in rcollection && rcollection.rules.length) {
-        collectionType = 'smart';
-      } else {
-        collectionType = 'custom';
-      }
+      // let collectionType;
+      // if ('rules' in rcollection && rcollection.rules.length) {
+      //   collectionType = 'smart';
+      // } else {
+      //   collectionType = 'custom';
+      // }
       console.log(
         'WebhooksController ~ collection-update ~ ',
         JSON.stringify(rcollection),
@@ -968,149 +1035,170 @@ export class WebhooksController {
       );
 
       // 2. delete all previous products collection
-      await this.inventryService.removeEntity(
-        rcollection.admin_graphql_api_id,
-        RecordType.Collection,
-      );
+      // await this.inventryService.removeEntity(
+      //   rcollection.admin_graphql_api_id,
+      //   RecordType.Collection,
+      // );
 
       // 3. get collection detail from shopify IF its a published collection
-      if (rcollection.published_at) {
-        const { shop, accessToken } = await this.storesService.findOne(
-          shopName,
+
+      const { shop, accessToken, id } = await this.storesService.findOne(
+        shopName,
+      );
+      const temp: any = await this.storesService.checkUpdatedCollection(
+        rcollection.admin_graphql_api_id,
+        false,
+      );
+
+      if (!temp[0].collections?.length) {
+        const body = {
+          collectionTitle: rcollection.title,
+          collectionId: rcollection.admin_graphql_api_id,
+          isSynced: false,
+          updatedAt: new Date(),
+        };
+        this.storesService.updateCollectionToSync(id, body);
+      } else {
+        this.storesService.updateCollectionDate(
+          rcollection.admin_graphql_api_id,
+          new Date(),
         );
-        const client = await this.shopifyService.client(shopName, accessToken);
-
-        let qres = await client.query({
-          data: {
-            query: `mutation {
-          bulkOperationRunQuery(
-            query:"""
-            {
-              collection(id: "${rcollection.admin_graphql_api_id}") {
-                      title
-                      id
-                      productsCount
-                      products(first:10000,sortKey:COLLECTION_DEFAULT){
-                        edges{
-                          node{
-                            title
-                            id
-                            status
-                            createdAt
-                          }
-                        }
-                      }
-                    }
-                }
-            """
-          ) {
-            bulkOperation {
-              id
-              status
-            }
-            userErrors {
-              field
-              message
-            }
-          }
-        }`,
-          },
-        });
-
-        let timer;
-        if (!qres.body['data']['bulkOperationRunQuery']['bulkOperation']) {
-          timer = setInterval(async () => {
-            qres = await this.shopifyService.createBulkOperation(
-              client,
-              rcollection.admin_graphql_api_id,
-            );
-          }, 4000);
-        } else if (
-          qres.body['data']['bulkOperationRunQuery']['bulkOperation']
-        ) {
-          if (timer) {
-            clearInterval(timer);
-          }
-          if (
-            qres.body['data']['bulkOperationRunQuery']['bulkOperation'][
-              'status'
-            ] === 'CREATED'
-          ) {
-            const pollit = setInterval(async () => {
-              const poll = await client.query({
-                data: {
-                  query: `query {
-            currentBulkOperation {
-              id
-              status
-              errorCode
-              createdAt
-              completedAt
-              objectCount
-              fileSize
-              url
-              partialDataUrl
-            }
-          }`,
-                },
-              });
-
-              if (
-                poll.body['data']['currentBulkOperation']['status'] ===
-                'COMPLETED'
-              ) {
-                clearInterval(pollit);
-
-                // fire inventory received event
-                const url = poll.body['data']['currentBulkOperation'].url;
-                this.httpService.get(url).subscribe(async (res) => {
-                  let productsArray;
-                  if (res.data?.length) {
-                    productsArray = readJsonLines(res.data);
-                  } else {
-                    productsArray = [res.data];
-                  }
-                  await this.inventryService.getRandomPurchaseCount(
-                    productsArray,
-                  );
-                  // console.log(
-                  //   '\x1b[44m%s\x1b[0m',
-                  //   'webhooks.controller.ts line:961 inventoryArray',
-                  //   JSON.stringify(productsArray, null, '\t'),
-                  // );
-                  /* 4. loop to the products 
-                    5. add collection to products 
-      */
-                  const collectionObjs = productsArray.map((product) => ({
-                    id: rcollection.admin_graphql_api_id,
-                    title: rcollection.title,
-                    // description: rcollection.body_html.replace(
-                    //   /<\/?[^>]+(>|$)/g,
-                    //   '',
-                    // ),
-                    type: collectionType,
-                    description: rcollection.body_html,
-                    productsCount: productsArray.length,
-                    sortOrder: rcollection.sort_order.toUpperCase(),
-                    featuredImage: rcollection?.image?.src,
-                    parentId: product.id,
-                    shop,
-                    recordType: 'Collection',
-                  }));
-
-                  // console.log(
-                  //   '\x1b[44m%s\x1b[0m',
-                  //   'webhooks.controller.ts line:982 collectionObjs',
-                  //   collectionObjs,
-                  // );
-
-                  await this.inventryService.insertMany(collectionObjs);
-                });
-              }
-            }, 3000);
-          } else console.log(JSON.stringify(qres.body['data']));
-        }
       }
+
+      // if (rcollection.published_at) {
+      //   const client = await this.shopifyService.client(shopName, accessToken);
+
+      //   let qres = await client.query({
+      //     data: {
+      //       query: `mutation {
+      //     bulkOperationRunQuery(
+      //       query:"""
+      //       {
+      //         collection(id: "${rcollection.admin_graphql_api_id}") {
+      //                 title
+      //                 id
+      //                 productsCount
+      //                 products(first:10000,sortKey:COLLECTION_DEFAULT){
+      //                   edges{
+      //                     node{
+      //                       title
+      //                       id
+      //                       status
+      //                       createdAt
+      //                     }
+      //                   }
+      //                 }
+      //               }
+      //           }
+      //       """
+      //     ) {
+      //       bulkOperation {
+      //         id
+      //         status
+      //       }
+      //       userErrors {
+      //         field
+      //         message
+      //       }
+      //     }
+      //   }`,
+      //     },
+      //   });
+
+      //   let timer;
+      //   if (!qres.body['data']['bulkOperationRunQuery']['bulkOperation']) {
+      //     timer = setInterval(async () => {
+      //       qres = await this.shopifyService.createBulkOperation(
+      //         client,
+      //         rcollection.admin_graphql_api_id,
+      //       );
+      //     }, 4000);
+      //   } else if (
+      //     qres.body['data']['bulkOperationRunQuery']['bulkOperation']
+      //   ) {
+      //     if (timer) {
+      //       clearInterval(timer);
+      //     }
+      //     if (
+      //       qres.body['data']['bulkOperationRunQuery']['bulkOperation'][
+      //         'status'
+      //       ] === 'CREATED'
+      //     ) {
+      //       const pollit = setInterval(async () => {
+      //         const poll = await client.query({
+      //           data: {
+      //             query: `query {
+      //       currentBulkOperation {
+      //         id
+      //         status
+      //         errorCode
+      //         createdAt
+      //         completedAt
+      //         objectCount
+      //         fileSize
+      //         url
+      //         partialDataUrl
+      //       }
+      //     }`,
+      //           },
+      //         });
+
+      //         if (
+      //           poll.body['data']['currentBulkOperation']['status'] ===
+      //           'COMPLETED'
+      //         ) {
+      //           clearInterval(pollit);
+
+      //           // fire inventory received event
+      //           const url = poll.body['data']['currentBulkOperation'].url;
+      //           this.httpService.get(url).subscribe(async (res) => {
+      //             let productsArray;
+      //             if (res.data?.length) {
+      //               productsArray = readJsonLines(res.data);
+      //             } else {
+      //               productsArray = [res.data];
+      //             }
+      //             await this.inventryService.getRandomPurchaseCount(
+      //               productsArray,
+      //             );
+      //             // console.log(
+      //             //   '\x1b[44m%s\x1b[0m',
+      //             //   'webhooks.controller.ts line:961 inventoryArray',
+      //             //   JSON.stringify(productsArray, null, '\t'),
+      //             // );
+      //             /* 4. loop to the products
+      //               5. add collection to products
+      // */
+      //             const collectionObjs = productsArray.map((product) => ({
+      //               id: rcollection.admin_graphql_api_id,
+      //               title: rcollection.title,
+      //               // description: rcollection.body_html.replace(
+      //               //   /<\/?[^>]+(>|$)/g,
+      //               //   '',
+      //               // ),
+      //               type: collectionType,
+      //               description: rcollection.body_html,
+      //               productsCount: productsArray.length,
+      //               sortOrder: rcollection.sort_order.toUpperCase(),
+      //               featuredImage: rcollection?.image?.src,
+      //               parentId: product.id,
+      //               shop,
+      //               recordType: 'Collection',
+      //             }));
+
+      //             // console.log(
+      //             //   '\x1b[44m%s\x1b[0m',
+      //             //   'webhooks.controller.ts line:982 collectionObjs',
+      //             //   collectionObjs,
+      //             // );
+
+      //             await this.inventryService.insertMany(collectionObjs);
+      //           });
+      //         }
+      //       }, 3000);
+      //     } else console.log(JSON.stringify(qres.body['data']));
+      //   }
+      // }
     } catch (err) {
       console.log(JSON.stringify(err));
       Logger.error(err, 'collection-updated');

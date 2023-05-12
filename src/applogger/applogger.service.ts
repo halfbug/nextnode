@@ -175,6 +175,27 @@ export class AppLoggerService {
     return res[0];
   }
 
+  async findLatestByCotext(context: string) {
+    const agg = [
+      {
+        $match: {
+          context,
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+      {
+        $limit: 1,
+      },
+    ];
+    const manager = getMongoManager();
+    const res = await manager.aggregate(AppLogger, agg).toArray();
+    return res[0];
+  }
+
   update(id: string, updateAppLoggerInput: UpdateAppLoggerInput) {
     return `This action updates a #${id} applogger`;
   }

@@ -12,6 +12,6 @@ import { AdminActivityLogsModule } from 'src/admin-activity-logs/admin-activity-
     forwardRef(() => AdminActivityLogsModule),
   ],
   providers: [AppLoggerResolver, AppLoggerService, Gslogger],
-  exports: [Gslogger],
+  exports: [Gslogger, AppLoggerService],
 })
 export class AppLoggerModule {}

@@ -19,6 +19,8 @@ import { InventoryDoneEvent } from './events/inventory-done.event';
 import { ProductOutofstockEvent } from './events/product-outofstock.event';
 import { UpdateSmartCollectionEvent } from './events/update-smart-collection.event';
 import { UpdateSmartCollectionListner } from './listeners/update-smart-collection.listner';
+import { SyncCollectionCron } from './inventory.cron';
+import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { UpdateSmartCollectionListner } from './listeners/update-smart-collectio
     DefaultColumnsService,
     HttpModule,
     forwardRef(() => StoresModule),
+    forwardRef(() => ShopifyStoreModule),
   ],
   providers: [
     InventoryResolver,
@@ -42,6 +45,7 @@ import { UpdateSmartCollectionListner } from './listeners/update-smart-collectio
     ProductOutofstockEvent,
     UpdateSmartCollectionEvent,
     UpdateSmartCollectionListner,
+    SyncCollectionCron,
   ],
   exports: [
     InventoryService,

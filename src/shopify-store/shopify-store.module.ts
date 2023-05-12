@@ -32,6 +32,8 @@ import { GsCommonModule } from 'src/gs-common/gs-common.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { ChannelModule } from 'src/channel/channel.module';
 import { DropsCategoryModule } from 'src/drops-category/drops-category.module';
+import { AppLoggerService } from 'src/applogger/applogger.service';
+import { AppLoggerModule } from 'src/applogger/applogger.module';
 @Global()
 @Module({
   imports: [
@@ -39,7 +41,7 @@ import { DropsCategoryModule } from 'src/drops-category/drops-category.module';
     HttpModule,
     TypeOrmModule.forFeature([Store]),
     forwardRef(() => StoresModule),
-    InventoryModule,
+    forwardRef(() => InventoryModule),
     EmailModule,
     CampaignsModule,
     forwardRef(() => GroupshopsModule),
@@ -49,6 +51,7 @@ import { DropsCategoryModule } from 'src/drops-category/drops-category.module';
     forwardRef(() => AuthModule),
     forwardRef(() => ChannelModule),
     forwardRef(() => DropsCategoryModule),
+    AppLoggerModule,
     UploadImageModule,
     BillingModule,
   ],

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, forwardRef, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { generatesecondaryCount } from 'src/utils/functions';
 import { getMongoManager, Repository } from 'typeorm';
@@ -7,12 +7,23 @@ import { ProductQueryInput } from './dto/product-query.input';
 import { UpdateInventoryInput } from './dto/update-inventory.input';
 import Inventory from './entities/inventory.modal';
 import { ProductVariant } from './entities/product.entity';
+import { StoresService } from 'src/stores/stores.service';
+import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
+import { HttpService } from '@nestjs/axios';
+import { log } from 'console';
+import readJsonLines from 'read-json-lines-sync';
+import { RecordType } from 'src/utils/constant';
+import { CollectionUpdateEnum } from 'src/stores/entities/store.model';
 @Injectable()
 export class InventoryService {
   private inventoryManager: any;
   constructor(
     @InjectRepository(Inventory)
     private inventoryRepository: Repository<Inventory>, // private inventoryManager: EntityManager,
+    @Inject(forwardRef(() => StoresService))
+    private storeService: StoresService,
+    private shopifyService: ShopifyService,
+    private httpService: HttpService,
   ) {
     this.inventoryManager = getMongoManager();
     // this.inventoryManager = getMongoManager();
@@ -144,6 +155,17 @@ export class InventoryService {
     return await this.inventoryManager.deleteMany(Inventory, {
       $and: [
         { id: id },
+        {
+          recordType: recordType,
+        },
+      ],
+    });
+  }
+
+  async removeMultiPleEntities(ids: string[], recordType) {
+    return await this.inventoryManager.deleteMany(Inventory, {
+      $and: [
+        { id: { $in: ids } },
         {
           recordType: recordType,
         },
@@ -359,7 +381,7 @@ export class InventoryService {
     return await manager.aggregate(Inventory, agg).toArray();
   }
 
-  async insertMany(inventory: []) {
+  async insertMany(inventory: any[]) {
     const manager = getMongoManager();
 
     return await manager.insertMany(Inventory, inventory);
@@ -775,4 +797,201 @@ export class InventoryService {
       console.log(err);
     }
   }
+
+  // CRON FUNCTIONS START
+  async runSyncCollectionCron(store: any) {
+    try {
+      const { shop, accessToken, collectionsToUpdate, id } = store;
+      const client = await this.shopifyService.client(shop, accessToken);
+
+      if (!collectionsToUpdate.length) {
+        log('No collections to update');
+      }
+
+      const queryString = collectionsToUpdate
+        .map((collection) => {
+          if (collection.isSynced === false) {
+            return `(title:${collection.collectionTitle})`;
+          }
+        })
+        .join(' OR ');
+
+      await client
+        .query({
+          data: {
+            query: `mutation {
+    bulkOperationRunQuery(
+      query:"""
+      {
+          collections(first: 1000, query: "${queryString}") {
+            edges {
+              node {
+                id
+                title
+                productsCount
+                descriptionHtml
+                ruleSet {
+                  rules {
+                    condition
+                    column
+                    relation
+                  }
+                }
+                sortOrder
+                image {
+                  src
+                }
+                products(first:10000,sortKey:COLLECTION_DEFAULT){
+                  edges{
+                    node{
+                      title
+                      id
+                      status
+                      createdAt
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      """
+    ) {
+      bulkOperation {
+        id
+        status
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }`,
+          },
+        })
+        .then((res) => {
+          const bulkOperationId =
+            res.body['data']['bulkOperationRunQuery']['bulkOperation']['id'];
+          Logger.log(
+            `collection to update bulk register with id - ${bulkOperationId}`,
+            'COLLECTIONTOUPDATBULK',
+            true,
+          );
+        });
+    } catch (err) {
+      log('Error while syncing collections');
+    }
+  }
+
+  async pollIt(client, id, shop) {
+    let poll;
+    const timer = setInterval(async () => {
+      poll = await client.query({
+        data: {
+          query: `query {
+              currentBulkOperation {
+                id
+                status
+                errorCode
+                createdAt
+                completedAt
+                objectCount
+                fileSize
+                url
+                partialDataUrl
+              }
+            }`,
+        },
+      });
+      if (poll.body['data']['currentBulkOperation']['status'] === 'COMPLETED') {
+        clearInterval(timer);
+        const url = poll.body['data']['currentBulkOperation'].url;
+        this.httpService.get(url).subscribe(async (res) => {
+          const checkCollection = res.data?.length
+            ? readJsonLines(res.data)
+            : [];
+          if (checkCollection.length && checkCollection[0].productsCount > 0) {
+            this.getProducts(checkCollection, id, shop);
+          } else {
+            log('No products found');
+          }
+        });
+      }
+    }, 5000);
+  }
+
+  async getProducts(products, id, shop) {
+    const collection = [];
+    const productsArray = [];
+
+    products.map((ele) => {
+      if ('productsCount' in ele) {
+        collection.push(ele);
+      }
+      if (ele.id.includes('Product')) {
+        productsArray.push(ele);
+      }
+    });
+
+    const collectionsWithProducts: any = collection.map((item) => {
+      return {
+        ...item,
+        products: products.filter((ele) => ele.__parentId === item.id),
+      };
+    });
+
+    const collectionIds = collection.map((item) => item.id);
+
+    try {
+      await this.removeMultiPleEntities(
+        collectionIds,
+        RecordType.Collection,
+      ).then(() => {
+        log(`${collectionIds.length} collection removed`);
+      });
+    } catch (err) {
+      console.error(
+        'Error - While removing collection or collection not found',
+        err,
+      );
+    }
+
+    for (const [index, col] of collectionsWithProducts.entries()) {
+      let collectionType;
+      if ('rules' in col && col.rules.length) {
+        collectionType = 'smart';
+      } else {
+        collectionType = 'custom';
+      }
+
+      const collectionObjs = col.products.map((product) => ({
+        id: col.id,
+        title: col.title,
+        type: collectionType,
+        description: col.descriptionHtml,
+        productsCount: col.productsCount,
+        sortOrder: col.sortOrder.toUpperCase(),
+        featuredImage: col?.image?.src,
+        parentId: product.id,
+        shop: shop,
+        recordType: 'Collection',
+      }));
+
+      await this.insertMany(collectionObjs)
+        .then(() => {
+          log(`${index + 1} of ${collection.length} Collections saved`);
+          this.storeService.removeSyncedCollection(col.id, id);
+          if (collectionsWithProducts?.length - 1 === index) {
+            this.storeService.updateStore(id, {
+              collectionUpdateStatus: CollectionUpdateEnum.COMPLETE,
+              id,
+            });
+          }
+        })
+        .catch((err) => {
+          log('Something error while storing collections', err);
+        });
+    }
+  }
+  // CRON FUNCTIONS ENDS
 }

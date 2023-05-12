@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { getMongoManager, Like, Repository } from 'typeorm';
 import { CreateStoreInput } from './dto/create-store.input';
 import { UpdateStoreInput } from './dto/update-store.input';
-import Store from './entities/store.model';
+import Store, { CollectionsToUpdate } from './entities/store.model';
 import { v4 as uuid } from 'uuid';
 import { CodeUpdateStatusTypeEnum, Resource } from './entities/store.entity';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
@@ -20,6 +20,7 @@ export class StoresService {
     @InjectRepository(Store) private storeRepository: Repository<Store>,
     private shopifyapi: ShopifyService,
     @Inject(forwardRef(() => DropsGroupshopService))
+    @Inject(forwardRef(() => InventoryService))
     private dropsService: DropsGroupshopService,
     private dropsCollectionUpdatedEvent: DropsCollectionUpdatedEvent,
     private inventoryService: InventoryService,
@@ -244,6 +245,68 @@ export class StoresService {
   async updateStore(id: string, updateStoreInput: UpdateStoreInput) {
     await this.storeRepository.update({ id }, updateStoreInput);
     return await this.findOneById(id);
+  }
+
+  async updateCollectionToSync(
+    id: string,
+    updateStoreInput: CollectionsToUpdate,
+  ) {
+    const manager = getMongoManager();
+    manager.updateOne(
+      Store,
+      { id },
+      { $push: { collectionsToUpdate: updateStoreInput } },
+    );
+  }
+
+  async updateCollectionDate(collectionId: string, date: Date) {
+    const manager = getMongoManager();
+    const repository = manager.getMongoRepository(Store);
+    await repository.updateOne(
+      { 'collectionsToUpdate.collectionId': collectionId },
+      { $set: { 'collectionsToUpdate.$.updatedAt': date } },
+    );
+  }
+
+  async removeSyncedCollection(collectionId: string, storeId: string) {
+    const manager = getMongoManager();
+    const repository = manager.getMongoRepository(Store);
+    await repository.updateOne(
+      { id: storeId },
+      { $pull: { collectionsToUpdate: { collectionId: collectionId } } },
+    );
+  }
+
+  async checkUpdatedCollection(id: string, flag: boolean) {
+    const agg = [
+      {
+        $addFields: {
+          collections: {
+            $filter: {
+              input: '$collectionsToUpdate',
+              as: 'cat',
+              cond: {
+                $and: [
+                  {
+                    $eq: ['$$cat.isSynced', flag],
+                  },
+                  {
+                    $eq: ['$$cat.collectionId', id],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          collections: 1,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    return await manager.aggregate(Store, agg).toArray();
   }
 
   async updateField(criteria: any, updateLiteral: any) {

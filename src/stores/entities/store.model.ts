@@ -42,6 +42,12 @@ export class MatchingBrandName {
   @Column({ nullable: true })
   brandName: string;
 }
+
+export enum CollectionUpdateEnum {
+  PROGRESS = 'PROGRESS',
+  COMPLETE = 'COMPLETE',
+}
+
 export class DiscoveryTools {
   @Column({ nullable: true })
   status?: string;
@@ -149,6 +155,20 @@ export class Drops {
   cartRewards?: CartRewards[];
 }
 
+export class CollectionsToUpdate {
+  @Column({ nullable: true })
+  collectionId?: string;
+
+  @Column({ nullable: true })
+  collectionTitle?: string;
+
+  @Column({ default: false })
+  isSynced: boolean;
+
+  @Column({ default: new Date() })
+  updatedAt: Date;
+}
+
 @Entity()
 export default class Store extends DefaultColumnsService {
   @Column()
@@ -228,4 +248,10 @@ export default class Store extends DefaultColumnsService {
 
   @Column({ nullable: true })
   drops: Drops;
+
+  @Column({ default: [] })
+  collectionsToUpdate?: CollectionsToUpdate[];
+
+  @Column({ nullable: true })
+  collectionUpdateStatus?: string;
 }

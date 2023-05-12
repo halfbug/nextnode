@@ -12,6 +12,7 @@ import {
   Resource,
 } from '../entities/store.entity';
 import { CodeUpdateStatusTypeEnum } from '../entities/store.entity';
+import { CollectionUpdateEnum } from '../entities/store.model';
 // import { Settings } from '../entities/settings.entity';
 
 @InputType()
@@ -228,6 +229,26 @@ export class DropsInput {
   @Field(() => [CartRewardsInput], { nullable: 'itemsAndList' })
   cartRewards?: CartRewardsInput[];
 }
+@InputType('CollectionsToUpdate')
+export class CollectionsToUpdate {
+  @Field({ nullable: true })
+  collectionId?: string;
+
+  @Field({ nullable: true })
+  collectionTitle?: string;
+
+  @Field({ defaultValue: false })
+  isSynced?: boolean;
+
+  @Field({ defaultValue: new Date() })
+  updatedAt?: Date;
+}
+
+@InputType('CollectionUpdateStatus')
+export class CollectionUpdateStatus {
+  cronStatus: CollectionUpdateEnum;
+}
+
 @InputType()
 export class CreateStoreInput {
   @Field()
@@ -318,4 +339,10 @@ export class CreateStoreInput {
 
   @Field({ nullable: true })
   activity?: string;
+
+  @Field(() => [CollectionsToUpdate], { nullable: true })
+  collectionsToUpdate?: CollectionsToUpdate[];
+
+  @Field({ nullable: true })
+  collectionUpdateStatus?: string;
 }
