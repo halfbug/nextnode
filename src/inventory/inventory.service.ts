@@ -13,7 +13,7 @@ import { HttpService } from '@nestjs/axios';
 import { log } from 'console';
 import readJsonLines from 'read-json-lines-sync';
 import { RecordType } from 'src/utils/constant';
-import { CollectionUpdateEnum } from 'src/stores/entities/store.model';
+import { CollectionUpdateEnum } from 'src/stores/entities/store.entity';
 @Injectable()
 export class InventoryService {
   private inventoryManager: any;

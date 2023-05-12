@@ -3,7 +3,7 @@ import { log } from 'console';
 import { StoresService } from 'src/stores/stores.service';
 import { InventoryService } from './inventory.service';
 import { Injectable, Logger } from '@nestjs/common';
-import { CollectionUpdateEnum } from 'src/stores/entities/store.model';
+import { CollectionUpdateEnum } from 'src/stores/entities/store.entity';
 
 @Injectable()
 export class SyncCollectionCron {

@@ -9,6 +9,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Public } from 'src/auth/public.decorator';
 import { StoresService } from 'src/stores/stores.service';
+import { CollectionUpdateEnum } from 'src/stores/entities/store.entity';
 @UseGuards(AuthGuard)
 @Resolver(() => Inventory)
 export class InventoryResolver {
@@ -76,13 +77,13 @@ export class InventoryResolver {
 
   @Query(() => [Inventory], { name: 'syncCollection' })
   async syncCollection(@Args('storeId') storeId: string) {
-    const store = this.storeService.findById(storeId);
+    const store = await this.storeService.findById(storeId);
     const res = await this.inventoryService.runSyncCollectionCron(store);
     // console.log(
     //   '🚀 ~ file: inventory.resolver.ts ~ line 57 ~ InventoryResolver ~ res',
     //   res,
     // );
-    return res;
+    return [{ status: CollectionUpdateEnum.PROGRESS }];
   }
 
   // @Mutation(() => Inventory)

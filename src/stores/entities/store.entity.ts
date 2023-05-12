@@ -49,6 +49,14 @@ registerEnumType(BillingTierEnum, {
   name: 'BillingTierEnum',
 });
 
+export enum CollectionUpdateEnum {
+  PROGRESS = 'PROGRESS',
+  COMPLETE = 'COMPLETE',
+}
+registerEnumType(CollectionUpdateEnum, {
+  name: 'CollectionUpdateEnum',
+});
+
 @ObjectType()
 export class getUpdateDiscountStatus {
   @Field({ nullable: true })
@@ -59,6 +67,11 @@ export class getUpdateDiscountStatus {
 
   @Field({ nullable: true, defaultValue: 0 })
   dropsCount?: number;
+}
+@ObjectType()
+export class getUpdateCollectionStatus {
+  @Field(() => CollectionUpdateEnum)
+  collectionUpdateStatus?: CollectionUpdateEnum;
 }
 
 @InputType('ResourceInput')
@@ -101,6 +114,20 @@ export class DiscoveryTools {
 
   @Field(() => [MatchingBrandName], { nullable: 'itemsAndList' })
   matchingBrandName?: MatchingBrandName[];
+}
+@ObjectType('CollectionsToUpdate')
+export class CollectionsToUpdate {
+  @Field({ nullable: true })
+  collectionId?: string;
+
+  @Field({ nullable: true })
+  collectionTitle?: string;
+
+  @Field({ defaultValue: false })
+  isSynced: boolean;
+
+  @Field({ defaultValue: new Date() })
+  updatedAt: Date;
 }
 
 @ObjectType('Klaviyo')
@@ -305,4 +332,10 @@ export class Store {
 
   @Field(() => Drops, { nullable: true })
   drops?: Drops;
+
+  @Field(() => [CollectionsToUpdate], { nullable: 'itemsAndList' })
+  collectionsToUpdate?: CollectionsToUpdate[];
+
+  @Field({ nullable: true })
+  collectionUpdateStatus?: string;
 }

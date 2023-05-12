@@ -1,6 +1,10 @@
 import { Resolver, Query, Mutation, Args, Int, Info } from '@nestjs/graphql';
 import { StoresService } from './stores.service';
-import { getUpdateDiscountStatus, Store } from './entities/store.entity';
+import {
+  getUpdateCollectionStatus,
+  getUpdateDiscountStatus,
+  Store,
+} from './entities/store.entity';
 import { CreateStoreInput } from './dto/create-store.input';
 import { UpdateStoreInput } from './dto/update-store.input';
 import { UseGuards } from '@nestjs/common';
@@ -123,5 +127,13 @@ export class StoresResolver {
     storeId: string,
   ) {
     return await this.storesService.getUpdateDiscountStatus(storeId);
+  }
+
+  @Query(() => getUpdateCollectionStatus, { name: 'getUpdateCollectionStatus' })
+  async getUpdateCollectionStatus(
+    @Args('storeId')
+    storeId: string,
+  ) {
+    return await this.storesService.getUpdateCollectionStatus(storeId);
   }
 }

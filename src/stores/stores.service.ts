@@ -5,7 +5,11 @@ import { CreateStoreInput } from './dto/create-store.input';
 import { UpdateStoreInput } from './dto/update-store.input';
 import Store, { CollectionsToUpdate } from './entities/store.model';
 import { v4 as uuid } from 'uuid';
-import { CodeUpdateStatusTypeEnum, Resource } from './entities/store.entity';
+import {
+  CodeUpdateStatusTypeEnum,
+  CollectionUpdateEnum,
+  Resource,
+} from './entities/store.entity';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { Product } from 'src/inventory/entities/product.entity';
@@ -1001,5 +1005,14 @@ export class StoresService {
       drops: { codeUpdateStatus, lastSync, dropsCount },
     } = await this.findById(storeId);
     return { codeUpdateStatus, lastSync, dropsCount };
+  }
+
+  async getUpdateCollectionStatus(storeId: string) {
+    const { collectionUpdateStatus } = await this.findById(storeId);
+    if (collectionUpdateStatus) {
+      return { collectionUpdateStatus };
+    } else {
+      return { collectionUpdateStatus: CollectionUpdateEnum.COMPLETE };
+    }
   }
 }

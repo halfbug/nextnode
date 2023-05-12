@@ -9,10 +9,10 @@ import {
 import {
   BillingPlanEnum,
   BillingTierEnum,
+  CollectionUpdateEnum,
   Resource,
 } from '../entities/store.entity';
 import { CodeUpdateStatusTypeEnum } from '../entities/store.entity';
-import { CollectionUpdateEnum } from '../entities/store.model';
 // import { Settings } from '../entities/settings.entity';
 
 @InputType()
@@ -229,8 +229,8 @@ export class DropsInput {
   @Field(() => [CartRewardsInput], { nullable: 'itemsAndList' })
   cartRewards?: CartRewardsInput[];
 }
-@InputType('CollectionsToUpdate')
-export class CollectionsToUpdate {
+@InputType('CollectionsToUpdateInput')
+export class CollectionsToUpdateInput {
   @Field({ nullable: true })
   collectionId?: string;
 
@@ -340,9 +340,9 @@ export class CreateStoreInput {
   @Field({ nullable: true })
   activity?: string;
 
-  @Field(() => [CollectionsToUpdate], { nullable: true })
-  collectionsToUpdate?: CollectionsToUpdate[];
+  @Field(() => [CollectionsToUpdateInput], { nullable: true })
+  collectionsToUpdate?: CollectionsToUpdateInput[];
 
-  @Field({ nullable: true })
-  collectionUpdateStatus?: string;
+  @Field(() => CollectionUpdateEnum)
+  collectionUpdateStatus?: CollectionUpdateEnum;
 }

@@ -7,6 +7,7 @@ import {
   BillingPlanEnum,
   BillingTierEnum,
   CodeUpdateStatusTypeEnum,
+  CollectionUpdateEnum,
 } from './store.entity';
 import {
   DiscountCode,
@@ -41,11 +42,6 @@ export class MatchingBrandName {
 
   @Column({ nullable: true })
   brandName: string;
-}
-
-export enum CollectionUpdateEnum {
-  PROGRESS = 'PROGRESS',
-  COMPLETE = 'COMPLETE',
 }
 
 export class DiscoveryTools {
@@ -252,6 +248,6 @@ export default class Store extends DefaultColumnsService {
   @Column({ default: [] })
   collectionsToUpdate?: CollectionsToUpdate[];
 
-  @Column({ nullable: true })
-  collectionUpdateStatus?: string;
+  @Column('enum', { default: CollectionUpdateEnum.COMPLETE })
+  collectionUpdateStatus?: CollectionUpdateEnum;
 }
