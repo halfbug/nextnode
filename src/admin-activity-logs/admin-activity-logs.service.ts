@@ -140,7 +140,7 @@ export class AdminActivityLogsService {
   }
 
   innerDropsArrays(newObject: any, oldValue: any, activityLog: any, title) {
-    Object.keys(newObject)?.map((ikey) => {
+    Object.keys(newObject ?? {})?.map((ikey) => {
       if (newObject[ikey] !== null) {
         if (typeof newObject[ikey] !== 'object') {
           if (oldValue[ikey] !== undefined || oldValue[ikey] !== null) {

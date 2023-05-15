@@ -179,21 +179,42 @@ export class OrderCreatedListener {
         : null;
       const dgroupshop = await this.dropsService.findOne(refferalId);
 
-      if (dgroupshop && cartRewards.length) {
-        const subTotal = +whOrder.current_subtotal_price;
+      // track product collection
+      if (dgroupshop) {
+        // get collections of lineitems
+        const pids: string[] = whOrder?.line_items?.map(
+          (l) => `gid://shopify/Product/${l.product_id}`,
+        );
+        let note = '';
 
-        const tags: string[] = cartRewards
-          .filter((cr) => subTotal >= +cr?.rewardValue)
-          .map((cr) => cr.rewardTitle);
-
-        if (tags.length) {
-          await this.shopifyapi.addTagsToOrder(
-            shop,
-            accessToken,
-            tags,
-            whOrder.admin_graphql_api_id,
+        for (const pid of pids) {
+          const collections =
+            await this.inventryService.getCollectionNameByProductId(shop, pid);
+          note = note.concat(
+            '',
+            `product : ${pid.replace(
+              'gid://shopify/Product/',
+              '',
+            )} collections : ${collections.map((c) => c.title).toString()};`,
           );
         }
+
+        const subTotal = +whOrder.current_subtotal_price;
+
+        let tags: string[];
+        if (cartRewards.length) {
+          tags = cartRewards
+            .filter((cr) => subTotal >= +cr?.rewardValue)
+            .map((cr) => cr.rewardTitle);
+        }
+
+        await this.shopifyapi.addTagsToOrder(
+          shop,
+          accessToken,
+          tags?.length ? tags : [],
+          note,
+          whOrder.admin_graphql_api_id,
+        );
       }
     } catch (err) {
       Logger.error(err, OrderCreatedListener.name);

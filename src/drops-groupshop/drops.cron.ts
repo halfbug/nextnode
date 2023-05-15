@@ -37,7 +37,7 @@ export class DropKlaviyoCron {
           groupshop.storeId,
         );
         const latestShortUrl =
-          currentProfile.data.attributes.properties?.groupshop_url;
+          currentProfile?.data.attributes.properties?.groupshop_url;
         if (shortURL === latestShortUrl) {
           const params = new URLSearchParams({
             groupshop_status: 'expired',

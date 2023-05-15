@@ -642,11 +642,31 @@ export class ShopifyService {
     shop: string,
     accessToken: string,
     tags: string[],
+    note: string,
     id: string,
   ) {
     // console.log({ tags });
     try {
       const client = await this.client(shop, accessToken);
+
+      let variables: any = { id };
+
+      if (tags.length) {
+        variables = {
+          input: {
+            tags,
+            note,
+            id,
+          },
+        };
+      } else {
+        variables = {
+          input: {
+            note,
+            id,
+          },
+        };
+      }
 
       const res = await client.query({
         data: {
@@ -663,12 +683,7 @@ export class ShopifyService {
             }
           }
           `,
-          variables: {
-            input: {
-              tags,
-              id,
-            },
-          },
+          variables,
         },
       });
       // console.log('res', JSON.stringify(res));
