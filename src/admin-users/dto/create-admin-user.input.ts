@@ -28,6 +28,9 @@ export class CreateAdminUserInput {
   userRole: string;
 
   @Field({ nullable: true })
+  userId?: string;
+
+  @Field({ nullable: true })
   lastLogin: Date;
 
   @Field({ defaultValue: new Date() })

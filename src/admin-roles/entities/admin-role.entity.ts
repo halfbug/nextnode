@@ -21,10 +21,10 @@ export class generalPermission {
 @ObjectType()
 export class AdminRole {
   @Field(() => ID)
-  id: string;
+  id?: string;
 
   @Field({ nullable: true })
-  roleName: string;
+  roleName?: string;
 
   @Field(() => [Permission], { nullable: 'itemsAndList' })
   permission?: Permission[];
@@ -33,7 +33,7 @@ export class AdminRole {
   generalPermission?: generalPermission[];
 
   @Field({ defaultValue: new Date() })
-  createdAt: Date;
+  createdAt?: Date;
 
   @Field({ defaultValue: new Date() })
   updatedAt?: Date;

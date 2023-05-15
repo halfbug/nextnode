@@ -43,7 +43,10 @@ export class AdminUsersResolver {
   }
 
   @Mutation(() => AdminUser)
-  removeAdminUser(@Args('id', { type: () => String }) id: string) {
-    return this.adminUsersService.remove(id);
+  removeAdminUser(
+    @Args('userId', { type: () => String }) userId: string,
+    @Args('id', { type: () => String }) id: string,
+  ) {
+    return this.adminUsersService.remove(userId, id);
   }
 }

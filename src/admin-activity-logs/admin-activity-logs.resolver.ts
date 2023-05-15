@@ -51,6 +51,12 @@ export class AdminActivityLogsResolver {
     return result;
   }
 
+  @Query(() => [AdminActivityLog], { name: 'adminActivity' })
+  async adminActivity(@Args('route', { type: () => String }) route: string) {
+    const result = await this.adminActivityLogsService.adminActivity(route);
+    return result;
+  }
+
   @Mutation(() => AdminActivityLog)
   removeAdminActivityLog(@Args('id', { type: () => String }) id: string) {
     return this.adminActivityLogsService.remove(id);

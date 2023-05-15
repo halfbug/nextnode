@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateAdminUserInput } from './dto/create-admin-user.input';
 import { UpdateAdminUserInput } from './dto/update-admin-user.input';
@@ -28,10 +28,24 @@ export class AdminUsersService {
         valid,
       );
       const id = uuid();
+      const usersInput = [];
+      usersInput.push({ ...createAdminUserInput });
+
       const adminUser = this.adminUserRepository.create({
         id,
         ...createAdminUserInput,
       });
+      delete usersInput[0]['password'];
+      Logger.log(
+        '/users',
+        'User Management',
+        false,
+        'CREATE',
+        usersInput,
+        createAdminUserInput.userId,
+        null,
+        null,
+      );
       return this.adminUserRepository.save(adminUser);
     } catch (errors) {
       console.log(
@@ -122,17 +136,50 @@ export class AdminUsersService {
   }
 
   async update(id: string, updateAdminUserInput: UpdateAdminUserInput) {
-    await this.adminUserRepository.update({ id }, updateAdminUserInput);
     const adminUser = await this.adminUserRepository.findOne({
       where: {
         id,
       },
     });
-    return adminUser;
+    console.log(
+      '🚀 ~ file: admin-users.service.ts:100 ~ AdminUsersService ~ update ~ adminUser',
+      adminUser,
+    );
+    Logger.log(
+      '/users',
+      'User Management',
+      false,
+      'UPDATE',
+      updateAdminUserInput,
+      updateAdminUserInput.userId,
+      adminUser,
+      null,
+    );
+    await this.adminUserRepository.update({ id }, updateAdminUserInput);
+    return await this.adminUserRepository.findOne({
+      where: {
+        id,
+      },
+    });
   }
 
-  async remove(id: string) {
+  async remove(userId: string, id: string) {
+    const oldValue = await this.adminUserRepository.findOne({ id });
+    delete oldValue['password'];
+    const usersInput = [];
+    usersInput.push(oldValue);
+
     await this.adminUserRepository.delete({ id });
+    Logger.log(
+      '/users',
+      'User Management',
+      false,
+      'REMOVE',
+      'newValue',
+      userId,
+      usersInput,
+      null,
+    );
     return { status: 'User deleted successfully' };
   }
 }

@@ -1,4 +1,5 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { AdminRole } from 'src/admin-roles/entities/admin-role.entity';
 import { AdminUser } from 'src/admin-users/entities/admin-user.entity';
 
 @ObjectType('collections')
@@ -25,6 +26,18 @@ export class discoveryTool {
 export class fieldDetail {
   @Field({ nullable: true })
   parentTitle?: string;
+
+  @Field({ nullable: true })
+  firstName?: string;
+
+  @Field({ nullable: true })
+  lastName?: string;
+
+  @Field({ nullable: true })
+  email?: string;
+
+  @Field({ nullable: true })
+  userRole?: string;
 
   @Field({ nullable: true })
   fieldname?: string;
@@ -74,6 +87,7 @@ export class fieldDetail {
   @Field({ nullable: true })
   rewardValue?: string;
 }
+
 @ObjectType()
 export class AdminActivityLog {
   @Field()
@@ -96,6 +110,9 @@ export class AdminActivityLog {
 
   @Field(() => AdminUser)
   user?: AdminUser;
+
+  @Field(() => AdminRole, { nullable: true })
+  adminRole?: AdminRole;
 
   @Field(() => [fieldDetail])
   changes?: fieldDetail[];

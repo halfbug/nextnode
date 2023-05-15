@@ -29,6 +29,9 @@ export default class AdminUser extends DefaultColumnsService {
   userRole: string;
 
   @Column({ nullable: true })
+  userId: string;
+
+  @Column({ nullable: true })
   favouriteStore?: string[];
 
   @BeforeInsert() async hashPassword() {

@@ -15,6 +15,11 @@ export class fieldDetails {
   newValue?: string;
 }
 
+export class AdminRole {
+  @Column({ nullable: true })
+  roleName?: string;
+}
+
 @Entity()
 export default class AdminActivityLogs extends DefaultColumnsService {
   @Column()
@@ -37,4 +42,7 @@ export default class AdminActivityLogs extends DefaultColumnsService {
 
   @Column(() => fieldDetails)
   changes?: fieldDetails[];
+
+  @Column(() => AdminRole)
+  adminRole?: AdminRole;
 }

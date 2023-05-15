@@ -72,6 +72,46 @@ export class AdminActivityLogsService {
     const gs = await manager.aggregate(AdminActivityLogs, agg).toArray();
     return gs;
   }
+
+  async adminActivity(route: string) {
+    const agg = [
+      {
+        $match: {
+          route: route,
+        },
+      },
+      {
+        $lookup: {
+          from: 'admin_user',
+          localField: 'userId',
+          foreignField: 'id',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: {
+          path: '$user',
+        },
+      },
+      {
+        $lookup: {
+          from: 'admin_user_role',
+          localField: 'user.userRole',
+          foreignField: 'id',
+          as: 'adminRole',
+        },
+      },
+      {
+        $unwind: {
+          path: '$adminRole',
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(AdminActivityLogs, agg).toArray();
+    return gs;
+  }
+
   async compareDropsArrays(oldValue: any, newValue: any) {
     const activityLog = [];
     Object.keys(newValue)?.map((key) => {
@@ -89,7 +129,7 @@ export class AdminActivityLogsService {
         if (typeof newValue[key] === 'object') {
           this.innerDropsArrays(
             newValue[key],
-            oldValue[key],
+            oldValue[key] === undefined ? [] : oldValue[key],
             activityLog,
             oldValue[0]?.title,
           );
@@ -102,21 +142,36 @@ export class AdminActivityLogsService {
   innerDropsArrays(newObject: any, oldValue: any, activityLog: any, title) {
     Object.keys(newObject)?.map((ikey) => {
       if (newObject[ikey] !== null) {
-        if (
-          newObject[ikey] !== oldValue[ikey] &&
-          typeof newObject[ikey] !== 'object'
-        ) {
-          activityLog.push({
-            parentTitle: title,
-            fieldname: ikey,
-            oldvalue: oldValue[ikey],
-            newValue: newObject[ikey],
-          });
+        if (typeof newObject[ikey] !== 'object') {
+          if (oldValue[ikey] !== undefined || oldValue[ikey] !== null) {
+            if (
+              newObject[ikey] !== oldValue[ikey] &&
+              ikey !== 'codeUpdateStatus' &&
+              ikey !== 'dropsCount'
+            ) {
+              activityLog.push({
+                parentTitle: title,
+                fieldname: ikey,
+                oldvalue: oldValue[ikey],
+                newValue: newObject[ikey],
+              });
+            }
+          } else {
+            if (ikey !== 'codeUpdateStatus' && ikey !== 'dropsCount') {
+              activityLog.push({
+                parentTitle: title,
+                fieldname: ikey,
+                oldvalue: null,
+                newValue: newObject[ikey],
+              });
+            }
+          }
         }
         if (typeof newObject[ikey] === 'object') {
+          const hasKey = ikey in oldValue;
           this.innerDropsArrays(
             newObject[ikey],
-            oldValue[ikey],
+            hasKey ? oldValue[ikey] : [],
             activityLog,
             title,
           );
@@ -128,6 +183,7 @@ export class AdminActivityLogsService {
 
   async compareVideoArrays(oldValue: any, newValues: any) {
     const activityLog = [];
+    console.log('activityLog');
     oldValue.forEach((field, key) => {
       const result = newValues.find((item) => item.id == field._id);
       if (typeof result !== 'undefined') {
@@ -180,6 +236,30 @@ export class AdminActivityLogsService {
           id: field.id,
           brandName: field.brandName,
         });
+      }
+    });
+    return activityLog;
+  }
+
+  async compareUserArrays(oldValue: any, newValue: any) {
+    const activityLog = [];
+    Object.keys(newValue)?.map((key) => {
+      if (
+        key !== 'userId' &&
+        key !== 'activity' &&
+        key !== 'createdAt' &&
+        key !== 'updatedAt'
+      ) {
+        if (
+          newValue[key] !== oldValue[key] &&
+          typeof newValue[key] !== 'object'
+        ) {
+          activityLog.push({
+            fieldname: key,
+            oldvalue: oldValue[key],
+            newValue: newValue[key],
+          });
+        }
       }
     });
     return activityLog;
@@ -264,6 +344,8 @@ export class AdminActivityLogsService {
         compareResult = await this.compareSortingArrays(oldValue, mfields);
       } else if (context === 'Video Management') {
         compareResult = await this.compareVideoArrays(oldValue, mfields);
+      } else if (context === 'User Management') {
+        compareResult = await this.compareUserArrays(oldValue, mfields);
       } else {
         compareResult = await this.compareDropsArrays(oldValue, mfields);
       }
@@ -293,7 +375,7 @@ export class AdminActivityLogsService {
       operation: operation,
       changes: compareResult,
     };
-    console.log('compareResult', compareResult);
+    console.log('compareResult', typeof compareResult, compareResult);
     if (compareResult?.length > 0 || typeof compareResult === 'object') {
       this.create(result);
     }
