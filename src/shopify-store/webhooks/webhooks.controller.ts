@@ -473,7 +473,7 @@ export class WebhooksController {
       nprod.createdAt = new Date();
       nprod.outofstock = false;
       nprod.purchaseCount = 0;
-      // nprod.secondaryCount = generatesecondaryCount();
+      nprod.secondaryCount = generatesecondaryCount();
       // nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
       nprod.description = rproduct.body_html;
       // if product is not active then it will be not purchaseable.
