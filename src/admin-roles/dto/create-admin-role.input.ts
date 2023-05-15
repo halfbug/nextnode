@@ -19,6 +19,9 @@ export class CreateAdminRoleInput {
   @Field(() => [PermissionInput], { nullable: 'itemsAndList' })
   permission?: PermissionInput[];
 
+  @Field({ nullable: true })
+  userId?: string;
+
   @Field({ defaultValue: new Date() })
   createdAt: Date;
 

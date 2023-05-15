@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 import { validateOrReject } from 'class-validator';
 import { Repository, getMongoManager } from 'typeorm';
@@ -33,7 +33,26 @@ export class AdminRolesService {
       adminRole.permission = [new PermissionInput()];
       adminRole.id = uuid();
       adminRole.permission = createAdminRoleInput.permission;
-      return this.adminUserRoleRepository.save(adminRole);
+      const save = this.adminUserRoleRepository.save(adminRole);
+
+      const usersInput = [];
+      usersInput.push({
+        roleName: adminRole.roleName,
+        permission: adminRole.permission,
+      });
+
+      Logger.log(
+        '/roles',
+        'Role Management',
+        false,
+        'CREATE',
+        usersInput,
+        createAdminRoleInput.userId,
+        null,
+        null,
+      );
+
+      return save;
     } catch (errors) {
       console.log(
         'Caught promise rejection (validation failed). Errors: ',
@@ -80,6 +99,23 @@ export class AdminRolesService {
   }
 
   async update(id: string, updateAdminRoleInput: UpdateAdminRoleInput) {
+    const roles = await this.adminUserRoleRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    Logger.log(
+      '/roles',
+      'Role Management',
+      false,
+      'UPDATE',
+      updateAdminRoleInput,
+      updateAdminRoleInput.userId,
+      roles,
+      null,
+    );
+
     await this.adminUserRoleRepository.update({ id }, updateAdminRoleInput);
     const adminUser = await this.adminUserRoleRepository.findOne({
       where: {
@@ -89,7 +125,23 @@ export class AdminRolesService {
     return adminUser;
   }
 
-  async remove(id: string) {
+  async remove(userId: string, id: string) {
+    const oldValue = await this.adminUserRoleRepository.findOne({ id });
+    delete oldValue['id'];
+    delete oldValue['_id'];
+    const usersInput = [];
+    usersInput.push(oldValue);
+
+    Logger.log(
+      '/roles',
+      'Role Management',
+      false,
+      'REMOVE',
+      'newValue',
+      userId,
+      usersInput,
+      null,
+    );
     await this.adminUserRoleRepository.delete({ id });
     return { roleName: 'Admin role deleted successfully' };
   }

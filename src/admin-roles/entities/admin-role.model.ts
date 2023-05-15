@@ -25,6 +25,9 @@ export default class AdminUserRole extends DefaultColumnsService {
   @Column(() => Permission)
   permission?: Permission[];
 
+  @Column({ nullable: true })
+  userId: string;
+
   @Column(() => generalPermission)
   generalPermission?: generalPermission[];
 }

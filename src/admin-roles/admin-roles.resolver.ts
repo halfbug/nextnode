@@ -45,7 +45,10 @@ export class AdminRolesResolver {
   }
 
   @Mutation(() => AdminRole)
-  removeAdminRole(@Args('id', { type: () => String }) id: string) {
-    return this.adminRolesService.remove(id);
+  removeAdminRole(
+    @Args('userId', { type: () => String }) userId: string,
+    @Args('id', { type: () => String }) id: string,
+  ) {
+    return this.adminRolesService.remove(userId, id);
   }
 }

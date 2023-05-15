@@ -109,6 +109,7 @@ export class AdminActivityLogsService {
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(AdminActivityLogs, agg).toArray();
+    console.log('gs', JSON.stringify(gs));
     return gs;
   }
 
@@ -265,6 +266,56 @@ export class AdminActivityLogsService {
     return activityLog;
   }
 
+  async compareRoleArrays(oldValue: any, newValue: any) {
+    const activityLog = [];
+    if (typeof newValue !== 'object') {
+      Object.keys(newValue)?.map((key) => {
+        if (
+          key !== 'userId' &&
+          key !== 'activity' &&
+          key !== 'createdAt' &&
+          key !== 'updatedAt'
+        ) {
+          if (
+            newValue[key] !== oldValue[key] &&
+            typeof newValue[key] !== 'object'
+          ) {
+            activityLog.push({
+              fieldname: key,
+              oldvalue: oldValue[key],
+              newValue: newValue[key],
+            });
+          }
+        }
+      });
+    }
+    if (typeof newValue === 'object') {
+      const differenceOld = oldValue.permission.filter(
+        (e) => !newValue.permission.find((a) => e.name === a.name),
+      );
+      differenceOld.forEach((key: any) => {
+        activityLog.push({
+          parentTitle: newValue.roleName,
+          fieldname: 'Permission (Remove)',
+          oldvalue: key.name,
+          newValue: null,
+        });
+      });
+      const differenceNew = newValue.permission.filter(
+        (e) => !oldValue.permission.find((a) => e.name === a.name),
+      );
+      differenceNew.forEach((key: any) => {
+        activityLog.push({
+          parentTitle: newValue.roleName,
+          fieldname: 'Permission (Added)',
+          oldvalue: null,
+          newValue: key.name,
+        });
+      });
+    }
+    return activityLog;
+  }
+
   async removeCompareArrays(oldValue: any, newValue: any, context: string) {
     let activityLog = [];
     if (
@@ -346,6 +397,8 @@ export class AdminActivityLogsService {
         compareResult = await this.compareVideoArrays(oldValue, mfields);
       } else if (context === 'User Management') {
         compareResult = await this.compareUserArrays(oldValue, mfields);
+      } else if (context === 'Role Management') {
+        compareResult = await this.compareRoleArrays(oldValue, mfields);
       } else {
         compareResult = await this.compareDropsArrays(oldValue, mfields);
       }
