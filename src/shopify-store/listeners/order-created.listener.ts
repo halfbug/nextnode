@@ -171,10 +171,8 @@ export class OrderCreatedListener {
     try {
       const { shop, webhook } = event;
       const whOrder = webhook;
-      const {
-        accessToken,
-        drops: { cartRewards },
-      } = await this.storesService.findOne(shop);
+      const { accessToken, drops: { cartRewards } = { cartRewards: [] } } =
+        await this.storesService.findOne(shop);
 
       const refferalId = whOrder.note_attributes.length
         ? whOrder.note_attributes[0]?.value
