@@ -67,6 +67,11 @@ export class AdminActivityLogsService {
           path: '$user',
         },
       },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
     ];
     const manager = getMongoManager();
     const gs = await manager.aggregate(AdminActivityLogs, agg).toArray();
@@ -94,16 +99,8 @@ export class AdminActivityLogsService {
         },
       },
       {
-        $lookup: {
-          from: 'admin_user_role',
-          localField: 'user.userRole',
-          foreignField: 'id',
-          as: 'adminRole',
-        },
-      },
-      {
-        $unwind: {
-          path: '$adminRole',
+        $sort: {
+          createdAt: -1,
         },
       },
     ];
@@ -428,7 +425,7 @@ export class AdminActivityLogsService {
       operation: operation,
       changes: compareResult,
     };
-    console.log('compareResult', typeof compareResult, compareResult);
+    console.log('compareResult', compareResult);
     if (compareResult?.length > 0 || typeof compareResult === 'object') {
       this.create(result);
     }
