@@ -26,6 +26,8 @@ import { EncryptDecryptService } from 'src/utils/encrypt-decrypt/encrypt-decrypt
 import { AuthService } from 'src/auth/auth.service';
 import { Public } from 'src/auth/public.decorator';
 import { ChannelGroupshopService } from 'src/channel/channelgroupshop.service';
+import { getMongoManager } from 'typeorm';
+import Inventory from 'src/inventory/entities/inventory.modal';
 @Public()
 @Controller()
 export class ShopifyStoreController {
@@ -283,5 +285,25 @@ export class ShopifyStoreController {
     return {
       billingStatus: this.configService.get('BILLING_LIVE'),
     };
+  }
+
+  @Get('add-secondary-purchase-count')
+  async addSecondaryPurchaseCount() {
+    const manager = getMongoManager();
+    const products = await manager.find(Inventory, {
+      where: {
+        recordType: 'Product',
+        secondaryCount: null,
+      },
+    });
+
+    return await this.inventorySrv
+      .getRandomPurchaseCount(products)
+      .then(() => {
+        return `Random purchase count added in ${products.length} products`;
+      })
+      .catch((err) => {
+        return `ERROR ${err}`;
+      });
   }
 }
