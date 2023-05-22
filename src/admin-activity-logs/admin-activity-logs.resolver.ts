@@ -43,17 +43,25 @@ export class AdminActivityLogsResolver {
   async dropsActivity(
     @Args('route', { type: () => String }) route: string,
     @Args('storeId', { type: () => String }) storeId: string,
+    @Args('filter', { type: () => String }) filter: string,
   ) {
     const result = await this.adminActivityLogsService.dropsActivity(
       route,
       storeId,
+      filter,
     );
     return result;
   }
 
   @Query(() => [AdminActivityLog], { name: 'adminActivity' })
-  async adminActivity(@Args('route', { type: () => String }) route: string) {
-    const result = await this.adminActivityLogsService.adminActivity(route);
+  async adminActivity(
+    @Args('route', { type: () => String }) route: string,
+    @Args('filter', { type: () => String }) filter: string,
+  ) {
+    const result = await this.adminActivityLogsService.adminActivity(
+      route,
+      filter,
+    );
     return result;
   }
 

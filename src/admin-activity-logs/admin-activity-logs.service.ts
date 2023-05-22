@@ -46,14 +46,8 @@ export class AdminActivityLogsService {
     return this.adminActivityLogsRepository.find();
   }
 
-  async dropsActivity(route: string, storeId: string) {
-    const agg = [
-      {
-        $match: {
-          route: route,
-          storeId: storeId,
-        },
-      },
+  async dropsActivity(route: string, storeId: string, filter: string) {
+    let agg: any[] = [
       {
         $lookup: {
           from: 'admin_user',
@@ -73,18 +67,61 @@ export class AdminActivityLogsService {
         },
       },
     ];
+
+    if (filter == 'All Fields') {
+      agg = [
+        {
+          $match: {
+            route: route,
+            storeId: storeId,
+          },
+        },
+        ...agg,
+      ];
+    } else {
+      agg = [
+        {
+          $match: {
+            $and: [
+              {
+                route: route,
+              },
+              {
+                storeId: storeId,
+              },
+              {
+                $or: [
+                  {
+                    'changes.fieldname': filter,
+                  },
+                  {
+                    [`changes.${filter}`]: {
+                      $exists: true,
+                    },
+                  },
+                  {
+                    [`changes.collection.${filter}`]: {
+                      $exists: true,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        ...agg,
+      ];
+    }
+
+    console.log(JSON.stringify(agg));
+
     const manager = getMongoManager();
     const gs = await manager.aggregate(AdminActivityLogs, agg).toArray();
     return gs;
   }
 
-  async adminActivity(route: string) {
-    const agg = [
-      {
-        $match: {
-          route: route,
-        },
-      },
+  async adminActivity(route: string, filter: string) {
+    let agg: any[] = [
       {
         $lookup: {
           from: 'admin_user',
@@ -104,6 +141,48 @@ export class AdminActivityLogsService {
         },
       },
     ];
+
+    if (filter == 'All Fields') {
+      agg = [
+        {
+          $match: {
+            route: route,
+          },
+        },
+        ...agg,
+      ];
+    } else {
+      agg = [
+        {
+          $match: {
+            $and: [
+              {
+                route: route,
+              },
+              {
+                $or: [
+                  {
+                    'changes.fieldname': filter,
+                  },
+                  {
+                    [`changes.${filter}`]: {
+                      $exists: true,
+                    },
+                  },
+                  {
+                    [`changes.collection.${filter}`]: {
+                      $exists: true,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        ...agg,
+      ];
+    }
+
     const manager = getMongoManager();
     const gs = await manager.aggregate(AdminActivityLogs, agg).toArray();
     console.log('gs', JSON.stringify(gs));
@@ -426,7 +505,7 @@ export class AdminActivityLogsService {
       changes: compareResult,
     };
     console.log('compareResult', compareResult);
-    if (compareResult?.length > 0 || typeof compareResult === 'object') {
+    if (compareResult?.length > 0) {
       this.create(result);
     }
   }

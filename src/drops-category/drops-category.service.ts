@@ -58,7 +58,13 @@ export class DropsCategoryService {
     let operation;
     if (activity === 'Update Sorting Order') {
       operation = 'UPDATE';
-      dropCategory = await this.findByStoreId(id);
+      if (updateDropsCategoryInput.length === 1) {
+        dropCategory = await this.findOne(
+          updateDropsCategoryInput[0].categoryId,
+        );
+      } else {
+        dropCategory = await this.findByStoreId(id);
+      }
     } else {
       dropCategory = await this.findOne(updateDropsCategoryInput[0].categoryId);
       operation =
