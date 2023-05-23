@@ -113,8 +113,6 @@ export class AdminActivityLogsService {
       ];
     }
 
-    console.log(JSON.stringify(agg));
-
     const manager = getMongoManager();
     const gs = await manager.aggregate(AdminActivityLogs, agg).toArray();
     return gs;
@@ -185,7 +183,6 @@ export class AdminActivityLogsService {
 
     const manager = getMongoManager();
     const gs = await manager.aggregate(AdminActivityLogs, agg).toArray();
-    console.log('gs', JSON.stringify(gs));
     return gs;
   }
 
@@ -440,19 +437,30 @@ export class AdminActivityLogsService {
 
   async compareSortingArrays(oldValue: any, newValue: any) {
     const activityLog = [];
-    oldValue.forEach((field, key) => {
-      const result = newValue.find((item) => item.title === field.title);
-      if (typeof result !== 'undefined') {
-        if (field.sortOrder !== result.sortOrder) {
-          activityLog.push({
-            parentTitle: field.title,
-            fieldname: 'sortOrder',
-            oldvalue: field.sortOrder,
-            newValue: result.sortOrder,
-          });
+    if (newValue.length > 1) {
+      oldValue.forEach((field, key) => {
+        const result = newValue.find((item) => item.title === field.title);
+        if (typeof result !== 'undefined') {
+          if (field.sortOrder !== result.sortOrder) {
+            activityLog.push({
+              parentTitle: field.title,
+              fieldname: 'sortOrder',
+              oldvalue: field.sortOrder,
+              newValue: result.sortOrder,
+            });
+          }
         }
-      }
-    });
+      });
+    } else {
+      oldValue[0]?.collections.forEach((field, key) => {
+        activityLog.push({
+          parentTitle: field.title,
+          fieldname: 'sortOrder',
+          oldvalue: field.name,
+          newValue: newValue[0].collections[key].name,
+        });
+      });
+    }
     return activityLog;
   }
 
