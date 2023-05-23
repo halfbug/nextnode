@@ -81,6 +81,11 @@ export class StoresService {
   findActiveAll() {
     return this.storeRepository.find({ where: { status: 'Active' } });
   }
+  findWithCollectionUpdate() {
+    return this.storeRepository.find({
+      where: { collectionsToUpdate: { $exists: true } },
+    });
+  }
 
   async findById(id: string) {
     return this.storeRepository.findOne({ id });

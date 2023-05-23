@@ -16,7 +16,7 @@ export class SyncCollectionCron {
   async syncCollections() {
     log('Cron running');
     try {
-      const stores = await this.storeService.findAll();
+      const stores = await this.storeService.findWithCollectionUpdate();
       for (const store of stores) {
         if (!store.collectionsToUpdate?.length) {
           Logger.log(
@@ -40,10 +40,10 @@ export class SyncCollectionCron {
         }
       }
     } catch (error) {
-      console.error(
-        'Error performing bulk collection query:',
+      Logger.error(
         JSON.stringify(error),
-        error,
+        'Error performing bulk collection query',
+        'SYNC_COLLECTION_CRON',
       );
     }
   }

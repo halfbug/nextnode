@@ -879,7 +879,11 @@ export class InventoryService {
           );
         });
     } catch (err) {
-      log('Error while syncing collections');
+      Logger.error(
+        JSON.stringify(err),
+        'Error while syncing collections',
+        'SYNC_COLLECTION_SERVICE',
+      );
     }
   }
 
@@ -913,7 +917,7 @@ export class InventoryService {
           if (checkCollection.length && checkCollection[0].productsCount > 0) {
             this.getProducts(checkCollection, id, shop);
           } else {
-            log('No products found');
+            Logger.log(`No products found`, 'SYNC_COLLECTION_SERVICE', true);
           }
         });
       }
@@ -948,11 +952,17 @@ export class InventoryService {
         RecordType.Collection,
       ).then(() => {
         log(`${collectionIds.length} collection removed`);
+        Logger.log(
+          `${collectionIds.length} collection removed`,
+          'SYNC_COLLECTION_SERVICE',
+          true,
+        );
       });
     } catch (err) {
-      console.error(
+      Logger.error(
+        JSON.stringify(err),
         'Error - While removing collection or collection not found',
-        err,
+        'SYNC_COLLECTION_SERVICE',
       );
     }
 
@@ -989,7 +999,11 @@ export class InventoryService {
           }
         })
         .catch((err) => {
-          log('Something error while storing collections', err);
+          Logger.error(
+            JSON.stringify(err),
+            'Something error while storing collections',
+            'SYNC_COLLECTION_SERVICE',
+          );
         });
     }
   }
