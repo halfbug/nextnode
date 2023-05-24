@@ -549,9 +549,7 @@ export class StoresService {
       updateDiscoveryTool.discoveryTool.matchingBrandName.length
     ) {
       operation = 'UPDATE';
-      newVaue = {
-        status: updateDiscoveryTool?.discoveryTool.status,
-      };
+      newVaue = updateDiscoveryTool?.discoveryTool;
     } else if (
       updateDiscoveryTool.discoveryTool.matchingBrandName.length >
       oldValue?.discoveryTool?.matchingBrandName.length

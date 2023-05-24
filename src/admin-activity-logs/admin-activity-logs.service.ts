@@ -389,6 +389,29 @@ export class AdminActivityLogsService {
     return activityLog;
   }
 
+  async compareDiscoverySortingArrays(oldValue: any, newValue: any) {
+    const activityLog = [];
+    if (oldValue.status !== newValue.status) {
+      activityLog.push({
+        parentTitle: null,
+        fieldname: 'status',
+        oldvalue: oldValue.status,
+        newValue: newValue.status,
+      });
+    }
+    oldValue?.matchingBrandName?.forEach((key: any, index) => {
+      if (key.id !== newValue?.matchingBrandName[index].id) {
+        activityLog.push({
+          parentTitle: 'Sorting',
+          fieldname: 'brandName',
+          oldvalue: key.brandName,
+          newValue: newValue?.matchingBrandName[index].brandName,
+        });
+      }
+    });
+    return activityLog;
+  }
+
   async removeCompareArrays(oldValue: any, newValue: any, context: string) {
     let activityLog = [];
     if (
@@ -483,6 +506,11 @@ export class AdminActivityLogsService {
         compareResult = await this.compareUserArrays(oldValue, mfields);
       } else if (context === 'Role Management') {
         compareResult = await this.compareRoleArrays(oldValue, mfields);
+      } else if (context === 'Discovery Tools Management') {
+        compareResult = await this.compareDiscoverySortingArrays(
+          oldValue,
+          mfields,
+        );
       } else {
         compareResult = await this.compareDropsArrays(oldValue, mfields);
       }
