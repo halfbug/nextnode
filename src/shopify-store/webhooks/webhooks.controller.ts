@@ -993,6 +993,8 @@ export class WebhooksController {
           },
         })
         .then((res) => {
+          const resp = JSON.stringify(res.body['data']['node']);
+          Logger.log(`${shop} ${resp}`, 'SYNC_COLLECTION_BULKFINISH', true);
           const url = res.body['data']['node'].url;
           this.httpService.get(url).subscribe(async (res) => {
             const checkCollection = res.data?.length
@@ -1010,7 +1012,11 @@ export class WebhooksController {
         });
     } catch (err) {
       console.log(JSON.stringify(err));
-      Logger.error(err, 'bulk-finish');
+      Logger.error(
+        JSON.stringify(err),
+        'Error performing bulk-finish',
+        'SYNC_COLLECTION_BULKFINISH',
+      );
     } finally {
       res.status(HttpStatus.OK).send();
     }
