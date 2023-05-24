@@ -40,11 +40,7 @@ export class SyncCollectionCron {
         }
       }
     } catch (error) {
-      Logger.error(
-        JSON.stringify(error),
-        'Error performing bulk collection query',
-        'SYNC_COLLECTION_CRON',
-      );
+      Logger.error(error, 'SYNC_COLLECTION_CRON');
     }
   }
 }

@@ -1011,12 +1011,7 @@ export class WebhooksController {
           });
         });
     } catch (err) {
-      console.log(JSON.stringify(err));
-      Logger.error(
-        JSON.stringify(err),
-        'Error performing bulk-finish',
-        'SYNC_COLLECTION_BULKFINISH',
-      );
+      Logger.error(err, 'SYNC_COLLECTION_BULKFINISH');
     } finally {
       res.status(HttpStatus.OK).send();
     }

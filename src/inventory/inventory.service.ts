@@ -949,11 +949,7 @@ export class InventoryService {
           );
         });
     } catch (err) {
-      Logger.error(
-        JSON.stringify(err),
-        'Error while syncing collections',
-        'SYNC_COLLECTION_SERVICE',
-      );
+      Logger.error(err, 'SYNC_COLLECTION_SERVICE');
     }
   }
 
@@ -1029,11 +1025,7 @@ export class InventoryService {
         );
       });
     } catch (err) {
-      Logger.error(
-        JSON.stringify(err),
-        'Error - While removing collection or collection not found',
-        'SYNC_COLLECTION_SERVICE',
-      );
+      Logger.error(err, 'SYNC_COLLECTION_SERVICE');
     }
 
     for (const [index, col] of collectionsWithProducts.entries()) {
@@ -1069,11 +1061,7 @@ export class InventoryService {
           }
         })
         .catch((err) => {
-          Logger.error(
-            JSON.stringify(err),
-            'Something error while storing collections',
-            'SYNC_COLLECTION_SERVICE',
-          );
+          Logger.error(err, 'SYNC_COLLECTION_SERVICE');
         });
     }
   }
