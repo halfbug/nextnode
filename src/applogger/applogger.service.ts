@@ -208,4 +208,40 @@ export class AppLoggerService {
   remove(id: string) {
     return `This action removes a #${id} applogger`;
   }
+
+  async findAotuSyncCollection(contextArray: string[]) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          context: {
+            $in: contextArray,
+          },
+        },
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+      {
+        $group: {
+          _id: '$context',
+          lastAutoSync: { $first: '$$ROOT' },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          lastAutoSync: { $push: '$lastAutoSync' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          lastAutoSync: 1,
+        },
+      },
+    ];
+    const res = await manager.aggregate(AppLogger, agg).toArray();
+    return res[0];
+  }
 }

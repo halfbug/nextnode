@@ -121,3 +121,18 @@ export class Inventory {
   @Field({ nullable: true })
   compareAtPrice?: string;
 }
+
+@ObjectType()
+export class CollectionStatusList {
+  @Field({ nullable: true })
+  collectionId?: string;
+
+  @Field({ nullable: true })
+  collectionTitle?: string;
+
+  @Field({ nullable: true })
+  isSynced?: boolean;
+
+  @Field({ nullable: true })
+  productCount?: number;
+}

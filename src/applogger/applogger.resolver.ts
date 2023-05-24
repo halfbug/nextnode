@@ -1,10 +1,11 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { AppLoggerService } from './applogger.service';
-import { AppLogger } from './entities/applogger.entity';
+import { AppLogger, LastAutoSync } from './entities/applogger.entity';
 import { CreateAppLoggerInput } from './dto/create-applogger.input';
 import { UpdateAppLoggerInput } from './dto/update-applogger.input';
 import { GridArgs } from 'src/drops-groupshop/dto/paginationArgs.input';
 import { AppLoggerPage } from './entities/applogger-paginate.entity';
+import { Public } from 'src/auth/public.decorator';
 
 @Resolver(() => AppLogger)
 export class AppLoggerResolver {
@@ -53,5 +54,13 @@ export class AppLoggerResolver {
     @Args('context', { type: () => String }) context: string,
   ) {
     return await this.apploggerService.findLatestLog(context, storeId);
+  }
+
+  @Public()
+  @Query(() => LastAutoSync, { name: 'getAppLoggerData' })
+  async getAppLoggerData(
+    @Args({ name: 'context', type: () => [String] }) context: string[],
+  ) {
+    return await this.apploggerService.findAotuSyncCollection(context);
   }
 }

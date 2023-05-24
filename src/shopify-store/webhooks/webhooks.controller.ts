@@ -1042,9 +1042,7 @@ export class WebhooksController {
 
       // 3. get collection detail from shopify IF its a published collection
 
-      const { shop, accessToken, id } = await this.storesService.findOne(
-        shopName,
-      );
+      const { id } = await this.storesService.findOne(shopName);
       const temp: any = await this.storesService.checkUpdatedCollection(
         rcollection.admin_graphql_api_id,
         false,
@@ -1064,6 +1062,12 @@ export class WebhooksController {
           new Date(),
         );
       }
+
+      Logger.log(
+        `Collection update receive on ${shopName} with id ${rcollection.admin_graphql_api_id}`,
+        'COLLECTION_UPDATE_RECEIVE',
+        true,
+      );
 
       // if (rcollection.published_at) {
       //   const client = await this.shopifyService.client(shopName, accessToken);

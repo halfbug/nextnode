@@ -21,6 +21,7 @@ import { UpdateSmartCollectionEvent } from './events/update-smart-collection.eve
 import { UpdateSmartCollectionListner } from './listeners/update-smart-collection.listner';
 import { SyncCollectionCron } from './inventory.cron';
 import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
+import { AppLoggerModule } from 'src/applogger/applogger.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
     HttpModule,
     forwardRef(() => StoresModule),
     forwardRef(() => ShopifyStoreModule),
+    forwardRef(() => AppLoggerModule),
   ],
   providers: [
     InventoryResolver,

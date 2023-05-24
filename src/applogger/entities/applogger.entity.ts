@@ -18,6 +18,19 @@ registerEnumType(LogEventTypeEnum, {
 });
 
 @ObjectType()
+export class LastAutoSyncType {
+  @Field({ nullable: true })
+  createdAt: Date;
+  @Field({ nullable: true })
+  context: string;
+}
+@ObjectType()
+export class LastAutoSync {
+  @Field(() => [LastAutoSyncType])
+  lastAutoSync: any;
+}
+
+@ObjectType()
 @Entity()
 export class AppLogger extends DefaultColumnsService {
   @Column()

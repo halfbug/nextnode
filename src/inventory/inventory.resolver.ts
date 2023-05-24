@@ -1,6 +1,6 @@
 import { Resolver, Query, Args, Info } from '@nestjs/graphql';
 import { InventoryService } from './inventory.service';
-import { Inventory } from './entities/inventory.entity';
+import { CollectionStatusList, Inventory } from './entities/inventory.entity';
 import { Collection } from './entities/collection.entity';
 import { Product } from './entities/product.entity';
 import { ProductQueryInput } from './dto/product-query.input';
@@ -84,6 +84,11 @@ export class InventoryResolver {
     //   res,
     // );
     return [{ status: CollectionUpdateEnum.PROGRESS }];
+  }
+
+  @Query(() => [CollectionStatusList], { name: 'getCollectionList' })
+  async getCollectionList(@Args('shop') shop: string) {
+    return await this.inventoryService.findCollectionsWithSyncedStatus(shop);
   }
 
   // @Mutation(() => Inventory)

@@ -343,6 +343,76 @@ export class InventoryService {
 
     return collections;
   }
+
+  async findCollectionsWithSyncedStatus(shop: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          recordType: 'Collection',
+          shop,
+        },
+      },
+      {
+        $lookup: {
+          from: 'store',
+          localField: 'id',
+          foreignField: 'collectionsToUpdate.collectionId',
+          as: 'storeCollections',
+        },
+      },
+      {
+        $addFields: {
+          isSynced: {
+            $cond: {
+              if: {
+                $gt: [
+                  {
+                    $size: '$storeCollections',
+                  },
+                  0,
+                ],
+              },
+              then: false,
+              else: true,
+            },
+          },
+          collectionTitle: {
+            $ifNull: ['$title', 'Untitled Collection'],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$id',
+          collectionTitle: {
+            $first: '$collectionTitle',
+          },
+          collectionId: {
+            $first: '$id',
+          },
+          productCount: {
+            $first: '$productsCount',
+          },
+          isSynced: {
+            $first: '$isSynced',
+          },
+        },
+      },
+      {
+        $project: {
+          collectionTitle: 1,
+          collectionId: 1,
+          productCount: 1,
+          isSynced: 1,
+          _id: 0,
+        },
+      },
+    ];
+
+    return await manager.aggregate(Inventory, agg).toArray();
+  }
+
   async findStoreProducts(productQueryInput: ProductQueryInput) {
     const { shop, sort, limit } = productQueryInput;
     const manager = getMongoManager();
