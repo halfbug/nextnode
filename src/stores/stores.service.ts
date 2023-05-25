@@ -255,6 +255,19 @@ export class StoresService {
     await this.storeRepository.update({ id }, updateStoreInput);
     return await this.findOneById(id);
   }
+  async updateCustom(shop: string, deletedCollectionIds: any[]) {
+    const manager = getMongoManager();
+    return manager.updateOne(
+      Store,
+      { shop },
+      {
+        $pull: {
+          collectionsToUpdate: { collectionId: { $in: deletedCollectionIds } },
+        },
+        $set: { collectionUpdateStatus: CollectionUpdateEnum.COMPLETE },
+      },
+    );
+  }
 
   async updateCollectionToSync(
     id: string,

@@ -285,7 +285,7 @@ export class WebhooksController {
         const { shop, accessToken } = store;
         const client = await this.shopifyService.client(shop, accessToken);
         console.log(
-          '🚀 ~ file: webhooks.controller.ts ~ line 11 ~ WebhooksController ~ register ~ shop',
+          '🚀 ~ file: webhooks.controller.ts ~ line 288 ~ WebhooksController ~ register ~ shop',
           shop,
         );
         const rhook = await this.shopifyService.registerHook(
@@ -298,7 +298,7 @@ export class WebhooksController {
         );
         console.log(
           '🚀 ~ file: webhooks.controller.ts:295 ~ stores.map ~ rhook:',
-          rhook,
+          JSON.stringify(rhook),
         );
         const id =
           rhook['result']['data']['webhookSubscriptionUpdate'][
@@ -963,7 +963,8 @@ export class WebhooksController {
       const { shop } = req.query;
       const bulkData = req.body;
 
-      const { accessToken, id } = await this.storesService.findOne(shop);
+      const { accessToken, id, collectionsToUpdate } =
+        await this.storesService.findOne(shop);
 
       const client = await this.shopifyService.client(shop, accessToken);
 
@@ -1004,7 +1005,26 @@ export class WebhooksController {
               checkCollection.length &&
               checkCollection[0].productsCount > 0
             ) {
-              this.inventryService.getProducts(checkCollection, id, shop);
+              // this.inventryService.getProducts(checkCollection, id, shop);
+              const deletedCollectionIds =
+                await this.inventryService.updateCollection(
+                  checkCollection,
+                  id,
+                  shop,
+                );
+              // update store status to complete
+              // remove store collectiontoupdate entries
+              await this.storesService.updateCustom(shop, deletedCollectionIds);
+              Logger.log(
+                `${shop} deletedIds ${deletedCollectionIds}`,
+                'SYNC_COLLECTION_UPDATESTORE',
+                true,
+              );
+              Logger.log(
+                `${shop} updated/sync`,
+                'SYNC_COLLECTION_UPDATESTORE',
+                true,
+              );
             } else {
               console.log('No products found');
             }

@@ -990,6 +990,66 @@ export class InventoryService {
     }, 5000);
   }
 
+  async updateCollection(products, id, shop) {
+    console.log(products);
+    // delete old collections send [id, id]
+    // map product array.
+    // 1 get colid and find in collection[] and make obj
+    // 2. return arr of obj
+    //3. use this and insert many
+    // after insert many ,
+    // remove collectionIds in collectiontoupdate arr and update store collectionstatus to complete
+    const collection = [];
+    const productsArray = [];
+
+    // seperate products and collections
+    products.map((ele) => {
+      if ('productsCount' in ele) {
+        collection.push(ele);
+      }
+      if (ele.id.includes('Product')) {
+        productsArray.push(ele);
+      }
+    });
+    const collectionIds = collection.map((item) => item.id);
+
+    try {
+      await this.removeMultiPleEntities(
+        collectionIds,
+        RecordType.Collection,
+      ).then(() => {
+        log(`${collectionIds.length} collection removed`);
+        Logger.log(
+          `${collectionIds.length} collection removed`,
+          'SYNC_COLLECTION_SERVICE',
+          true,
+        );
+      });
+    } catch (err) {
+      Logger.error(err, 'SYNC_COLLECTION_SERVICE');
+    }
+    const collectionObjects = productsArray.map((item) => {
+      const col = collection.find((coll) => coll.id === item.__parentId);
+      const collectionType =
+        'rules' in col && col.rules.length ? 'smart' : 'custom';
+
+      return {
+        id: col.id,
+        title: col.title,
+        type: collectionType,
+        description: col.descriptionHtml,
+        productsCount: col.productsCount,
+        sortOrder: col.sortOrder.toUpperCase(),
+        featuredImage: col?.image?.src,
+        parentId: item.id,
+        shop: shop,
+        recordType: 'Collection',
+      };
+    });
+    await this.insertMany(collectionObjects);
+    return collectionIds;
+  } //updatecollection new function
+
   async getProducts(products, id, shop) {
     const collection = [];
     const productsArray = [];
@@ -1028,6 +1088,7 @@ export class InventoryService {
       Logger.error(err, 'SYNC_COLLECTION_SERVICE');
     }
 
+    // const colObj = collectionsWithProducts.map((item) => {});
     for (const [index, col] of collectionsWithProducts.entries()) {
       let collectionType;
       if ('rules' in col && col.rules.length) {
