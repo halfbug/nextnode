@@ -1001,9 +1001,15 @@ export class WebhooksController {
             const checkCollection = res.data?.length
               ? readJsonLines(res.data)
               : [];
+            Logger.log(
+              `check collection ${JSON.stringify(checkCollection)}`,
+              'SYNC_COLLECTION_BULKFINISH',
+              true,
+            );
+
             if (
-              checkCollection.length &&
-              checkCollection[0].productsCount > 0
+              checkCollection.length
+              // checkCollection[0].productsCount > 0
             ) {
               // this.inventryService.getProducts(checkCollection, id, shop);
               const deletedCollectionIds =
