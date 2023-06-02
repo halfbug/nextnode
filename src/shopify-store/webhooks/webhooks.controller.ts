@@ -957,6 +957,53 @@ export class WebhooksController {
     }
   }
 
+  @Post('collection-delete?')
+  async collectionDelete(@Req() req, @Res() res) {
+    try {
+      const { shop } = req.query;
+      const collection = req.body;
+      console.log(
+        '🚀 ~ file: webhooks.controller.ts:965 ~ collectionDelete ~ collection:',
+        collection,
+      );
+
+      const { id } = await this.storesService.findOne(shop);
+
+      this.inventryService
+        .removeEntity(
+          `gid://shopify/Collection/${collection.id}`,
+          RecordType.Collection,
+        )
+        .then(() => {
+          console.log(
+            '🚀 ~ file: webhooks.controller.ts:965 ~ collectionDelete',
+            `Collection deleted id: gid://shopify/Collection/${collection.id} of ${shop}`,
+          );
+          Logger.log(
+            `Collection deleted id: gid://shopify/Collection/${collection.id} of ${shop}`,
+            'collection-delete',
+            true,
+          );
+        })
+        .catch((err) => {
+          Logger.error(
+            `Can't delete collection id: gid://shopify/Collection/${collection.id} of ${shop} : ${err}`,
+            'collection-delete',
+          );
+        });
+
+      await this.storesService.removeSyncedCollection(
+        `gid://shopify/Collection/${collection.id}`,
+        id,
+      );
+    } catch (err) {
+      console.log(JSON.stringify(err));
+      Logger.error(err, 'collection-delete');
+    } finally {
+      res.status(HttpStatus.OK).send();
+    }
+  }
+
   @Post('bulk-finish?')
   async bulkFinish(@Req() req, @Res() res) {
     try {
@@ -1073,6 +1120,7 @@ export class WebhooksController {
       const temp: any = await this.storesService.checkUpdatedCollection(
         rcollection.admin_graphql_api_id,
         false,
+        id,
       );
 
       if (!temp[0].collections?.length) {

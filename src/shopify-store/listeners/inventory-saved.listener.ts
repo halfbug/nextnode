@@ -237,6 +237,34 @@ export class InvenotrySavedListener {
         .registerHook(
           shop,
           accessToken,
+          '/webhooks/collection-delete',
+          'COLLECTIONS_DELETE',
+        )
+        .then(() => {
+          console.log(
+            'webhook COLLECTIONS_DELETE -> registered for shop',
+            shop,
+          );
+        });
+
+      this.shopifyapi
+        .registerHook(
+          shop,
+          accessToken,
+          '/webhooks/bulk-finish',
+          'BULK_OPERATIONS_FINISH',
+        )
+        .then(() => {
+          console.log(
+            'webhook BULK_OPERATIONS_FINISH -> registered for shop',
+            shop,
+          );
+        });
+
+      this.shopifyapi
+        .registerHook(
+          shop,
+          accessToken,
           '/webhooks/collection-update',
           'COLLECTIONS_UPDATE',
         )

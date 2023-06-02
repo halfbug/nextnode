@@ -299,8 +299,13 @@ export class StoresService {
     );
   }
 
-  async checkUpdatedCollection(id: string, flag: boolean) {
+  async checkUpdatedCollection(id: string, flag: boolean, storeId: string) {
     const agg = [
+      {
+        $match: {
+          id: storeId,
+        },
+      },
       {
         $addFields: {
           collections: {
