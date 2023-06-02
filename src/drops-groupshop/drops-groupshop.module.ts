@@ -18,6 +18,8 @@ import { UtilsModule } from 'src/utils/utils.module';
 import { DropsCollectionUpdatedEvent } from './events/drops-collection-update.event';
 import { DropsCollectionUpdatedListener } from './listeners/drops-collection-update.listener';
 import { DropsCategoryModule } from 'src/drops-category/drops-category.module';
+import { DiscountCron } from './discount.cron';
+import { AppLoggerModule } from 'src/applogger/applogger.module';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { DropsCategoryModule } from 'src/drops-category/drops-category.module';
     forwardRef(() => GsCommonModule),
     forwardRef(() => InventoryModule),
     forwardRef(() => DropsCategoryModule),
+    forwardRef(() => AppLoggerModule),
   ],
   providers: [
     DropsGroupshopResolver,
@@ -39,6 +42,7 @@ import { DropsCategoryModule } from 'src/drops-category/drops-category.module';
     DropCreatedListener,
     DropsCollectionUpdatedEvent,
     DropsCollectionUpdatedListener,
+    DiscountCron,
   ],
   exports: [
     DropsGroupshopService,
