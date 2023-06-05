@@ -13,7 +13,44 @@ import { HttpService } from '@nestjs/axios';
 import { log } from 'console';
 import readJsonLines from 'read-json-lines-sync';
 import { RecordType } from 'src/utils/constant';
+import { Document } from 'flexsearch';
+import * as fs from 'fs';
 import { CollectionUpdateEnum } from 'src/stores/entities/store.entity';
+
+const options = {
+  tokenize: function (str) {
+    return str.split(/\s-\//g);
+  },
+  optimize: true,
+  resolution: 9,
+  id: 'id',
+  index: [
+    {
+      field: 'title',
+      tokenize: 'forward',
+    },
+    {
+      field: 'collection',
+      tokenize: 'forward',
+    },
+    {
+      field: 'description',
+      tokenize: 'strict',
+      resolution: 5,
+      minlength: 3,
+      context: {
+        depth: 1,
+        resolution: 3,
+      },
+    },
+    {
+      field: 'tags[]',
+    },
+  ],
+};
+
+const searchIndexPath = './src/utils/searchIndexes/';
+
 @Injectable()
 export class InventoryService {
   private inventoryManager: any;
@@ -1127,4 +1164,112 @@ export class InventoryService {
     }
   }
   // CRON FUNCTIONS ENDS
+
+  async createSearchIndex(shop: string) {
+    const inventoryProducts = await this.inventoryRepository.find({
+      where: {
+        shop,
+        recordType: 'Product',
+      },
+    });
+
+    const inventoryCollections = await this.inventoryRepository.find({
+      where: {
+        shop,
+        recordType: 'Collection',
+      },
+    });
+    console.log('inventoryCollections', inventoryCollections);
+
+    const index = new Document(options);
+
+    if (inventoryProducts.length) {
+      console.log(
+        '🚀 ~ file: inventory.service.ts:776 ~ InventoryService ~ createSearchIndex ~ inventoryProducts.length:',
+        inventoryProducts.length,
+      );
+      inventoryProducts.forEach((product) => {
+        index.add({
+          id: product.id,
+          description: product.description,
+          title: product.title,
+          tags: product?.tags ?? [],
+        });
+      });
+    }
+
+    if (inventoryCollections.length) {
+      console.log(
+        '🚀 ~ file: inventory.service.ts:776 ~ InventoryService ~ createSearchIndex ~ inventoryCollections.length:',
+        inventoryCollections.length,
+      );
+      inventoryCollections.forEach((collection) => {
+        index.add({
+          id: collection.id,
+          collection: collection.title,
+        });
+      });
+    }
+    //console.log('index.search(searchTerm)', index.search('wome'));
+    fs.mkdir(`${searchIndexPath}${shop}`, { recursive: true }, (err) => {
+      if (err) throw err;
+    });
+    index.export((key, data: string | NodeJS.ArrayBufferView | null) =>
+      fs.writeFileSync(
+        `${searchIndexPath}${shop}/${key}.json`,
+        data !== undefined ? data : 'null',
+      ),
+    );
+    return true;
+  }
+
+  async searchProducts(searchTerm: string, shop: string) {
+    let index = new Document(options);
+    index = this.retrieveIndex(shop, index);
+    const result = index.search(searchTerm, 0, { suggest: true });
+    console.log(
+      '🚀 ~ file: inventory.service.ts:789 ~ InventoryService ~ index.search ~ result:',
+      result,
+    );
+    const filterProducts: any = [];
+    result?.forEach(async (search: any) => {
+      const fieldType = search.field;
+      if (fieldType === 'collection') {
+        const collectionProducts = await this.getProductsByCollectionIDs(
+          shop,
+          search.result,
+        );
+        collectionProducts.forEach((collection: any) => {
+          if (!filterProducts.includes(collection.id)) {
+            filterProducts.push(collection.id);
+          }
+        });
+      } else {
+        search.result.forEach((productId: any) => {
+          if (!filterProducts.includes(productId)) {
+            filterProducts.push(productId);
+          }
+        });
+      }
+    });
+    // console.log('filterProductsfilterProducts', filterProducts);
+    return filterProducts;
+  }
+
+  retrieveIndex = (shop: string, index) => {
+    const keys = fs
+      .readdirSync(`${searchIndexPath}${shop}/`, { withFileTypes: true })
+      .filter((item) => !item.isDirectory())
+      .map((item) => item.name.slice(0, -5));
+
+    for (let i = 0, key; i < keys.length; i += 1) {
+      key = keys[i];
+      const data = fs.readFileSync(
+        `${searchIndexPath}${shop}/${key}.json`,
+        'utf8',
+      );
+      index.import(key, data ?? null);
+    }
+    return index;
+  };
 }

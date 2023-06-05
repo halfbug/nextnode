@@ -123,6 +123,12 @@ export class Inventory {
 }
 
 @ObjectType()
+export class SearchResult {
+  @Field(() => [String], { nullable: 'itemsAndList' })
+  products?: string[];
+}
+
+@ObjectType()
 export class CollectionStatusList {
   @Field({ nullable: true })
   collectionId?: string;

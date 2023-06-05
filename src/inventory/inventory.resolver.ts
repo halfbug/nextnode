@@ -1,6 +1,10 @@
 import { Resolver, Query, Args, Info } from '@nestjs/graphql';
 import { InventoryService } from './inventory.service';
-import { CollectionStatusList, Inventory } from './entities/inventory.entity';
+import {
+  CollectionStatusList,
+  Inventory,
+  SearchResult,
+} from './entities/inventory.entity';
 import { Collection } from './entities/collection.entity';
 import { Product } from './entities/product.entity';
 import { ProductQueryInput } from './dto/product-query.input';
@@ -73,6 +77,26 @@ export class InventoryResolver {
     //   res,
     // );
     return res;
+  }
+
+  @Public()
+  @Query(() => Boolean, { name: 'createSearchIndex' })
+  async createSearchIndex(@Args('shop') shop: string) {
+    const result = await this.inventoryService.createSearchIndex(shop);
+    return result;
+  }
+
+  @Public()
+  @Query(() => [SearchResult], { name: 'searchProducts' })
+  async searchProducts(
+    @Args('searchTerm') searchTerm: string,
+    @Args('shop') shop: string,
+  ) {
+    const productsData = await this.inventoryService.searchProducts(
+      searchTerm,
+      shop,
+    );
+    return [{ products: productsData }];
   }
 
   @Query(() => [Inventory], { name: 'syncCollection' })
