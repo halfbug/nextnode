@@ -33,12 +33,12 @@ export class LastAutoSync {
 @ObjectType()
 @Entity()
 export class AppLogger extends DefaultColumnsService {
-  @Column()
-  @Field()
+  @Column({ nullable: true })
+  @Field({ nullable: true })
   id: string;
 
-  @Field()
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   context: string;
 
   @Column({ nullable: true })

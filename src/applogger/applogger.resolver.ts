@@ -63,4 +63,20 @@ export class AppLoggerResolver {
   ) {
     return await this.apploggerService.findAotuSyncCollection(context);
   }
+
+  @Public()
+  @Query(() => AppLogger || undefined, { name: 'getDiscountLoggerData' })
+  async getDiscountLoggerData(
+    @Args({ name: 'context', type: () => String }) context: string,
+  ) {
+    const res = await this.apploggerService.findLatestByCotext(context);
+    const resp = res ?? {
+      id: 'null',
+      message: 'null',
+      context: 'null',
+      createdAt: new Date(),
+    };
+
+    return resp;
+  }
 }
