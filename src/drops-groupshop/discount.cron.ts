@@ -17,7 +17,10 @@ export class DiscountCron {
   ) {}
   @Cron(CronExpression.EVERY_HOUR)
   async setDiscountAfterUpdateCollections() {
-    if (this.configService.get('ENV') === 'production') {
+    if (
+      this.configService.get('ENV') === 'production' ||
+      this.configService.get('ENV') === 'stage'
+    ) {
       console.log('run new cron');
       const dropStores = await this.storesService.findDropStore();
       dropStores.map(async (store) => {
