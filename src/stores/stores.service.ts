@@ -15,6 +15,7 @@ import { InventoryService } from 'src/inventory/inventory.service';
 import { Product } from 'src/inventory/entities/product.entity';
 import { DropsGroupshopService } from 'src/drops-groupshop/drops-groupshop.service';
 import { DropsCollectionUpdatedEvent } from 'src/drops-groupshop/events/drops-collection-update.event';
+import { SearchIndexingRefreshEvent } from 'src/inventory/events/searchIndexing-refresh.event';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash');
 
@@ -28,6 +29,7 @@ export class StoresService {
     private dropsService: DropsGroupshopService,
     private dropsCollectionUpdatedEvent: DropsCollectionUpdatedEvent,
     private inventoryService: InventoryService,
+    public searchIndexingRefreshEvent: SearchIndexingRefreshEvent,
   ) {}
 
   static formatSpotlightDiscountTitle(name: string) {
@@ -241,6 +243,15 @@ export class StoresService {
           oldValue,
           updateStoreInput.id,
         );
+
+        const { shop } = await this.storeRepository.findOne({
+          where: {
+            id: updateStoreInput.id,
+          },
+        });
+        // create event for Search Indexing
+        this.searchIndexingRefreshEvent.shopName = shop;
+        this.searchIndexingRefreshEvent.emit();
       }
 
       await this.storeRepository.update({ id }, updateStoreInput);

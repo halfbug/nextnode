@@ -9,6 +9,7 @@ import { DropsCollectionUpdatedEvent } from 'src/drops-groupshop/events/drops-co
 import { StoresService } from 'src/stores/stores.service';
 import { UpdateStoreInput } from 'src/stores/dto/update-store.input';
 import { CodeUpdateStatusTypeEnum } from 'src/stores/entities/store.entity';
+import { SearchIndexingRefreshEvent } from 'src/inventory/events/searchIndexing-refresh.event';
 
 @Injectable()
 export class DropsCategoryService {
@@ -20,6 +21,7 @@ export class DropsCategoryService {
     private dropsCollectionUpdatedEvent: DropsCollectionUpdatedEvent,
     @Inject(forwardRef(() => StoresService))
     private storesService: StoresService,
+    public searchIndexingRefreshEvent: SearchIndexingRefreshEvent,
   ) {}
   create(createDropsCategoryInput: CreateDropsCategoryInput) {
     return 'This action adds a new dropsCategory';
@@ -117,6 +119,12 @@ export class DropsCategoryService {
 
     const manager = getMongoManager();
     await manager.bulkWrite(DropsCategory, blukWrite);
+
+    const { shop } = await this.storesService.findById(id);
+    // create event for Search Indexing
+    this.searchIndexingRefreshEvent.shopName = shop;
+    this.searchIndexingRefreshEvent.emit();
+
     const temp = await this.findByStoreId(id);
     return temp;
   }
@@ -139,6 +147,12 @@ export class DropsCategoryService {
       dropCategory,
       storeId,
     );
+
+    const { shop } = await this.storesService.findById(storeId);
+    // create event for Search Indexing
+    this.searchIndexingRefreshEvent.shopName = shop;
+    this.searchIndexingRefreshEvent.emit();
+
     Logger.log(collectionUpdateMsg, 'DROPS_COLLECTION_UPDATED', true);
     return await manager.deleteMany(DropsCategory, {
       categoryId: { $in: categoryId },
@@ -278,5 +292,33 @@ export class DropsCategoryService {
     return {
       codeUpdateStatus: CodeUpdateStatusTypeEnum.none,
     };
+  }
+
+  // Find drops product and collections for search indexing
+  async findDropsproducts(storeId: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          storeId: storeId,
+          status: 'active',
+        },
+      },
+      {
+        $unwind: {
+          path: '$collections',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'collections.shopifyId',
+          foreignField: 'id',
+          as: 'products',
+        },
+      },
+    ];
+    const res = await manager.aggregate(DropsCategory, agg).toArray();
+    return res;
   }
 }

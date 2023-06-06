@@ -16,6 +16,7 @@ import { RecordType } from 'src/utils/constant';
 import { Document } from 'flexsearch';
 import * as fs from 'fs';
 import { CollectionUpdateEnum } from 'src/stores/entities/store.entity';
+import { DropsCategoryService } from 'src/drops-category/drops-category.service';
 
 const options = {
   tokenize: function (str) {
@@ -60,6 +61,8 @@ export class InventoryService {
     @Inject(forwardRef(() => StoresService))
     private storeService: StoresService,
     private shopifyService: ShopifyService,
+    @Inject(forwardRef(() => DropsCategoryService))
+    private dropsCategoryService: DropsCategoryService,
     private httpService: HttpService,
   ) {
     this.inventoryManager = getMongoManager();
@@ -1166,29 +1169,19 @@ export class InventoryService {
   // CRON FUNCTIONS ENDS
 
   async createSearchIndex(shop: string) {
-    const inventoryProducts = await this.inventoryRepository.find({
-      where: {
-        shop,
-        recordType: 'Product',
-      },
-    });
-
-    const inventoryCollections = await this.inventoryRepository.find({
-      where: {
-        shop,
-        recordType: 'Collection',
-      },
-    });
-    console.log('inventoryCollections', inventoryCollections);
-
+    const { id: storeId } = await this.storeService.findOne(shop);
+    const dropsProducts = await this.dropsCategoryService.findDropsproducts(
+      storeId,
+    );
     const index = new Document(options);
+    //console.log('dropsProducts', dropsProducts);
+    dropsProducts.forEach((collection) => {
+      index.add({
+        id: collection.id,
+        collection: collection.title,
+      });
 
-    if (inventoryProducts.length) {
-      console.log(
-        '🚀 ~ file: inventory.service.ts:776 ~ InventoryService ~ createSearchIndex ~ inventoryProducts.length:',
-        inventoryProducts.length,
-      );
-      inventoryProducts.forEach((product) => {
+      collection?.products.forEach((product) => {
         index.add({
           id: product.id,
           description: product.description,
@@ -1196,21 +1189,9 @@ export class InventoryService {
           tags: product?.tags ?? [],
         });
       });
-    }
+    });
 
-    if (inventoryCollections.length) {
-      console.log(
-        '🚀 ~ file: inventory.service.ts:776 ~ InventoryService ~ createSearchIndex ~ inventoryCollections.length:',
-        inventoryCollections.length,
-      );
-      inventoryCollections.forEach((collection) => {
-        index.add({
-          id: collection.id,
-          collection: collection.title,
-        });
-      });
-    }
-    //console.log('index.search(searchTerm)', index.search('wome'));
+    // //console.log('index.search(searchTerm)', index.search('wome'));
     fs.mkdir(`${searchIndexPath}${shop}`, { recursive: true }, (err) => {
       if (err) throw err;
     });

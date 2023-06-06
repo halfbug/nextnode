@@ -71,6 +71,7 @@ import { UpdateSmartCollectionEvent } from 'src/inventory/events/update-smart-co
 import { DropsCategoryService } from 'src/drops-category/drops-category.service';
 import { RecordType } from 'src/utils/constant';
 import { AppLoggerService } from 'src/applogger/applogger.service';
+import { SearchIndexingRefreshEvent } from 'src/inventory/events/searchIndexing-refresh.event';
 @Public()
 @Controller('webhooks')
 export class WebhooksController {
@@ -89,6 +90,7 @@ export class WebhooksController {
     private dropCreatedEvent: DropCreatedEvent,
     private httpService: HttpService,
     public productMedia: ProductMediaObject,
+    public searchIndexingRefreshEvent: SearchIndexingRefreshEvent,
     public campaignStock: ProductOutofstockEvent,
     private lifecyclesrv: LifecycleService,
     private campaignService: CampaignsService,
@@ -622,6 +624,11 @@ export class WebhooksController {
 
       await this.inventryService.removeVariants(rproduct?.admin_graphql_api_id);
       this.productMedia.emit();
+
+      // create event for Search Indexing
+      this.searchIndexingRefreshEvent.shopName = shop;
+      this.searchIndexingRefreshEvent.emit();
+
       this.inventryService.findOne(shop, 'ProductVideo');
       const variants = [];
       rproduct.variants?.map(async (variant) => {
@@ -920,6 +927,10 @@ export class WebhooksController {
         });
       });
 
+      // create event for Search Indexing
+      this.searchIndexingRefreshEvent.shopName = shop;
+      this.searchIndexingRefreshEvent.emit();
+
       //  3 update groupshop page query so that it can display deleted bought products as discontinued products.
     } catch (err) {
       console.log(JSON.stringify(err));
@@ -984,6 +995,9 @@ export class WebhooksController {
             'collection-delete',
             true,
           );
+          // create event for Search Indexing
+          this.searchIndexingRefreshEvent.shopName = shop;
+          this.searchIndexingRefreshEvent.emit();
         })
         .catch((err) => {
           Logger.error(
@@ -1082,6 +1096,10 @@ export class WebhooksController {
               console.log('No products found');
             }
           });
+
+          // create event for Search Indexing
+          this.searchIndexingRefreshEvent.shopName = shop;
+          this.searchIndexingRefreshEvent.emit();
         });
     } catch (err) {
       Logger.error(err, 'SYNC_COLLECTION_BULKFINISH');
@@ -1143,6 +1161,10 @@ export class WebhooksController {
         'COLLECTION_UPDATE_RECEIVE',
         true,
       );
+
+      // create event for Search Indexing
+      this.searchIndexingRefreshEvent.shopName = shopName;
+      this.searchIndexingRefreshEvent.emit();
 
       // if (rcollection.published_at) {
       //   const client = await this.shopifyService.client(shopName, accessToken);

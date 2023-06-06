@@ -22,12 +22,16 @@ import { UpdateSmartCollectionListner } from './listeners/update-smart-collectio
 import { SyncCollectionCron } from './inventory.cron';
 import { ShopifyStoreModule } from 'src/shopify-store/shopify-store.module';
 import { AppLoggerModule } from 'src/applogger/applogger.module';
+import { SearchIndexingRefreshEvent } from './events/searchIndexing-refresh.event';
+import { SearchIndexingListener } from './listeners/searchIndexing-refresh.listner';
+import { DropsCategoryModule } from 'src/drops-category/drops-category.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Inventory, Orders]),
     DefaultColumnsService,
     HttpModule,
+    DropsCategoryModule,
     forwardRef(() => StoresModule),
     forwardRef(() => ShopifyStoreModule),
     forwardRef(() => AppLoggerModule),
@@ -43,6 +47,8 @@ import { AppLoggerModule } from 'src/applogger/applogger.module';
     OrdersResolver,
     ProductMediaListener,
     ProductMediaObject,
+    SearchIndexingRefreshEvent,
+    SearchIndexingListener,
     InventoryDoneEvent,
     ProductOutofstockEvent,
     UpdateSmartCollectionEvent,
@@ -53,6 +59,7 @@ import { AppLoggerModule } from 'src/applogger/applogger.module';
     InventoryService,
     OrdersService,
     ProductMediaObject,
+    SearchIndexingRefreshEvent,
     InventoryDoneEvent,
     ProductOutofstockEvent,
     UpdateSmartCollectionEvent,

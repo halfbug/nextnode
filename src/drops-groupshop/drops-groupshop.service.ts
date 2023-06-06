@@ -26,7 +26,9 @@ export class DropsGroupshopService {
     private storesService: StoresService,
     private shopifyService: ShopifyService,
     private paginateService: PaginationService,
+    @Inject(forwardRef(() => InventoryService))
     private inventoryService: InventoryService,
+    @Inject(forwardRef(() => DropsCategoryService))
     private dropsCategoryService: DropsCategoryService,
   ) {}
 

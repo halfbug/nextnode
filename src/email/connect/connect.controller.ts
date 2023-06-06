@@ -721,12 +721,4 @@ export class CatController {
       }
     });
   }
-
-  @Get('createSearchindex')
-  async createSearchindex() {
-    console.log(`createSearchindex`);
-    const createSearchIndex = await this.inventoryService.createSearchIndex(
-      'native-root-stage.myshopify.com',
-    );
-  }
 }
