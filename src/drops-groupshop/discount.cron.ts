@@ -37,17 +37,33 @@ export class DiscountCron {
         ) {
           const getLatestDate = getLatestLogStatus.createdAt;
           console.log(store.shop, updateCollectionDate, getLatestDate);
+          // console.log(
+          //   'before if updateCollectionDate > getLatestDate',
+          //   !!(updateCollectionDate > getLatestDate),
+          // );
           if (updateCollectionDate > getLatestDate) {
             this.dropsCategoryService.syncDiscountCodes(store.id);
-            console.log('update discoutn codes');
+            // console.log('update discoutn codes');
             Logger.log(
               `discountcode update after collection sync`,
               'SYNC_DISCOUNT_AFTER_COLLECTION_UPDATE',
               true,
             );
+          } else {
+            Logger.log(
+              `cron run but nothing to sync`,
+              'SYNC_DISCOUNT_AFTER_COLLECTION_UPDATE',
+              true,
+            );
           }
+        } else {
+          Logger.log(
+            `cron run but store has no drops`,
+            'SYNC_DISCOUNT_AFTER_COLLECTION_UPDATE',
+            true,
+          );
         }
       });
-    }
+    } // outer cron if
   }
 }
