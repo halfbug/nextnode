@@ -317,6 +317,24 @@ export class DropsCategoryService {
           as: 'products',
         },
       },
+      {
+        $unwind: {
+          path: '$products',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'products.parentId',
+          foreignField: 'id',
+          as: 'products',
+        },
+      },
+      {
+        $unwind: {
+          path: '$products',
+        },
+      },
     ];
     const res = await manager.aggregate(DropsCategory, agg).toArray();
     return res;

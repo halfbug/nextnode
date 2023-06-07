@@ -1173,21 +1173,24 @@ export class InventoryService {
     const dropsProducts = await this.dropsCategoryService.findDropsproducts(
       storeId,
     );
+    // console.log('dropsProducts', JSON.stringify(dropsProducts));
     const index = new Document(options);
-    //console.log('dropsProducts', dropsProducts);
-    dropsProducts.forEach((collection) => {
-      index.add({
-        id: collection.id,
-        collection: collection.title,
-      });
+    const collectionIds = [];
 
-      collection?.products.forEach((product) => {
+    dropsProducts.forEach((collection) => {
+      if (!collectionIds.includes(collection.collections.shopifyId)) {
         index.add({
-          id: product.id,
-          description: product.description,
-          title: product.title,
-          tags: product?.tags ?? [],
+          id: collection.collections.shopifyId,
+          collection: collection.collections.name,
         });
+        collectionIds.push(collection.collections.shopifyId);
+      }
+
+      index.add({
+        id: collection.products.id,
+        description: collection.products.description,
+        title: collection.products.title,
+        tags: collection.products?.tags ?? [],
       });
     });
 
