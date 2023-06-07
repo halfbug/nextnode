@@ -16,7 +16,10 @@ export class SyncCollectionCron {
 
   @Cron(CronExpression.EVERY_HOUR)
   async syncCollections() {
-    if (this.configService.get('ENV') === 'production') {
+    if (
+      this.configService.get('ENV') === 'production' ||
+      this.configService.get('ENV') === 'stage'
+    ) {
       log('Cron running');
       try {
         const stores = await this.storeService.findWithCollectionUpdate();
