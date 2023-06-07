@@ -1211,23 +1211,17 @@ export class InventoryService {
     let index = new Document(options);
     index = this.retrieveIndex(shop, index);
     const result = index.search(searchTerm, 0, { suggest: true });
+    console.log('searchTerm', searchTerm);
     console.log(
       '🚀 ~ file: inventory.service.ts:789 ~ InventoryService ~ index.search ~ result:',
       result,
     );
     const filterProducts: any = [];
-    result?.forEach(async (search: any) => {
+    let collectionIds: any = null;
+    result?.forEach((search: any) => {
       const fieldType = search.field;
       if (fieldType === 'collection') {
-        const collectionProducts = await this.getProductsByCollectionIDs(
-          shop,
-          search.result,
-        );
-        collectionProducts.forEach((collection: any) => {
-          if (!filterProducts.includes(collection.id)) {
-            filterProducts.push(collection.id);
-          }
-        });
+        collectionIds = search.result;
       } else {
         search.result.forEach((productId: any) => {
           if (!filterProducts.includes(productId)) {
@@ -1236,7 +1230,17 @@ export class InventoryService {
         });
       }
     });
-    // console.log('filterProductsfilterProducts', filterProducts);
+    if (collectionIds !== null) {
+      const collectionProducts = await this.getProductsByCollectionIDs(
+        shop,
+        collectionIds,
+      );
+      collectionProducts.forEach((product: any) => {
+        if (!filterProducts.includes(product.id)) {
+          filterProducts.push(product.id);
+        }
+      });
+    }
     return filterProducts;
   }
 
