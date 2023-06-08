@@ -134,6 +134,103 @@ export class DropsGroupshopService {
     return this.DropsGroupshopRepository.find();
   }
 
+  async addFavoriteProduct(dropsId: string, productId: string) {
+    const manager = getMongoManager();
+    try {
+      await manager.updateOne(
+        DropsGroupshop,
+        { id: dropsId },
+        { $push: { favorite: productId } },
+      );
+
+      Logger.log(
+        `Product added (${productId}) in favorite of Drops GS ${dropsId}`,
+        'FAVORITE_PRODUCT',
+        true,
+      );
+
+      return await this.getFavoriteProducts(dropsId);
+    } catch (err) {
+      Logger.error(
+        `Failed to add product (${productId}) in favorite of Drops GS ${dropsId}. (err) : ${err} `,
+        'FAVORITE_PRODUCT',
+        true,
+      );
+    }
+  }
+
+  async removeFavoriteProduct(dropsId: string, productId: string) {
+    const manager = getMongoManager();
+    const repository = manager.getMongoRepository(DropsGroupshop);
+    try {
+      await repository.updateOne(
+        { id: dropsId },
+        { $pull: { favorite: productId } },
+      );
+
+      Logger.log(
+        `Product removed (${productId}) from favorite of Drops GS ${dropsId}`,
+        'FAVORITE_PRODUCT',
+        true,
+      );
+
+      return await this.getFavoriteProducts(dropsId);
+    } catch (err) {
+      Logger.error(
+        `Failed to remove product (${productId}) from favorite of Drops GS ${dropsId} (err) : ${err}`,
+        'FAVORITE_PRODUCT',
+        true,
+      );
+    }
+  }
+
+  async getFavoriteProducts(dropsId: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          id: dropsId,
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'favorite',
+          foreignField: 'id',
+          as: 'favorite',
+        },
+      },
+      {
+        $addFields: {
+          favorite: {
+            $filter: {
+              input: '$favorite',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $ne: ['$$j.publishedAt', null],
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          favorite: 1,
+        },
+      },
+    ];
+
+    const temp = await manager.aggregate(DropsGroupshop, agg).toArray();
+    return temp[0];
+  }
+
   async getdrops({ pagination, filters, sorting }) {
     try {
       const { skip, take } = pagination;
@@ -315,6 +412,34 @@ export class DropsGroupshopService {
       {
         $unwind: {
           path: '$store',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'favorite',
+          foreignField: 'id',
+          as: 'favorite',
+        },
+      },
+      {
+        $addFields: {
+          favorite: {
+            $filter: {
+              input: '$favorite',
+              as: 'j',
+              cond: {
+                $and: [
+                  {
+                    $ne: ['$$j.publishedAt', null],
+                  },
+                  {
+                    $eq: ['$$j.status', 'ACTIVE'],
+                  },
+                ],
+              },
+            },
+          },
         },
       },
       {
@@ -668,6 +793,7 @@ export class DropsGroupshopService {
           sections: 1,
           firstCategory: 1,
           categories: 1,
+          favorite: 1,
         },
       },
     ];

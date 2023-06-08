@@ -212,6 +212,30 @@ export class DropsGroupshopResolver {
     );
   }
 
+  @Public()
+  @Mutation(() => DropsGroupshop)
+  async addFavoriteProduct(
+    @Args('dropsId') dropsId: string,
+    @Args('productId') productId: string,
+  ) {
+    return await this.dropsGroupshopService.addFavoriteProduct(
+      dropsId,
+      productId,
+    );
+  }
+
+  @Public()
+  @Mutation(() => DropsGroupshop)
+  async removeFavoriteProduct(
+    @Args('dropsId') dropsId: string,
+    @Args('productId') productId: string,
+  ) {
+    return await this.dropsGroupshopService.removeFavoriteProduct(
+      dropsId,
+      productId,
+    );
+  }
+
   @Mutation(() => DropsGroupshop)
   removeDropsGroupshop(@Args('id', { type: () => String }) id: string) {
     return this.dropsGroupshopService.remove(id);
