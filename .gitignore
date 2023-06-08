@@ -11,6 +11,9 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# search indexes
+/src/utils/searchIndexes
+
 # OS
 .DS_Store
 
