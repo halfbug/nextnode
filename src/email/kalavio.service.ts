@@ -121,7 +121,7 @@ export class KalavioService {
   async getProfilesByListId(listId, nextPage, PRIVATE_KEY) {
     const urlKlaviyo = `${this.configService.get(
       'KLAVIYO_BASE_URL',
-    )}${'/lists/'}${listId}${'/profiles/?'}${nextPage}`;
+    )}${'/lists/'}${listId}${'/profiles/?'}${nextPage}&page[size]=100`;
     try {
       const options = {
         headers: {
