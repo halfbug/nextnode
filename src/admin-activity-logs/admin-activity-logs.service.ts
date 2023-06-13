@@ -487,6 +487,18 @@ export class AdminActivityLogsService {
     return activityLog;
   }
 
+  async syncDiscountArrays(oldValue: any, newValue: any) {
+    const activityLog = [];
+    Object.keys(newValue)?.map((key) => {
+      activityLog.push({
+        fieldname: key,
+        oldvalue: null,
+        newValue: newValue[key],
+      });
+    });
+    return activityLog;
+  }
+
   async createAdminActivity(
     message,
     context,
@@ -511,6 +523,8 @@ export class AdminActivityLogsService {
           oldValue,
           mfields,
         );
+      } else if (context === 'Sync Discount Codes') {
+        compareResult = await this.syncDiscountArrays(oldValue, mfields);
       } else {
         compareResult = await this.compareDropsArrays(oldValue, mfields);
       }
