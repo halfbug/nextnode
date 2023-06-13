@@ -54,7 +54,7 @@ export class CreateDropsGroupshopInput {
   @Field(() => OBSettingsInput, { nullable: true })
   obSettings?: OBSettingsInput;
 
-  @Field(() => [String], { nullable: true })
+  @Field(() => [String], { defaultValue: [] })
   favorite?: string[];
 
   @Field({ nullable: true })

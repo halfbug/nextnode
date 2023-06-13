@@ -175,6 +175,6 @@ export class DropsGroupshop {
   @Field(() => [Product], { nullable: true })
   cartSuggested?: Product;
 
-  @Field(() => [Product], { nullable: true })
+  @Field(() => [Product], { defaultValue: [] })
   favorite?: Product[];
 }
