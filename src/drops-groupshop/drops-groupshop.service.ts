@@ -231,7 +231,7 @@ export class DropsGroupshopService {
     return temp[0];
   }
 
-  async getdrops({ pagination, filters, sorting }) {
+  async getdrops({ pagination, filters, sorting, startdate, endDate }) {
     try {
       const { skip, take } = pagination;
 
@@ -319,6 +319,14 @@ export class DropsGroupshopService {
 
       agg = [
         {
+          $match: {
+            createdAt: {
+              $gte: startdate,
+              $lte: endDate,
+            },
+          },
+        },
+        {
           $lookup: {
             from: 'store',
             localField: 'storeId',
@@ -347,7 +355,7 @@ export class DropsGroupshopService {
         $count: 'total',
       });
       const gscount = await manager.aggregate(DropsGroupshop, agg).toArray();
-      const total = gscount[0]?.total;
+      const total = gscount[0]?.total ?? 0;
       return {
         result,
         pageInfo: this.paginateService.paginate(result, total, take, skip),
