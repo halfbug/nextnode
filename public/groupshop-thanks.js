@@ -897,7 +897,11 @@ async function init() {
           var rightHeadTxt = '';
           let cashback = 0;
           var amountCal = 0;
-          if (members < 3 && Shopify.checkout.discount) {
+          if (
+            members < 3 &&
+            Shopify.checkout.discount &&
+            store.dropsLastMilestone != mem.availedDiscount
+          ) {
             console.log(
               '🚀 ~ file: groupshop-thanks.js:808 ~ pollit3 ~ lineitems:',
               lineitems,
