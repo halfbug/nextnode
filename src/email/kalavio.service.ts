@@ -140,6 +140,28 @@ export class KalavioService {
     }
   }
 
+  async getProfilesBySegmentId(segementId, nextPage, PRIVATE_KEY) {
+    const urlKlaviyo = `${this.configService.get(
+      'KLAVIYO_BASE_URL',
+    )}${'/segments/'}${segementId}${'/profiles/?'}${nextPage}&page[size]=100`;
+    try {
+      const options = {
+        headers: {
+          Authorization: `${'Klaviyo-API-Key '}${PRIVATE_KEY}`,
+          accept: 'application/json',
+          revision: '2023-02-22',
+        },
+      };
+      const getProfiles = await lastValueFrom(
+        this.httpService.get(urlKlaviyo, options).pipe(map((res) => res.data)),
+      );
+      return getProfiles;
+    } catch (err) {
+      Logger.error(err, KalavioService.name);
+      console.error(err);
+    }
+  }
+
   async klaviyoProfileSmsUpdate(input) {
     const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
     const customerEmail = input.email;

@@ -275,4 +275,10 @@ export class LifecycleService {
     console.log('🚀 get billing by date', TotalRes);
     return TotalRes;
   }
+
+  async insertMany(dgroupshops: any[]) {
+    const manager = getMongoManager();
+
+    return await manager.insertMany(Lifecycle, dgroupshops);
+  }
 }

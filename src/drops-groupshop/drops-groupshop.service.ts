@@ -1181,4 +1181,41 @@ export class DropsGroupshopService {
       where: { storeId, milestones: { $size: 3 } },
     });
   }
+
+  async getAllPendingDropsByIds(ids: string[]) {
+    const pendingDropGroupshop = this.DropsGroupshopRepository.find({
+      where: { 'customerDetail.klaviyoId': { $in: ids }, status: 'pending' },
+    });
+
+    return (await pendingDropGroupshop).map((dgropshop) => {
+      return dgropshop.id;
+    });
+  }
+
+  async insertMany(dgroupshops: any[]) {
+    const manager = getMongoManager();
+    return await manager.insertMany(DropsGroupshop, dgroupshops);
+  }
+
+  async updateBulkDgroupshops(dgroupshops: any) {
+    const bulkwrite = dgroupshops.map((dgroupshop) => {
+      return {
+        updateOne: {
+          filter: { id: dgroupshop },
+          update: {
+            $set: {
+              status: 'expired',
+              expiredAt: new Date(),
+            },
+          },
+        },
+      };
+    });
+    try {
+      const manager = getMongoManager();
+      return await manager.bulkWrite(DropsGroupshop, bulkwrite);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 }
