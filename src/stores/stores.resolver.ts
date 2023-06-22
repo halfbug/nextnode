@@ -62,16 +62,6 @@ export class StoresResolver {
   }
 
   @Public()
-  @Query(() => Store, { name: 'StoreKlaviyoDetail' })
-  async findKlaviyoOne(@Args('shop') shop: string) {
-    console.log('shopname ', shop);
-    if (shop !== 'undefined.myshopify.com') {
-      console.log('shopshop ', shop);
-      return this.storesService.findOneKlaviyoByName(shop);
-    }
-  }
-
-  @Public()
   @Query(() => Store, { name: 'activeCampaignWithProducts' })
   async findOneCampaign(@Args('shop') shop: string, @Info() info: any) {
     return this.storesService.findOneWithActiveCampaingProducts(shop);

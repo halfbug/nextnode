@@ -142,15 +142,6 @@ export class StoresService {
     }
   }
 
-  async findOneKlaviyoByName(shop: string) {
-    const result = await this.storeRepository.findOne({
-      where: {
-        shop: shop,
-      },
-    });
-    return result;
-  }
-
   async findDropStore() {
     const manager = getMongoManager();
     const agg = [
