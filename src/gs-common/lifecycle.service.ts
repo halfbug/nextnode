@@ -14,6 +14,10 @@ export class LifecycleService {
     return this.lifecycleRepository.save(eventLifecycle);
   }
 
+  createMany(documents) {
+    return this.lifecycleRepository.insertMany(documents);
+  }
+
   findAll(groupshopId: string) {
     return this.lifecycleRepository.find({
       where: { groupshopId },

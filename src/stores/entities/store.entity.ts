@@ -6,17 +6,15 @@ import {
   InputType,
 } from '@nestjs/graphql';
 import { Campaign } from 'src/campaigns/entities/campaign.entity';
-import { AnyScalar } from 'src/utils/any.scalarType';
 import { Settings } from './settings.entity';
 import { SocialLinks } from 'src/campaigns/entities/social-links.entity';
 import { PartnerRewards } from 'src/partners/entities/partner.entity';
 import { Product } from 'src/inventory/entities/product.entity';
+import { DiscountCode } from 'src/groupshops/entities/groupshop.entity';
 import {
-  DealProducts,
-  DiscountCode,
-  GroupShop,
-  Member,
-} from 'src/groupshops/entities/groupshop.entity';
+  Category,
+  Sections,
+} from 'src/drops-groupshop/entities/drops-groupshop.entity';
 
 export enum BillingPlanEnum {
   EXPLORE, // 30days
@@ -232,7 +230,6 @@ export class Drops {
   @Field(() => [CartRewards], { nullable: 'itemsAndList' })
   cartRewards?: CartRewards;
 }
-
 @ObjectType('Store')
 export class Store {
   // @Field({ description: 'mongo entity id' })
@@ -338,4 +335,19 @@ export class Store {
 
   @Field({ nullable: true })
   collectionUpdateStatus?: string;
+
+  @Field(() => Category, { nullable: true })
+  firstCategory?: Category;
+
+  @Field(() => [Sections], { nullable: true })
+  sections?: Sections[];
+
+  @Field(() => [Category], { nullable: true })
+  categories?: Category;
+
+  @Field(() => [Product], { nullable: true })
+  cartSuggested?: Product;
+
+  @Field(() => Store, { nullable: true })
+  store?: Store;
 }

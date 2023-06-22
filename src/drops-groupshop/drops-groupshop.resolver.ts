@@ -15,12 +15,10 @@ import { StoresService } from 'src/stores/stores.service';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 import { GridArgs } from './dto/paginationArgs.input';
 import { DropsPage } from './entities/drops-paginate.entity';
-import {
-  SPOTLIGHT_SECTION_TITLE,
-  VAULT_SECTION_TITLE,
-} from 'src/utils/constant';
 import { DropsCategory } from 'src/drops-category/entities/drops-category.entity';
 import { DropsCategoryService } from 'src/drops-category/drops-category.service';
+import { Store } from 'src/stores/entities/store.entity';
+import { OBSettingsInput } from 'src/groupshops/dto/create-groupshops.input';
 
 @Resolver(() => DropsGroupshop)
 export class DropsGroupshopResolver {
@@ -110,6 +108,7 @@ export class DropsGroupshopResolver {
     }
     const updateGS = await this.dropsGroupshopService.updateExpireDate(
       {
+        ...groupshop,
         status: 'active',
         discountCode: updatedDiscountCode ?? groupshop.discountCode,
         expiredAt: newExpiredate,
@@ -120,17 +119,20 @@ export class DropsGroupshopResolver {
 
     // add lifcycle event for revised groupshop
 
-    this.lifecyclesrv.create({
-      groupshopId: groupshop.id,
-      event: eventType,
-      dateTime: new Date(),
-    });
+    const documents = [
+      {
+        groupshopId: groupshop.id,
+        event: eventType,
+        dateTime: new Date(),
+      },
+      {
+        groupshopId: groupshop.id,
+        event: EventType.expired,
+        dateTime: newExpiredate ?? new Date(),
+      },
+    ];
 
-    this.lifecyclesrv.create({
-      groupshopId: groupshop.id,
-      event: EventType.expired,
-      dateTime: newExpiredate,
-    });
+    this.lifecyclesrv.createMany(documents);
 
     return updateGS;
   }
@@ -201,6 +203,12 @@ export class DropsGroupshopResolver {
   }
 
   @Public()
+  @Query(() => Store, { name: 'DropGroupshopSections' })
+  async getDropsSections() {
+    return await this.dropsGroupshopService.findDropGroupshopSections();
+  }
+
+  @Public()
   @Mutation(() => DropsGroupshop)
   updateDropsGroupshop(
     @Args('updateDropsGroupshopInput')
@@ -246,32 +254,24 @@ export class DropsGroupshopResolver {
   async createOnBoardingDiscountCode(@Args('gid') gid: string) {
     try {
       const dgroupshop = await this.dropsGroupshopService.findOne(gid);
-      const klaviyoId = dgroupshop?.customerDetail?.klaviyoId;
-      const shortURL = dgroupshop?.shortUrl;
+      const dGroupshop = {
+        ...dgroupshop,
+        obSettings: { ...dgroupshop.obSettings, step: 1 },
+      };
+
+      const klaviyoId = dGroupshop?.customerDetail?.klaviyoId;
+      const shortURL = dGroupshop?.shortUrl;
+
       // Update status on Klaviyo profile
-      if (typeof klaviyoId !== 'undefined') {
-        const currentProfile = await this.kalavioService.getProfilesById(
-          klaviyoId,
-          dgroupshop.storeId,
-        );
-        const latestShortUrl =
-          currentProfile?.data.attributes.properties?.groupshop_url;
-        if (shortURL === latestShortUrl) {
-          const params = new URLSearchParams({
-            groupshop_status: 'active',
-          });
-          const data = params.toString();
-          await this.kalavioService.klaviyoProfileUpdate(
-            klaviyoId,
-            data,
-            dgroupshop.storeId,
-          );
-        }
-      }
+      this.kalavioService.updateKlaviyoProfileStatus(
+        klaviyoId,
+        shortURL,
+        dGroupshop,
+      );
 
       const updateDropsGroupshop = await this.expireAtUpdate(
-        dgroupshop,
-        dgroupshop.discountCode.title,
+        dGroupshop,
+        dGroupshop.discountCode.title,
         EventType.started,
       );
 

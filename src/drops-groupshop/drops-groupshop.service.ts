@@ -12,9 +12,10 @@ import { FilterOption } from './dto/paginationArgs.input';
 import { PaginationService } from 'src/utils/pagination.service';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { Product } from 'src/inventory/entities/product.entity';
-import { OrderLineItems } from 'src/inventory/entities/orders.entity';
 import DropsCategory from 'src/drops-category/entities/drops-category.model';
 import { DropsCategoryService } from 'src/drops-category/drops-category.service';
+import Store from 'src/stores/entities/store.model';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class DropsGroupshopService {
@@ -30,6 +31,7 @@ export class DropsGroupshopService {
     private inventoryService: InventoryService,
     @Inject(forwardRef(() => DropsCategoryService))
     private dropsCategoryService: DropsCategoryService,
+    private configService: ConfigService,
   ) {}
 
   async create(createDropsGroupshopInput: CreateDropsGroupshopInput) {
@@ -411,19 +413,6 @@ export class DropsGroupshopService {
       },
       {
         $lookup: {
-          from: 'store',
-          localField: 'storeId',
-          foreignField: 'id',
-          as: 'store',
-        },
-      },
-      {
-        $unwind: {
-          path: '$store',
-        },
-      },
-      {
-        $lookup: {
           from: 'inventory',
           localField: 'favorite',
           foreignField: 'id',
@@ -448,6 +437,124 @@ export class DropsGroupshopService {
               },
             },
           },
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              as: 'me',
+              in: {
+                $mergeObjects: [
+                  '$$me',
+                  {
+                    products: {
+                      $map: {
+                        input: '$$me.lineItems',
+                        in: {
+                          $arrayElemAt: [
+                            {
+                              $filter: {
+                                input: {
+                                  $concatArrays: [
+                                    {
+                                      $ifNull: ['$products', []],
+                                    },
+                                  ],
+                                },
+                                as: 'j',
+                                cond: {
+                                  $eq: ['$$this.product.id', '$$j.id'],
+                                },
+                              },
+                            },
+                            0,
+                          ],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'orders',
+          localField: 'members.orderId',
+          foreignField: 'id',
+          as: 'orders',
+        },
+      },
+      {
+        $addFields: {
+          members: {
+            $map: {
+              input: '$members',
+              as: 'me',
+              in: {
+                $mergeObjects: [
+                  '$$me',
+                  {
+                    orderDetail: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$orders',
+                            as: 'j',
+                            cond: {
+                              $eq: ['$$me.orderId', '$$j.id'],
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          createdAt: 1,
+          customerDetail: 1,
+          storeId: 1,
+          shortUrl: 1,
+          url: 1,
+          obSettings: 1,
+          expiredUrl: 1,
+          expiredShortUrl: 1,
+          expiredAt: 1,
+          discountCode: 1,
+          members: 1,
+          milestones: 1,
+          id: 1,
+          updatedAt: 1,
+          favorite: 1,
+        },
+      },
+    ];
+    const manager = getMongoManager();
+    const gs = await manager.aggregate(DropsGroupshop, agg).toArray();
+    return gs[0];
+  }
+
+  async findDropGroupshopSections() {
+    const agg = [
+      {
+        $match: {
+          id: this.configService.get('DROPSTORE'),
+        },
+      },
+      {
+        $project: {
+          store: '$$ROOT',
         },
       },
       {
@@ -625,48 +732,6 @@ export class DropsGroupshopService {
       },
       {
         $addFields: {
-          members: {
-            $map: {
-              input: '$members',
-              as: 'me',
-              in: {
-                $mergeObjects: [
-                  '$$me',
-                  {
-                    products: {
-                      $map: {
-                        input: '$$me.lineItems',
-                        in: {
-                          $arrayElemAt: [
-                            {
-                              $filter: {
-                                input: {
-                                  $concatArrays: [
-                                    {
-                                      $ifNull: ['$products', []],
-                                    },
-                                  ],
-                                },
-                                as: 'j',
-                                cond: {
-                                  $eq: ['$$this.product.id', '$$j.id'],
-                                },
-                              },
-                            },
-                            0,
-                          ],
-                        },
-                      },
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
-      {
-        $addFields: {
           products: {
             $filter: {
               input: '$products',
@@ -731,82 +796,21 @@ export class DropsGroupshopService {
         },
       },
       {
-        $lookup: {
-          from: 'orders',
-          localField: 'members.orderId',
-          foreignField: 'id',
-          as: 'orders',
-        },
-      },
-      {
-        $addFields: {
-          members: {
-            $map: {
-              input: '$members',
-              as: 'me',
-              in: {
-                $mergeObjects: [
-                  '$$me',
-                  {
-                    orderDetail: {
-                      $arrayElemAt: [
-                        {
-                          $filter: {
-                            input: '$orders',
-                            as: 'j',
-                            cond: {
-                              $eq: ['$$me.orderId', '$$j.id'],
-                            },
-                          },
-                        },
-                        0,
-                      ],
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
-      {
         $project: {
-          createdAt: 1,
-          customerDetail: 1,
-          storeId: 1,
-          totalProducts: 1,
-          shortUrl: 1,
           products: 1,
-          productObj: 1,
           collections: 1,
-          url: 1,
-          obSettings: 1,
-          expiredUrl: 1,
-          expiredShortUrl: 1,
-          expiredAt: 1,
           cartSuggested: 1,
-          dealProducts: 1,
-          discountCode: 1,
-          members: 1,
-          milestones: 1,
-          id: 1,
           updatedAt: 1,
           store: 1,
-          partnerRewards: 1,
-          partnerDetails: 1,
-          memberDetails: 1,
-          refferalProducts: 1,
-          isActive: 1,
-          partnerCommission: 1,
           sections: 1,
           firstCategory: 1,
           categories: 1,
-          favorite: 1,
+          drops: 1,
         },
       },
     ];
     const manager = getMongoManager();
-    const gs = await manager.aggregate(DropsGroupshop, agg).toArray();
+    const gs = await manager.aggregate(Store, agg).toArray();
     return gs[0];
   }
 

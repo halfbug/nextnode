@@ -34,6 +34,21 @@ export class KalavioService {
       });
   }
 
+  updateKlaviyoProfileStatus(klaviyoId, shortURL, dgroupshop) {
+    if (typeof klaviyoId !== 'undefined') {
+      this.getProfilesById(klaviyoId, dgroupshop.storeId).then((res) => {
+        const latestShortUrl = res?.data.attributes.properties?.groupshop_url;
+        if (shortURL === latestShortUrl) {
+          const params = new URLSearchParams({
+            groupshop_status: 'active',
+          });
+          const data = params.toString();
+          this.klaviyoProfileUpdate(klaviyoId, data, dgroupshop.storeId);
+        }
+      });
+    }
+  }
+
   createKlaviyoSubscribes(body: any) {
     const PRIVATE_KEY = this.configService.get('KLAVIYO_PRIVATE_KEY');
     const urlKlaviyo = `${this.configService.get(
