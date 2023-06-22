@@ -937,7 +937,10 @@ export class DropsGroupshopService {
     const { id } = updateGroupshopInput;
 
     delete updateGroupshopInput.id;
-    await this.DropsGroupshopRepository.update({ id }, updateGroupshopInput);
+    await this.DropsGroupshopRepository.update(
+      { id, status: 'pending' },
+      updateGroupshopInput,
+    );
     return await this.findDropsGS(code);
   }
 
