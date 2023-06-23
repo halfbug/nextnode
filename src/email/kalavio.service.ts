@@ -134,15 +134,21 @@ export class KalavioService {
   }
 
   async getProfilesByListId(listId, nextPage, PRIVATE_KEY) {
-    const urlKlaviyo = `${this.configService.get(
-      'KLAVIYO_BASE_URL',
-    )}${'/lists/'}${listId}${'/profiles/?'}${nextPage}&page[size]=100`;
+    let urlKlaviyo;
+    if (nextPage == '') {
+      urlKlaviyo = `${this.configService.get(
+        'KLAVIYO_BASE_URL',
+      )}${'/lists/'}${listId}${'/profiles/?'}${nextPage}&page[size]=100`;
+    } else {
+      urlKlaviyo = nextPage;
+    }
+
     try {
       const options = {
         headers: {
           Authorization: `${'Klaviyo-API-Key '}${PRIVATE_KEY}`,
           accept: 'application/json',
-          revision: '2023-02-22',
+          revision: '2023-06-15',
         },
       };
       const getProfiles = await lastValueFrom(
@@ -156,15 +162,21 @@ export class KalavioService {
   }
 
   async getProfilesBySegmentId(segementId, nextPage, PRIVATE_KEY) {
-    const urlKlaviyo = `${this.configService.get(
-      'KLAVIYO_BASE_URL',
-    )}${'/segments/'}${segementId}${'/profiles/?'}${nextPage}&page[size]=100`;
+    let urlKlaviyo;
+    if (nextPage == '') {
+      urlKlaviyo = `${this.configService.get(
+        'KLAVIYO_BASE_URL',
+      )}${'/segments/'}${segementId}${'/profiles/?'}${nextPage}&page[size]=100`;
+    } else {
+      urlKlaviyo = nextPage;
+    }
+
     try {
       const options = {
         headers: {
           Authorization: `${'Klaviyo-API-Key '}${PRIVATE_KEY}`,
           accept: 'application/json',
-          revision: '2023-02-22',
+          revision: '2023-06-15',
         },
       };
       const getProfiles = await lastValueFrom(

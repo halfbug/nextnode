@@ -503,11 +503,13 @@ export class CatController {
       );
       allProfiles = [...allProfiles, ...profiles.data];
       const nextPageLink = profiles?.links?.next ? profiles?.links?.next : '';
+
       if (nextPageLink !== '') {
-        nextPage = nextPageLink.split('profiles/?')[1];
+        nextPage = nextPageLink;
       } else {
         nextPage = '';
       }
+      console.log('nextPageLink', nextPageLink);
     } while (nextPage !== '');
 
     Logger.log(
@@ -517,8 +519,6 @@ export class CatController {
       'WeeklyDropCron',
       true,
     );
-
-    // console.log('allProfiles', JSON.stringify(allProfiles));
 
     const filteredProfiles = allProfiles.filter(
       (profile) =>
@@ -560,24 +560,32 @@ export class CatController {
       true,
     );
 
-    const pendingdropGroupshops = getpendingdropGroupshops.map((dgroupshop) => {
-      return {
-        groupshopId: dgroupshop,
-        event: EventType.ended,
-        dateTime: new Date(),
-      };
-    });
-    await this.lifecyclesrv.insertMany(pendingdropGroupshops);
+    const pendingdropGroupshops = getpendingdropGroupshops?.map(
+      (dgroupshop) => {
+        return {
+          groupshopId: dgroupshop,
+          event: EventType.ended,
+          dateTime: new Date(),
+        };
+      },
+    );
 
+    if (pendingdropGroupshops.length > 0) {
+      await this.lifecyclesrv.insertMany(pendingdropGroupshops);
+    }
     Logger.log(
-      `Weekly Drop Cron Completed Lifecycle for Pending Drop Groupshops at ${new Date()} `,
+      `Weekly Drop Cron Completed  Lifecycle ${
+        pendingdropGroupshops.length
+      } records for Pending Drop Groupshops at ${new Date()} `,
       'WeeklyDropCron',
       true,
     );
 
-    await this.dropsGroupshopService.updateBulkDgroupshops(
-      getpendingdropGroupshops,
-    );
+    if (getpendingdropGroupshops.length > 0) {
+      await this.dropsGroupshopService.updateBulkDgroupshops(
+        getpendingdropGroupshops,
+      );
+    }
 
     Logger.log(
       `Weekly Drop Cron Updated Bulk Pending Drop Groupshops Status at ${new Date()} `,
@@ -631,7 +639,9 @@ export class CatController {
     });
 
     Logger.log(
-      `Weekly Drop Cron Created Drop object for New drop links at ${new Date()} `,
+      `Weekly Drop Cron Created ${
+        dropobjects.length
+      } records of Drop object for New drop links at ${new Date()} `,
       'WeeklyDropCron',
       true,
     );
