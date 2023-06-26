@@ -119,6 +119,10 @@ export class DropKlaviyoCron {
             profile.attributes.properties?.groupshop_status !== 'pending' &&
             Date.parse(profile.attributes.properties?.groupshop_created_at) <
               lastWeek) ||
+          (profile.attributes.properties?.groupshop_source === 'API' &&
+            profile.attributes.properties?.groupshop_status !== 'pending' &&
+            Date.parse(profile.attributes.properties?.groupshop_created_at) >=
+              lastWeek) ||
           (profile.attributes.properties?.groupshop_source === 'CRON' &&
             Date.parse(profile.attributes.properties?.groupshop_created_at) !==
               today),
@@ -228,6 +232,8 @@ export class DropKlaviyoCron {
           expiredAt: null,
           milestones: [{ activatedAt: new Date(), discount: baseline }],
           members: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
         };
       });
 
