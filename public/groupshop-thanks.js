@@ -879,14 +879,18 @@ async function init() {
             priceSum + quantity * parseFloat(line_price),
           0,
         );
-        fbq('track', 'Purchase', {
-          contents: cartDetails,
-          currency: store?.currencyCode,
-          eventref: res?.id,
-          value:
-            totalPrice -
-            (Shopify.checkout.discount ? Shopify.checkout.discount.amount : 0),
-        });
+        if (shop === 'groupshopdrops.myshopify.com') {
+          fbq('track', 'Purchase', {
+            contents: cartDetails,
+            currency: store?.currencyCode,
+            eventref: res?.id,
+            value:
+              totalPrice -
+              (Shopify.checkout.discount
+                ? Shopify.checkout.discount.amount
+                : 0),
+          });
+        }
         if (res.activeMember) {
           clearInterval(pollit3);
           const { activeMember: mem, url, percentage, members } = res;
