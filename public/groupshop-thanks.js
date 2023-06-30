@@ -812,6 +812,22 @@ function addRightBlock(
   }
 }
 
+function getCookie(cname) {
+  let name = cname + '=';
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return 0;
+}
+
 async function init() {
   //   try {
   // fetch store detail
@@ -879,7 +895,11 @@ async function init() {
             priceSum + quantity * parseFloat(line_price),
           0,
         );
-        if (shop === 'groupshopdrops.myshopify.com') {
+        const cookieOrderId = getCookie('fbq_loaded');
+        if (
+          shop == 'groupshopdrops.myshopify.com' &&
+          cookieOrderId != Shopify.checkout.order_id
+        ) {
           fbq('track', 'Purchase', {
             contents: cartDetails,
             currency: store?.currencyCode,
@@ -890,6 +910,7 @@ async function init() {
                 ? Shopify.checkout.discount.amount
                 : 0),
           });
+          document.cookie = 'fbq_loaded=' + Shopify.checkout.order_id;
         }
         if (res.activeMember) {
           clearInterval(pollit3);
