@@ -135,8 +135,8 @@ export class StoresService {
       },
     });
     console.log(JSON.stringify(result));
-    if (typeof result.industry === 'string') {
-      return { ...result, industry: [result.industry] };
+    if (typeof result?.industry === 'string') {
+      return { ...result, industry: [result?.industry] };
     } else {
       return result;
     }
