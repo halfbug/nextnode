@@ -319,7 +319,7 @@ export class OrderPlacedListener {
             id: campaignId,
             salesTarget: { rewards },
             products: campaignProducts,
-          },
+          } = { id: null, salesTarget: { rewards: null }, products: [] },
           drops: { rewards: { baseline, average, maximum } } = {
             rewards: {
               baseline: '0',

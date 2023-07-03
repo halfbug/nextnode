@@ -1047,6 +1047,7 @@ export class DropsGroupshopService {
     return await this.DropsGroupshopRepository.findOne({
       where: {
         'members.orderId': { $regex: `${orderId}` },
+        status: 'active',
       },
     });
   }

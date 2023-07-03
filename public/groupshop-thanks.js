@@ -834,7 +834,10 @@ async function init() {
   const store = await fetchStore(Shopify.shop);
   console.log('🚀 ~ file: groupshop-pdp.js ~ line 124 ~ init ~ store', store);
   const bannerSummaryPage = store.settings.layout.bannerSummaryPage;
-  if (['Active', 'Inactive'].includes(store.status)) {
+  if (
+    ['Active', 'Inactive'].includes(store.status) &&
+    store.dropsStatus == 'Active'
+  ) {
     //create products slider
     injectStyleSheet('gsthanks.css');
     injectStyleSheet('glider.min.css');

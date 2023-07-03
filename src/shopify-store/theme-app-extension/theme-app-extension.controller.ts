@@ -38,44 +38,50 @@ export class ThemeAppExtensionController {
   async getStoreWithActiveCampaign(@Req() req, @Res() res) {
     try {
       const { shop } = req.query;
-      const {
-        id,
-        currencyCode,
-        activeCampaign: {
-          id: campaignId,
-          salesTarget: {
-            rewards: [, , { discount }],
-          },
-        },
-        settings,
-        status,
-        logoImage,
-        brandName,
-        drops: { collections, rewards: { maximum } } = {
-          rewards: { maximum: 0 },
-          collections: [],
-          klaviyo: {},
-        },
-      } = await this.storesService.findOneWithActiveCampaing(shop);
-      // console.log(await this.storesService.findOneWithActiveCampaing(shop));
-      res.send(
-        JSON.stringify({
+      const result = await this.storesService.findOneByName(shop);
+
+      if (result && result?.drops?.status == 'Active') {
+        const {
           id,
           currencyCode,
-          campaignId,
-          status,
-          discount,
-          logoImage: `${this.configService.get('IMAGE_PATH')}${
-            logoImage?.split('/')[4]
-          }`,
           settings,
+          status,
+          logoImage,
           brandName,
-          shopifyId:
-            collections.filter((c) => c.name === BESTSELLER_SECTION_TITLE)?.[0]
-              ?.shopifyId ?? '', // Static Bestseller name for idetify collection.
-          dropsLastMilestone: maximum,
-        }),
-      );
+          drops: { status: dropsStatus, collections, rewards: { maximum } } = {
+            rewards: { maximum: 0 },
+            collections: [],
+            klaviyo: {},
+          },
+        } = result;
+
+        // console.log(await this.storesService.findOneWithActiveCampaing(shop));
+        res.send(
+          JSON.stringify({
+            id,
+            currencyCode,
+            status,
+            dropsStatus,
+            logoImage: `${this.configService.get('IMAGE_PATH')}${
+              logoImage?.split('/')[4]
+            }`,
+            settings,
+            brandName,
+            shopifyId:
+              collections.filter(
+                (c) => c.name === BESTSELLER_SECTION_TITLE,
+              )?.[0]?.shopifyId ?? '', // Static Bestseller name for idetify collection.
+            dropsLastMilestone: maximum,
+          }),
+        );
+      } else {
+        res.send(
+          JSON.stringify({
+            status: 'onHold',
+            dropsStatus: 'InActive',
+          }),
+        );
+      }
     } catch (err) {
       Logger.error(err, ThemeAppExtensionController.name);
     } finally {
