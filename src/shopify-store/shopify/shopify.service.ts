@@ -1027,4 +1027,37 @@ export class ShopifyService {
       Logger.error(err, ShopifyService.name);
     }
   }
+
+  async getLocationsByVariantIds(shop: string, ids: string[], accessToken) {
+    try {
+      const client = await this.client(shop, accessToken);
+      const subQueries = ids?.map(
+        (id, index) =>
+          `productVariant${
+            index + 1
+          }: productVariant(id: "${id}") { inventoryItem { inventoryLevels(first: 1) { edges { node { location { id } } } } } }\n`,
+      );
+
+      const ldetail = await client.query({
+        data: {
+          query: `{
+            ${subQueries.map((sq) => sq)}
+          }`,
+        },
+      });
+      // console.log({ ldetail });
+      Logger.debug(ldetail, ShopifyService.name);
+      const arr = Object.values(ldetail.body['data']);
+      const locations = arr.map(
+        (item) =>
+          item['inventoryItem']['inventoryLevels']['edges'][0]['node'][
+            'location'
+          ]['id'],
+      );
+      return locations;
+    } catch (err) {
+      console.log(err.response.errors);
+      Logger.error(err, ShopifyService.name);
+    }
+  }
 }

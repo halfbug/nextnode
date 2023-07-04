@@ -3,6 +3,7 @@ import { InventoryService } from './inventory.service';
 import {
   CollectionStatusList,
   Inventory,
+  GetLocationsOutput,
   SearchResult,
 } from './entities/inventory.entity';
 import { Collection } from './entities/collection.entity';
@@ -14,12 +15,15 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Public } from 'src/auth/public.decorator';
 import { StoresService } from 'src/stores/stores.service';
 import { CollectionUpdateEnum } from 'src/stores/entities/store.entity';
+import { GetLocationsInput } from './dto/create-inventory.input';
+import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
 @UseGuards(AuthGuard)
 @Resolver(() => Inventory)
 export class InventoryResolver {
   constructor(
     private readonly inventoryService: InventoryService,
     private readonly storeService: StoresService,
+    private shopifyapi: ShopifyService,
   ) {}
 
   @Query(() => TotalProducts, { name: 'TotalProducts' })
@@ -115,6 +119,23 @@ export class InventoryResolver {
     return await this.inventoryService.findCollectionsWithSyncedStatus(shop);
   }
 
+  @Public()
+  @Query(() => GetLocationsOutput, { name: 'getLocations' })
+  async getLocations(
+    @Args('getLocationsInput') getLocationsInput: GetLocationsInput,
+  ) {
+    const { shop, variantIds } = getLocationsInput;
+
+    const { accessToken } = await this.storeService.findOne(shop);
+
+    const locations = await this.shopifyapi.getLocationsByVariantIds(
+      shop,
+      variantIds,
+      accessToken,
+    );
+
+    return { locations };
+  }
   // @Mutation(() => Inventory)
   // updateInventory(
   //   @Args('updateInventoryInput') updateInventoryInput: UpdateInventoryInput,

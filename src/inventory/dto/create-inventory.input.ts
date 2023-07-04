@@ -105,3 +105,12 @@ export class CreateInventoryInput {
   @Field({ nullable: true })
   compareAtPrice?: string;
 }
+
+@InputType()
+export class GetLocationsInput {
+  @Field()
+  shop: string;
+
+  @Field(() => [String])
+  variantIds: string[];
+}

@@ -142,3 +142,9 @@ export class CollectionStatusList {
   @Field({ nullable: true })
   productCount?: number;
 }
+
+@ObjectType()
+export class GetLocationsOutput {
+  @Field(() => [String], { nullable: 'itemsAndList' })
+  locations: string[];
+}
