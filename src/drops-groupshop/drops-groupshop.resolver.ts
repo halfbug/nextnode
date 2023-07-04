@@ -84,6 +84,7 @@ export class DropsGroupshopResolver {
           newExpiredate,
           null,
           true,
+          true,
         );
       }
     } else {
@@ -97,6 +98,7 @@ export class DropsGroupshopResolver {
         groupshop.createdAt,
         newExpiredate,
         groupshop.discountCode.priceRuleId,
+        true,
         true,
       );
 

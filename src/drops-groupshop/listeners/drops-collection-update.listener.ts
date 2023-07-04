@@ -40,6 +40,7 @@ export class DropsCollectionUpdatedListener {
           null,
           dg.discountCode.priceRuleId,
           true,
+          true,
         );
         console.log(
           '🚀 ~ file: drops-collection-update.listener.ts:44 ~ DropsCollectionUpdatedListener ~ discountCode:',

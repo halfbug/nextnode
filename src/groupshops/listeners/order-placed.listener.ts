@@ -527,6 +527,7 @@ export class OrderPlacedListener {
                 dgroupshop.expiredAt,
                 priceRuleId,
                 true,
+                true,
               );
               // update milestone
               const gsMilestone = new MilestoneInput();

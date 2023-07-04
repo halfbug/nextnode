@@ -2032,6 +2032,7 @@ export class WebhooksController {
           null,
           dg.discountCode.priceRuleId,
           true,
+          true,
         );
       }
     } catch (err) {

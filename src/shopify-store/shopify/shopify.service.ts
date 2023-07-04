@@ -255,6 +255,7 @@ export class ShopifyService {
     ends?: Date,
     id?: string,
     isCollection?: boolean,
+    shippingDiscounts?: boolean,
   ) {
     // if (percentage) {
     console.log({ title });
@@ -305,6 +306,7 @@ export class ShopifyService {
                 },
                 combinesWith: {
                   productDiscounts: true,
+                  shippingDiscounts,
                 },
                 customerSelection: {
                   forAllCustomers: true,
@@ -337,6 +339,7 @@ export class ShopifyService {
               },
               combinesWith: {
                 productDiscounts: true,
+                shippingDiscounts,
               },
             },
           };
@@ -353,6 +356,7 @@ export class ShopifyService {
               },
               combinesWith: {
                 productDiscounts: true,
+                shippingDiscounts,
               },
             },
           };
@@ -365,6 +369,7 @@ export class ShopifyService {
               },
               combinesWith: {
                 productDiscounts: true,
+                shippingDiscounts,
               },
             },
           };
@@ -379,6 +384,7 @@ export class ShopifyService {
               },
               combinesWith: {
                 productDiscounts: true,
+                shippingDiscounts,
               },
             },
           };
@@ -392,6 +398,7 @@ export class ShopifyService {
               },
               combinesWith: {
                 productDiscounts: true,
+                shippingDiscounts,
               },
             },
           };

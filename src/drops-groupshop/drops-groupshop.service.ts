@@ -394,6 +394,7 @@ export class DropsGroupshopService {
       null,
       null,
       true,
+      true,
     );
     return discountCode;
   }
