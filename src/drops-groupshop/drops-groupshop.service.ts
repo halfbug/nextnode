@@ -441,6 +441,14 @@ export class DropsGroupshopService {
         },
       },
       {
+        $lookup: {
+          from: 'inventory',
+          localField: 'members.lineItems.product.id',
+          foreignField: 'id',
+          as: 'products',
+        },
+      },
+      {
         $addFields: {
           members: {
             $map: {
