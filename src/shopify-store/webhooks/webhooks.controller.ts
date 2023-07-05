@@ -458,85 +458,89 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const rproduct = req.body;
-      console.log('Webhook : PRODUCT_CREATED : ', JSON.stringify(rproduct));
-      const prodinfo = await this.inventryService.findOne(shop, 'Product');
-      const nprod = new CreateInventoryInput();
+      const storeData = await this.storesService.findOneByName(shop);
+      if (storeData?.drops && storeData?.drops?.status == 'Active') {
+        console.log('Webhook : PRODUCT_CREATED : ', JSON.stringify(rproduct));
+        const prodinfo = await this.inventryService.findOne(shop, 'Product');
+        const nprod = new CreateInventoryInput();
 
-      // add product
-      nprod.id = rproduct?.admin_graphql_api_id;
-      nprod.createdAtShopify = rproduct?.created_at;
-      nprod.publishedAt = rproduct?.published_at;
-      nprod.title = rproduct?.title;
-      nprod.shop = shop;
-      nprod.recordType = 'Product';
-      nprod.status = rproduct?.status?.toUpperCase();
-      nprod.price = rproduct?.variants[0]?.price;
-      nprod.featuredImage = rproduct?.image?.src;
-      nprod.createdAt = new Date();
-      nprod.outofstock = false;
-      nprod.purchaseCount = 0;
-      nprod.secondaryCount = generatesecondaryCount();
-      // nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
-      nprod.description = rproduct.body_html;
-      // if product is not active then it will be not purchaseable.
-      if (nprod.status !== 'ACTIVE') nprod.outofstock = true;
-      nprod.currencyCode = prodinfo?.currencyCode;
-      const pcreated = await this.inventryService.create(nprod);
-      // console.log(
-      //   '🚀 ~ file: webhooks.controller.ts:453 ~ createProducts ~ pcreated',
-      //   pcreated,
-      // );
-      // console.log(
-      //   '🚀 ~ file: webhooks.controller.ts:453 ~ createProducts ~ nprod',
-      //   nprod,
-      // );
+        // add product
+        nprod.id = rproduct?.admin_graphql_api_id;
+        nprod.createdAtShopify = rproduct?.created_at;
+        nprod.publishedAt = rproduct?.published_at;
+        nprod.title = rproduct?.title;
+        nprod.shop = shop;
+        nprod.recordType = 'Product';
+        nprod.status = rproduct?.status?.toUpperCase();
+        nprod.price = rproduct?.variants[0]?.price;
+        nprod.featuredImage = rproduct?.image?.src;
+        nprod.createdAt = new Date();
+        nprod.outofstock = false;
+        nprod.purchaseCount = 0;
+        nprod.secondaryCount = generatesecondaryCount();
+        // nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
+        nprod.description = rproduct.body_html;
+        // if product is not active then it will be not purchaseable.
+        if (nprod.status !== 'ACTIVE') nprod.outofstock = true;
+        nprod.currencyCode = prodinfo?.currencyCode;
+        const pcreated = await this.inventryService.create(nprod);
+        // console.log(
+        //   '🚀 ~ file: webhooks.controller.ts:453 ~ createProducts ~ pcreated',
+        //   pcreated,
+        // );
+        // console.log(
+        //   '🚀 ~ file: webhooks.controller.ts:453 ~ createProducts ~ nprod',
+        //   nprod,
+        // );
 
-      //add variat
-      const vprod = nprod;
-      rproduct.variants?.map(async (variant) => {
-        vprod.id = variant.admin_graphql_api_id;
-        vprod.title = variant?.title;
-        vprod.parentId = rproduct?.admin_graphql_api_id;
-        vprod.recordType = 'ProductVariant';
-        vprod.createdAtShopify = variant?.created_at;
-        vprod.publishedAt = rproduct?.published_at;
-        vprod.inventoryManagement = variant?.inventory_management;
-        vprod.inventoryPolicy = variant?.inventory_policy;
-        vprod.price = variant.price;
-        vprod.compareAtPrice = variant?.compare_at_price;
-        vprod.createdAt = new Date();
-        vprod.inventoryQuantity = variant?.inventory_quantity;
-        const img = new ProductImage();
-        img.src = variant.image_id
-          ? rproduct.images.filter((img) => img.id === variant.image_id)?.[0]
-              .src
-          : rproduct.image
-          ? rproduct.image.src
-          : null;
-        vprod.image = img;
-        vprod.selectedOptions = rproduct.options.map((item, index) => {
-          const sOpt = new SelectedOption();
-          sOpt.name = item.name;
-          sOpt.value = variant[`option${index + 1}`];
-          return sOpt;
+        //add variat
+        const vprod = nprod;
+        rproduct.variants?.map(async (variant) => {
+          vprod.id = variant.admin_graphql_api_id;
+          vprod.title = variant?.title;
+          vprod.parentId = rproduct?.admin_graphql_api_id;
+          vprod.recordType = 'ProductVariant';
+          vprod.createdAtShopify = variant?.created_at;
+          vprod.publishedAt = rproduct?.published_at;
+          vprod.inventoryManagement = variant?.inventory_management;
+          vprod.inventoryPolicy = variant?.inventory_policy;
+          vprod.price = variant.price;
+          vprod.compareAtPrice = variant?.compare_at_price;
+          vprod.createdAt = new Date();
+          vprod.inventoryQuantity = variant?.inventory_quantity;
+          const img = new ProductImage();
+          img.src = variant.image_id
+            ? rproduct.images.filter((img) => img.id === variant.image_id)?.[0]
+                .src
+            : rproduct.image
+            ? rproduct.image.src
+            : null;
+          vprod.image = img;
+          vprod.selectedOptions = rproduct.options.map((item, index) => {
+            const sOpt = new SelectedOption();
+            sOpt.name = item.name;
+            sOpt.value = variant[`option${index + 1}`];
+            return sOpt;
+          });
+
+          await this.inventryService.create(vprod);
+        });
+        rproduct.images.map((img) => {
+          const vprod = new CreateInventoryInput();
+          vprod.id = img.admin_graphql_api_id;
+          vprod.parentId = rproduct.admin_graphql_api_id;
+          vprod.recordType = 'ProductImage';
+          vprod.shop = shop;
+          // image
+          vprod.src = img.src;
+
+          this.inventryService.create(vprod);
         });
 
-        await this.inventryService.create(vprod);
-      });
-      rproduct.images.map((img) => {
-        const vprod = new CreateInventoryInput();
-        vprod.id = img.admin_graphql_api_id;
-        vprod.parentId = rproduct.admin_graphql_api_id;
-        vprod.recordType = 'ProductImage';
-        vprod.shop = shop;
-        // image
-        vprod.src = img.src;
-
-        this.inventryService.create(vprod);
-      });
-      // this.updateSmartCollection.productId = rproduct?.admin_graphql_api_id;
-      // this.updateSmartCollection.shop = shop;
-      // this.updateSmartCollection.emit();
+        // this.updateSmartCollection.productId = rproduct?.admin_graphql_api_id;
+        // this.updateSmartCollection.shop = shop;
+        // this.updateSmartCollection.emit();
+      }
     } catch (err) {
       console.log(JSON.stringify(err));
       Logger.error(err, 'product-created');
@@ -577,122 +581,127 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const rproduct = req.body;
-      console.log(
-        '🚀 ~ file: webhooks.controller.ts:522 ~ productUpdate ~ rproduct',
-        JSON.stringify(rproduct),
-      );
-      this.productMedia.productId = rproduct.admin_graphql_api_id;
-      this.productMedia.shopName = shop;
-      // const ProductMedia = new ProductMediaObject();
-      // console.log(
-      //   'WebhooksController ~ productUpdate ~ rproduct',
-      //   JSON.stringify(rproduct),
-      // );
-      const nprod = new UpdateInventoryInput();
-      // nprod.id = rproduct.id;
-      nprod.id = rproduct?.admin_graphql_api_id;
-      nprod.createdAtShopify = rproduct?.created_at;
-      nprod.publishedAt = rproduct?.published_at;
-      nprod.title = rproduct?.title;
-      nprod.tags =
-        typeof rproduct?.tags === 'string'
-          ? rproduct?.tags.split(', ')
-          : (nprod.tags = rproduct?.tags);
-      nprod.vendor = rproduct?.vendor;
-      nprod.productCategory = rproduct?.productType;
-      nprod.status = rproduct?.status?.toUpperCase();
-      nprod.price = rproduct?.variants[0]?.price; //
-      nprod.compareAtPrice = rproduct?.variants[0]?.compare_at_price;
-      nprod.featuredImage = rproduct?.image?.src;
-      // nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
-      nprod.description = rproduct.body_html;
-      // nprod.secondaryCount = generatesecondaryCount();
-      // let qDifference: number;
-      // const isAvailable = rproduct.variants.some(
-      //   (item) => item.inventory_quantity > 0,
-      // );
+      const storeData = await this.storesService.findOneByName(shop);
+      if (storeData?.drops && storeData?.drops?.status == 'Active') {
+        console.log(
+          '🚀 ~ file: webhooks.controller.ts:522 ~ productUpdate ~ rproduct',
+          JSON.stringify(rproduct),
+        );
+        this.productMedia.productId = rproduct.admin_graphql_api_id;
+        this.productMedia.shopName = shop;
+        // const ProductMedia = new ProductMediaObject();
+        // console.log(
+        //   'WebhooksController ~ productUpdate ~ rproduct',
+        //   JSON.stringify(rproduct),
+        // );
+        const nprod = new UpdateInventoryInput();
+        // nprod.id = rproduct.id;
+        nprod.id = rproduct?.admin_graphql_api_id;
+        nprod.createdAtShopify = rproduct?.created_at;
+        nprod.publishedAt = rproduct?.published_at;
+        nprod.title = rproduct?.title;
+        nprod.tags =
+          typeof rproduct?.tags === 'string'
+            ? rproduct?.tags.split(', ')
+            : (nprod.tags = rproduct?.tags);
+        nprod.vendor = rproduct?.vendor;
+        nprod.productCategory = rproduct?.productType;
+        nprod.status = rproduct?.status?.toUpperCase();
+        nprod.price = rproduct?.variants[0]?.price; //
+        nprod.compareAtPrice = rproduct?.variants[0]?.compare_at_price;
+        nprod.featuredImage = rproduct?.image?.src;
+        // nprod.description = rproduct.body_html.replace(/<\/?[^>]+(>|$)/g, '');
+        nprod.description = rproduct.body_html;
+        // nprod.secondaryCount = generatesecondaryCount();
+        // let qDifference: number;
+        // const isAvailable = rproduct.variants.some(
+        //   (item) => item.inventory_quantity > 0,
+        // );
 
-      // !isAvailable;
-      nprod.options = rproduct.options.map(
-        ({ id, name, position, values }) => ({
-          id,
-          name,
-          position,
-          values,
-        }),
-      );
+        // !isAvailable;
+        nprod.options = rproduct.options.map(
+          ({ id, name, position, values }) => ({
+            id,
+            name,
+            position,
+            values,
+          }),
+        );
 
-      await this.inventryService.removeVariants(rproduct?.admin_graphql_api_id);
-      this.productMedia.emit();
+        await this.inventryService.removeVariants(
+          rproduct?.admin_graphql_api_id,
+        );
+        this.productMedia.emit();
 
-      // create event for Search Indexing
-      this.searchIndexingRefreshEvent.shopName = shop;
-      this.searchIndexingRefreshEvent.emit();
+        // create event for Search Indexing
+        this.searchIndexingRefreshEvent.shopName = shop;
+        this.searchIndexingRefreshEvent.emit();
 
-      this.inventryService.findOne(shop, 'ProductVideo');
-      const variants = [];
-      rproduct.variants?.map(async (variant) => {
-        const vprod = new CreateInventoryInput();
-        vprod.id = variant.admin_graphql_api_id;
-        vprod.title = variant?.title;
-        vprod.parentId = rproduct?.admin_graphql_api_id;
-        vprod.recordType = 'ProductVariant';
-        vprod.createdAtShopify = variant?.created_at;
-        vprod.publishedAt = rproduct?.published_at;
-        vprod.featuredImage = rproduct?.image?.src;
-        vprod.shop = shop;
-        vprod.inventoryManagement = variant?.inventory_management;
-        vprod.inventoryPolicy = variant?.inventory_policy;
-        const img = new ProductImage();
-        img.src = variant.image_id
-          ? rproduct.images.filter((img) => img.id === variant.image_id)?.[0]
-              .src
-          : rproduct?.image?.src;
-        // rproduct?.image && rproduct?.image.src ? rproduct?.image.src : null;
+        this.inventryService.findOne(shop, 'ProductVideo');
+        const variants = [];
+        rproduct.variants?.map(async (variant) => {
+          const vprod = new CreateInventoryInput();
+          vprod.id = variant.admin_graphql_api_id;
+          vprod.title = variant?.title;
+          vprod.parentId = rproduct?.admin_graphql_api_id;
+          vprod.recordType = 'ProductVariant';
+          vprod.createdAtShopify = variant?.created_at;
+          vprod.publishedAt = rproduct?.published_at;
+          vprod.featuredImage = rproduct?.image?.src;
+          vprod.shop = shop;
+          vprod.inventoryManagement = variant?.inventory_management;
+          vprod.inventoryPolicy = variant?.inventory_policy;
+          const img = new ProductImage();
+          img.src = variant.image_id
+            ? rproduct.images.filter((img) => img.id === variant.image_id)?.[0]
+                .src
+            : rproduct?.image?.src;
+          // rproduct?.image && rproduct?.image.src ? rproduct?.image.src : null;
 
-        vprod.image = img;
-        vprod.price = variant?.price;
-        vprod.compareAtPrice = variant?.compare_at_price;
-        vprod.inventoryQuantity = variant?.inventory_quantity;
-        // const seOptions = [];
-        // console.log(seOptions, 'seOptions');
-        // vprod.selectedOptions = [new SelectedOption()];
-        vprod.selectedOptions = rproduct.options.map((item, index) => {
-          const sOpt = new SelectedOption();
-          sOpt.name = item.name;
-          sOpt.value = variant[`option${index + 1}`];
-          return sOpt;
+          vprod.image = img;
+          vprod.price = variant?.price;
+          vprod.compareAtPrice = variant?.compare_at_price;
+          vprod.inventoryQuantity = variant?.inventory_quantity;
+          // const seOptions = [];
+          // console.log(seOptions, 'seOptions');
+          // vprod.selectedOptions = [new SelectedOption()];
+          vprod.selectedOptions = rproduct.options.map((item, index) => {
+            const sOpt = new SelectedOption();
+            sOpt.name = item.name;
+            sOpt.value = variant[`option${index + 1}`];
+            return sOpt;
+          });
+          variants.push(vprod);
+          await this.inventryService.create(vprod);
         });
-        variants.push(vprod);
-        await this.inventryService.create(vprod);
-      });
 
-      rproduct.images.map((img) => {
-        const vprod = new CreateInventoryInput();
-        vprod.id = img.admin_graphql_api_id;
-        vprod.parentId = rproduct.admin_graphql_api_id;
-        vprod.recordType = 'ProductImage';
-        vprod.shop = shop;
-        // image
-        vprod.src = img.src;
-        this.inventryService.create(vprod);
-      });
-      // this.updateSmartCollection.productId = rproduct?.admin_graphql_api_id;
-      // this.updateSmartCollection.shop = shop;
-      // this.updateSmartCollection.emit();
+        rproduct.images.map((img) => {
+          const vprod = new CreateInventoryInput();
+          vprod.id = img.admin_graphql_api_id;
+          vprod.parentId = rproduct.admin_graphql_api_id;
+          vprod.recordType = 'ProductImage';
+          vprod.shop = shop;
+          // image
+          vprod.src = img.src;
+          this.inventryService.create(vprod);
+        });
+        // this.updateSmartCollection.productId = rproduct?.admin_graphql_api_id;
+        // this.updateSmartCollection.shop = shop;
+        // this.updateSmartCollection.emit();
 
-      nprod.outofstock =
-        nprod.status !== 'ACTIVE'
-          ? true
-          : this.inventryService.calculateOutOfStock(variants);
-      await this.inventryService.update(nprod);
-      // console.log(
-      //   '🚀 ~ file: webhooks.controller.ts ~ line 590 ~ WebhooksController ~ productUpdate ~ nprod',
-      //   nprod,
-      // );
-      if (nprod.outofstock) {
-        this.campaignStock.shop = shop;
-        this.campaignStock.emit();
+        nprod.outofstock =
+          nprod.status !== 'ACTIVE'
+            ? true
+            : this.inventryService.calculateOutOfStock(variants);
+        await this.inventryService.update(nprod);
+        // console.log(
+        //   '🚀 ~ file: webhooks.controller.ts ~ line 590 ~ WebhooksController ~ productUpdate ~ nprod',
+        //   nprod,
+        // );
+        if (nprod.outofstock) {
+          this.campaignStock.shop = shop;
+          this.campaignStock.emit();
+        }
       }
       // res.send('product updated..');
     } catch (err) {
@@ -859,17 +868,19 @@ export class WebhooksController {
   async orderCreate(@Req() req, @Res() res) {
     try {
       const { shop } = req.query;
-      // console.log(
-      //   'WebhooksController ~ orderCreate ~ webhookData',
-      //   JSON.stringify(req.body),
-      // );
-      // const webhook = req.body;
-      if (req.body.source_name !== 'pos') {
-        this.orderCreatedEvent.webhook = req.body;
-        this.orderCreatedEvent.shop = shop;
-        this.orderCreatedEvent.emit();
+      const storeData = await this.storesService.findOneByName(shop);
+      if (storeData?.drops && storeData?.drops?.status == 'Active') {
+        // console.log(
+        //   'WebhooksController ~ orderCreate ~ webhookData',
+        //   JSON.stringify(req.body),
+        // );
+        // const webhook = req.body;
+        if (req.body.source_name !== 'pos') {
+          this.orderCreatedEvent.webhook = req.body;
+          this.orderCreatedEvent.shop = shop;
+          this.orderCreatedEvent.emit();
+        }
       }
-
       // res.send('order created..');
     } catch (err) {
       console.log(JSON.stringify(err));
@@ -884,52 +895,56 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const rproduct = req.body;
-      console.log(
-        'WebhooksController ~ productDelete ~ rproduct',
-        JSON.stringify(rproduct),
-      );
-      const { id: storeId } = await this.storesService.findOne(shop);
+      const storeData = await this.storesService.findOneByName(shop);
+      if (storeData?.drops && storeData?.drops?.status == 'Active') {
+        console.log(
+          'WebhooksController ~ productDelete ~ rproduct',
+          JSON.stringify(rproduct),
+        );
+        const { id: storeId } = await this.storesService.findOne(shop);
 
-      // const { result } = await this.inventryService.remove(
-      //   JSON.stringify(rproduct.id),
-      // );
-      // res.send(result.deletedCount);
-      Logger.warn(
-        `product : ${rproduct.id} is deleted from ${shop}`,
-        'product-deleted',
-      );
-      const PrdId = `gid://shopify/Product/${rproduct.id}`;
+        // const { result } = await this.inventryService.remove(
+        //   JSON.stringify(rproduct.id),
+        // );
+        // res.send(result.deletedCount);
+        Logger.warn(
+          `product : ${rproduct.id} is deleted from ${shop}`,
+          'product-deleted',
+        );
+        const PrdId = `gid://shopify/Product/${rproduct.id}`;
 
-      //  1 products are not deleted from the database but are marked out of stock and set deleted product status to DELETED
-      // await this.inventryService.removeVariants(PrdId);
+        //  1 products are not deleted from the database but are marked out of stock and set deleted product status to DELETED
+        // await this.inventryService.removeVariants(PrdId);
 
-      await this.inventryService.updateProduct(PrdId, {
-        status: 'DELETED',
-        outofstock: true,
-        featuredImage: 'https://d1o2v5h7slksjm.cloudfront.net/discontinued.png',
-      });
-      //  2 if they are part of any campaign remove them from campaign products
-      const allCampaign = await this.campaignService.findAll(storeId);
-      const filteredCampaigns = allCampaign.filter((campaign) =>
-        campaign.products.includes(PrdId),
-      );
-      console.log(
-        '🚀 ~ file: webhooks.controller.ts:854 ~ productDelete ~ filteredCampaigns',
-        filteredCampaigns,
-      );
-      filteredCampaigns.map(async (campaign) => {
-        const updatedPrd = campaign.products.filter((prd) => prd !== PrdId);
-        return await this.campaignService.update(campaign.id, {
-          storeId,
-          products: updatedPrd,
-          criteria: campaign.criteria,
-          id: campaign.id,
+        await this.inventryService.updateProduct(PrdId, {
+          status: 'DELETED',
+          outofstock: true,
+          featuredImage:
+            'https://d1o2v5h7slksjm.cloudfront.net/discontinued.png',
         });
-      });
+        //  2 if they are part of any campaign remove them from campaign products
+        const allCampaign = await this.campaignService.findAll(storeId);
+        const filteredCampaigns = allCampaign.filter((campaign) =>
+          campaign.products.includes(PrdId),
+        );
+        console.log(
+          '🚀 ~ file: webhooks.controller.ts:854 ~ productDelete ~ filteredCampaigns',
+          filteredCampaigns,
+        );
+        filteredCampaigns.map(async (campaign) => {
+          const updatedPrd = campaign.products.filter((prd) => prd !== PrdId);
+          return await this.campaignService.update(campaign.id, {
+            storeId,
+            products: updatedPrd,
+            criteria: campaign.criteria,
+            id: campaign.id,
+          });
+        });
 
-      // create event for Search Indexing
-      this.searchIndexingRefreshEvent.shopName = shop;
-      this.searchIndexingRefreshEvent.emit();
+        // create event for Search Indexing
+        this.searchIndexingRefreshEvent.shopName = shop;
+        this.searchIndexingRefreshEvent.emit();
+      }
 
       //  3 update groupshop page query so that it can display deleted bought products as discontinued products.
     } catch (err) {
@@ -950,16 +965,19 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const rproduct = req.body;
-      console.log(
-        'WebhooksController ~ collection-create ~ rproduct',
-        JSON.stringify(rproduct),
-        shop,
-      );
+      const storeData = await this.storesService.findOneByName(shop);
+      if (storeData?.drops && storeData?.drops?.status == 'Active') {
+        console.log(
+          'WebhooksController ~ collection-create ~ rproduct',
+          JSON.stringify(rproduct),
+          shop,
+        );
 
-      // const { result } = await this.inventryService.remove(
-      //   JSON.stringify(rproduct.id),
-      // );
-      // res.send(result.deletedCount);
+        // const { result } = await this.inventryService.remove(
+        //   JSON.stringify(rproduct.id),
+        // );
+        // res.send(result.deletedCount);
+      }
     } catch (err) {
       console.log(JSON.stringify(err));
       Logger.error(err, 'collection-created');
@@ -973,43 +991,46 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const collection = req.body;
-      console.log(
-        '🚀 ~ file: webhooks.controller.ts:965 ~ collectionDelete ~ collection:',
-        collection,
-      );
+      const storeData = await this.storesService.findOneByName(shop);
+      if (storeData?.drops && storeData?.drops?.status == 'Active') {
+        console.log(
+          '🚀 ~ file: webhooks.controller.ts:965 ~ collectionDelete ~ collection:',
+          collection,
+        );
 
-      const { id } = await this.storesService.findOne(shop);
+        const { id } = await this.storesService.findOne(shop);
 
-      this.inventryService
-        .removeEntity(
+        this.inventryService
+          .removeEntity(
+            `gid://shopify/Collection/${collection.id}`,
+            RecordType.Collection,
+          )
+          .then(() => {
+            console.log(
+              '🚀 ~ file: webhooks.controller.ts:965 ~ collectionDelete',
+              `Collection deleted id: gid://shopify/Collection/${collection.id} of ${shop}`,
+            );
+            Logger.log(
+              `Collection deleted id: gid://shopify/Collection/${collection.id} of ${shop}`,
+              'collection-delete',
+              true,
+            );
+            // create event for Search Indexing
+            this.searchIndexingRefreshEvent.shopName = shop;
+            this.searchIndexingRefreshEvent.emit();
+          })
+          .catch((err) => {
+            Logger.error(
+              `Can't delete collection id: gid://shopify/Collection/${collection.id} of ${shop} : ${err}`,
+              'collection-delete',
+            );
+          });
+
+        await this.storesService.removeSyncedCollection(
           `gid://shopify/Collection/${collection.id}`,
-          RecordType.Collection,
-        )
-        .then(() => {
-          console.log(
-            '🚀 ~ file: webhooks.controller.ts:965 ~ collectionDelete',
-            `Collection deleted id: gid://shopify/Collection/${collection.id} of ${shop}`,
-          );
-          Logger.log(
-            `Collection deleted id: gid://shopify/Collection/${collection.id} of ${shop}`,
-            'collection-delete',
-            true,
-          );
-          // create event for Search Indexing
-          this.searchIndexingRefreshEvent.shopName = shop;
-          this.searchIndexingRefreshEvent.emit();
-        })
-        .catch((err) => {
-          Logger.error(
-            `Can't delete collection id: gid://shopify/Collection/${collection.id} of ${shop} : ${err}`,
-            'collection-delete',
-          );
-        });
-
-      await this.storesService.removeSyncedCollection(
-        `gid://shopify/Collection/${collection.id}`,
-        id,
-      );
+          id,
+        );
+      }
     } catch (err) {
       console.log(JSON.stringify(err));
       Logger.error(err, 'collection-delete');
@@ -1023,28 +1044,29 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const bulkData = req.body;
+      const storeData = await this.storesService.findOneByName(shop);
+      if (storeData?.drops && storeData?.drops?.status == 'Active') {
+        const { accessToken, id, collectionsToUpdate } =
+          await this.storesService.findOne(shop);
 
-      const { accessToken, id, collectionsToUpdate } =
-        await this.storesService.findOne(shop);
+        const client = await this.shopifyService.client(shop, accessToken);
 
-      const client = await this.shopifyService.client(shop, accessToken);
+        console.log(
+          'WebhooksController ~ bulk-finish',
+          JSON.stringify(bulkData),
+          shop,
+        );
 
-      console.log(
-        'WebhooksController ~ bulk-finish',
-        JSON.stringify(bulkData),
-        shop,
-      );
+        const log = await this.appLoggerService.findLatestByCotext(
+          'COLLECTIONTOUPDATBULK',
+        );
 
-      const log = await this.appLoggerService.findLatestByCotext(
-        'COLLECTIONTOUPDATBULK',
-      );
+        const bulkOperationId = log.message?.split('-')[1]?.trim();
 
-      const bulkOperationId = log.message?.split('-')[1]?.trim();
-
-      await client
-        .query({
-          data: {
-            query: `query {
+        await client
+          .query({
+            data: {
+              query: `query {
             node(id: "${bulkOperationId}") {
               ... on BulkOperation {
                 url
@@ -1052,55 +1074,59 @@ export class WebhooksController {
               }
             }
           }`,
-          },
-        })
-        .then((res) => {
-          const resp = JSON.stringify(res.body['data']['node']);
-          Logger.log(`${shop} ${resp}`, 'SYNC_COLLECTION_BULKFINISH', true);
-          const url = res.body['data']['node'].url;
-          this.httpService.get(url).subscribe(async (res) => {
-            const checkCollection = res.data?.length
-              ? readJsonLines(res.data)
-              : [];
-            Logger.log(
-              `check collection ${JSON.stringify(checkCollection)}`,
-              'SYNC_COLLECTION_BULKFINISH',
-              true,
-            );
+            },
+          })
+          .then((res) => {
+            const resp = JSON.stringify(res.body['data']['node']);
+            Logger.log(`${shop} ${resp}`, 'SYNC_COLLECTION_BULKFINISH', true);
+            const url = res.body['data']['node'].url;
+            this.httpService.get(url).subscribe(async (res) => {
+              const checkCollection = res.data?.length
+                ? readJsonLines(res.data)
+                : [];
+              Logger.log(
+                `check collection ${JSON.stringify(checkCollection)}`,
+                'SYNC_COLLECTION_BULKFINISH',
+                true,
+              );
 
-            if (
-              checkCollection.length
-              // checkCollection[0].productsCount > 0
-            ) {
-              // this.inventryService.getProducts(checkCollection, id, shop);
-              const deletedCollectionIds =
-                await this.inventryService.updateCollection(
-                  checkCollection,
-                  id,
+              if (
+                checkCollection.length
+                // checkCollection[0].productsCount > 0
+              ) {
+                // this.inventryService.getProducts(checkCollection, id, shop);
+                const deletedCollectionIds =
+                  await this.inventryService.updateCollection(
+                    checkCollection,
+                    id,
+                    shop,
+                  );
+                // update store status to complete
+                // remove store collectiontoupdate entries
+                await this.storesService.updateCustom(
                   shop,
+                  deletedCollectionIds,
                 );
-              // update store status to complete
-              // remove store collectiontoupdate entries
-              await this.storesService.updateCustom(shop, deletedCollectionIds);
-              Logger.log(
-                `${shop} deletedIds ${deletedCollectionIds}`,
-                'SYNC_COLLECTION_UPDATESTORE',
-                true,
-              );
-              Logger.log(
-                `${shop} updated/sync`,
-                'SYNC_COLLECTION_UPDATESTORE',
-                true,
-              );
-            } else {
-              console.log('No products found');
-            }
-          });
+                Logger.log(
+                  `${shop} deletedIds ${deletedCollectionIds}`,
+                  'SYNC_COLLECTION_UPDATESTORE',
+                  true,
+                );
+                Logger.log(
+                  `${shop} updated/sync`,
+                  'SYNC_COLLECTION_UPDATESTORE',
+                  true,
+                );
+              } else {
+                console.log('No products found');
+              }
+            });
 
-          // create event for Search Indexing
-          this.searchIndexingRefreshEvent.shopName = shop;
-          this.searchIndexingRefreshEvent.emit();
-        });
+            // create event for Search Indexing
+            this.searchIndexingRefreshEvent.shopName = shop;
+            this.searchIndexingRefreshEvent.emit();
+          });
+      }
     } catch (err) {
       Logger.error(err, 'SYNC_COLLECTION_BULKFINISH');
     } finally {
@@ -1114,192 +1140,60 @@ export class WebhooksController {
       // 1. receive collection webhook
       const { shop: shopName } = req.query;
       const rcollection = req.body;
-      // let collectionType;
-      // if ('rules' in rcollection && rcollection.rules.length) {
-      //   collectionType = 'smart';
-      // } else {
-      //   collectionType = 'custom';
-      // }
-      console.log(
-        'WebhooksController ~ collection-update ~ ',
-        JSON.stringify(rcollection),
-        shopName,
-      );
-
-      // 2. delete all previous products collection
-      // await this.inventryService.removeEntity(
-      //   rcollection.admin_graphql_api_id,
-      //   RecordType.Collection,
-      // );
-
-      // 3. get collection detail from shopify IF its a published collection
-
-      const { id } = await this.storesService.findOne(shopName);
-      const temp: any = await this.storesService.checkUpdatedCollection(
-        rcollection.admin_graphql_api_id,
-        false,
-        id,
-      );
-
-      if (!temp[0].collections?.length) {
-        const body = {
-          collectionTitle: rcollection.title,
-          collectionId: rcollection.admin_graphql_api_id,
-          isSynced: false,
-          updatedAt: new Date(),
-        };
-        this.storesService.updateCollectionToSync(id, body);
-      } else {
-        this.storesService.updateCollectionDate(
-          rcollection.admin_graphql_api_id,
-          new Date(),
+      const storeData = await this.storesService.findOneByName(shopName);
+      if (storeData?.drops && storeData?.drops?.status == 'Active') {
+        // let collectionType;
+        // if ('rules' in rcollection && rcollection.rules.length) {
+        //   collectionType = 'smart';
+        // } else {
+        //   collectionType = 'custom';
+        // }
+        console.log(
+          'WebhooksController ~ collection-update ~ ',
+          JSON.stringify(rcollection),
+          shopName,
         );
+
+        // 2. delete all previous products collection
+        // await this.inventryService.removeEntity(
+        //   rcollection.admin_graphql_api_id,
+        //   RecordType.Collection,
+        // );
+
+        // 3. get collection detail from shopify IF its a published collection
+
+        const { id } = await this.storesService.findOne(shopName);
+        const temp: any = await this.storesService.checkUpdatedCollection(
+          rcollection.admin_graphql_api_id,
+          false,
+          id,
+        );
+
+        if (!temp[0].collections?.length) {
+          const body = {
+            collectionTitle: rcollection.title,
+            collectionId: rcollection.admin_graphql_api_id,
+            isSynced: false,
+            updatedAt: new Date(),
+          };
+          this.storesService.updateCollectionToSync(id, body);
+        } else {
+          this.storesService.updateCollectionDate(
+            rcollection.admin_graphql_api_id,
+            new Date(),
+          );
+        }
+
+        Logger.log(
+          `Collection update receive on ${shopName} with id ${rcollection.admin_graphql_api_id}`,
+          'COLLECTION_UPDATE_RECEIVE',
+          true,
+        );
+
+        // create event for Search Indexing
+        this.searchIndexingRefreshEvent.shopName = shopName;
+        this.searchIndexingRefreshEvent.emit();
       }
-
-      Logger.log(
-        `Collection update receive on ${shopName} with id ${rcollection.admin_graphql_api_id}`,
-        'COLLECTION_UPDATE_RECEIVE',
-        true,
-      );
-
-      // create event for Search Indexing
-      this.searchIndexingRefreshEvent.shopName = shopName;
-      this.searchIndexingRefreshEvent.emit();
-
-      // if (rcollection.published_at) {
-      //   const client = await this.shopifyService.client(shopName, accessToken);
-
-      //   let qres = await client.query({
-      //     data: {
-      //       query: `mutation {
-      //     bulkOperationRunQuery(
-      //       query:"""
-      //       {
-      //         collection(id: "${rcollection.admin_graphql_api_id}") {
-      //                 title
-      //                 id
-      //                 productsCount
-      //                 products(first:10000,sortKey:COLLECTION_DEFAULT){
-      //                   edges{
-      //                     node{
-      //                       title
-      //                       id
-      //                       status
-      //                       createdAt
-      //                     }
-      //                   }
-      //                 }
-      //               }
-      //           }
-      //       """
-      //     ) {
-      //       bulkOperation {
-      //         id
-      //         status
-      //       }
-      //       userErrors {
-      //         field
-      //         message
-      //       }
-      //     }
-      //   }`,
-      //     },
-      //   });
-
-      //   let timer;
-      //   if (!qres.body['data']['bulkOperationRunQuery']['bulkOperation']) {
-      //     timer = setInterval(async () => {
-      //       qres = await this.shopifyService.createBulkOperation(
-      //         client,
-      //         rcollection.admin_graphql_api_id,
-      //       );
-      //     }, 4000);
-      //   } else if (
-      //     qres.body['data']['bulkOperationRunQuery']['bulkOperation']
-      //   ) {
-      //     if (timer) {
-      //       clearInterval(timer);
-      //     }
-      //     if (
-      //       qres.body['data']['bulkOperationRunQuery']['bulkOperation'][
-      //         'status'
-      //       ] === 'CREATED'
-      //     ) {
-      //       const pollit = setInterval(async () => {
-      //         const poll = await client.query({
-      //           data: {
-      //             query: `query {
-      //       currentBulkOperation {
-      //         id
-      //         status
-      //         errorCode
-      //         createdAt
-      //         completedAt
-      //         objectCount
-      //         fileSize
-      //         url
-      //         partialDataUrl
-      //       }
-      //     }`,
-      //           },
-      //         });
-
-      //         if (
-      //           poll.body['data']['currentBulkOperation']['status'] ===
-      //           'COMPLETED'
-      //         ) {
-      //           clearInterval(pollit);
-
-      //           // fire inventory received event
-      //           const url = poll.body['data']['currentBulkOperation'].url;
-      //           this.httpService.get(url).subscribe(async (res) => {
-      //             let productsArray;
-      //             if (res.data?.length) {
-      //               productsArray = readJsonLines(res.data);
-      //             } else {
-      //               productsArray = [res.data];
-      //             }
-      //             await this.inventryService.getRandomPurchaseCount(
-      //               productsArray,
-      //             );
-      //             // console.log(
-      //             //   '\x1b[44m%s\x1b[0m',
-      //             //   'webhooks.controller.ts line:961 inventoryArray',
-      //             //   JSON.stringify(productsArray, null, '\t'),
-      //             // );
-      //             /* 4. loop to the products
-      //               5. add collection to products
-      // */
-      //             const collectionObjs = productsArray.map((product) => ({
-      //               id: rcollection.admin_graphql_api_id,
-      //               title: rcollection.title,
-      //               // description: rcollection.body_html.replace(
-      //               //   /<\/?[^>]+(>|$)/g,
-      //               //   '',
-      //               // ),
-      //               type: collectionType,
-      //               description: rcollection.body_html,
-      //               productsCount: productsArray.length,
-      //               sortOrder: rcollection.sort_order.toUpperCase(),
-      //               featuredImage: rcollection?.image?.src,
-      //               parentId: product.id,
-      //               shop,
-      //               recordType: 'Collection',
-      //             }));
-
-      //             // console.log(
-      //             //   '\x1b[44m%s\x1b[0m',
-      //             //   'webhooks.controller.ts line:982 collectionObjs',
-      //             //   collectionObjs,
-      //             // );
-
-      //             await this.inventryService.insertMany(collectionObjs);
-      //           });
-      //         }
-      //       }, 3000);
-      //     } else console.log(JSON.stringify(qres.body['data']));
-      //   }
-      // }
     } catch (err) {
       console.log(JSON.stringify(err));
       Logger.error(err, 'collection-updated');
@@ -1885,37 +1779,39 @@ export class WebhooksController {
     try {
       const { shop } = req.query;
       const rorder = req.body;
-      // console.log(
-      //   'WebhooksController ~ orderUpdate ~ webhookData',
-      //   JSON.stringify(req.body),
-      // );
+      const storeData = await this.storesService.findOneByName(shop);
+      if (storeData?.drops && storeData?.drops?.status == 'Active') {
+        // console.log(
+        //   'WebhooksController ~ orderUpdate ~ webhookData',
+        //   JSON.stringify(req.body),
+        // );
 
-      const order = new UpdateFullOrderInput();
-      order.id = rorder.admin_graphql_api_id;
-      order.financialStatus = rorder.financial_status;
-      if (rorder.financial_status.includes('refund')) {
-        order.refundDetail = rorder.refunds?.map((refund) => {
-          if (refund.order_adjustments.length > 0)
-            return refund.order_adjustments?.map((oj: any) => ({
-              date: refund.created_at,
-              note: refund.note,
-              type: 'amount adjustment',
-              amount: oj.amount,
-            }));
-          else
-            return refund.refund_line_items?.map((rl: any) => ({
-              date: refund.created_at,
-              note: refund.note,
-              type: 'lineitem returned',
-              lineItemId: rl.line_item.admin_graphql_api_id,
-              amount: rl.subtotal,
-              quantity: rl.quantity,
-            }));
-        });
+        const order = new UpdateFullOrderInput();
+        order.id = rorder.admin_graphql_api_id;
+        order.financialStatus = rorder.financial_status;
+        if (rorder.financial_status.includes('refund')) {
+          order.refundDetail = rorder.refunds?.map((refund) => {
+            if (refund.order_adjustments.length > 0)
+              return refund.order_adjustments?.map((oj: any) => ({
+                date: refund.created_at,
+                note: refund.note,
+                type: 'amount adjustment',
+                amount: oj.amount,
+              }));
+            else
+              return refund.refund_line_items?.map((rl: any) => ({
+                date: refund.created_at,
+                note: refund.note,
+                type: 'lineitem returned',
+                lineItemId: rl.line_item.admin_graphql_api_id,
+                amount: rl.subtotal,
+                quantity: rl.quantity,
+              }));
+          });
+        }
+        order.refundDetail = order.refundDetail?.map((rd) => rd[0]);
+        this.orderService.update(order);
       }
-      order.refundDetail = order.refundDetail?.map((rd) => rd[0]);
-      this.orderService.update(order);
-
       // res.send('order created..');
     } catch (err) {
       console.log(JSON.stringify(err));
