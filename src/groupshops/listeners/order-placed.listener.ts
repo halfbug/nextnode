@@ -315,11 +315,6 @@ export class OrderPlacedListener {
         store: {
           shop,
           accessToken,
-          activeCampaign: {
-            id: campaignId,
-            salesTarget: { rewards },
-            products: campaignProducts,
-          } = { id: null, salesTarget: { rewards: null }, products: [] },
           drops: { rewards: { baseline, average, maximum } } = {
             rewards: {
               baseline: '0',
@@ -348,108 +343,15 @@ export class OrderPlacedListener {
       //   newLineItems,
       // );
 
-      const title = OrderPlacedListener.formatTitle(name);
-      const expires = OrderPlacedListener.addDays(new Date(), 14);
-      let ownerDiscount = false;
       //check order price is greater than $1
       if (+totalProductPrice > 1) {
-        let ugroupshop = null;
-        let pgroupshop = null;
-        let cgroupshop = null;
         let dgroupshop = null;
         if (discountCode) {
-          // const updateGroupshop = await this.gsService.findOne(discountCode);
-          ugroupshop = new UpdateGroupshopInput();
-          cgroupshop = new UpdateChannelGroupshopInput();
-          dgroupshop = new UpdateDropsGroupshopInput();
-          ugroupshop = await this.gsService.findOneWithLineItems(discountCode);
-          pgroupshop = await this.partnerSrv.findOne(discountCode);
-          cgroupshop = await this.channelGSService.findChannelGS(discountCode);
           dgroupshop = await this.dropsService.findDropsGS(discountCode);
         } else {
           dgroupshop = await this.dropsService.findOne(gsId);
         }
-        if (ugroupshop) {
-          console.log('🚀 ugroupshop groupshop', ugroupshop);
-          const {
-            discountCode: { title, priceRuleId },
-            createdAt,
-            expiredAt,
-            id,
-            dealProducts,
-          } = ugroupshop;
-          this.groupshop = ugroupshop as Groupshops;
-          const totalCampaignProducts = campaignProducts.concat(
-            dealProducts?.map((p: { productId: any }) => p.productId) || [],
-          );
-
-          gsMember.role = RoleTypeEnum.referral;
-          gsMember.availedDiscount = parseFloat(
-            ugroupshop.discountCode.percentage,
-          );
-          ugroupshop.members = [...ugroupshop.members, gsMember];
-
-          this.addedRef.groupshop = this.groupshop;
-          this.addedRef.groupshopId = id;
-          this.addedRef.emit();
-
-          ugroupshop.dealProducts = dealProducts;
-          ugroupshop.totalProducts = totalCampaignProducts.length;
-          ugroupshop.members = await this.setPreviousMembersRefund(
-            ugroupshop.members,
-            ugroupshop.discountCode,
-          );
-
-          const newDiscount = this.getNextMemberDiscount(
-            ugroupshop.members.length,
-            rewards,
-          );
-
-          if (!!newDiscount) {
-            ugroupshop.discountCode = await this.shopifyapi.setDiscountCode(
-              shop,
-              'Update',
-              accessToken,
-              title,
-              parseInt(newDiscount),
-              totalCampaignProducts,
-              createdAt,
-              expiredAt,
-              priceRuleId,
-            );
-            const gsMilestone = new MilestoneInput();
-            gsMilestone.activatedAt = new Date();
-            gsMilestone.discount = `${newDiscount}`;
-            ugroupshop.milestones = [...ugroupshop.milestones, gsMilestone];
-          }
-          await this.gsService.update(ugroupshop);
-
-          const groupshopSavedEvent = new GroupshopSavedEvent();
-          console.log('Referrer Order');
-          groupshopSavedEvent.data = event;
-          groupshopSavedEvent.post = 'no';
-          groupshopSavedEvent.groupdeal = newDiscount;
-          groupshopSavedEvent.ugroupshop = ugroupshop;
-          this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
-        } else if (pgroupshop) {
-          this.pmemberArrived.pgroupshop = pgroupshop;
-          this.pmemberArrived.order = event.order;
-          this.pmemberArrived.store = event.store;
-          this.pmemberArrived.lineItems = event.lineItems;
-          this.pmemberArrived.emit();
-          // create billing for partner
-        } else if (cgroupshop) {
-          gsMember.role = RoleTypeEnum.referral;
-          gsMember.availedDiscount = parseFloat(
-            cgroupshop.discountCode.percentage,
-          );
-          if (cgroupshop.members && cgroupshop.members.length) {
-            cgroupshop.members = [...cgroupshop.members, gsMember];
-          } else {
-            cgroupshop.members = [gsMember];
-          }
-          await this.channelGSService.update(cgroupshop.id, cgroupshop);
-        } else if (dgroupshop) {
+        if (dgroupshop) {
           this.groupshop = dgroupshop as Groupshops;
           let isExistingUser = false as boolean;
 
@@ -562,90 +464,6 @@ export class OrderPlacedListener {
           //   '🚀 ~ file: order-placed.listener.ts:488 ~ OrderPlacedListener ~ createGroupShop ~ dgroupshop',
           //   dgroupshop.milestones,
           // );
-        } else {
-          ownerDiscount = !!discountCode && true;
-          const dealProducts = newLineItems
-            .filter((item) => !campaignProducts.includes(item.product.id))
-            .map((nitem) => ({
-              productId: nitem.product.id,
-              type: ProductTypeEnum.first,
-              addedBy: customer.firstName,
-              customerIP: customer.ip,
-            }));
-          console.log(
-            '🚀 ~ file: order-placed.listener.ts ~ line 379 ~ OrderPlacedListener ~ createGroupShop ~ dealProducts',
-            dealProducts,
-          );
-          const totalCampaignProducts = campaignProducts.concat(
-            dealProducts.map((p) => p.productId),
-          );
-          const cryptURL = `/${shop.split('.')[0]}/deal/${this.crypt.encrypt(
-            title,
-          )}`;
-
-          const ownerCryptURL = `/${
-            shop.split('.')[0]
-          }/deal/${this.crypt.encrypt(title)}/owner&${this.crypt.encrypt(
-            event?.order?.name,
-          )}`;
-          const fulllink = `${this.configSevice.get('FRONT')}${cryptURL}`;
-          const exipredFulllink = `${this.configSevice.get(
-            'FRONT',
-          )}${cryptURL}/status&activated`;
-          const shortLink = await this.kalavioService.generateShortLink(
-            fulllink,
-          );
-          const exipredShortLink = await this.kalavioService.generateShortLink(
-            exipredFulllink,
-          );
-          console.log('myshort wwww: ' + shortLink);
-
-          const newGroupshop = new CreateGroupshopInput();
-          newGroupshop.storeId = id;
-          newGroupshop.campaignId = campaignId;
-          newGroupshop.discountCode = await this.shopifyapi.setDiscountCode(
-            shop,
-            'Create',
-            accessToken,
-            title,
-            parseInt(rewards[0].discount),
-            totalCampaignProducts,
-            new Date(),
-            expires,
-          );
-          newGroupshop.dealProducts = [new DealProductsInput()];
-          newGroupshop.dealProducts = dealProducts;
-          newGroupshop.totalProducts = totalCampaignProducts.length;
-          newGroupshop.url = cryptURL;
-          newGroupshop.obSettings = { ownerUrl: ownerCryptURL, step: 0 };
-          newGroupshop.shortUrl = shortLink;
-          newGroupshop.exipredShortLink = exipredShortLink;
-          newGroupshop.createdAt = new Date();
-          newGroupshop.expiredAt = expires;
-          // newGroupshop.
-          gsMember.availedDiscount = 0;
-          gsMember.role = RoleTypeEnum.owner;
-          newGroupshop.members = [gsMember];
-          const gsMilestone = new MilestoneInput();
-          gsMilestone.activatedAt = new Date();
-          gsMilestone.discount = rewards[0].discount;
-          newGroupshop.milestones = [gsMilestone];
-          // this.gsService.create(newGroupshop);
-
-          const groupshopSavedEvent = new GroupshopSavedEvent();
-          console.log('GroupshopSavedEvent Start');
-          groupshopSavedEvent.data = event;
-          groupshopSavedEvent.post = 'yes';
-          groupshopSavedEvent.groupdeal = newGroupshop;
-          this.eventEmitter.emit('groupshop.saved', groupshopSavedEvent);
-
-          const savedGs = await this.gsService.create(newGroupshop);
-          const groupShopCreated = new GroupShopCreated();
-          groupShopCreated.groupshop = savedGs;
-          groupShopCreated.store = event.store;
-          // groupShopCreated.revenue = this.totalRevenue(lineItems, 0);
-          groupShopCreated.revenue = 0;
-          this.eventEmitter.emit('groupshop.created', groupShopCreated);
         }
       }
     } catch (err) {

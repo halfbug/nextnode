@@ -143,9 +143,7 @@ export class OrderCreatedListener {
       const newOrderPlaced = new OrderPlacedEvent();
       newOrderPlaced.klaviyo = newOrder.customer;
       newOrderPlaced.order = newOrderSaved;
-      newOrderPlaced.store = await this.storesService.findOneWithActiveCampaing(
-        shop,
-      );
+      newOrderPlaced.store = await this.storesService.findOneByName(shop);
       newOrderPlaced.lineItems = lineItems;
       newOrderPlaced.gsId = whOrder.note_attributes.length
         ? whOrder.note_attributes[0]?.value
@@ -155,12 +153,7 @@ export class OrderCreatedListener {
       //   JSON.stringify(newOrderPlaced.store.activeCampaign),
       // );
 
-      if (
-        ['Active', 'ACTIVE', 'active'].includes(
-          newOrderPlaced.store.subscription.status,
-        )
-      )
-        this.eventEmitter.emit('order.placed', newOrderPlaced);
+      this.eventEmitter.emit('order.placed', newOrderPlaced);
     } catch (err) {
       Logger.error(err, OrderCreatedListener.name);
     }
