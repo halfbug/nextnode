@@ -396,6 +396,19 @@ export class InventoryService {
       {
         $lookup: {
           from: 'store',
+          localField: 'shop',
+          foreignField: 'shop',
+          as: 'store',
+        },
+      },
+      {
+        $unwind: {
+          path: '$store',
+        },
+      },
+      {
+        $lookup: {
+          from: 'store',
           localField: 'id',
           foreignField: 'collectionsToUpdate.collectionId',
           as: 'storeCollections',
@@ -424,7 +437,9 @@ export class InventoryService {
       },
       {
         $group: {
-          _id: '$id',
+          _id: {
+            collectionId: '$id',
+          },
           collectionTitle: {
             $first: '$collectionTitle',
           },
@@ -437,19 +452,42 @@ export class InventoryService {
           isSynced: {
             $first: '$isSynced',
           },
+          store: {
+            $first: '$store',
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          collections: {
+            $push: {
+              collectionTitle: '$collectionTitle',
+              collectionId: '$collectionId',
+              productCount: '$productCount',
+              isSynced: '$isSynced',
+            },
+          },
+          collectionsToUpdate: {
+            $first: '$store.collectionsToUpdate',
+          },
+        },
+      },
+      {
+        $match: {
+          'collections.collectionId': { $exists: true },
         },
       },
       {
         $project: {
-          collectionTitle: 1,
-          collectionId: 1,
-          productCount: 1,
-          isSynced: 1,
+          collections: 1,
+          collectionsToUpdate: {
+            $ifNull: ['$collectionsToUpdate', []],
+          },
           _id: 0,
         },
       },
     ];
-
     return await manager.aggregate(Inventory, agg).toArray();
   }
 

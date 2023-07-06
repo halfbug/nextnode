@@ -148,3 +148,12 @@ export class GetLocationsOutput {
   @Field(() => [String], { nullable: 'itemsAndList' })
   locations: string[];
 }
+
+@ObjectType()
+export class CollectionListOfShop {
+  @Field(() => [CollectionStatusList], { defaultValue: [] })
+  collections?: CollectionStatusList[];
+
+  @Field(() => [CollectionStatusList], { defaultValue: [] })
+  collectionsToUpdate?: CollectionStatusList[];
+}
