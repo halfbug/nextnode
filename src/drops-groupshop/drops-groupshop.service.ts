@@ -561,6 +561,7 @@ export class DropsGroupshopService {
           id: this.configService.get('DROPSTORE'),
         },
       },
+
       {
         $project: {
           store: '$$ROOT',
@@ -588,6 +589,11 @@ export class DropsGroupshopService {
           from: 'inventory',
           localField: 'bestseller.shopifyId',
           foreignField: 'id',
+          pipeline: [
+            {
+              $limit: 10,
+            },
+          ],
           as: 'bestseller',
         },
       },
@@ -645,40 +651,6 @@ export class DropsGroupshopService {
         },
       },
       {
-        $lookup: {
-          from: 'inventory',
-          localField: 'firstCategory.collections.shopifyId',
-          foreignField: 'id',
-          as: 'collections',
-        },
-      },
-      {
-        $addFields: {
-          sections: {
-            $map: {
-              input: '$firstCategory.collections',
-              as: 'col',
-              in: {
-                $mergeObjects: [
-                  '$$col',
-                  {
-                    products: {
-                      $filter: {
-                        input: '$collections',
-                        as: 'j',
-                        cond: {
-                          $eq: ['$$col.shopifyId', '$$j.id'],
-                        },
-                      },
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
-      {
         $addFields: {
           categories: {
             $map: {
@@ -732,89 +704,93 @@ export class DropsGroupshopService {
         },
       },
       {
+        $addFields: {
+          sections: '$firstCategory.collections',
+        },
+      },
+      {
+        $unwind: {
+          path: '$sections',
+        },
+      },
+      {
         $lookup: {
           from: 'inventory',
-          localField: 'sections.products.parentId',
+          localField: 'sections.shopifyId',
           foreignField: 'id',
+          pipeline: [
+            {
+              $limit: 20,
+            },
+          ],
+          as: 'collections',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'collections.parentId',
+          foreignField: 'id',
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $ne: ['$publishedAt', null],
+                    },
+                    {
+                      $eq: ['$status', 'ACTIVE'],
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              $limit: 10,
+            },
+          ],
           as: 'products',
         },
       },
       {
         $addFields: {
-          products: {
-            $filter: {
-              input: '$products',
-              as: 'j',
-              cond: {
-                $and: [
-                  {
-                    $ne: ['$$j.publishedAt', null],
-                  },
-                  {
-                    $eq: ['$$j.status', 'ACTIVE'],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
-      {
-        $addFields: {
           sections: {
-            $map: {
-              input: '$sections',
-              as: 'me',
-              in: {
-                $mergeObjects: [
-                  '$$me',
-                  {
-                    products: {
-                      $filter: {
-                        input: {
-                          $map: {
-                            input: '$$me.products',
-                            as: 'mep',
-                            in: {
-                              $arrayElemAt: [
-                                {
-                                  $filter: {
-                                    input: '$products',
-                                    as: 'j',
-                                    cond: {
-                                      $eq: ['$$mep.parentId', '$$j.id'],
-                                    },
-                                  },
-                                },
-                                0,
-                              ],
-                            },
-                          },
-                        },
-                        as: 'd',
-                        cond: {
-                          $ne: ['$$d', null],
-                        },
-                      },
-                    },
-                  },
-                ],
+            $mergeObjects: [
+              '$sections',
+              {
+                products: '$products',
               },
-            },
+            ],
           },
         },
       },
       {
-        $project: {
-          products: 1,
-          collections: 1,
-          cartSuggested: 1,
-          updatedAt: 1,
-          store: 1,
-          sections: 1,
-          firstCategory: 1,
-          categories: 1,
-          drops: 1,
+        $group: {
+          _id: '$store.id',
+          drops: {
+            $first: '$store.drops',
+          },
+          cartSuggested: {
+            $first: '$cartSuggested',
+          },
+          categories: {
+            $first: '$categories',
+          },
+          firstCategory: {
+            $first: '$firstCategory',
+          },
+          store: {
+            $first: '$store',
+          },
+          sections: {
+            $push: {
+              name: '$sections.name',
+              shopifyId: '$sections.shopifyId',
+              type: '$sections.type',
+              products: '$sections.products',
+            },
+          },
         },
       },
     ];

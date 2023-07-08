@@ -18,6 +18,8 @@ import { StoresService } from 'src/stores/stores.service';
 import { CollectionUpdateEnum } from 'src/stores/entities/store.entity';
 import { GetLocationsInput } from './dto/create-inventory.input';
 import { ShopifyService } from 'src/shopify-store/shopify/shopify.service';
+import { ProductsPaginated } from './entities/products-paginated.entity';
+import { ProductsPaginatedArgs } from './dto/products-paginated.input';
 @UseGuards(AuthGuard)
 @Resolver(() => Inventory)
 export class InventoryResolver {
@@ -140,6 +142,18 @@ export class InventoryResolver {
     );
 
     return { locations };
+  }
+
+  @Public()
+  @Query(() => ProductsPaginated, { name: 'getPaginatedProducts' })
+  async getDrops(@Args('productArgs') productArgs: ProductsPaginatedArgs) {
+    console.log(
+      '🚀 ~ file: inventory.resolver.ts:145 ~ InventoryResolver ~ getDrops ~ productArgs:',
+      productArgs,
+    );
+    return await this.inventoryService.getPaginatedProductsByCollectionIDs(
+      productArgs,
+    );
   }
   // @Mutation(() => Inventory)
   // updateInventory(

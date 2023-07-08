@@ -17,6 +17,7 @@ import { Document } from 'flexsearch';
 import * as fs from 'fs';
 import { CollectionUpdateEnum } from 'src/stores/entities/store.entity';
 import { DropsCategoryService } from 'src/drops-category/drops-category.service';
+import { PaginationService } from 'src/utils/pagination.service';
 
 const options = {
   tokenize: function (str) {
@@ -64,6 +65,7 @@ export class InventoryService {
     @Inject(forwardRef(() => DropsCategoryService))
     private dropsCategoryService: DropsCategoryService,
     private httpService: HttpService,
+    private paginateService: PaginationService,
   ) {
     this.inventoryManager = getMongoManager();
     // this.inventoryManager = getMongoManager();
@@ -1298,4 +1300,78 @@ export class InventoryService {
     }
     return index;
   };
+
+  async getPaginatedProductsByCollectionIDs({ pagination, collection_id }) {
+    const manager = getMongoManager();
+    const { skip, take } = pagination;
+    const agg: any = [
+      {
+        $match: {
+          id: collection_id,
+        },
+      },
+      {
+        $sort: {
+          _id: 1,
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          localField: 'parentId',
+          foreignField: 'id',
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $ne: ['$publishedAt', null],
+                    },
+                    {
+                      $eq: ['$status', 'ACTIVE'],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'products',
+        },
+      },
+      {
+        $unwind: {
+          path: '$products',
+        },
+      },
+      {
+        $replaceRoot: {
+          newRoot: '$products',
+        },
+      },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: take,
+      },
+    ];
+    const result = await manager.aggregate(Inventory, agg).toArray();
+    agg.pop();
+    agg.pop();
+    agg.push({
+      $count: 'total',
+    });
+    const prodcount = await manager.aggregate(Inventory, agg).toArray();
+    const total = prodcount[0]?.total ?? 0;
+    return {
+      result,
+      pageInfo: this.paginateService.paginate(result, total, take, skip),
+    };
+    // console.log(
+    //   '🚀 ~ file: inventory.service.ts:1328 ~ InventoryService ~ getPaginatedProductsByCollectionIDs ~ res:',
+    //   res[0],
+    // );
+    // return res;
+  }
 }
