@@ -807,108 +807,76 @@ export class DropsGroupshopService {
         },
       },
       {
+        $addFields: {
+          sections: '$collections',
+        },
+      },
+      {
+        $unwind: {
+          path: '$sections',
+        },
+      },
+      {
         $lookup: {
           from: 'inventory',
           localField: 'collections.shopifyId',
           foreignField: 'id',
-          as: 'result',
-        },
-      },
-      {
-        $addFields: {
-          sections: {
-            $map: {
-              input: '$collections',
-              as: 'col',
-              in: {
-                $mergeObjects: [
-                  '$$col',
-                  {
-                    products: {
-                      $filter: {
-                        input: '$result',
-                        as: 'j',
-                        cond: {
-                          $eq: ['$$col.shopifyId', '$$j.id'],
-                        },
-                      },
-                    },
-                  },
-                ],
-              },
+          pipeline: [
+            {
+              $limit: 12,
             },
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'sections.products.parentId',
-          foreignField: 'id',
+          ],
           as: 'products',
         },
       },
       {
-        $addFields: {
-          products: {
-            $filter: {
-              input: '$products',
-              as: 'j',
-              cond: {
-                $and: [
-                  {
-                    $ne: ['$$j.publishedAt', null],
-                  },
-                  {
-                    $eq: ['$$j.status', 'ACTIVE'],
-                  },
-                ],
+        $lookup: {
+          from: 'inventory',
+          localField: 'products.parentId',
+          foreignField: 'id',
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $ne: ['$publishedAt', null],
+                    },
+                    {
+                      $eq: ['$status', 'ACTIVE'],
+                    },
+                  ],
+                },
               },
             },
-          },
+            {
+              $limit: 10,
+            },
+          ],
+          as: 'products',
         },
       },
       {
-        $addFields: {
+        $group: {
+          _id: '$categoryId',
+          collections: {
+            $first: '$collections',
+          },
+          sortOrder: {
+            $first: '$sortOrder',
+          },
+          title: {
+            $first: '$title',
+          },
+          parentId: {
+            $first: '$parentId',
+          },
           sections: {
-            $map: {
-              input: '$sections',
-              as: 'me',
-              in: {
-                $mergeObjects: [
-                  '$$me',
-                  {
-                    products: {
-                      $filter: {
-                        input: {
-                          $map: {
-                            input: '$$me.products',
-                            as: 'mep',
-                            in: {
-                              $arrayElemAt: [
-                                {
-                                  $filter: {
-                                    input: '$products',
-                                    as: 'j',
-                                    cond: {
-                                      $eq: ['$$mep.parentId', '$$j.id'],
-                                    },
-                                  },
-                                },
-                                0,
-                              ],
-                            },
-                          },
-                        },
-                        as: 'd',
-                        cond: {
-                          $ne: ['$$d', null],
-                        },
-                      },
-                    },
-                  },
-                ],
-              },
+            $push: {
+              name: '$sections.name',
+              shopifyId: '$sections.shopifyId',
+              type: '$sections.type',
+              products: '$products',
             },
           },
         },

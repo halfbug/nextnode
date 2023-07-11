@@ -147,10 +147,10 @@ export class InventoryResolver {
   @Public()
   @Query(() => ProductsPaginated, { name: 'getPaginatedProducts' })
   async getDrops(@Args('productArgs') productArgs: ProductsPaginatedArgs) {
-    console.log(
-      '🚀 ~ file: inventory.resolver.ts:145 ~ InventoryResolver ~ getDrops ~ productArgs:',
-      productArgs,
-    );
+    // console.log(
+    //   '🚀 ~ file: inventory.resolver.ts:145 ~ InventoryResolver ~ getDrops ~ productArgs:',
+    //   productArgs,
+    // );
     return await this.inventoryService.getPaginatedProductsByCollectionIDs(
       productArgs,
     );
