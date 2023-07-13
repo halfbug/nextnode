@@ -819,7 +819,7 @@ export class DropsGroupshopService {
       {
         $lookup: {
           from: 'inventory',
-          localField: 'collections.shopifyId',
+          localField: 'sections.shopifyId',
           foreignField: 'id',
           pipeline: [
             {
