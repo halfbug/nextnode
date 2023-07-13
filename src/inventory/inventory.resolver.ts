@@ -66,6 +66,12 @@ export class InventoryResolver {
     return this.inventoryService.findProductById(id);
   }
 
+  @Public()
+  @Query(() => Product, { name: 'PlatformFeeById' })
+  findPlatformFeeById() {
+    return this.inventoryService.findPlatformFeeById();
+  }
+
   @Query(() => Inventory, { name: 'inventory' })
   findOne(@Args('shop') shop: string, @Args('recordType') recordType: string) {
     return this.inventoryService.findOne(shop, recordType);

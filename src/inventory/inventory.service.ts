@@ -18,6 +18,7 @@ import * as fs from 'fs';
 import { CollectionUpdateEnum } from 'src/stores/entities/store.entity';
 import { DropsCategoryService } from 'src/drops-category/drops-category.service';
 import { PaginationService } from 'src/utils/pagination.service';
+import { ConfigService } from '@nestjs/config';
 
 const options = {
   tokenize: function (str) {
@@ -66,6 +67,7 @@ export class InventoryService {
     private dropsCategoryService: DropsCategoryService,
     private httpService: HttpService,
     private paginateService: PaginationService,
+    private configService: ConfigService,
   ) {
     this.inventoryManager = getMongoManager();
     // this.inventoryManager = getMongoManager();
@@ -612,6 +614,105 @@ export class InventoryService {
   }
 
   async findProductById(id: string) {
+    const manager = getMongoManager();
+    const agg = [
+      {
+        $match: {
+          id,
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          let: {
+            pid: '$id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ['$$pid', '$parentId'],
+                    },
+                    {
+                      $eq: ['$recordType', 'ProductVariant'],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'variants',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          let: {
+            pid: '$id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ['$$pid', '$parentId'],
+                    },
+                    {
+                      $eq: ['$recordType', 'ProductImage'],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'images',
+        },
+      },
+      {
+        $lookup: {
+          from: 'inventory',
+          let: {
+            pid: '$id',
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ['$$pid', '$parentId'],
+                    },
+                    {
+                      $eq: ['$recordType', 'ProductVideo'],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'videos',
+        },
+      },
+    ];
+    const res = await manager.aggregate(Inventory, agg).toArray();
+    // console.log(
+    //   '🚀 ~ file: inventory.service.ts ~ line 329 ~ InventoryService ~ findProductById ~ res',
+    //   res[0].length,
+    //   res[0],
+    // );
+    // console.log('🎈 res[0]', res[0]);
+    return res.length && res[0].status !== 'ACTIVE'
+      ? { ...res[0], outofstock: true }
+      : res[0];
+
+    // return await manager.aggregate(Inventory, agg).toArray();
+  }
+
+  async findPlatformFeeById() {
+    const id = this.configService.get('PLATFORM_FEE_ID');
     const manager = getMongoManager();
     const agg = [
       {
