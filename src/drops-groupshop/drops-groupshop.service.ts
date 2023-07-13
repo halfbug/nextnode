@@ -862,6 +862,9 @@ export class DropsGroupshopService {
           collections: {
             $first: '$collections',
           },
+          categoryId: {
+            $first: '$categoryId',
+          },
           sortOrder: {
             $first: '$sortOrder',
           },
