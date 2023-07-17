@@ -61,7 +61,7 @@ export class BillingUsageCargeCron {
     }
   }
 
-  @Cron('0 59 23 * * *') // CronExpression.EVERY_DAY_AT_5PM) ///EVERY_DAY_AT_6AM) // EVERY_10_SECONDS)
+  // @Cron('0 59 23 * * *') // CronExpression.EVERY_DAY_AT_5PM) ///EVERY_DAY_AT_6AM) // EVERY_10_SECONDS)
   async handleBillingCron() {
     try {
       if (this.configService.get('BILLING_LIVE') === 'false')

@@ -15,7 +15,7 @@ export class StoreUpdatePlanCron {
 
   // @Cron('0 59 23 * * *')
   // @Cron(CronExpression.EVERY_DAY_AT_1AM)
-  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  // @Cron(CronExpression.EVERY_DAY_AT_1AM)
   async handleCron() {
     this.logger.log(
       'Called for daily cron for store plan check',
