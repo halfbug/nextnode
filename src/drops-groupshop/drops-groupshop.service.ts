@@ -192,34 +192,34 @@ export class DropsGroupshopService {
       {
         $match: {
           id: dropsId,
+          status: 'active',
         },
+      },
+      {
+        $limit: 1,
       },
       {
         $lookup: {
           from: 'inventory',
           localField: 'favorite',
           foreignField: 'id',
-          as: 'favorite',
-        },
-      },
-      {
-        $addFields: {
-          favorite: {
-            $filter: {
-              input: '$favorite',
-              as: 'j',
-              cond: {
-                $and: [
-                  {
-                    $ne: ['$$j.publishedAt', null],
-                  },
-                  {
-                    $eq: ['$$j.status', 'ACTIVE'],
-                  },
-                ],
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $ne: ['$publishedAt', null],
+                    },
+                    {
+                      $eq: ['$status', 'ACTIVE'],
+                    },
+                  ],
+                },
               },
             },
-          },
+          ],
+          as: 'favorite',
         },
       },
       {

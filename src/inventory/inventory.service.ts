@@ -1403,72 +1403,85 @@ export class InventoryService {
   };
 
   async getPaginatedProductsByCollectionIDs({ pagination, collection_id }) {
-    const manager = getMongoManager();
-    const { skip, take } = pagination;
-    const agg: any = [
-      {
-        $match: {
-          id: collection_id,
+    try {
+      const manager = getMongoManager();
+      const { skip, take } = pagination;
+      const agg: any = [
+        {
+          $match: {
+            id: collection_id,
+          },
         },
-      },
-      {
-        $sort: {
-          _id: 1,
-        },
-      },
-      {
-        $lookup: {
-          from: 'inventory',
-          localField: 'parentId',
-          foreignField: 'id',
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    {
-                      $ne: ['$publishedAt', null],
-                    },
-                    {
-                      $eq: ['$status', 'ACTIVE'],
-                    },
-                  ],
+        // {
+        //   $sort: {
+        //     _id: 1,
+        //   },
+        // },
+        {
+          $lookup: {
+            from: 'inventory',
+            localField: 'parentId',
+            foreignField: 'id',
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      {
+                        $ne: ['$publishedAt', null],
+                      },
+                      {
+                        $eq: ['$status', 'ACTIVE'],
+                      },
+                    ],
+                  },
                 },
               },
-            },
-          ],
-          as: 'products',
+            ],
+            as: 'products',
+          },
         },
-      },
-      {
-        $unwind: {
-          path: '$products',
+        {
+          $unwind: {
+            path: '$products',
+          },
         },
-      },
-      {
-        $replaceRoot: {
-          newRoot: '$products',
+        {
+          $replaceRoot: {
+            newRoot: '$products',
+          },
         },
-      },
-      {
-        $skip: skip,
-      },
-      {
-        $limit: take,
-      },
-    ];
-    const result = await manager.aggregate(Inventory, agg).toArray();
-    agg.pop();
-    agg.pop();
-    agg.push({
-      $count: 'total',
-    });
-    const prodcount = await manager.aggregate(Inventory, agg).toArray();
-    const total = prodcount[0]?.total ?? 0;
-    return {
-      result,
-      pageInfo: this.paginateService.paginate(result, total, take, skip),
-    };
+        {
+          $skip: skip,
+        },
+        {
+          $limit: take,
+        },
+      ];
+      const result = await manager.aggregate(Inventory, agg).toArray();
+      agg.pop();
+      agg.pop();
+      agg.push({
+        $count: 'total',
+      });
+      const prodcount = await manager.aggregate(Inventory, agg).toArray();
+      const total = prodcount[0]?.total ?? 0;
+      Logger.log(
+        `Products paginated for collection (${collection_id}) `,
+        'PAGINATE_PRODUCTS',
+        true,
+      );
+      return {
+        result,
+        pageInfo: this.paginateService.paginate(result, total, take, skip),
+      };
+    } catch (err) {
+      Logger.error(
+        `Failed to paginate products for collection (${collection_id}) : ${err}`,
+        'PAGINATE_PRODUCTS',
+        true,
+      );
+    }
     // console.log(
     //   '🚀 ~ file: inventory.service.ts:1328 ~ InventoryService ~ getPaginatedProductsByCollectionIDs ~ res:',
     //   res[0],
