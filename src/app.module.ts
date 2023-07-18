@@ -72,13 +72,15 @@ import AdminActivityLogs from './admin-activity-logs/entities/admin-activity-log
 
       useFactory: async (configservice: ConfigService) => {
         console.log(configservice.get('DB_URL'));
-        console.log(configservice.get('STAGE'));
 
         return {
           type: 'mongodb',
           url: configservice.get('DB_URL'),
           synchronize: true,
           useUnifiedTopology: true,
+          useNewUrlParser: true,
+          // logging: true,
+
           // entities: [__dirname + './**/*.modal.ts'],
           entities: [
             Store,

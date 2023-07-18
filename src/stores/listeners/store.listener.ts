@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 // import moment from 'moment';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -105,5 +105,10 @@ export class StoreListener {
       this.planUpdateEvent.revenue = event.revenue;
       this.planUpdateEvent.emit();
     }
+  }
+
+  @OnEvent('error')
+  errorInEvent(err: any) {
+    Logger.error(err, StoreListener.name);
   }
 }
