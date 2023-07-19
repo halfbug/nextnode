@@ -115,6 +115,7 @@ export class DropsGroupshopResolver {
         discountCode: updatedDiscountCode ?? groupshop.discountCode,
         expiredAt: newExpiredate,
         id: groupshop.id,
+        oldStatus: groupshop.status,
       },
       Dcode,
     );

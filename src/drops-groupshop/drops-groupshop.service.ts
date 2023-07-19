@@ -894,11 +894,17 @@ export class DropsGroupshopService {
     updateGroupshopInput: UpdateDropsGroupshopInput,
     code: string,
   ) {
-    const { id } = updateGroupshopInput;
-
+    const { id, oldStatus } = updateGroupshopInput;
+    delete updateGroupshopInput.oldStatus;
     delete updateGroupshopInput.id;
     await this.DropsGroupshopRepository.update(
-      { id, status: 'pending' },
+      {
+        id,
+        status: oldStatus,
+        customerDetail: {
+          klaviyoId: updateGroupshopInput.customerDetail.klaviyoId,
+        },
+      },
       updateGroupshopInput,
     );
     return await this.findDropsGS(code);
