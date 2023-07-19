@@ -299,9 +299,11 @@ export class ThemeAppExtensionController {
       const { shop, bestsellerCollectionId } = req.body;
 
       const bestSellerProducts =
-        await this.inventoryService.getProductsByCollectionIDs(shop, [
-          bestsellerCollectionId,
-        ]);
+        await this.inventoryService.getProductsByCollectionIDs(
+          shop,
+          [bestsellerCollectionId],
+          true,
+        );
 
       res.send(JSON.stringify({ products: bestSellerProducts }));
     } catch (err) {

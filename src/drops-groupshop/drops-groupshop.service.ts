@@ -1129,9 +1129,11 @@ export class DropsGroupshopService {
     const { id } = await this.storesService.findOne(shop);
     const collections = await this.dropsCategoryService.getSVCollectionIDs(id);
     return await (
-      await this.inventoryService.getProductsByCollectionIDs(shop, [
-        ...new Set(collections),
-      ])
+      await this.inventoryService.getProductsByCollectionIDs(
+        shop,
+        [...new Set(collections)],
+        false,
+      )
     ).map((p: Product) => p.id);
   }
 

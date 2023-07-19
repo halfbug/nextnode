@@ -907,9 +907,32 @@ export class InventoryService {
   }
 
   // find specific collection products
-  async getProductsByCollectionIDs(shop: string, ids: string[]) {
+  async getProductsByCollectionIDs(shop: string, ids: string[], limit) {
     const manager = getMongoManager();
-    const agg = [
+    const pipeline: any[] = [
+      {
+        $match: {
+          $expr: {
+            $and: [
+              {
+                $ne: ['$publishedAt', null],
+              },
+              {
+                $eq: ['$status', 'ACTIVE'],
+              },
+              {
+                $ne: ['$outofstock', true],
+              },
+            ],
+          },
+        },
+      },
+    ];
+    if (limit) {
+      pipeline.push({ $limit: 15 });
+    }
+
+    const agg: any[] = [
       {
         $match: {
           shop,
@@ -924,31 +947,32 @@ export class InventoryService {
           localField: 'parentId',
           foreignField: 'id',
           as: 'products',
+          pipeline,
         },
       },
-      {
-        $addFields: {
-          products: {
-            $filter: {
-              input: '$products',
-              as: 'j',
-              cond: {
-                $and: [
-                  {
-                    $ne: ['$$j.publishedAt', null],
-                  },
-                  {
-                    $ne: ['$$j.outofstock', true],
-                  },
-                  {
-                    $eq: ['$$j.status', 'ACTIVE'],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      },
+      // {
+      //   $addFields: {
+      //     products: {
+      //       $filter: {
+      //         input: '$products',
+      //         as: 'j',
+      //         cond: {
+      //           $and: [
+      //             {
+      //               $ne: ['$$j.publishedAt', null],
+      //             },
+      //             {
+      //               $ne: ['$$j.outofstock', true],
+      //             },
+      //             {
+      //               $eq: ['$$j.status', 'ACTIVE'],
+      //             },
+      //           ],
+      //         },
+      //       },
+      //     },
+      //   },
+      // },
       {
         $unwind: {
           path: '$products',
@@ -968,6 +992,7 @@ export class InventoryService {
         },
       },
     ];
+
     const res = await manager.aggregate(Inventory, agg).toArray();
     return [...new Set(res[0].products)];
   }
@@ -1375,6 +1400,7 @@ export class InventoryService {
       const collectionProducts = await this.getProductsByCollectionIDs(
         shop,
         collectionIds,
+        false,
       );
       collectionProducts.forEach((product: any) => {
         if (!filterProducts.includes(product.id)) {

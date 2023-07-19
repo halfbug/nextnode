@@ -993,7 +993,7 @@ export class StoresService {
     // const spotlightProducts =
     //   await this.inventoryService.getProductsByCollectionIDs(shop, [
     //     spotlightColletionId,
-    //   ]);
+    //   ], false);
 
     const discountCode = await this.shopifyapi.setAutomaticDiscountCode(
       shop,
