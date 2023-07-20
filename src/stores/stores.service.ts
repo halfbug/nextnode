@@ -85,7 +85,7 @@ export class StoresService {
   }
   findWithCollectionUpdate() {
     return this.storeRepository.find({
-      where: { collectionsToUpdate: { $exists: true } },
+      where: { collectionsToUpdate: { $exists: true }, status: 'Active' },
     });
   }
 

@@ -24,25 +24,27 @@ export class SyncCollectionCron {
       try {
         const stores = await this.storeService.findWithCollectionUpdate();
         for (const store of stores) {
-          if (!store.collectionsToUpdate?.length) {
-            Logger.log(
-              `No collections to update in store ${store.shop}`,
-              'SYNC_COLLECTION_CRON',
-              true,
-            );
-            continue;
-          } else {
-            Logger.log(
-              `Sync Collection CRON Started (${store.collectionsToUpdate?.length} needs to update in store ${store.shop})`,
-              'SYNC_COLLECTION_CRON',
-              true,
-            );
+          if (store?.drops && store?.drops?.status == 'Active') {
+            if (!store.collectionsToUpdate?.length) {
+              Logger.log(
+                `No collections to update in store ${store.shop}`,
+                'SYNC_COLLECTION_CRON',
+                true,
+              );
+              continue;
+            } else {
+              Logger.log(
+                `Sync Collection CRON Started (${store.collectionsToUpdate?.length} needs to update in store ${store.shop})`,
+                'SYNC_COLLECTION_CRON',
+                true,
+              );
 
-            this.storeService.updateStore(store.id, {
-              collectionUpdateStatus: CollectionUpdateEnum.PROGRESS,
-              id: store.id,
-            });
-            await this.inventryService.runSyncCollectionCron(store);
+              this.storeService.updateStore(store.id, {
+                collectionUpdateStatus: CollectionUpdateEnum.PROGRESS,
+                id: store.id,
+              });
+              await this.inventryService.runSyncCollectionCron(store);
+            }
           }
         }
       } catch (error) {

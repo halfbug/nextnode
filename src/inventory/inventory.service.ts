@@ -1078,24 +1078,25 @@ export class InventoryService {
   async runSyncCollectionCron(store: any) {
     try {
       const { shop, accessToken, collectionsToUpdate, id } = store;
-      const client = await this.shopifyService.client(shop, accessToken);
+      if (store?.drops && store?.drops?.status == 'Active') {
+        const client = await this.shopifyService.client(shop, accessToken);
 
-      if (!collectionsToUpdate.length) {
-        log('No collections to update');
-      }
+        if (!collectionsToUpdate.length) {
+          log('No collections to update');
+        }
 
-      const queryString = collectionsToUpdate
-        .map((collection) => {
-          if (collection.isSynced === false) {
-            return `(title:${collection.collectionTitle})`;
-          }
-        })
-        .join(' OR ');
+        const queryString = collectionsToUpdate
+          .map((collection) => {
+            if (collection.isSynced === false) {
+              return `(title:${collection.collectionTitle})`;
+            }
+          })
+          .join(' OR ');
 
-      await client
-        .query({
-          data: {
-            query: `mutation {
+        await client
+          .query({
+            data: {
+              query: `mutation {
     bulkOperationRunQuery(
       query:"""
       {
@@ -1143,17 +1144,18 @@ export class InventoryService {
       }
     }
   }`,
-          },
-        })
-        .then((res) => {
-          const bulkOperationId =
-            res.body['data']['bulkOperationRunQuery']['bulkOperation']['id'];
-          Logger.log(
-            `collection to update bulk register with id - ${bulkOperationId}`,
-            'COLLECTIONTOUPDATBULK',
-            true,
-          );
-        });
+            },
+          })
+          .then((res) => {
+            const bulkOperationId =
+              res.body['data']['bulkOperationRunQuery']['bulkOperation']['id'];
+            Logger.log(
+              `collection to update bulk register with id - ${bulkOperationId}`,
+              'COLLECTIONTOUPDATBULK',
+              true,
+            );
+          });
+      }
     } catch (err) {
       Logger.error(err, 'SYNC_COLLECTION_SERVICE');
     }
